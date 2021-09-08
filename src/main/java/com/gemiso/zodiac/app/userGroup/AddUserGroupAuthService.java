@@ -1,0 +1,110 @@
+package com.gemiso.zodiac.app.userGroup;
+
+import com.gemiso.zodiac.app.appAuth.AppAuth;
+import com.gemiso.zodiac.app.appAuth.AppAuthRepository;
+import com.gemiso.zodiac.app.appAuth.dto.AppAuthDTO;
+import com.gemiso.zodiac.app.appAuth.mapper.AppAuthMapper;
+import com.gemiso.zodiac.app.userGroup.dto.UserGroupAuthCreateDTO;
+import com.gemiso.zodiac.app.userGroup.dto.UserGroupAuthDTO;
+import com.gemiso.zodiac.app.userGroup.dto.UserGroupDTO;
+import com.gemiso.zodiac.app.userGroup.mapper.UserGroupAuthMapper;
+import com.gemiso.zodiac.app.userGroup.mapper.UserGroupMapper;
+import com.gemiso.zodiac.exception.ResourceNotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@Log4j2
+@RequiredArgsConstructor
+@Transactional
+public class AddUserGroupAuthService {
+
+    private final UserGroupRepository userGroupRepository;
+    private final UserGroupAuthRepository userGroupAuthRepository;
+    private final AppAuthRepository appAuthRepository;
+
+    private final UserGroupMapper userGroupMapper;
+    private final AppAuthMapper appAuthMapper;
+    private final UserGroupAuthMapper userGroupAuthMapper;
+
+    public UserGroupDTO find(Long userGrpId) {
+
+        UserGroup userGroup = userGrouupFindOrFail(userGrpId);
+
+        UserGroupDTO userGroupDTO = userGroupMapper.toDto(userGroup);
+
+        List<UserGroupAuth> userGroupAuthList = userGroupAuthRepository.findByUserGrpId(userGrpId);
+
+        if (!CollectionUtils.isEmpty(userGroupAuthList)) {
+
+            List<UserGroupAuthDTO> userGroupAuthDTOList = userGroupAuthMapper.dtoList(userGroupAuthList);
+
+            //맵핑테이블에 그룹권한 정보만 빼서 보여주기 위함
+            List<UserGroupAuthDTO> returnUserGroupAuthDTOS = new ArrayList<>();
+
+            for (UserGroupAuthDTO userGroupAuthDTO : userGroupAuthDTOList) {
+                UserGroupAuthDTO userGroupAuthDto = new UserGroupAuthDTO();
+                userGroupAuthDto.setAppAuth(userGroupAuthDTO.getAppAuth());
+                returnUserGroupAuthDTOS.add(userGroupAuthDto);
+            }
+            userGroupDTO.setUserGroupAuthDTOS(returnUserGroupAuthDTOS);
+        }
+
+        return userGroupDTO;
+    }
+
+    public void create(List<UserGroupAuthCreateDTO> userGroupAuthCreateDTO,
+                       Long UserGrpId) {
+
+        UserGroup userGroup = userGrouupFindOrFail(UserGrpId);
+        UserGroupDTO userGroupDTO = userGroupMapper.toDto(userGroup);
+
+        List<UserGroupAuth> userGroupAuthList = userGroupAuthRepository.findByUserGrpId(UserGrpId);
+
+        if (!CollectionUtils.isEmpty(userGroupAuthList)) {
+            for (UserGroupAuth userGroupAuths : userGroupAuthList) {
+                Long userGroupAuthId = userGroupAuths.getId();
+
+                userGroupAuthRepository.deleteById(userGroupAuthId);
+            }
+        }
+
+        if (!CollectionUtils.isEmpty(userGroupAuthCreateDTO)) {
+
+            UserGroupAuthDTO userGroupAuthDTO = new UserGroupAuthDTO();
+
+            for (UserGroupAuthCreateDTO userGroupAuthCreateDTOs : userGroupAuthCreateDTO) {
+                Long userGroupAuthId = userGroupAuthCreateDTOs.getAppAuthId();
+
+                AppAuth appAuthEntity = appAuthFindOrFail(userGroupAuthId);
+                AppAuthDTO appAuthDTO = appAuthMapper.toDto(appAuthEntity);
+
+                userGroupAuthDTO.setUserGroup(userGroupDTO);
+                userGroupAuthDTO.setAppAuth(appAuthDTO);
+
+                UserGroupAuth userGroupAuth = userGroupAuthMapper.toEntity(userGroupAuthDTO);
+                userGroupAuthRepository.save(userGroupAuth);
+            }
+        }
+    }
+
+    public UserGroup userGrouupFindOrFail(Long userGrpId) {
+
+        return userGroupRepository.findById(userGrpId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserGroupId not found. UserGroupId : " + userGrpId));
+
+    }
+
+    public AppAuth appAuthFindOrFail(Long userGroupAuthId) {
+
+        return appAuthRepository.findById(userGroupAuthId)
+                .orElseThrow(() -> new ResourceNotFoundException("AppAuthId not found. userGroupAuthId : " + userGroupAuthId));
+
+    }
+}

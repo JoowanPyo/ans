@@ -1,0 +1,37 @@
+package com.gemiso.zodiac.app.userGroup;
+
+import com.gemiso.zodiac.app.userGroup.dto.UserGroupAuthCreateDTO;
+import com.gemiso.zodiac.app.userGroup.dto.UserGroupDTO;
+import com.gemiso.zodiac.core.response.ApiResponse;
+import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@Api(description = "유저그룹 권한 추가,수정 API")
+@RestController
+@RequestMapping("/userGroups")
+@Log4j2
+@RequiredArgsConstructor
+public class AddUserGroupAuthController {
+
+    private final AddUserGroupAuthService addUserGroupAuthService;
+
+    @Operation(summary = "사용자그룹 권한 등록", description = "사용자그룹 권한 등록")
+    @PostMapping(path = "/{userGrpId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<UserGroupDTO> create(@Parameter(name = "userGroupAuthCreateDTOList", required = true) @RequestBody List<UserGroupAuthCreateDTO> userGroupAuthCreateDTOList,
+                                            @Parameter(name = "userGrpId", required = true) @PathVariable("userGrpId") Long userGrpId) {
+
+        addUserGroupAuthService.create(userGroupAuthCreateDTOList, userGrpId);
+
+        UserGroupDTO userGroupDTO = addUserGroupAuthService.find(userGrpId);
+
+        return new ApiResponse<>(userGroupDTO);
+    }
+}

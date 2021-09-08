@@ -1,0 +1,109 @@
+plugins {
+    id 'org.springframework.boot' version '2.5.3'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10" //querydsl
+    id 'java'
+    id 'war'
+}
+
+group = 'com.gemiso'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    compileOnly 'org.projectlombok:lombok'
+    // https://mvnrepository.com/artifact/org.mapstruct/mapstruct
+    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // https://mvnrepository.com/artifact/org.mapstruct/mapstruct
+    annotationProcessor "org.mapstruct:mapstruct-processor:1.4.2.Final"
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // https://github.com/DiUS/java-faker
+    implementation 'com.github.javafaker:javafaker:1.0.2'
+    //testImplementation 'org.springframework.security:spring-security-test'
+
+    // https://github.com/auth0/java-jwt
+    //implementation 'com.auth0:java-jwt:3.18.1'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-text
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
+
+    implementation group: 'org.apache.commons', name: 'commons-io', version: '1.3.2'
+
+    /*swagger3.0*/
+    implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+
+    implementation 'com.querydsl:querydsl-jpa'
+    implementation('org.hibernate:hibernate-java8')
+
+    // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple 제이손 심플
+    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+
+    //파일 업로드
+    implementation group: 'org.jdom', name: 'jdom2', version: '2.0.6'
+    //compileOnly group: "javax.ws.rs", name: "javax.ws.rs-api", version: "2.1"
+    // https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api
+    implementation group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.0'
+
+
+
+    // war 내/외장 서블릿 컨테이너 모두에 사용 가능한 설정
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+
+}
+
+bootWar {
+    archiveName("zodiac.war")
+    archiveBaseName = 'zodiac'
+    archiveFileName = 'zodiac.war'
+    archiveVersion = "0.0.0"
+}
+/*bootJar {
+    archiveBaseName = 'zodiac'
+    archiveVersion = "0.0.0"
+}*/
+
+
+test {
+    useJUnitPlatform()
+}
+def  querydslDir = "$buildDir/generated/querydsl"
+
+querydsl{
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+
+sourceSets{
+    main.java.srcDir querydslDir
+}
+
+configurations {
+    querydsl.extendsFrom compileClasspath
+}
+
+compileQuerydsl{
+    options.annotationProcessorPath = configurations.querydsl
+}
