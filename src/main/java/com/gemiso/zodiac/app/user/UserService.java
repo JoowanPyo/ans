@@ -10,6 +10,7 @@ import com.gemiso.zodiac.app.user.mapper.UserMapper;
 import com.gemiso.zodiac.app.user.mapper.UserUpdateMapper;
 import com.gemiso.zodiac.app.userGroup.UserGroup;
 import com.gemiso.zodiac.app.userGroup.UserGroupRepository;
+import com.gemiso.zodiac.core.service.AuthAddService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +43,8 @@ public class UserService {
     private final UserGroupUserMapper userGroupUserMapper;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final AuthAddService authAddService;
 
   /*  @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -82,7 +86,7 @@ public class UserService {
 
     public UserDTO find(String userId){
 
-        User userEntity = userRepository.findByUserId(userId);
+        User userEntity = userFindOrFail(userId);
 
         UserDTO userDTO = userMapper.toDto(userEntity);
 
@@ -111,6 +115,9 @@ public class UserService {
 
         String password = encodePassword(userCreateDTO.getPwd()); //password encoding type 어떻게 할지
         userCreateDTO.setPwd(password);
+
+        String userId = authAddService.authUser.getUserId();
+        userCreateDTO.setInputrId(userId);
 
         User userEntity = userCreateMapper.toEntity(userCreateDTO);
 
@@ -161,45 +168,46 @@ public class UserService {
         return userDto;
     }*/
 
-    public UserDTO update(UserUpdateDTO userUpdateDTO, String userId) {
+    public void update(UserUpdateDTO userUpdateDTO, String userId) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found. userId : " + userId));
+        User user = userFindOrFail(userId);
 
+        String updtrId = authAddService.authUser.getUserId();
+        userUpdateDTO.setUpdtrId(updtrId);
         userUpdateDTO.setUserId(userId);
+       // User userEntity = userUpdateMapper.toEntity(userUpdateDTO);
+       // userEntity.setPwd(user.getPwd());
+        userUpdateMapper.updateFromDto(userUpdateDTO, user);
+        userRepository.save(user);
 
-        User userEntity = userUpdateMapper.toEntity(userUpdateDTO);
-
-        userEntity.setPwd(user.getPwd());
-
-        userRepository.save(userEntity);
-
-        UserDTO userDTO = userFindOrFail(userId);
-
-        return userDTO;
     }
 
 
     public void delete(String userId) {
 
-        UserDTO userDTO = userFindOrFail(userId);
+        User user = userFindOrFail(userId);
 
+        UserDTO userDTO = userMapper.toDto(user);
         userDTO.setDelYn("Y");
+        userDTO.setDelDtm(new Date());
+        String delrId = authAddService.authUser.getUserId();
+        userDTO.setDelrId(delrId);
 
-        User userEntity = userMapper.toEntity(userDTO);
+        userMapper.updateFromDto(userDTO, user);
 
-        userRepository.save(userEntity);
+        userRepository.save(user);
     }
 
 
 
-    public UserDTO userFindOrFail(String userId) {
-        User userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found. userId : " + userId));
+    public User userFindOrFail(String userId) {
+        Optional<User> userEntity = userRepository.findByUserId(userId);
 
-        UserDTO userDto = userMapper.toDto(userEntity);
+        if (!userEntity.isPresent()){
+            throw new ResourceNotFoundException("User not found. userId : " + userId);
+        }
 
-        return userDto;
+        return userEntity.get();
     }
 
 
@@ -238,8 +246,15 @@ public class UserService {
 
     public UserGroup userGroupFindOrFail(Long userGrpId){
 
-       return  userGroupRepository.findById(userGrpId)
-                .orElseThrow(() -> new ResourceNotFoundException("UserGroupId not found. userGroupId : " + userGrpId));
+       /*return  userGroupRepository.findById(userGrpId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserGroupId not found. userGroupId : " + userGrpId));*/
+        Optional<UserGroup> userGroup = userGroupRepository.findByUserGroupId(userGrpId);
+
+        if (!userGroup.isPresent()){
+            throw new ResourceNotFoundException("UserGroupId not found. userGroupId : " + userGrpId);
+        }
+
+        return userGroup.get();
     }
 
 

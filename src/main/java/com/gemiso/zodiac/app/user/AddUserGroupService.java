@@ -13,20 +13,26 @@ import com.gemiso.zodiac.app.userGroup.UserGroupRepository;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupDTO;
 import com.gemiso.zodiac.app.userGroup.mapper.UserGroupMapper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
+import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Log4j2
 @RequiredArgsConstructor
 @Transactional
 public class AddUserGroupService {
+
+    private final UserService userService;
 
     private final UserRepository userRepository;
     private final UserGroupUserRepository userGroupUserRepository;
@@ -37,7 +43,19 @@ public class AddUserGroupService {
     private final UserGroupUserMapper userGroupUserMapper;
 
 
-    public List<UserDTO> find(Long userGrpId){
+    public List<UserGroupUserDTO> findAll(Long userGrpId){
+
+        BooleanBuilder booleanBuilder = getSearch(userGrpId);
+
+        List<UserGroupUser> userGroupUsers = (List<UserGroupUser>) userGroupUserRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "id"));
+
+        List<UserGroupUserDTO> userDTOList = userGroupUserMapper.toDtoList(userGroupUsers);
+
+        return userDTOList;
+
+    }
+
+    public List<UserDTO> find(Long userGrpId) {
 
         List<User> userEntity = userRepository.findByUser(userGrpId);
 
@@ -48,8 +66,9 @@ public class AddUserGroupService {
 
     public UserDTO findUser(String userId) {
 
-        User userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found. userId : " + userId));
+        User userEntity = userService.userFindOrFail(userId);
+        /*User userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found. userId : " + userId));*/
 
         UserDTO userDTO = userMapper.toDto(userEntity);
 
@@ -74,25 +93,29 @@ public class AddUserGroupService {
         return userDTO;
     }
 
-    public void create(String userId, Long userGrpId) {
+    public void create(List<String> userIdList, Long userGrpId) {
 
-        UserDTO userDTO = userFindOrFail(userId);
+        for (String userId : userIdList) {
+            User user = userFindOrFail(userId);
+            UserDTO userDTO = userMapper.toDto(user);
 
-        UserGroup userGroupEntity = userGroupFindOrFail(userGrpId);
-        UserGroupDTO userGroupDTO = userGroupMapper.toDto(userGroupEntity);
+            UserGroup userGroupEntity = userGroupFindOrFail(userGrpId);
+            UserGroupDTO userGroupDTO = userGroupMapper.toDto(userGroupEntity);
 
-        UserGroupUserDTO userGroupUserDTO = new UserGroupUserDTO();
-        userGroupUserDTO.setUser(userDTO);
-        userGroupUserDTO.setUserGroup(userGroupDTO);
+            UserGroupUserDTO userGroupUserDTO = new UserGroupUserDTO();
+            userGroupUserDTO.setUser(userDTO);
+            userGroupUserDTO.setUserGroup(userGroupDTO);
 
-        UserGroupUser userGroupUserEntity = userGroupUserMapper.toEntity(userGroupUserDTO);
-        userGroupUserRepository.save(userGroupUserEntity);
-
+            UserGroupUser userGroupUserEntity = userGroupUserMapper.toEntity(userGroupUserDTO);
+            userGroupUserRepository.save(userGroupUserEntity);
+        }
     }
 
     public void update(List<UserToGroupUdateDTO> userToGroupUdateDTO, String userId) {
 
-        UserDTO userDTO = userFindOrFail(userId);
+        User user = userFindOrFail(userId);
+
+        UserDTO userDTO = userMapper.toDto(user);
 
         List<UserGroupUser> userGroupUserList = userGroupUserRepository.findByUserId(userId);
 
@@ -123,25 +146,34 @@ public class AddUserGroupService {
         }
     }
 
-    public void delete(List<UserGroupUserDeleteDTO> userGroupUserDeleteDTOS, Long userGrpId){
+    public void delete(List<UserGroupUserDeleteDTO> userGroupUserDeleteDTOS, Long userGrpId) {
 
-        for (UserGroupUserDeleteDTO userDeleteDTO : userGroupUserDeleteDTOS){
+        for (UserGroupUserDeleteDTO userDeleteDTO : userGroupUserDeleteDTOS) {
 
             String userId = userDeleteDTO.getUserId();
 
-            userRepository.deleteById(userId);
+            Optional<UserGroupUser> userGroupUser = userGroupUserRepository.findAllByUserId(userId, userGrpId);
+
+            if (!userGroupUser.isPresent()) {
+                throw new ResourceNotFoundException("그룹에 등록된 사용자를 찾을 수 없습니다. UserId : " + userId);
+            }
+
+            Long userGrpUserId = userGroupUser.get().getId();
+
+            userGroupUserRepository.deleteById(userGrpUserId);
 
         }
 
     }
 
-    public UserDTO userFindOrFail(String userId) {
-        User userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found. userId : " + userId));
+    public User userFindOrFail(String userId) {
+        Optional<User> userEntity = userRepository.findByUserId(userId);
 
-        UserDTO userDto = userMapper.toDto(userEntity);
+        if (!userEntity.isPresent()) {
+            throw new ResourceNotFoundException("User not found. userId : " + userId);
+        }
 
-        return userDto;
+        return userEntity.get();
     }
 
     public UserGroup userGroupFindOrFail(Long userGrpId) {
@@ -149,4 +181,18 @@ public class AddUserGroupService {
         return userGroupRepository.findById(userGrpId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserGroupId not found. userGroupId : " + userGrpId));
     }
+
+    private BooleanBuilder getSearch(Long userGrpId) {
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+        QUserGroupUser qUserGroupUser = QUserGroupUser.userGroupUser;
+
+        if(!StringUtils.isEmpty(userGrpId)){
+            booleanBuilder.and(qUserGroupUser.userGroup.userGrpId.eq(userGrpId));
+        }
+
+        return booleanBuilder;
+    }
+
 }

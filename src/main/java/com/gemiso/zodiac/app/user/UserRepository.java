@@ -6,6 +6,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, String> , QuerydslPredicateExecutor<User> {
 
@@ -14,7 +15,7 @@ public interface UserRepository extends JpaRepository<User, String> , QuerydslPr
     User getUserWithGroup(@Param("userId") String userId);
 
     @Query("select a from User a where a.userId =:userId and a.delYn = 'N'")
-    User findByUserId(@Param("userId")String userId);
+    Optional<User> findByUserId(@Param("userId")String userId);
 
     @Query("select b from UserGroupUser a left outer join User b on b.userId = a.user.userId " +
             "where a.userGroup.userGrpId = :userGrpId")

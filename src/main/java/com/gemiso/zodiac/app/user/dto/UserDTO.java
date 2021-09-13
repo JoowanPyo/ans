@@ -28,7 +28,7 @@ public class UserDTO {
     private String delrId;
     private String deptId;
     private String dutyCd;
-    private String eMail;
+    private String email;
     private String emplNo;
     private String freeYn;
     private String inphonNo;

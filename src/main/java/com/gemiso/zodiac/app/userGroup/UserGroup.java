@@ -15,7 +15,8 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString(exclude = {"userGroupUsers","groupAuth"})
+@Setter
+@ToString(exclude = {"userGroupUsers","userGroupAuths"})
 @DynamicUpdate
 public class UserGroup extends BaseEntity {
 
@@ -53,10 +54,10 @@ public class UserGroup extends BaseEntity {
     private String delrId;
 
     @OneToMany(mappedBy="userGroup")
-    private List<UserGroupUser> userGroupUsers = new ArrayList<>();
+    private List<UserGroupUser> userGroupUsers ;
 
     @OneToMany(mappedBy="userGroup")
-    private List<UserGroupAuth> userGroupAuths = new ArrayList<>();
+    private List<UserGroupAuth> userGroupAuths ;
 
     @PrePersist
     public void prePersist() {

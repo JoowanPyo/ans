@@ -17,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @ToString(exclude = "userGroupAuth")
 @DynamicUpdate
 public class AppAuth extends BaseEntity {

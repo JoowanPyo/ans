@@ -14,4 +14,7 @@ public interface CodeRepository extends JpaRepository<Code, Long> , QuerydslPred
 
     @Query("select max(a.cdOrd) from Code a where a.hrnkCdId =:hrnkCd")
     Optional<Integer> findOrd(@Param("hrnkCd")Long hrnkCd);
+
+    @Query("select a from Code a where a.cdId =:cdId and a.delYn = 'N'")
+    Optional<Code> findByCodeId(@Param("cdId")Long cdId);
 }

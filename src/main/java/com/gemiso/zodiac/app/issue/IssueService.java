@@ -66,7 +66,7 @@ public class IssueService {
 
     public IssueDTO find(Long issuId) {
 
-        Issue IssueEntity = issueRepositoy.findByIssuId(issuId);
+        Issue IssueEntity = issueFindOrFail(issuId);
 
         return issueMapper.toDto(IssueEntity);
     }
@@ -78,7 +78,6 @@ public class IssueService {
 
         issueCreateDTO.setIssuOrd(issuOrd + 1);
         issueCreateDTO.setInputrId(authAddService.authUser.getUserId());
-        issueCreateDTO.setInputDtm(new Date());
 
         Issue issue = issueCreateMapper.toEntity(issueCreateDTO);
         issueRepositoy.save(issue);
@@ -107,16 +106,24 @@ public class IssueService {
 
         issueDto.setIssuDelYn("Y");
         issueDto.setDelDtm(new Date());
-        issueDto.setDelrId("삭제자Id");
+        issueDto.setDelrId(authAddService.authUser.getUserId());
 
-        Issue issueEntity = issueMapper.toEntity(issueDto);
+        issueMapper.updateFromDto(issueDto, issue);
 
-        issueRepositoy.save(issueEntity);
+        issueRepositoy.save(issue);
     }
 
     private Issue issueFindOrFail(Long issuId) {
-        return issueRepositoy.findById(issuId)
-                .orElseThrow(() -> new ResourceNotFoundException("Issue not found. issueId : " + issuId));
+        /*return issueRepositoy.findById(issuId)
+                .orElseThrow(() -> new ResourceNotFoundException("Issue not found. issueId : " + issuId));*/
+
+        Optional<Issue> issue = issueRepositoy.findByIssuId(issuId);
+
+        if (!issue.isPresent()){
+            throw new ResourceNotFoundException("Issue not found. issueId : " + issuId);
+        }
+
+        return issue.get();
     }
 
     public BooleanBuilder getSearch(Date sdate, Date edate, String issuDelYn){
@@ -159,7 +166,7 @@ public class IssueService {
                 issueDTOCopy.setUpdtrId(issueDTO.getUpdtrId());
                 issueDTOCopy.setUpdtDtm(issueDTO.getUpdtDtm());
                 issueDTOCopy.setInputDtm(targetDate);
-                issueDTOCopy.setInputrId("copyUserId");
+                issueDTOCopy.setInputrId(authAddService.authUser.getUserId());
 
                 Issue issueEntity = issueMapper.toEntity(issueDTOCopy);
                 issueRepositoy.save(issueEntity);
@@ -193,6 +200,7 @@ public class IssueService {
 
         Date issuDtm = issueDTO.getInputDtm(); //조회한 이슈값에서 입력날짜를 통해 List 조회 sdate값을 가져온다.
 
+        // yyyy-MM-dd ss:hh:mm 형식을 yyyy-MM-dd로 변환
         Calendar cal = Calendar.getInstance();//정확한 데이터를 조회 하기위해 파싱
         String format = "yyyy-MM-dd";
         SimpleDateFormat sdf = new SimpleDateFormat(format);

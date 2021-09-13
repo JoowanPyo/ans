@@ -109,8 +109,8 @@ public class CodeService {
         codeUpdateDTO.setUpdtDtm(new Date());
         codeUpdateDTO.setUpdtrId(userId);
 
-        Code codeEntity = codeUpdateMapper.toEntity(codeUpdateDTO);
-        codeRepository.save(codeEntity);
+        codeUpdateMapper.updateFromDto(codeUpdateDTO, code);
+        codeRepository.save(code);
 
     }
 
@@ -133,8 +133,15 @@ public class CodeService {
 
     public Code codeFindOrFail(Long cdId){
 
-        return codeRepository.findById(cdId)
-                .orElseThrow(() -> new ResourceNotFoundException("CodeId not found. CodeId : " + cdId));
+        /*return codeRepository.findById(cdId)
+                .orElseThrow(() -> new ResourceNotFoundException("CodeId not found. CodeId : " + cdId));*/
+
+        Optional<Code> code = codeRepository.findByCodeId(cdId);
+
+        if (!code.isPresent()){
+            throw new ResourceNotFoundException("CodeId not found. CodeId : " + cdId);
+        }
+        return code.get();
 
     }
 

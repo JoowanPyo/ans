@@ -40,7 +40,7 @@ public class UserGroupController {
 
     @Operation(summary = "사용자 그룹 상세 조회", description = "사용자 그룹 상세 조회")
     @GetMapping(path = "/{userGrpId}")
-    public ApiResponse<UserGroupDTO> find(@PathVariable Long userGrpId) {
+    public ApiResponse<UserGroupDTO> find(@Parameter(name = "userGrpId", description = "그룹 아이디") @PathVariable Long userGrpId) {
 
         UserGroupDTO userGroupDTO = userGroupService.find(userGrpId);
 
@@ -91,7 +91,6 @@ public class UserGroupController {
         if (ObjectUtils.isEmpty(userGroupIdCheck)) {
             throw new ResourceNotFoundException("UserGroupId not found. userGroupId" + userGrpId);
         }
-
 
         userGroupService.delete(userGrpId);
 

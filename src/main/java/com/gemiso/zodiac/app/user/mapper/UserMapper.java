@@ -9,7 +9,6 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper extends GenericMapper<UserDTO, User, UserUpdateDTO> {
+public interface UserMapper extends GenericMapper<UserDTO, User, UserDTO> {
 
-    List<UserDTO> toDtoList(List<User> users);
 }

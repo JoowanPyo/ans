@@ -39,5 +39,5 @@ public class ApiResponse<T> extends BaseApiResponse {
     public static ApiResponse noContent() {
         return new ApiResponse(null, HttpStatus.NO_CONTENT);
     }
-    public static ApiResponse aleadyExist() { return new ApiResponse(null, HttpStatus.CONFLICT); }
+
 }

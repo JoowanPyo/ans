@@ -7,13 +7,14 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.web.servlet.DispatcherServlet;
 
 @SpringBootApplication
 @EnableJpaAuditing
 @ServletComponentScan
-//@ComponentScan(basePackages = {"com.gemiso.zodiac"})
+@PropertySource("classpath:application.properties")
 public class Application extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

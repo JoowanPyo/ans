@@ -74,16 +74,16 @@ dependencies {
 
 }
 
-bootWar {
+/*bootWar {
     archiveName("zodiac.war")
     archiveBaseName = 'zodiac'
     archiveFileName = 'zodiac.war'
     archiveVersion = "0.0.0"
-}
-/*bootJar {
+}*/
+bootJar {
     archiveBaseName = 'zodiac'
     archiveVersion = "0.0.0"
-}*/
+}
 
 
 test {

@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Log4j2
@@ -96,15 +97,27 @@ public class AddUserGroupAuthService {
 
     public UserGroup userGrouupFindOrFail(Long userGrpId) {
 
-        return userGroupRepository.findById(userGrpId)
-                .orElseThrow(() -> new ResourceNotFoundException("UserGroupId not found. UserGroupId : " + userGrpId));
+       /* return userGroupRepository.findById(userGrpId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserGroupId not found. UserGroupId : " + userGrpId));*/
 
+        Optional<UserGroup> userGroup = userGroupRepository.findByUserGroupId(userGrpId);
+
+        if (!userGroup.isPresent()){
+            throw new ResourceNotFoundException("UserGroupId not found. UserGroupId : " + userGrpId);
+        }
+        return userGroup.get();
     }
 
     public AppAuth appAuthFindOrFail(Long userGroupAuthId) {
 
-        return appAuthRepository.findById(userGroupAuthId)
-                .orElseThrow(() -> new ResourceNotFoundException("AppAuthId not found. userGroupAuthId : " + userGroupAuthId));
+       /* return appAuthRepository.findById(userGroupAuthId)
+                .orElseThrow(() -> new ResourceNotFoundException("AppAuthId not found. userGroupAuthId : " + userGroupAuthId));*/
 
+        Optional<AppAuth> appAuth = appAuthRepository.findByAppAuthId(userGroupAuthId);
+
+        if (!appAuth.isPresent()){
+            throw new ResourceNotFoundException("AppAuthId not found. AppAuthId : " + userGroupAuthId);
+        }
+        return appAuth.get();
     }
 }

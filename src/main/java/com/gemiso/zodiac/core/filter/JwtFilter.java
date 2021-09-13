@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -63,7 +64,6 @@ public class JwtFilter implements Filter {
 
         //param-value URL값 적용[토큰 필터를 거치지 않는다]
         String path = ((HttpServletRequest) request).getServletPath();
-        log.info("PPPPPPPPPPPATH&&&&&&&&&&&&&&&&&&::::"+path);
 
         if (!StringUtils.pathEquals(httpServletRequest.getMethod(), "OPTIONS")) {
 
@@ -81,7 +81,6 @@ public class JwtFilter implements Filter {
                     if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
                         //헤더에 있는 Bearer Substring => 토큰값을 빼기 위함.
                         jwtToken = requestTokenHeader.substring(7);
-
                         Claims claims = Jwts.parser()
                                 .setSigningKey(secretKey.getBytes("UTF-8")) // Set Key
                                 .parseClaimsJws(jwtToken) // 파싱 및 검증, 실패 시 에러
@@ -101,6 +100,7 @@ public class JwtFilter implements Filter {
                         }
 
                         String userId = claims.get("userId", String.class);
+
 
                         User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new ResourceNotFoundException("UserId not found. UserId : " + userId));

@@ -46,12 +46,27 @@ public class AppAuthService{
 
         String hrnkCd = appAuthCreatDTO.getHrnkAppAuthCd();
 
+        //하위 권한이 있을 경우 하위 권한 GET
         if (!StringUtils.isEmpty(hrnkCd)){
-           int chillOrd = appAuthRepository.findChildOrd(hrnkCd);
-            appAuthCreatDTO.setOrd(chillOrd+1);
-        }else {
-            int parentOrd = appAuthRepository.findParentOrd();
-            appAuthCreatDTO.setOrd(parentOrd+1);
+           Optional<Integer> chillOrd = appAuthRepository.findChildOrd(hrnkCd);
+           if (chillOrd.isPresent()) {
+               Integer getChillOrd = chillOrd.get();
+               int setChillOrd = getChillOrd;
+               appAuthCreatDTO.setOrd(setChillOrd + 1);
+           }else {
+               appAuthCreatDTO.setOrd(1);
+           }
+        }else { //하위 권한이 없을 경우 상위 Ord GET
+            Optional<Integer> parentOrd = appAuthRepository.findParentOrd();
+
+            if (parentOrd.isPresent()){
+                Integer ord = parentOrd.get();
+                int setOrd = ord;
+                appAuthCreatDTO.setOrd(setOrd+1);
+            }else {
+                appAuthCreatDTO.setOrd(1);
+            }
+
         }
 
         AppAuth appAuth = appAuthCreateMapper.toEntity(appAuthCreatDTO);
@@ -63,32 +78,30 @@ public class AppAuthService{
     }
 
     public AppAuthDTO find(Long appAuthId) {
-        Optional<AppAuth> appAuth = appAuthRepository.findById(appAuthId);
 
-        if (!appAuth.isPresent()){
-            new ResourceNotFoundException("AppAuth not found. appAuthId : " + appAuthId);
-        }
+        AppAuth appAuth = appAuthFindOrFail(appAuthId);
 
-        AppAuthDTO appAuthDTO = appAuthMapper.toDto(appAuth.get());
+        AppAuthDTO appAuthDTO = appAuthMapper.toDto(appAuth);
 
         return appAuthDTO;
     }
 
     public void update(AppAuthUpdateDTO appAuthUpdateDTO, Long appAuthId){
 
+        AppAuth appAuth = appAuthFindOrFail(appAuthId);
+
         appAuthUpdateDTO.setAppAuthId(appAuthId);
         appAuthUpdateDTO.setUpdtrId("updtrId");
 
-        AppAuth appAuthEntity = appAuthUpdateMapper.toEntity(appAuthUpdateDTO);
+        appAuthUpdateMapper.updateFromDto(appAuthUpdateDTO, appAuth);
 
-        appAuthRepository.save(appAuthEntity);
+        appAuthRepository.save(appAuth);
 
     }
 
     public void delete(Long appAuthId){
 
-        AppAuth appAuthEntity = appAuthRepository.findById(appAuthId)
-                .orElseThrow(() -> new ResourceNotFoundException("AppAuth not found. appAuthId: "+appAuthId));
+        AppAuth appAuthEntity = appAuthFindOrFail(appAuthId);
         AppAuthDTO appAuthDTO = appAuthMapper.toDto(appAuthEntity);
 
         appAuthDTO.setDelYn("Y");
@@ -99,6 +112,17 @@ public class AppAuthService{
 
         appAuthRepository.save(appAuth);
 
+    }
+
+    public AppAuth appAuthFindOrFail(Long appAuthId){
+
+        Optional<AppAuth> appAuth = appAuthRepository.findByAppAuthId(appAuthId);
+
+        if (!appAuth.isPresent()){
+            throw new ResourceNotFoundException("AppAuth not found. AppAuthId: "+appAuthId);
+        }
+
+        return appAuth.get();
     }
 
     private BooleanBuilder getSearch(String useYn, String delYn, String hrnkAppAuthCd, String searchWord) {

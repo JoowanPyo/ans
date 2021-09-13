@@ -8,6 +8,7 @@ import com.gemiso.zodiac.app.auth.mapper.AuthMapper;
 import com.gemiso.zodiac.app.auth.mapper.UserTokenMapper;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserRepository;
+import com.gemiso.zodiac.app.user.UserService;
 import com.gemiso.zodiac.app.user.dto.UserDTO;
 import com.gemiso.zodiac.app.user.mapper.UserMapper;
 import com.gemiso.zodiac.core.helper.JWTBuilder;
@@ -33,6 +34,8 @@ import java.util.Date;
 @Transactional
 public class AuthService {
 
+    private final UserService userService;
+
     private final UserRepository userRepository;
     private final UserTokenRepository userTokenRepository;
     private final AuthRepository authRepository;
@@ -52,8 +55,10 @@ public class AuthService {
         String userId = authRequestDTO.getUserId();
         String password = authRequestDTO.getPassword();
 
-        User userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found. userId : " + userId));
+        /*User userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found. userId : " + userId));*/
+        User userEntity = userService.userFindOrFail(userId);
+
         UserDTO userDTO = userMapper.toDto(userEntity); //tb_user_login 테이블에 정보를 저장하기위한 DTO생성
 
         if (!passwordEncoder.matches(password, userEntity.getPwd())) {

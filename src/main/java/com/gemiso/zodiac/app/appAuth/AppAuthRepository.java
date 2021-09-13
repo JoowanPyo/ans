@@ -5,13 +5,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface AppAuthRepository extends JpaRepository<AppAuth, Long>, QuerydslPredicateExecutor<AppAuth> {
 
     @Query("select MAX(a.ord) from AppAuth a where a.hrnkAppAuthCd =:hrnkCd ")
-    int findChildOrd(@Param("hrnkCd")String hrnkCd);
+    Optional<Integer> findChildOrd(@Param("hrnkCd")String hrnkCd);
 
     @Query("select MAX(a.ord) from AppAuth a where a.hrnkAppAuthCd = '' ")
-    int findParentOrd();
+    Optional<Integer> findParentOrd();
+
+    @Query("select a from AppAuth a where a.appAuthId = :appAuthId and a.delYn = 'N'")
+    Optional<AppAuth> findByAppAuthId(@Param("appAuthId")Long appAuthId);
 
    /* @Query("select a from AppAuth a where a.useYn = :userYn and a.delYn =:delYn" +
             " and a.hrnkAppAuthCd = :hrnkAppAuthCd and a.appAuthNm like %:searchWord%")

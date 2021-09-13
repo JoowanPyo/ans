@@ -12,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"userGroup, userAppAuth"})
+@ToString(exclude = {"userGroup", "userAppAuth"})
 public class UserGroupAuth {
 
     @Id

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Log4j2
@@ -53,7 +54,7 @@ public class UserGroupService {
 
     public UserGroupDTO find(Long userGrpId){
 
-        UserGroup userGroupEntity = userGroupRepository.findByUserGroupId(userGrpId);
+        UserGroup userGroupEntity = userGroupFindOrFail(userGrpId);
 
         //System.out.println(userGroupEntity.getUserGroupUsers());
 
@@ -64,12 +65,14 @@ public class UserGroupService {
 
     public void update(UserGroupUpdateDTO userGroupUpdateDTO, Long userGrpId){
 
+        UserGroup userGroup = userGrouupFindOrFail(userGrpId);
+
         userGroupUpdateDTO.setUserGrpId(userGrpId);
         userGroupUpdateDTO.setUpdtrId("userGrpId");
 
-        UserGroup userGroupEntity = userGroupUpdateMapper.toEntity(userGroupUpdateDTO);
+        userGroupUpdateMapper.updateFromDto(userGroupUpdateDTO, userGroup);
 
-        userGroupRepository.save(userGroupEntity);
+        userGroupRepository.save(userGroup);
 
     }
 
@@ -88,9 +91,16 @@ public class UserGroupService {
 
     public UserGroup userGrouupFindOrFail(Long userGrpId){
 
-        return userGroupRepository.findById(userGrpId)
-                .orElseThrow(() -> new ResourceNotFoundException("UserGroupId not found. UserGroupId : " + userGrpId));
+        /*return userGroupRepository.findById(userGrpId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserGroupId not found. UserGroupId : " + userGrpId));*/
 
+        Optional<UserGroup> userGroup = userGroupRepository.findByUserGroupId(userGrpId);
+
+        if (!userGroup.isPresent()){
+            throw new ResourceNotFoundException("UserGroupId not found. UserGroupId : " + userGrpId);
+        }
+
+        return userGroup.get();
     }
 
     private BooleanBuilder getSearch(String userGrpNm, String useYn) {
@@ -107,5 +117,18 @@ public class UserGroupService {
         }
 
         return booleanBuilder;
+    }
+
+    public UserGroup userGroupFindOrFail(Long userGrpId){
+
+       /*return  userGroupRepository.findById(userGrpId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserGroupId not found. userGroupId : " + userGrpId));*/
+        Optional<UserGroup> userGroup = userGroupRepository.findByUserGroupId(userGrpId);
+
+        if (!userGroup.isPresent()){
+            throw new ResourceNotFoundException("UserGroupId not found. userGroupId : " + userGrpId);
+        }
+
+        return userGroup.get();
     }
 }

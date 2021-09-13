@@ -49,8 +49,8 @@ public class User extends BaseEntity {
     @Column(name = "chief_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String chiefYn;
 
-    @Column(name = "e_mail", length = 200)
-    private String eMail;
+    @Column(name = "email", length = 200)
+    private String email;
 
     @Column(name = "tel", length = 200)
     private String tel;

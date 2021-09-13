@@ -4,8 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserGroupUserRepository extends JpaRepository<UserGroupUser, Long>, QuerydslPredicateExecutor<UserGroupUser> {
 
@@ -21,7 +23,8 @@ public interface UserGroupUserRepository extends JpaRepository<UserGroupUser, Lo
 
 
     @Query("select a from UserGroupUser a where a.user.userId = :userId and a.userGroup.userGrpId = :userGrpId")
-    UserGroupUser findAllByUserId(@Param("userId")String userId,
-                                        @Param("userGrpId")String userGrpId);
+    Optional<UserGroupUser> findAllByUserId(@Param("userId")String userId,
+                                           @Param("userGrpId")Long userGrpId);
+
 
 }

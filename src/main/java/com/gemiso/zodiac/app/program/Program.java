@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.program;
 
+import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -12,9 +13,10 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @ToString
 @DynamicUpdate
-public class Program {
+public class Program extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,11 +44,11 @@ public class Program {
     @Column(name = "sch_time", length = 6)
     private String schTime;
 
-    @Column(name = "input_dtm")
-    private Date inputDtm;
+    //@Column(name = "input_dtm")
+    //private Date inputDtm;
 
-    @Column(name = "updt_dtm")
-    private Date updtDtm;
+    //@Column(name = "updt_dtm")
+    //private Date updtDtm;
 
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
