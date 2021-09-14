@@ -30,8 +30,10 @@ public class UserGroupController {
 
     @Operation(summary = "사용자 그룹 목록조회", description = "사용자 그룹 목록조회")
     @GetMapping
-    public ApiResponse<List<UserGroupDTO>> findAll(@Parameter(name = "userGrpNm", description = "그룹 명", in = ParameterIn.QUERY) @RequestParam(value = "userGrpNm", required = false) String userGrpNm,
-                                                   @Parameter(name = "useYn", description = "사용 여부", in = ParameterIn.QUERY) @RequestParam(value = "useYn", required = false) String useYn) {
+    public ApiResponse<List<UserGroupDTO>> findAll(@Parameter(name = "userGrpNm", description = "그룹 명", in = ParameterIn.QUERY)
+                                                   @RequestParam(value = "userGrpNm", required = false) String userGrpNm,
+                                                   @Parameter(name = "useYn", description = "사용 여부", in = ParameterIn.QUERY)
+                                                   @RequestParam(value = "useYn", required = false) String useYn) {
 
         List<UserGroupDTO> userGroupUserDtoList = userGroupService.findAll(userGrpNm, useYn);
 
@@ -40,7 +42,8 @@ public class UserGroupController {
 
     @Operation(summary = "사용자 그룹 상세 조회", description = "사용자 그룹 상세 조회")
     @GetMapping(path = "/{userGrpId}")
-    public ApiResponse<UserGroupDTO> find(@Parameter(name = "userGrpId", description = "그룹 아이디") @PathVariable Long userGrpId) {
+    public ApiResponse<UserGroupDTO> find(@Parameter(name = "userGrpId", description = "그룹 아이디")
+                                          @PathVariable("userGrpId") Long userGrpId) {
 
         UserGroupDTO userGroupDTO = userGroupService.find(userGrpId);
 
