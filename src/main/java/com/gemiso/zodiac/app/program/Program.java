@@ -1,11 +1,15 @@
 package com.gemiso.zodiac.app.program;
 
+import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.app.cueTemplate.CueTemplate;
+import com.gemiso.zodiac.app.dailyProgram.DailyProgram;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_brdc_pgm")
@@ -14,7 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"cueTemplate","dailyProgram","cueSheet"})
 @DynamicUpdate
 public class Program extends BaseEntity {
 
@@ -64,6 +68,15 @@ public class Program extends BaseEntity {
 
     @Column(name = "delr_id", length = 50)
     private String delrId;
+
+    @OneToMany(mappedBy = "program")
+    private List<CueTemplate> cueTemplate;
+
+    @OneToMany(mappedBy = "program")
+    private List<DailyProgram> dailyProgram;
+
+    @OneToMany(mappedBy = "program")
+    private List<CueSheet> cueSheet;
 
     @PrePersist
     public void prePersist() {

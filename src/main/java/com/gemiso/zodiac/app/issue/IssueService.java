@@ -7,11 +7,12 @@ import com.gemiso.zodiac.app.issue.dto.IssueUpdateDTO;
 import com.gemiso.zodiac.app.issue.mapper.IssueCreateMapper;
 import com.gemiso.zodiac.app.issue.mapper.IssueMapper;
 import com.gemiso.zodiac.app.issue.mapper.IssueUpdateMapper;
-import com.gemiso.zodiac.core.service.AuthAddService;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class IssueService {
@@ -35,7 +36,7 @@ public class IssueService {
     private final IssueCreateMapper issueCreateMapper;
     private final IssueMapper issueMapper;
     private final IssueUpdateMapper issueUpdateMapper;
-    private final AuthAddService authAddService;
+    private final UserAuthService userAuthService;
 
 
     public List<IssueDTO> findAll(Date sdate, Date edate, String issuDelYn){
@@ -77,7 +78,7 @@ public class IssueService {
         Integer issuOrd = getOrd();
 
         issueCreateDTO.setIssuOrd(issuOrd + 1);
-        issueCreateDTO.setInputrId(authAddService.authUser.getUserId());
+        issueCreateDTO.setInputrId(userAuthService.authUser.getUserId());
 
         Issue issue = issueCreateMapper.toEntity(issueCreateDTO);
         issueRepositoy.save(issue);
@@ -90,7 +91,7 @@ public class IssueService {
         Issue issue = issueFindOrFail(issuId);
 
         issueUpdateDTO.setUpdtDtm(new Date());
-        issueUpdateDTO.setUpdtrId(authAddService.authUser.getUserId());
+        issueUpdateDTO.setUpdtrId(userAuthService.authUser.getUserId());
         issueUpdateDTO.setUpdtDtm(new Date());
 
         issueUpdateMapper.updateFromDto(issueUpdateDTO, issue);
@@ -106,7 +107,7 @@ public class IssueService {
 
         issueDto.setIssuDelYn("Y");
         issueDto.setDelDtm(new Date());
-        issueDto.setDelrId(authAddService.authUser.getUserId());
+        issueDto.setDelrId(userAuthService.authUser.getUserId());
 
         issueMapper.updateFromDto(issueDto, issue);
 
@@ -166,7 +167,7 @@ public class IssueService {
                 issueDTOCopy.setUpdtrId(issueDTO.getUpdtrId());
                 issueDTOCopy.setUpdtDtm(issueDTO.getUpdtDtm());
                 issueDTOCopy.setInputDtm(targetDate);
-                issueDTOCopy.setInputrId(authAddService.authUser.getUserId());
+                issueDTOCopy.setInputrId(userAuthService.authUser.getUserId());
 
                 Issue issueEntity = issueMapper.toEntity(issueDTOCopy);
                 issueRepositoy.save(issueEntity);

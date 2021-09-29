@@ -10,7 +10,7 @@ import com.gemiso.zodiac.app.user.mapper.UserMapper;
 import com.gemiso.zodiac.app.user.mapper.UserUpdateMapper;
 import com.gemiso.zodiac.app.userGroup.UserGroup;
 import com.gemiso.zodiac.app.userGroup.UserGroupRepository;
-import com.gemiso.zodiac.core.service.AuthAddService;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final AuthAddService authAddService;
+    private final UserAuthService userAuthService;
 
   /*  @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -116,7 +116,7 @@ public class UserService {
         String password = encodePassword(userCreateDTO.getPwd()); //password encoding type 어떻게 할지
         userCreateDTO.setPwd(password);
 
-        String userId = authAddService.authUser.getUserId();
+        String userId = userAuthService.authUser.getUserId();
         userCreateDTO.setInputrId(userId);
 
         User userEntity = userCreateMapper.toEntity(userCreateDTO);
@@ -156,9 +156,9 @@ public class UserService {
 
                 UserGroupUser Entity = userGroupUser;
 
-                UserGroupUserDTO dto = userGroupUserMapper.toDto(Entity);
+                UserGroupUserDTO CueSheet = userGroupUserMapper.toDto(Entity);
 
-                userGroupUserDTOList.add(dto);
+                userGroupUserDTOList.add(CueSheet);
             }
         }
         UserDTO userDto = userMapper.toDto(userEntity);
@@ -172,7 +172,7 @@ public class UserService {
 
         User user = userFindOrFail(userId);
 
-        String updtrId = authAddService.authUser.getUserId();
+        String updtrId = userAuthService.authUser.getUserId();
         userUpdateDTO.setUpdtrId(updtrId);
         userUpdateDTO.setUserId(userId);
        // User userEntity = userUpdateMapper.toEntity(userUpdateDTO);
@@ -190,7 +190,7 @@ public class UserService {
         UserDTO userDTO = userMapper.toDto(user);
         userDTO.setDelYn("Y");
         userDTO.setDelDtm(new Date());
-        String delrId = authAddService.authUser.getUserId();
+        String delrId = userAuthService.authUser.getUserId();
         userDTO.setDelrId(delrId);
 
         userMapper.updateFromDto(userDTO, user);

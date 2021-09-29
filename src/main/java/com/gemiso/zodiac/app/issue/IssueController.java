@@ -5,7 +5,7 @@ import com.gemiso.zodiac.app.issue.dto.IssueCreateDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueUpdateDTO;
 import com.gemiso.zodiac.core.response.ApiResponse;
-import com.gemiso.zodiac.core.service.AuthAddService;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,7 +28,7 @@ import java.util.List;
 public class IssueController {
 
     private final IssueService issueService;
-    private final AuthAddService authAddService;
+    private final UserAuthService userAuthService;
 
     @Operation(summary = "이슈 목록 조회", description = "조회조건으로 이슈 목록 조회")
     @GetMapping(path = "")

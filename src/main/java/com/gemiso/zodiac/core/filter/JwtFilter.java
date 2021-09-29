@@ -3,7 +3,7 @@ package com.gemiso.zodiac.core.filter;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserRepository;
 import com.gemiso.zodiac.app.user.dto.UserDTO;
-import com.gemiso.zodiac.core.service.AuthAddService;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -35,7 +34,7 @@ public class JwtFilter implements Filter {
     private UserRepository userRepository;
 
     @Autowired
-    private AuthAddService authAddService;
+    private UserAuthService userAuthService;
 
     private List<String> excludedUrls = null;
 
@@ -105,7 +104,7 @@ public class JwtFilter implements Filter {
                         User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new ResourceNotFoundException("UserId not found. UserId : " + userId));
 
-                        authAddService.authUser = UserDTO.builder().userId(user.getUserId()).build();
+                        userAuthService.authUser = UserDTO.builder().userId(user.getUserId()).build();
 
                         logMessage.append(" [TOKEN USER ID:").append(user.getUserId().toString()).append("]");
 

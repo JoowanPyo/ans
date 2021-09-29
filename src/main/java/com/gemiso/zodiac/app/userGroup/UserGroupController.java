@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -21,18 +21,19 @@ import java.util.List;
 //@Tag(name = "userGroup", description = "사용자 그룹 API")
 @Api(description = "그룹 API")
 @RestController
-@RequestMapping("/userGroups")
-@Log4j2
+@RequestMapping("/usergroups")
+@Slf4j
 @RequiredArgsConstructor
+/*@CrossOrigin(origins = "*", allowedHeaders = "*")*/
 public class UserGroupController {
 
     private final UserGroupService userGroupService;
 
     @Operation(summary = "사용자 그룹 목록조회", description = "사용자 그룹 목록조회")
-    @GetMapping
-    public ApiResponse<List<UserGroupDTO>> findAll(@Parameter(name = "userGrpNm", description = "그룹 명", in = ParameterIn.QUERY)
+    @GetMapping(path = "")
+    public ApiResponse<List<UserGroupDTO>> findAll(@Parameter(name = "userGrpNm", description = "그룹 명")
                                                    @RequestParam(value = "userGrpNm", required = false) String userGrpNm,
-                                                   @Parameter(name = "useYn", description = "사용 여부", in = ParameterIn.QUERY)
+                                                   @Parameter(name = "useYn", description = "사용 여부")
                                                    @RequestParam(value = "useYn", required = false) String useYn) {
 
         List<UserGroupDTO> userGroupUserDtoList = userGroupService.findAll(userGrpNm, useYn);
@@ -55,10 +56,10 @@ public class UserGroupController {
     }
 
     @Operation(summary = "사용자 그룹 등록", description = "사용자 그룹 등록")
-    @PostMapping
+    @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<UserGroupDTO> create(
-            @Parameter(description = "필수값<br> ", required = true) @RequestBody UserGroupCreateDTO userGroupCreateDTO
+            @Parameter(description = "필수값<br> ", required = true) @RequestBody @Valid UserGroupCreateDTO userGroupCreateDTO
     ) {
 
         UserGroupDTO userGroupDTO = userGroupService.create(userGroupCreateDTO);

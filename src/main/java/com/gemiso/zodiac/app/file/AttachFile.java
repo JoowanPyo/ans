@@ -64,8 +64,8 @@ public class AttachFile {
         @OneToMany(mappedBy="attachFile")
         private List<YonhapAttchFile> yonhapAttchFiles;
 
-        @OneToOne(mappedBy="attachFile")
-        private Symbol symbol;
+        @OneToMany(mappedBy="attachFile")
+        private List<Symbol> symbol;
 
 
         @PrePersist

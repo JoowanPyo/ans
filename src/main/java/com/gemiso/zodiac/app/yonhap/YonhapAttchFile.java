@@ -44,7 +44,7 @@ public class YonhapAttchFile {
     @Column(name = "mime_type", length = 100)
     private String mimeType;
 
-    @Column(name = "cap", length = 4000)
+    @Column(name = "capTemplate", length = 4000)
     private String cap;
 
     @Column(name = "yh_url", length = 2000)

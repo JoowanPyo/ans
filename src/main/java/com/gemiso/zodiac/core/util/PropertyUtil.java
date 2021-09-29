@@ -3,13 +3,14 @@ package com.gemiso.zodiac.core.util;
 import com.gemiso.zodiac.core.util.common.Config;
 import com.gemiso.zodiac.core.util.common.Configuration;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
 import java.io.File;
 
-@Log4j2
+@Slf4j
 public class PropertyUtil {
     //private static final Logger logger = Logger.getLogger("com.common");
 
@@ -28,6 +29,7 @@ public class PropertyUtil {
             }
             //file:/C:/FileAttach.xml
             doc = builder.build(new File(getConfigRoot(), fn));
+            log.info("doc           :" +doc);
             Element root = doc.getRootElement();
 
             Element divcd = root.getChild("uploads").getChild(target).getChild("divcd");

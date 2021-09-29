@@ -1,8 +1,6 @@
 package com.gemiso.zodiac.app.symbol;
 
-import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.file.AttachFileRepository;
-import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.mapper.AttachFileMapper;
 import com.gemiso.zodiac.app.symbol.dto.SymbolCreateDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
@@ -10,8 +8,7 @@ import com.gemiso.zodiac.app.symbol.dto.SymbolUpdateDTO;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolCreateMapper;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolMapper;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolUpdateMapper;
-import com.gemiso.zodiac.app.user.QUser;
-import com.gemiso.zodiac.core.service.AuthAddService;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -40,13 +37,13 @@ public class SymbolService {
     private final AttachFileMapper attachFileMapper;
 
 
-    private final AuthAddService authAddService;
+    private final UserAuthService userAuthService;
 
-    public List<SymbolDTO> findAll(String useYn, String userNm, String delYn){
+    public List<SymbolDTO> findAll(String useYn, String symbolNm){
 
-        BooleanBuilder booleanBuilder = getSearch(useYn, userNm, delYn);
+        BooleanBuilder booleanBuilder = getSearch(useYn, symbolNm);
 
-        List<Symbol> symbolList = (List<Symbol>) symbolRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "id"));
+        List<Symbol> symbolList = (List<Symbol>) symbolRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "symbolId"));
 
         List<SymbolDTO> symbolDTOS = symbolMapper.toDtoList(symbolList);
 
@@ -74,7 +71,7 @@ public class SymbolService {
 
     public Long create(SymbolCreateDTO symbolCreateDTO){ //방송 아이콘 등록 서비스
 
-        String userId = authAddService.authUser.getUserId(); //토큰에필터에서 토큰 파싱하여 등록된 UserId
+        String userId = userAuthService.authUser.getUserId(); //토큰에필터에서 토큰 파싱하여 등록된 UserId
 
         symbolCreateDTO.setInputrId(userId); //등록자 추가.
 
@@ -91,7 +88,7 @@ public class SymbolService {
         Symbol symbol = userFindOrFail(symbolId);
 
 
-        String userId = authAddService.authUser.getUserId();
+        String userId = userAuthService.authUser.getUserId();
         symbolUpdateDTO.setUpdtrId(userId); // 수정자 추가.
 
         symbolUpdateMapper.updateFromDto(symbolUpdateDTO, symbol);
@@ -106,7 +103,7 @@ public class SymbolService {
         SymbolDTO symbolDTO = symbolMapper.toDto(symbol);
 
         symbolDTO.setDelDtm(new Date());
-        String userId = authAddService.authUser.getUserId();
+        String userId = userAuthService.authUser.getUserId();
         symbolDTO.setDelrId(userId);
         symbolDTO.setDelYn("Y");
 
@@ -130,23 +127,21 @@ public class SymbolService {
 
     }
 
-    private BooleanBuilder getSearch(String useYn, String userNm, String delYn) {
+    private BooleanBuilder getSearch(String useYn, String symbolNm) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         QSymbol qSymbol = QSymbol.symbol;
 
+        booleanBuilder.and(qSymbol.delYn.eq("N"));
+
         if(!StringUtils.isEmpty(useYn)){
             booleanBuilder.and(qSymbol.useYn.eq(useYn));
         }
-        if(!StringUtils.isEmpty(userNm)){
-            booleanBuilder.and(qSymbol.symbolNm.contains(userNm));
+        if(!StringUtils.isEmpty(symbolNm)){
+            booleanBuilder.and(qSymbol.symbolNm.contains(symbolNm));
         }
-        if(!StringUtils.isEmpty(delYn)){
-            booleanBuilder.and(qSymbol.delYn.eq(delYn));
-        }else{
-            booleanBuilder.and(qSymbol.delYn.eq("N"));
-        }
+
         return booleanBuilder;
     }
 }

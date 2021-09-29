@@ -6,8 +6,7 @@ import com.gemiso.zodiac.app.program.dto.ProgramUpdateDTO;
 import com.gemiso.zodiac.app.program.mapper.ProgramCrateMapper;
 import com.gemiso.zodiac.app.program.mapper.ProgramMapper;
 import com.gemiso.zodiac.app.program.mapper.ProgramUpdateMapper;
-import com.gemiso.zodiac.app.user.QUser;
-import com.gemiso.zodiac.core.service.AuthAddService;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,7 @@ public class ProgramService {
     private final ProgramCrateMapper programCrateMapper;
     private final ProgramUpdateMapper programUpdateMapper;
 
-    private final AuthAddService authAddService;
+    private final UserAuthService userAuthService;
 
     public List<ProgramDTO> findAll(String brdcPgmNm) {
 
@@ -59,7 +58,7 @@ public class ProgramService {
     public Long create(ProgramCreateDTO programCreateDTO) {
 
         //작성자 추가.
-        String userId = authAddService.authUser.getUserId();
+        String userId = userAuthService.authUser.getUserId();
         programCreateDTO.setInputrId(userId);
 
         Program program = programCrateMapper.toEntity(programCreateDTO);
@@ -75,7 +74,7 @@ public class ProgramService {
         Program program = programFindOrFail(brdcPgmId);
 
         //업데이트 작성자 추가.
-        String userId = authAddService.authUser.getUserId();
+        String userId = userAuthService.authUser.getUserId();
         programUpdateDTO.setUpdtrId(userId);
 
         programUpdateMapper.updateFromDto(programUpdateDTO, program);
@@ -91,7 +90,7 @@ public class ProgramService {
 
         //삭제 정보 추가.
         //삭제자 추가.
-        String userId = authAddService.authUser.getUserId();
+        String userId = userAuthService.authUser.getUserId();
         programDTO.setDelDtm(new Date());
         programDTO.setDelYn("Y");
         programDTO.setDelrId(userId);

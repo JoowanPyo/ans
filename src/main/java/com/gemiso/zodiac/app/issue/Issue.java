@@ -1,5 +1,8 @@
 package com.gemiso.zodiac.app.issue;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -8,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_issu",
@@ -19,9 +23,9 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "article")
 @DynamicUpdate
-public class Issue  {
+public class Issue extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,11 +59,11 @@ public class Issue  {
     @Column(name = "issu_fnsh_dtm")
     private Date  issuFnshDtm;
 
-    @Column( name = "input_dtm", updatable = false)
+/*    @Column( name = "input_dtm", updatable = false)
     private Date inputDtm;
 
     @Column(name = "updt_dtm")
-    private Date updtDtm;
+    private Date updtDtm;*/
 
     @Column(name = "issu_org_id", length = 50)
     private Long issuOrgId;
@@ -72,6 +76,10 @@ public class Issue  {
 
     @Column(name = "delr_id", length = 50)
     private String delrId;
+
+    /*@OneToMany(mappedBy="issue")
+    @JsonManagedReference
+    private List<Article> article;*/
 
     /**
      * insert 되기전 (persist 되기전) 실행된다.

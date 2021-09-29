@@ -1,0 +1,94 @@
+package com.gemiso.zodiac.app.articleMedia;
+
+
+import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaCreateDTO;
+import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
+import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaUpdateDTO;
+import com.gemiso.zodiac.core.response.ApiResponse;
+import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.Date;
+import java.util.List;
+
+@Api(description = "기사 미디어 API")
+@RestController
+@RequestMapping("/articlemedia")
+@Slf4j
+@RequiredArgsConstructor
+public class ArticleMediaController {
+
+    private final ArticleMediaService articleMediaService;
+
+
+    @Operation(summary = "기사 미디어 목록조회", description = "기사 미디어 목록조회")
+    @GetMapping(path = "")
+    public ApiResponse<List<ArticleMediaDTO>> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
+                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                      @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
+                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                      @Parameter(name = "trnsfFileNm", description = "전송 파일 명")
+                                                      @RequestParam(value = "trnsfFileNm", required = false) String trnsfFileNm) {
+
+        List<ArticleMediaDTO> articleMediaDTOList = articleMediaService.findAll(sdate, edate, trnsfFileNm);
+
+        return new ApiResponse<>(articleMediaDTOList);
+    }
+
+    @Operation(summary = "기사 미디어 상세조회", description = "기사 미디어 상세조회")
+    @GetMapping(path = "/{artclMediaId}")
+    public ApiResponse<ArticleMediaDTO> find(@Parameter(name = "artclMediaId", description = "기사미디어 아이디")
+                                             @PathVariable("artclMediaId") Long artclMediaId) {
+
+        ArticleMediaDTO articleMediaDTO = articleMediaService.find(artclMediaId);
+
+        return new ApiResponse<>(articleMediaDTO);
+    }
+
+    @Operation(summary = "기사 미디어 등록", description = "기사 미디어 등록")
+    @PostMapping(path = "")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<ArticleMediaDTO> create(@Parameter(description = "필수값<br> ", required = true)
+                                               @RequestBody @Valid ArticleMediaCreateDTO articleMediaCreateDTO) {
+
+        Long artclMediaId = articleMediaService.create(articleMediaCreateDTO);
+
+        ArticleMediaDTO articleMediaDTO = articleMediaService.find(artclMediaId);
+
+        return new ApiResponse<>(articleMediaDTO);
+    }
+
+    @Operation(summary = "기사 미디어 수정", description = "기사 미디어 수정")
+    @PutMapping(path = "/{artclMediaId}")
+    public ApiResponse<ArticleMediaDTO> update(@Parameter(description = "필수값<br> ", required = true)
+                                               @RequestBody @Valid ArticleMediaUpdateDTO articleMediaUpdateDTO,
+                                               @Parameter(name = "artclMediaId", description = "기사미디어 아이디")
+                                               @PathVariable("artclMediaId") Long artclMediaId) {
+
+        articleMediaService.update(articleMediaUpdateDTO, artclMediaId);
+
+        ArticleMediaDTO articleMediaDTO = articleMediaService.find(artclMediaId);
+
+        return new ApiResponse<>(articleMediaDTO);
+
+    }
+
+    @Operation(summary = "기사 미디어 삭제", description = "기사 미디어 삭제")
+    @DeleteMapping(path = "/{artclMediaId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ApiResponse<?> delete(@Parameter(name = "artclMediaId", description = "기사미디어 아이디")
+                                 @PathVariable("artclMediaId") Long artclMediaId) {
+
+        articleMediaService.delete(artclMediaId);
+
+        return ApiResponse.noContent();
+    }
+
+}

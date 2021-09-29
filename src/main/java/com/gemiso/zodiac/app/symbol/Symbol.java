@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.app.symbol;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.user.UserGroupUser;
 import com.gemiso.zodiac.core.entity.BaseEntity;
@@ -19,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString(exclude = "attachFile")
+@ToString(exclude = {"attachFile", "articleCap"})
 @Setter
 @DynamicUpdate
 public class Symbol extends BaseEntity {
@@ -65,9 +67,12 @@ public class Symbol extends BaseEntity {
     @Column(name = "typ_cd", length = 50)
     private String typCd;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "file_id")
     private AttachFile attachFile;
+
+    @OneToMany(mappedBy = "symbol")
+    private List<ArticleCap> articleCap;
 
     @PrePersist
     public void prePersist() {

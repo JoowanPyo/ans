@@ -144,7 +144,7 @@ public class AppAuthService{
             booleanBuilder.and(qAppAuth.appAuthNm.contains(searchWord));
         }
 
-        //.and((Predicate) Sort.by((List<Sort.Order>) qAppAuth.ord).descending());
+        //.and((Predicate) Sort.by((List<Sort.ArticleOrder>) qAppAuth.ord).descending());
 
         return booleanBuilder;
     }

@@ -24,14 +24,12 @@ public class SymbolController {
 
     @Operation(summary = "방송아이콘 목록조회", description = "방송아이콘 목록조회")
     @GetMapping(path = "")
-    public ApiResponse<List<SymbolDTO>> findAll(@Parameter(name = "useYn", description = "사용자 아이디")
-                                                @RequestParam(value = "userId", required = false) String useYn,
-                                                @Parameter(name = "userNm", description = "사용자명")
-                                                @RequestParam(value = "userNm", required = false) String userNm,
-                                                @Parameter(name = "delYn", description = "삭제 여부")
-                                                @RequestParam(value = "delYn", required = false) String delYn) {
+    public ApiResponse<List<SymbolDTO>> findAll(@Parameter(name = "useYn", description = "사용여부 (N , Y)")
+                                                @RequestParam(value = "useYn", required = false) String useYn,
+                                                @Parameter(name = "symbolNm", description = "방송아이콘 아이디")
+                                                @RequestParam(value = "symbolNm", required = false) String symbolNm) {
 
-        List<SymbolDTO> symbolDTOS = symbolService.findAll(useYn, userNm, delYn);
+        List<SymbolDTO> symbolDTOS = symbolService.findAll(useYn, symbolNm);
 
         return new ApiResponse<>(symbolDTOS);
 
