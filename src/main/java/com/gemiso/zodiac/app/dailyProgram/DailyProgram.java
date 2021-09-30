@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.dailyProgram;
 
 import com.gemiso.zodiac.app.program.Program;
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -61,11 +62,14 @@ public class DailyProgram extends BaseEntity {
     @Column(name = "rmk", length = 500)
     private String rmk;
 
-    @Column(name = "inputr_id", length = 50, nullable = false)
-    private String inputrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inputr_id", nullable = false)
+    private User inputr;
 
-    @Column(name = "updtr_id", length = 50)
-    private String updtrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updtr_id")
+    private User updtr;
+
 
     /*@Column(name = "brdc_pgm_id")*/
     @ManyToOne

@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.program.dto.ProgramUpdateDTO;
 import com.gemiso.zodiac.app.program.mapper.ProgramCrateMapper;
 import com.gemiso.zodiac.app.program.mapper.ProgramMapper;
 import com.gemiso.zodiac.app.program.mapper.ProgramUpdateMapper;
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -57,9 +58,10 @@ public class ProgramService {
 
     public Long create(ProgramCreateDTO programCreateDTO) {
 
-        //작성자 추가.
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        programCreateDTO.setInputrId(userId);
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        programCreateDTO.setInputr(userSimpleDTO);
 
         Program program = programCrateMapper.toEntity(programCreateDTO);
 
@@ -73,9 +75,10 @@ public class ProgramService {
 
         Program program = programFindOrFail(brdcPgmId);
 
-        //업데이트 작성자 추가.
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        programUpdateDTO.setUpdtrId(userId);
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        programUpdateDTO.setUpdtr(userSimpleDTO);
 
         programUpdateMapper.updateFromDto(programUpdateDTO, program);
         programRepository.save(program);
@@ -88,12 +91,13 @@ public class ProgramService {
 
         ProgramDTO programDTO = programMapper.toDto(program);
 
-        //삭제 정보 추가.
-        //삭제자 추가.
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        programDTO.setDelr(userSimpleDTO);
         programDTO.setDelDtm(new Date());
         programDTO.setDelYn("Y");
-        programDTO.setDelrId(userId);
+
 
         programMapper.updateFromDto(programDTO, program);
         programRepository.save(program);

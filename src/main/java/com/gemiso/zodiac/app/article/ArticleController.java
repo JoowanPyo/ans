@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.article;
 
 import com.gemiso.zodiac.app.article.dto.ArticleCreateDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleLockDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.ApiResponse;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -40,7 +42,7 @@ public class ArticleController {
             @Parameter(name = "artclDivCd", description = "기사구분코드(01:일반, 02:예정, 03:엠바고)") @RequestParam(value = "artclDivCd", required = false) String artclDivCd,
             @Parameter(name = "artclTypCd", description = "기사유형코드(01:스트레이트, 02:리포트, 03:C/T, 04:하단롤, 05:긴급자막)") @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
             @Parameter(name = "searchDivCd", description = "검색구분코드<br>01 - 기사제목<br>02 - 기자명") @RequestParam(value = "searchDivCd", required = false) String searchDivCd,
-            @Parameter(name = "searchWord", description = "검색키워드") @RequestParam(value = "searchWord", required = false) String searchWord) {
+            @Parameter(name = "searchWord", description = "검색키워드") @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
 
         SearchDate searchDate = new SearchDate(sdate, edate);
 
@@ -100,6 +102,34 @@ public class ArticleController {
 
         return ApiResponse.noContent();
 
+    }
+
+    @Operation(summary = "기사 잠금", description = "기사 잠금")
+    @PutMapping(path = "/{artclId}/lock")
+    public ApiResponse<ArticleDTO> articleLock(@Parameter(name = "artclId", required = true, description = "기사 아이디")
+                                               @PathVariable("artclId") long artclId,
+                                               @Parameter(description = "필수값<br> lckYn ", required = true)
+                                               @RequestBody @Valid ArticleLockDTO articleLockDTO) {
+
+        articleService.articleLock(artclId, articleLockDTO);
+
+        ArticleDTO articleDTO = articleService.find(artclId);
+
+        return new ApiResponse<>(articleDTO);
+    }
+
+    @Operation(summary = "기사 잠금해제", description = "기사 잠금해제")
+    @PutMapping(path = "/{artclId}/unlock")
+    public ApiResponse<ArticleDTO> articleUnlock(@Parameter(name = "artclId", required = true, description = "기사 아이디")
+                                                 @PathVariable("artclId") long artclId,
+                                                 @Parameter(description = "필수값<br> lckYn ", required = true)
+                                                 @RequestBody @Valid ArticleLockDTO articleLockDTO) {
+
+        articleService.articleUnlock(artclId, articleLockDTO);
+
+        ArticleDTO articleDTO = articleService.find(artclId);
+
+        return new ApiResponse<>(articleDTO);
     }
 
 }

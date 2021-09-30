@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.capTemplateGrp.dto.CapTemplateGrpUpdateDTO;
 import com.gemiso.zodiac.app.capTemplateGrp.mapper.CapTemplateGrpCreateMapper;
 import com.gemiso.zodiac.app.capTemplateGrp.mapper.CapTemplateGrpMapper;
 import com.gemiso.zodiac.app.capTemplateGrp.mapper.CapTemplateGrpUpdateMapper;
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -58,8 +59,10 @@ public class CapTemplateGrpService {
 
     public Long create(CapTemplateGrpCreateDTO capTemplateGrpCreateDTO){
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        capTemplateGrpCreateDTO.setInputrId(userId);//입력자 추가.
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        capTemplateGrpCreateDTO.setInputr(userSimpleDTO);//입력자 추가.
 
         CapTemplateGrp capTemplateGrp = capTemplateGrpCreateMapper.toEntity(capTemplateGrpCreateDTO);
 
@@ -73,8 +76,10 @@ public class CapTemplateGrpService {
         
         CapTemplateGrp capTemplateGrp = templateFindOrFail(tmplGrpId);
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        capTemplateGrpUpdateDTO.setUpdtrId(userId);//수정자 추가.
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        capTemplateGrpUpdateDTO.setUpdtr(userSimpleDTO);//수정자 추가.
 
         capTemplateGrpUpdateMapper.updateFromDto(capTemplateGrpUpdateDTO, capTemplateGrp);
         capTemplateGrpRepository.save(capTemplateGrp);

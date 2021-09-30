@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.userGroup.dto;
 
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +21,7 @@ public class UserGroupCreateDTO {
     //private Date inputDtm;
     //private Date updtDtm;
     //private Date delDtm;
-    private String inputrId;
+    private UserSimpleDTO inputr;
     //private String updtrId;
     //private String delrId;
     //private List<UserGroupAuthDTO> userGroupAuthDTOS = new ArrayList<>();

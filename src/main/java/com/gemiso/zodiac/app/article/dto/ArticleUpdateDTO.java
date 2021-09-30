@@ -1,13 +1,7 @@
 package com.gemiso.zodiac.app.article.dto;
 
-import com.gemiso.zodiac.app.ArticleOrder.dto.ArticleOrderDTO;
-import com.gemiso.zodiac.app.ArticleOrder.dto.ArticleOrderSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
-import com.gemiso.zodiac.app.articleHist.dto.ArticleHistDTO;
-import com.gemiso.zodiac.app.articleHist.dto.ArticleHistSimpleDTO;
-import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
-import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
@@ -15,7 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -67,9 +60,9 @@ public class ArticleUpdateDTO {
     //private String updtrId;
     private UserSimpleDTO updtr;
     //private String delrId;
-    private String apprvrId;
-    private String lckrId;
-    private String rptrId;
+    private UserSimpleDTO apprvr;
+    private UserSimpleDTO lckr;
+    private UserSimpleDTO rptr;
     private Integer artclCttTime;
     private Integer ancMentCttTime;
     private Integer artclExtTime;
@@ -78,7 +71,7 @@ public class ArticleUpdateDTO {
     private String deviceCd;
     private IssueDTO issue;
     //private List<ArticleMediaDTO> articleMedia;
-    private List<ArticleCapDTO> articleCap;
+    private List<ArticleCapSimpleDTO> articleCap;
     //private List<ArticleOrderDTO> articleOrder;
     //private List<ArticleHistDTO> articleHist;
 }

@@ -1,8 +1,8 @@
-package com.gemiso.zodiac.app.ArticleOrder;
+package com.gemiso.zodiac.app.articleOrder;
 
-import com.gemiso.zodiac.app.ArticleOrder.dto.ArticleOrderCreateDTO;
-import com.gemiso.zodiac.app.ArticleOrder.dto.ArticleOrderDTO;
-import com.gemiso.zodiac.app.ArticleOrder.dto.ArticleOrderUpdateDTO;
+import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderCreateDTO;
+import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderDTO;
+import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderUpdateDTO;
 import com.gemiso.zodiac.core.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;

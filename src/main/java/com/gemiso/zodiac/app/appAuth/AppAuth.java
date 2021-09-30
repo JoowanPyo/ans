@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.appAuth;
 
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.userGroup.UserGroupAuth;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
@@ -55,14 +56,17 @@ public class AppAuth extends BaseEntity {
     @Column(name = "DEL_DTM")
     private Date delDtm;
 
-    @Column(name = "INPUTR_ID", length = 50)
-    private String inputrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inputr_id")
+    private User inputr;
 
-    @Column(name = "UPDTR_ID", length = 50)
-    private String updtrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updtr_id")
+    private User updtr;
 
-    @Column(name = "DELR_ID", length = 50)
-    private String delrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delr_id")
+    private User delr;
 
     @OneToMany(mappedBy="appAuth")
     private List<UserGroupAuth> userGroupAuth = new ArrayList<>();

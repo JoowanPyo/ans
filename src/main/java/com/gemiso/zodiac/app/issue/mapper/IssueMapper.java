@@ -13,7 +13,4 @@ import java.util.List;
 )
 public interface IssueMapper extends GenericMapper<IssueDTO, Issue, IssueDTO> {
 
-    List<IssueDTO> toDtoList(List<Issue> issues);
-
-    //IssueDTO toDtoPage(Issue issue);
 }

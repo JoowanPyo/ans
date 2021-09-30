@@ -1,7 +1,7 @@
-package com.gemiso.zodiac.app.ArticleOrder.mapper;
+package com.gemiso.zodiac.app.articleOrder.mapper;
 
-import com.gemiso.zodiac.app.ArticleOrder.ArticleOrder;
-import com.gemiso.zodiac.app.ArticleOrder.dto.ArticleOrderDTO;
+import com.gemiso.zodiac.app.articleOrder.ArticleOrder;
+import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderDTO;
 import com.gemiso.zodiac.core.mapper.GenericMapper;
 import org.mapstruct.Mapper;
 

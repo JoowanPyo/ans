@@ -1,10 +1,13 @@
 package com.gemiso.zodiac.app.capTemplateGrp;
 
+import com.gemiso.zodiac.app.capTemplate.CapTemplate;
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_cap_tmplt_grp")
@@ -31,17 +34,19 @@ public class CapTemplateGrp extends BaseEntity {
     @Column(name = "brdc_pgm_id", length = 21)
     private String brdcPgmId;
 
-    @Column(name = "inputr_id", length = 50, nullable = false)
-    private String inputrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inputr_id", nullable = false)
+    private User inputr;
 
-    @Column(name = "updtr_id", length = 50)
-    private String updtrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updtr_id")
+    private User updtr;
 
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'")
     private String delYn;
 
-   /* @OneToMany(mappedBy="capTemplateGrp")
-    private List<CapTemplate> capTemplate ;*/
+    @OneToMany(mappedBy="capTemplateGrp")
+    private List<CapTemplate> capTemplate ;
 
     @PrePersist
     public void prePersist() {

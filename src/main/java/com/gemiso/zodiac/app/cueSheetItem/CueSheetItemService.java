@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemUpdateDTO;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemUpdateMapper;
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -44,8 +45,11 @@ public class CueSheetItemService {
     public Long create(CueSheetItemCreateDTO cueSheetItemCreateDTO, Long cueId){
 
         cueSheetItemCreateDTO.setCueId(cueId);
+
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        cueSheetItemCreateDTO.setInputrId(userId);
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        cueSheetItemCreateDTO.setInputr(userSimpleDTO);
 
         CueSheetItem cueSheetItem = cueSheetItemCreateMapper.toEntity(cueSheetItemCreateDTO);
         cueSheetItemRepository.save(cueSheetItem); //큐시트아이템 등록
@@ -82,8 +86,10 @@ public class CueSheetItemService {
 
         cueSheetItemUpdateDTO.setCueId(cueId);
         cueSheetItemUpdateDTO.setCueItemId(cueItemId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        cueSheetItemUpdateDTO.setUpdtrId(userId);
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        cueSheetItemUpdateDTO.setUpdtr(userSimpleDTO);
 
         cueSheetItemUpdateMapper.updateFromDto(cueSheetItemUpdateDTO, cueSheetItem);
 
@@ -96,8 +102,10 @@ public class CueSheetItemService {
 
         CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        cueSheetItemDTO.setDelrId(userId);
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        cueSheetItemDTO.setDelr(userSimpleDTO);
         cueSheetItemDTO.setDelYn("Y");
         cueSheetItemDTO.setDelDtm(new Date());
 

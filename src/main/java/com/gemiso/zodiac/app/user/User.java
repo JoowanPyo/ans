@@ -92,14 +92,17 @@ public class User extends BaseEntity {
     @Column(name = "del_yn",columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
 
-    @Column(name = "inputr_id", length = 50)
-    private String inputrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inputr_id", nullable = false)
+    private User inputr;
 
-    @Column(name = "updtr_id", length = 50)
-    private String updtrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updtr_id")
+    private User updtr;
 
-    @Column(name = "delr_id", length = 50)
-    private String delrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delr_id")
+    private User delr;
 
     @LastModifiedDate
     @Column(name = "del_dtm")

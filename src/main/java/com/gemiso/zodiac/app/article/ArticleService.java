@@ -1,11 +1,10 @@
 package com.gemiso.zodiac.app.article;
 
-import com.gemiso.zodiac.app.ArticleOrder.dto.ArticleOrderSimpleDTO;
-import com.gemiso.zodiac.app.ArticleOrder.mapper.ArticleOrderSimpleMapper;
-import com.gemiso.zodiac.app.article.dto.ArticleCreateDTO;
-import com.gemiso.zodiac.app.article.dto.ArticleDTO;
-import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
+import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderSimpleDTO;
+import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderSimpleMapper;
+import com.gemiso.zodiac.app.article.dto.*;
 import com.gemiso.zodiac.app.article.mapper.ArticleCreateMapper;
+import com.gemiso.zodiac.app.article.mapper.ArticleLockMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleUpdateMapper;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
@@ -16,12 +15,12 @@ import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapMapper;
 import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapSimpleMapper;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.articleHist.ArticleHistRepository;
-import com.gemiso.zodiac.app.articleHist.dto.ArticleHistDTO;
 import com.gemiso.zodiac.app.articleHist.dto.ArticleHistSimpleDTO;
-import com.gemiso.zodiac.app.articleHist.mapper.ArticleHistMapper;
 import com.gemiso.zodiac.app.articleHist.mapper.ArticleHistSimpleMapper;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
+import com.gemiso.zodiac.app.symbol.Symbol;
+import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.user.QUser;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
@@ -29,7 +28,7 @@ import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -55,8 +54,12 @@ public class ArticleService {
     private final ArticleMediaSimpleMapper articleMediaSimpleMapper;
     private final ArticleOrderSimpleMapper articleOrderSimpleMapper;
     private final ArticleUpdateMapper articleUpdateMapper;
+    private final ArticleLockMapper articleLockMapper;
 
     private final UserAuthService userAuthService;
+
+    @Value("${files.url-key}")
+    private String fileUrl;
 
 
     public List<ArticleDTO> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, Long brdcPgmId,
@@ -78,14 +81,32 @@ public class ArticleService {
         ArticleDTO articleDTO = articleMapper.toDto(article);
 
         //기사정보를 불러와 맵퍼스트럭트 사용시 스텍오버플로우에러[기사에 포함된 리스트에 기사정보포함되어이써 문제 발생] 때문에 따로 DTO변환.
-        List<ArticleHistSimpleDTO> articleHistDTOList = articleHistSimpleMapper.toDtoList(article.getArticleHist());//기사이력정보 DTO변환
+        //List<ArticleHistSimpleDTO> articleHistDTOList = articleHistSimpleMapper.toDtoList(article.getArticleHist());//기사이력정보 DTO변환
         List<ArticleCapSimpleDTO> articleCapDTOList = articleCapSimpleMapper.toDtoList(article.getArticleCap()); //기사자막정보 DTO변환
         List<ArticleMediaSimpleDTO> articleMediaSimpleDTOList = articleMediaSimpleMapper.toDtoList(article.getArticleMedia()); //기사미디어정보 DTO변환
         List<ArticleOrderSimpleDTO> articleOrderSimpleDTOList = articleOrderSimpleMapper.toDtoList(article.getArticleOrder()); //기사의뢰정보 DTO변환
-        
+
+
+        //방송아이콘 이미지 Url 추가.
+        List<ArticleCapSimpleDTO> setArticleCapDTOList = new ArrayList<>();
+        for (ArticleCapSimpleDTO articleCapSimpleDTO : articleCapDTOList){
+
+            SymbolDTO symbolDTO = new SymbolDTO();
+
+            symbolDTO = articleCapSimpleDTO.getSymbol();
+
+            String fileLoc = articleCapSimpleDTO.getSymbol().getAttachFile().getFileLoc();
+            String url = fileUrl + fileLoc;
+
+            symbolDTO.setUrl(url);
+
+            articleCapSimpleDTO.setSymbol(symbolDTO);
+            setArticleCapDTOList.add(articleCapSimpleDTO);
+        }
+
         //기사이력, 자막, 미디어, 의뢰 정보 set
-        articleDTO.setArticleHistDTO(articleHistDTOList);
-        articleDTO.setArticleCapDTO(articleCapDTOList);
+        //articleDTO.setArticleHistDTO(articleHistDTOList);
+        articleDTO.setArticleCapDTO(setArticleCapDTOList);
         articleDTO.setArticleMediaDTO(articleMediaSimpleDTOList);
         articleDTO.setArticleOrderDTO(articleOrderSimpleDTOList);
 
@@ -113,13 +134,15 @@ public class ArticleService {
         if (!ObjectUtils.isEmpty(articleCapDTOS)) {
             for (ArticleCapDTO articleCapDTO : articleCapDTOS) {
 
-                articleCapDTO.setArticle(articleDTO);
+                Article articleSimple = Article.builder().artclId(articleDTO.getArtclId()).build();
+
                 ArticleCap articleCap = articleCapMapper.toEntity(articleCapDTO);
+                articleCap.setArticle(articleSimple);
                 articleCapRepository.save(articleCap);
             }
         }
         //기사 이력 create
-        createArticleHist(article ,articleDTO);
+        createArticleHist(article);
 
         return article.getArtclId();
     }
@@ -128,9 +151,20 @@ public class ArticleService {
 
         Article article = articleFindOrFail(artclId);
 
+        List<ArticleCap> articleCapList = article.getArticleCap();
+
+        if (ObjectUtils.isEmpty(articleCapList) == false) {
+            for (ArticleCap articleCap : articleCapList) {
+
+                Long artclCapId = articleCap.getArtclCapId();
+
+                articleCapRepository.deleteById(artclCapId);
+
+            }
+        }
+
         String userId = userAuthService.authUser.getUserId();
         UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-
         articleUpdateDTO.setUpdtr(userSimpleDTO);
 
         articleUpdateMapper.updateFromDto(articleUpdateDTO, article);
@@ -138,7 +172,7 @@ public class ArticleService {
         articleRepository.save(article);
 
         //기사이력 등록.
-        updateArticleHist(article ,articleUpdateDTO);
+        updateArticleHist(article);
 
     }
 
@@ -151,10 +185,48 @@ public class ArticleService {
         //삭제정보 등록
         articleDTO.setDelDtm(new Date());
         String userId = userAuthService.authUser.getUserId();
-        articleDTO.setDelrId(userId);
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        articleDTO.setDelr(userSimpleDTO);
         articleDTO.setDelYn("Y");
 
         articleMapper.updateFromDto(articleDTO, article);
+
+        articleRepository.save(article);
+
+    }
+
+    public void articleLock(Long artclId, ArticleLockDTO articleLockDTO){
+
+        Article article = articleFindOrFail(artclId);
+
+        if (articleLockDTO.getLckYn().equals("Y")){
+            articleLockDTO.setLckDtm(new Date());
+            // 토큰 인증된 사용자 아이디를 입력자로 등록
+            String userId = userAuthService.authUser.getUserId();
+            UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+            articleLockDTO.setLckr(userSimpleDTO);
+        }else {
+            article.setLckDtm(null);
+            article.setLckr(null);
+        }
+
+        articleLockMapper.updateFromDto(articleLockDTO, article);
+
+        articleRepository.save(article);
+
+
+    }
+
+    public void articleUnlock(Long artclId, ArticleLockDTO articleLockDTO){
+
+        Article article = articleFindOrFail(artclId);
+
+        if (articleLockDTO.getLckYn().equals("N")){
+            article.setLckDtm(null);
+            article.setLckr(null);
+        }
+
+        articleLockMapper.updateFromDto(articleLockDTO, article);
 
         articleRepository.save(article);
 
@@ -196,7 +268,7 @@ public class ArticleService {
             booleanBuilder.and(qArticle.inputDtm.between(rcvDt, rcvDtTomerrow));
         }
         if (!StringUtils.isEmpty(rptrId)){
-            booleanBuilder.and(qArticle.rptrId.eq(rptrId));
+            booleanBuilder.and(qArticle.rptr.userId.eq(rptrId));
         }
         if (!StringUtils.isEmpty(brdcPgmId)){
             booleanBuilder.and(qArticle.brdcPgmId.eq(brdcPgmId));
@@ -212,7 +284,7 @@ public class ArticleService {
                 booleanBuilder.and(qArticle.artclTitl.contains(searchWord));
             }
             if (searchDivCd.equals("02")){
-                booleanBuilder.and(qArticle.rptrId.eq(String.valueOf(qUser.userNm.contains(searchWord))));
+                booleanBuilder.and(qArticle.rptr.userId.eq(String.valueOf(qUser.userNm.contains(searchWord))));
             }
 
         }
@@ -221,36 +293,36 @@ public class ArticleService {
         return booleanBuilder;
     }
 
-    public void createArticleHist(Article article, ArticleDTO articleDTO){
+    public void createArticleHist(Article article){
 
         ArticleHist articleHist = ArticleHist.builder()
                 .article(article)
-                .chDivCd(articleDTO.getChDivCd())
-                .artclTitl(articleDTO.getArtclTitl())
-                .artclTitlEn(articleDTO.getArtclTitlEn())
-                .artclCtt(articleDTO.getArtclCtt())
-                .ancMentCtt(articleDTO.getAncMentCtt())
-                .artclOrd(articleDTO.getArtclOrd())
-                .orgArtclId(articleDTO.getOrgArtclId())
+                .chDivCd(article.getChDivCd())
+                .artclTitl(article.getArtclTitl())
+                .artclTitlEn(article.getArtclTitlEn())
+                .artclCtt(article.getArtclCtt())
+                .ancMentCtt(article.getAncMentCtt())
+                .artclOrd(article.getArtclOrd())
+                .orgArtclId(article.getOrgArtclId())
                 .inputDtm(new Date())
-                .ver(0) //수정! 버전이 설정?
+                .ver(0) //수정! 버전 설정?
                 .build();
 
         articleHistRepository.save(articleHist);
     }
-    public void updateArticleHist(Article article, ArticleUpdateDTO articleUpdateDTO){
+    public void updateArticleHist(Article article){
 
         ArticleHist articleHist = ArticleHist.builder()
                 .article(article)
-                .chDivCd(articleUpdateDTO.getChDivCd())
-                .artclTitl(articleUpdateDTO.getArtclTitl())
-                .artclTitlEn(articleUpdateDTO.getArtclTitlEn())
-                .artclCtt(articleUpdateDTO.getArtclCtt())
-                .ancMentCtt(articleUpdateDTO.getAncMentCtt())
-                .artclOrd(articleUpdateDTO.getArtclOrd())
-                .orgArtclId(articleUpdateDTO.getOrgArtclId())
+                .chDivCd(article.getChDivCd())
+                .artclTitl(article.getArtclTitl())
+                .artclTitlEn(article.getArtclTitlEn())
+                .artclCtt(article.getArtclCtt())
+                .ancMentCtt(article.getAncMentCtt())
+                .artclOrd(article.getArtclOrd())
+                .orgArtclId(article.getOrgArtclId())
                 .inputDtm(new Date())
-                .ver(0) //수정! 버전이 설정?
+                .ver(0) //수정! 버전 설정?
                 .build();
 
         articleHistRepository.save(articleHist);

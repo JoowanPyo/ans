@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.cueSheet;
 
 import com.gemiso.zodiac.app.program.Program;
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -73,32 +74,41 @@ public class CueSheet {
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
 
-    @Column(name = "inputr_id", length = 50 , nullable = false)
-    private String inputrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inputr_id", nullable = false)
+    private User inputr;
 
-    @Column(name = "delr_id", length = 50)
-    private String delrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delr_id")
+    private User delr;
 
-    @Column(name = "pd_1_id", length = 50)
-    private String pd1Id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pd_1_id")
+    private User pd1;
 
-    @Column(name = "pd_2_id", length = 50)
-    private String pd2Id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pd_2_id")
+    private User pd2;
 
-    @Column(name = "anc_1_id", length = 50)
-    private String anc1Id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "anc_1_id")
+    private User anc1;
 
-    @Column(name = "anc_2_id", length = 50)
-    private String anc2Id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "anc_2_id")
+    private User anc2;
 
-    @Column(name = "lckr_id", length = 50)
-    private String lckrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lckr_id")
+    private User lckr;
 
-    @Column(name = "td_1_id", length = 50)
-    private String td1Id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "td_1_id")
+    private User td1;
 
-    @Column(name = "td_2_id", length = 50)
-    private String td2Id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "td_2_id")
+    private User td2;
 
     @Column(name = "remark", length = 500)
     private String remark;

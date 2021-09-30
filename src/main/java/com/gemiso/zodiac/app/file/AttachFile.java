@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.file;
 
 import com.gemiso.zodiac.app.symbol.Symbol;
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.yonhap.YonhapAttchFile;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -57,8 +58,9 @@ public class AttachFile {
         @Column(name = "org_file_nm", length = 600)
         private String orgFileNm;
 
-        @Column(name = "inputr_id", length = 50)
-        private String inputrId;
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "inputr_id", nullable = false)
+        private User inputr;
 
 
         @OneToMany(mappedBy="attachFile")

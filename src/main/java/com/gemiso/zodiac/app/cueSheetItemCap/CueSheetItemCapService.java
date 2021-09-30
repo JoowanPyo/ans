@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapUpdateDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.mapper.CueSheetItemCapCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItemCap.mapper.CueSheetItemCapMapper;
 import com.gemiso.zodiac.app.cueSheetItemCap.mapper.CueSheetItemCapUpdateMapper;
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -66,8 +67,10 @@ public class CueSheetItemCapService {
         //수정. cueId???, cueItemCapDivCd값으로 큐시트아이템아티클캡 업데이트
 
         cueSheetItemCapCreateDTO.setCueItemId(cueItemId);//큐아이템 아이디 추가.
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        cueSheetItemCapCreateDTO.setInputrId(userId);//등록자 아이디 추가.
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        cueSheetItemCapCreateDTO.setInputr(userSimpleDTO);//등록자 아이디 추가.
 
         CueSheetItemCap cueSheetItemCap = cueSheetItemCapCreateMapper.toEntity(cueSheetItemCapCreateDTO);
 
@@ -87,8 +90,10 @@ public class CueSheetItemCapService {
             for (CueSheetItemCapCreateDTO cueSheetItemCapCreateDTO : cueSheetItemCapCreateDTOList){ //큐시트 아이템 자막 저장
                 cueSheetItemCapCreateDTO.setCueItemId(cueItemId);
 
+                // 토큰 인증된 사용자 아이디를 입력자로 등록
                 String userId = userAuthService.authUser.getUserId();
-                cueSheetItemCapCreateDTO.setInputrId(userId);//등록자 아이디 추가.
+                UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+                cueSheetItemCapCreateDTO.setInputr(userSimpleDTO);//등록자 아이디 추가.
 
                 CueSheetItemCap cueSheetItemCap = cueSheetItemCapCreateMapper.toEntity(cueSheetItemCapCreateDTO);
                 cueSheetItemCapRepotitory.save(cueSheetItemCap);
@@ -103,8 +108,10 @@ public class CueSheetItemCapService {
 
         cueSheetItemCapUpdateDTO.setCueItemId(cueItemId);//큐아이템 아이디 등록
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        cueSheetItemCapUpdateDTO.setUpdtrId(userId);
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        cueSheetItemCapUpdateDTO.setUpdtr(userSimpleDTO);
 
         cueSheetItemCapUpdateMapper.updateFromDto(cueSheetItemCapUpdateDTO, cueSheetItemCap);
 

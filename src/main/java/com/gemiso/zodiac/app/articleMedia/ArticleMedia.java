@@ -1,8 +1,8 @@
 package com.gemiso.zodiac.app.articleMedia;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -65,14 +65,17 @@ public class ArticleMedia extends BaseEntity {
     @Column(name = "del_dtm")
     private Date delDtm;
 
-    @Column(name = "inputr_id", length = 50, nullable = false)
-    private String inputrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inputr_id")
+    private User inputr;
 
-    @Column(name = "updtr_id", length = 50)
-    private String updtrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updtr_id")
+    private User updtr;
 
-    @Column(name = "delr_id", length = 50)
-    private String delrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delr_id")
+    private User delr;
 
     @Column(name = "video_edtr_id", length = 50)
     private String videoEdtrId;

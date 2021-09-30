@@ -1,15 +1,8 @@
 package com.gemiso.zodiac.app.article.dto;
 
-import com.gemiso.zodiac.app.ArticleOrder.ArticleOrder;
-import com.gemiso.zodiac.app.ArticleOrder.dto.ArticleOrderDTO;
-import com.gemiso.zodiac.app.ArticleOrder.dto.ArticleOrderSimpleDTO;
-import com.gemiso.zodiac.app.articleCap.ArticleCap;
-import com.gemiso.zodiac.app.articleCap.dto.ArticleCapDTO;
+import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
-import com.gemiso.zodiac.app.articleHist.dto.ArticleHistDTO;
 import com.gemiso.zodiac.app.articleHist.dto.ArticleHistSimpleDTO;
-import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
-import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
@@ -69,10 +62,10 @@ public class ArticleDTO {
     private UserSimpleDTO inputr;
     //private String updtrId;
     private UserSimpleDTO updtr;
-    private String delrId;
-    private String apprvrId;
-    private String lckrId;
-    private String rptrId;
+    private UserSimpleDTO delr;
+    private UserSimpleDTO apprvr;
+    private UserSimpleDTO lckr;
+    private UserSimpleDTO rptr;
     private Integer artclCttTime;
     private Integer ancMentCttTime;
     private Integer artclExtTime;
@@ -80,7 +73,7 @@ public class ArticleDTO {
     private String deptCd;
     private String deviceCd;
     private IssueDTO issue;
-    private List<ArticleHistSimpleDTO> articleHistDTO = new ArrayList<>();
+    //private List<ArticleHistSimpleDTO> articleHistDTO = new ArrayList<>();
     private List<ArticleCapSimpleDTO> articleCapDTO = new ArrayList<>();
     private List<ArticleMediaSimpleDTO> articleMediaDTO = new ArrayList<>();
     private List<ArticleOrderSimpleDTO> articleOrderDTO = new ArrayList<>();

@@ -1,9 +1,6 @@
 package com.gemiso.zodiac.app.user;
 
-import com.gemiso.zodiac.app.user.dto.UserCreateDTO;
-import com.gemiso.zodiac.app.user.dto.UserDTO;
-import com.gemiso.zodiac.app.user.dto.UserGroupUserDTO;
-import com.gemiso.zodiac.app.user.dto.UserUpdateDTO;
+import com.gemiso.zodiac.app.user.dto.*;
 import com.gemiso.zodiac.app.user.mapper.UserCreateMapper;
 import com.gemiso.zodiac.app.user.mapper.UserGroupUserMapper;
 import com.gemiso.zodiac.app.user.mapper.UserMapper;
@@ -116,8 +113,10 @@ public class UserService {
         String password = encodePassword(userCreateDTO.getPwd()); //password encoding type 어떻게 할지
         userCreateDTO.setPwd(password);
 
-        String userId = userAuthService.authUser.getUserId();
-        userCreateDTO.setInputrId(userId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String tokenUserId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(tokenUserId).build();
+        userCreateDTO.setInputr(userSimpleDTO);
 
         User userEntity = userCreateMapper.toEntity(userCreateDTO);
 
@@ -172,8 +171,10 @@ public class UserService {
 
         User user = userFindOrFail(userId);
 
-        String updtrId = userAuthService.authUser.getUserId();
-        userUpdateDTO.setUpdtrId(updtrId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String tokenUserId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(tokenUserId).build();
+        userUpdateDTO.setUpdtr(userSimpleDTO);
         userUpdateDTO.setUserId(userId);
        // User userEntity = userUpdateMapper.toEntity(userUpdateDTO);
        // userEntity.setPwd(user.getPwd());
@@ -190,8 +191,10 @@ public class UserService {
         UserDTO userDTO = userMapper.toDto(user);
         userDTO.setDelYn("Y");
         userDTO.setDelDtm(new Date());
-        String delrId = userAuthService.authUser.getUserId();
-        userDTO.setDelrId(delrId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String tokenUserId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(tokenUserId).build();
+        userDTO.setDelr(userSimpleDTO);
 
         userMapper.updateFromDto(userDTO, user);
 

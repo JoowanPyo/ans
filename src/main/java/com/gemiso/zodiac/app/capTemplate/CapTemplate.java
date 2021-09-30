@@ -3,6 +3,7 @@ package com.gemiso.zodiac.app.capTemplate;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrp;
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -83,16 +84,19 @@ public class CapTemplate extends BaseEntity {
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
 
-    @Column(name = "inputr_id", length = 50, nullable = false)
-    private String inputrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inputr_id", nullable = false)
+    private User inputr;
 
-    @Column(name = "updtr_id", length = 50)
-    private String updtrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updtr_id")
+    private User updtr;
 
-    @Column(name = "delr_Id", length = 50)
-    private String delrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delr_id")
+    private User delr;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tmplt_grp_id")
     private CapTemplateGrp capTemplateGrp;
 

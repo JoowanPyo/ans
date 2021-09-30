@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.file.dto;
 
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,5 +24,5 @@ public class AttachFileDTO {
     private String delYn;
     private Date inputDtm;
     private String orgFileNm;
-    private String inputrId;
+    private UserSimpleDTO inputr;
 }

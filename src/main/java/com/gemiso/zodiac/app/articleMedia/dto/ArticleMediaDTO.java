@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.articleMedia.dto;
 
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,9 +29,9 @@ public class ArticleMediaDTO {
     private Date delDtm;
     private Date inputDtm;
     private Date updtDtm;
-    private String inputrId;
-    private String updtrId;
-    private String delrId;
+    private UserSimpleDTO inputr;
+    private UserSimpleDTO updtr;
+    private UserSimpleDTO delr;
     private String videoEdtrId;
     private ArticleDTO article;
 }

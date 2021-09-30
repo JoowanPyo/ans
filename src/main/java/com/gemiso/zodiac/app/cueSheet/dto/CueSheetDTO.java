@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.cueSheet.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,15 +35,15 @@ public class CueSheetDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
     private String delYn;
-    private String inputrId;
-    private String delrId;
-    private String pd1Id;
-    private String pd2Id;
-    private String anc1Id;
-    private String anc2Id;
-    private String lckrId;
-    private String td1Id;
-    private String td2Id;
+    private UserSimpleDTO inputr;
+    private UserSimpleDTO delr;
+    private UserSimpleDTO pd1;
+    private UserSimpleDTO pd2;
+    private UserSimpleDTO anc1;
+    private UserSimpleDTO anc2;
+    private UserSimpleDTO lckr;
+    private UserSimpleDTO td1;
+    private UserSimpleDTO td2;
     private String remark;
     private ProgramDTO program;
 }

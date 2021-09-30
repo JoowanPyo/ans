@@ -8,16 +8,20 @@ import com.gemiso.zodiac.app.symbol.dto.SymbolUpdateDTO;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolCreateMapper;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolMapper;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolUpdateMapper;
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -29,15 +33,17 @@ import java.util.Optional;
 public class SymbolService {
 
     private final SymbolRepository symbolRepository;
-    private final AttachFileRepository attachFileRepository;
+    //private final AttachFileRepository attachFileRepository;
 
     private final SymbolMapper symbolMapper;
     private final SymbolCreateMapper symbolCreateMapper;
     private final SymbolUpdateMapper symbolUpdateMapper;
-    private final AttachFileMapper attachFileMapper;
-
+    //private final AttachFileMapper attachFileMapper;
 
     private final UserAuthService userAuthService;
+
+    @Value("${files.url-key}")
+    private String fileUrl;
 
     public List<SymbolDTO> findAll(String useYn, String symbolNm){
 
@@ -47,7 +53,21 @@ public class SymbolService {
 
         List<SymbolDTO> symbolDTOS = symbolMapper.toDtoList(symbolList);
 
-        return symbolDTOS;
+        //방송아이콘 이미지가 있는 서버Url Set
+        List<SymbolDTO> returnSymbolDTOList = new ArrayList<>();
+
+            for (SymbolDTO symbolDTO : symbolDTOS) {
+
+                if (ObjectUtils.isEmpty(symbolDTO.getAttachFile()) == false) {
+                    String fileLoc = symbolDTO.getAttachFile().getFileLoc();
+                    String url = fileUrl + fileLoc;
+                    symbolDTO.setUrl(url);
+                }
+                returnSymbolDTOList.add(symbolDTO);
+            }
+
+
+        return returnSymbolDTOList;
     }
 
 
@@ -58,22 +78,22 @@ public class SymbolService {
 
         SymbolDTO symbolDTO = symbolMapper.toDto(symbol);
 
-/*        Optional<AttachFile> attachFile = attachFileRepository.findById(symbol.getAttachFile().getFileId());
-
-        if (attachFile.isPresent()){
-
-            AttachFileDTO attachFileDTO = attachFileMapper.toDto(attachFile.get());
-            symbolDTO.setAttachFile(attachFileDTO);
-        }*/
+        //방송아이콘 이미지가 있는 서버Url Set
+        if (ObjectUtils.isEmpty(symbolDTO.getAttachFile()) == false) {
+            String fileLoc = symbolDTO.getAttachFile().getFileLoc();
+            String url = fileUrl + fileLoc;
+            symbolDTO.setUrl(url);
+        }
 
         return symbolDTO;
     }
 
     public Long create(SymbolCreateDTO symbolCreateDTO){ //방송 아이콘 등록 서비스
 
-        String userId = userAuthService.authUser.getUserId(); //토큰에필터에서 토큰 파싱하여 등록된 UserId
-
-        symbolCreateDTO.setInputrId(userId); //등록자 추가.
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        symbolCreateDTO.setInputr(userSimpleDTO); //등록자 추가.
 
         Symbol symbol = symbolCreateMapper.toEntity(symbolCreateDTO); //DTO -> Entity로 변환
 
@@ -88,8 +108,10 @@ public class SymbolService {
         Symbol symbol = userFindOrFail(symbolId);
 
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        symbolUpdateDTO.setUpdtrId(userId); // 수정자 추가.
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        symbolUpdateDTO.setUpdtr(userSimpleDTO); // 수정자 추가.
 
         symbolUpdateMapper.updateFromDto(symbolUpdateDTO, symbol);
         symbolRepository.save(symbol);
@@ -102,10 +124,13 @@ public class SymbolService {
 
         SymbolDTO symbolDTO = symbolMapper.toDto(symbol);
 
-        symbolDTO.setDelDtm(new Date());
+
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        symbolDTO.setDelrId(userId);
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        symbolDTO.setDelr(userSimpleDTO);
         symbolDTO.setDelYn("Y");
+        symbolDTO.setDelDtm(new Date());
 
         symbolMapper.updateFromDto(symbolDTO, symbol);
 

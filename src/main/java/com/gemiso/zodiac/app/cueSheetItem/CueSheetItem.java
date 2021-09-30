@@ -3,6 +3,7 @@ package com.gemiso.zodiac.app.cueSheetItem;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -110,17 +111,21 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "news_break_yn", columnDefinition = "bpchar(1) default 'N'")
     private String newsBreakYn;
 
-    @Column(name = "inputr_id", length = 50, nullable = false)
-    private String inputrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inputr_id", nullable = false)
+    private User inputr;
 
-    @Column(name = "updtr_id", length = 50)
-    private String updtrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updtr_id")
+    private User updtr;
 
-    @Column(name = "delr_id", length = 50)
-    private String delrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delr_id")
+    private User delr;
 
-    @Column(name = "lckr_id", length = 50)
-    private String lckrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lckr_id")
+    private User lckr;
 
     @Column(name = "cue_id", nullable = false)
     private Long cueId;

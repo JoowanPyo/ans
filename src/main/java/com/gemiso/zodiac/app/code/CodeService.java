@@ -6,7 +6,9 @@ import com.gemiso.zodiac.app.code.dto.CodeUpdateDTO;
 import com.gemiso.zodiac.app.code.mapper.CodeCreateMapper;
 import com.gemiso.zodiac.app.code.mapper.CodeMapper;
 import com.gemiso.zodiac.app.code.mapper.CodeUpdateMapper;
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.helper.JWTParser;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +35,8 @@ public class CodeService {
     private final CodeCreateMapper codeCreateMapper;
     private final CodeUpdateMapper codeUpdateMapper;
 
-    private final JWTParser jwtParser;
+    private final UserAuthService userAuthService;
+
 
     public List<CodeDTO> findAll(String searchWord, String useYn, List<Long> hrnkCdIds){
 
@@ -82,9 +85,10 @@ public class CodeService {
 
         }
 
-        String userId = jwtParser.acTokenParser(authorization); //엑세스 토큰에 등록된 사용자 아이디
-
-        codeCreateDTO.setInputrId(userId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        codeCreateDTO.setInputr(userSimpleDTO);
         codeCreateDTO.setInputDtm(new Date());
 
         Code codeEntity = codeCreateMapper.toEntity(codeCreateDTO);
@@ -103,11 +107,12 @@ public class CodeService {
 
         Code code = codeFindOrFail(cdId);
 
-        String userId = jwtParser.acTokenParser(authorization);
-
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
         codeUpdateDTO.setCdId(cdId);
         codeUpdateDTO.setUpdtDtm(new Date());
-        codeUpdateDTO.setUpdtrId(userId);
+        codeUpdateDTO.setUpdtr(userSimpleDTO);
 
         codeUpdateMapper.updateFromDto(codeUpdateDTO, code);
         codeRepository.save(code);
@@ -118,12 +123,13 @@ public class CodeService {
 
         Code code = codeFindOrFail(cdId);
 
-        String userId = jwtParser.acTokenParser(authorization);
-
         CodeDTO codeDTO = codeMapper.toDto(code);
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        codeDTO.setDelr(userSimpleDTO);
         codeDTO.setDelYn("Y");
-        codeDTO.setDelrId(userId);
         codeDTO.setDelDtm(new Date());
 
         Code codeEntity = codeMapper.toEntity(codeDTO);

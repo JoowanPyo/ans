@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.code.dto;
 
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +25,7 @@ public class CodeCreateDTO {
     private Date inputDtm;
     //private Date updtDtm;
     //private Date delDtm;
-    private String inputrId;
+    private UserSimpleDTO inputr;
     //private String updtrId;
     //private String delrId;
 }

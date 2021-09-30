@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.userGroup;
 
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserGroupUser;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
@@ -44,14 +45,17 @@ public class UserGroup extends BaseEntity {
     @Column(name = "del_dtm")
     private Date delDtm;
 
-    @Column(name = "inputr_id", length = 50)
-    private String inputrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inputr_id", nullable = false)
+    private User inputr;
 
-    @Column(name = "updtr_id", length = 50)
-    private String updtrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updtr_id")
+    private User updtr;
 
-    @Column(name = "delr_id", length = 50)
-    private String delrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delr_id")
+    private User delr;
 
     @OneToMany(mappedBy="userGroup")
     private List<UserGroupUser> userGroupUsers ;

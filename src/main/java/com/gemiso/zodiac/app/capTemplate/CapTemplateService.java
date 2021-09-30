@@ -8,6 +8,7 @@ import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateMapper;
 import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateUpdateMapper;
 import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrpService;
 import com.gemiso.zodiac.app.capTemplateGrp.dto.CapTemplateGrpDTO;
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -57,9 +58,9 @@ public class CapTemplateService {
 
         CapTemplateDTO capTemplateDTO = capTemplateMapper.toDto(capTemplate);
 
-        CapTemplateGrpDTO capTemplateGrpDTO = capTemplateGrpService.find(capTemplateDTO.getTemplate().getTmpltGrpId());
+        //CapTemplateGrpDTO capTemplateGrpDTO = capTemplateGrpService.find(capTemplateDTO.getTemplate().getTmpltGrpId());
 
-        capTemplateDTO.setTemplate(capTemplateGrpDTO);
+        //capTemplateDTO.setTemplate(capTemplateGrpDTO);
 
         return capTemplateDTO;
 
@@ -69,8 +70,10 @@ public class CapTemplateService {
 
         CapTemplate capTemplate = new CapTemplate();
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        capTemplateCreateDTO.setInputrId(userId); //등록자 추가.
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        capTemplateCreateDTO.setInputr(userSimpleDTO); //등록자 추가.
         
         if (capTemplateCreateDTO.getCapTmpltOrd() == 0){ //Ord값이 빈값으로 들어왔을경우 max(ord)값 셋팅
             Optional<Integer> capTmplOrd = capTemplateRepository.findOrd(); //max Ord값 get
@@ -127,8 +130,10 @@ public class CapTemplateService {
 
         CapTemplate capTemplate = capFindOrFail(capTmpltId);
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        capTemplateUpdateDTO.setUpdtrId(userId); //수정자 추가
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        capTemplateUpdateDTO.setUpdtr(userSimpleDTO); //수정자 추가
 
         capTemplateUpdateMapper.updateFromDto(capTemplateUpdateDTO, capTemplate);
         capTemplateRepository.save(capTemplate); //update
@@ -167,8 +172,10 @@ public class CapTemplateService {
 
             CapTemplateDTO capTemplateDTO = capTemplateMapper.toDto(capTemplate);
 
+            // 토큰 인증된 사용자 아이디를 입력자로 등록
             String userId = userAuthService.authUser.getUserId();
-            capTemplateDTO.setDelrId(userId);
+            UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+            capTemplateDTO.setDelr(userSimpleDTO);
             capTemplateDTO.setDelDtm(new Date());
             capTemplateDTO.setDelYn("Y");
 

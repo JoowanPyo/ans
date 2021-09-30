@@ -7,6 +7,7 @@ import com.gemiso.zodiac.app.issue.dto.IssueUpdateDTO;
 import com.gemiso.zodiac.app.issue.mapper.IssueCreateMapper;
 import com.gemiso.zodiac.app.issue.mapper.IssueMapper;
 import com.gemiso.zodiac.app.issue.mapper.IssueUpdateMapper;
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -36,6 +37,7 @@ public class IssueService {
     private final IssueCreateMapper issueCreateMapper;
     private final IssueMapper issueMapper;
     private final IssueUpdateMapper issueUpdateMapper;
+
     private final UserAuthService userAuthService;
 
 
@@ -78,7 +80,11 @@ public class IssueService {
         Integer issuOrd = getOrd();
 
         issueCreateDTO.setIssuOrd(issuOrd + 1);
-        issueCreateDTO.setInputrId(userAuthService.authUser.getUserId());
+
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        issueCreateDTO.setInputr(userSimpleDTO);
 
         Issue issue = issueCreateMapper.toEntity(issueCreateDTO);
         issueRepositoy.save(issue);
@@ -90,9 +96,11 @@ public class IssueService {
 
         Issue issue = issueFindOrFail(issuId);
 
-        issueUpdateDTO.setUpdtDtm(new Date());
-        issueUpdateDTO.setUpdtrId(userAuthService.authUser.getUserId());
-        issueUpdateDTO.setUpdtDtm(new Date());
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        issueUpdateDTO.setUpdtr(userSimpleDTO);
+
 
         issueUpdateMapper.updateFromDto(issueUpdateDTO, issue);
         issueRepositoy.save(issue);
@@ -107,7 +115,11 @@ public class IssueService {
 
         issueDto.setIssuDelYn("Y");
         issueDto.setDelDtm(new Date());
-        issueDto.setDelrId(userAuthService.authUser.getUserId());
+
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        issueDto.setDelr(userSimpleDTO);
 
         issueMapper.updateFromDto(issueDto, issue);
 
@@ -145,6 +157,10 @@ public class IssueService {
 
     public Date copy(List<IssueCopyDTO> issueCopyDTO, Date targetDate) throws Exception {
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+
         if (!CollectionUtils.isEmpty(issueCopyDTO)){
             for (IssueCopyDTO issueCopyDto : issueCopyDTO){
 
@@ -164,10 +180,10 @@ public class IssueService {
                 issueDTOCopy.setIssuDelYn(issueDTO.getIssuDelYn());
                 issueDTOCopy.setIssuFnshDtm(issueDTO.getIssuFnshDtm());
                 issueDTOCopy.setIssuOrgId(issueDTO.getIssuOrgId());
-                issueDTOCopy.setUpdtrId(issueDTO.getUpdtrId());
+                issueDTOCopy.setUpdtr(issueDTO.getUpdtr());
                 issueDTOCopy.setUpdtDtm(issueDTO.getUpdtDtm());
                 issueDTOCopy.setInputDtm(targetDate);
-                issueDTOCopy.setInputrId(userAuthService.authUser.getUserId());
+                issueDTOCopy.setInputr(userSimpleDTO);
 
                 Issue issueEntity = issueMapper.toEntity(issueDTOCopy);
                 issueRepositoy.save(issueEntity);

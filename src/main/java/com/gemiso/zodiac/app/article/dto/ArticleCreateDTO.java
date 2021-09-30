@@ -58,9 +58,9 @@ public class ArticleCreateDTO {
     private UserSimpleDTO inputr;
     //private String updtrId;
     //private String delrId;
-    private String apprvrId;
-    private String lckrId;
-    private String rptrId;
+    private UserSimpleDTO apprvr;
+    private UserSimpleDTO lckr;
+    private UserSimpleDTO rptr;
     private Integer artclCttTime;
     private Integer ancMentCttTime;
     private Integer artclExtTime;
@@ -71,6 +71,6 @@ public class ArticleCreateDTO {
 
     //private List<ArticleMediaDTO> articleMedia;
     private List<ArticleCapDTO> articleCap;
-    //private List<ArticleOrderDTO> ArticleOrder;
+    //private List<ArticleOrderDTO> articleOrder;
     //private List<ArticleHistDTO> articleHist;
 }

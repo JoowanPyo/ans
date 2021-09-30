@@ -1,8 +1,8 @@
-package com.gemiso.zodiac.app.ArticleOrder;
+package com.gemiso.zodiac.app.articleOrder;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -46,11 +46,13 @@ public class ArticleOrder extends BaseEntity {
     @Column(name = "ord_rmk", columnDefinition = "text")
     private String ordRmk;
 
-    @Column(name = "inputr_id", length = 50, nullable = false)
-    private String inputrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inputr_id", nullable = false)
+    private User inputr;
 
-    @Column(name = "updtr_id", length = 50)
-    private String updtrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updtr_id")
+    private User updtr;
 
     @Column(name = "workr_id", length = 50)
     private String workrId;

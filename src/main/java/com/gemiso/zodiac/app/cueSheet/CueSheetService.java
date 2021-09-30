@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.cueSheet.dto.CueSheetUpdateDTO;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetCreateMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetUpdateMapper;
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.app.userGroup.QUserGroup;
 import com.gemiso.zodiac.app.userGroup.UserGroup;
 import com.gemiso.zodiac.core.service.UserAuthService;
@@ -61,8 +62,10 @@ public class CueSheetService {
 
     public Long create(CueSheetCreateDTO cueSheetCreateDTO){
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        cueSheetCreateDTO.setInputrId(userId);
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        cueSheetCreateDTO.setInputr(userSimpleDTO);
 
         CueSheet cueSheet = cueSheetCreateMapper.toEntity(cueSheetCreateDTO);
 
@@ -94,9 +97,11 @@ public class CueSheetService {
 
         CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        cueSheetDTO.setDelr(userSimpleDTO);
         cueSheetDTO.setDelDtm(new Date());
-        cueSheetDTO.setDelrId(userId);
         cueSheetDTO.setDelYn("Y");
 
         cueSheetMapper.updateFromDto(cueSheetDTO, cueSheet);
@@ -135,8 +140,8 @@ public class CueSheetService {
             booleanBuilder.and(qCueSheet.brdcPgmNm.contains(brdcPgmNm));
         }
         if(!StringUtils.isEmpty(searchWord)){
-            booleanBuilder.and(qCueSheet.brdcPgmNm.contains(searchWord).or(qCueSheet.pd1Id.contains(searchWord))
-                    .or(qCueSheet.pd2Id.contains(searchWord)));
+            booleanBuilder.and(qCueSheet.brdcPgmNm.contains(searchWord).or(qCueSheet.pd1.userNm.contains(searchWord))
+                    .or(qCueSheet.pd2.userNm.contains(searchWord)));
         }
 
         return booleanBuilder;

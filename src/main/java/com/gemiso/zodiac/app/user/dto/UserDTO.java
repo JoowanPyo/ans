@@ -25,14 +25,14 @@ public class UserDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date delDtm;
     private String delYn;
-    private String delrId;
+    private UserSimpleDTO delr;
     private String deptId;
     private String dutyCd;
     private String email;
     private String emplNo;
     private String freeYn;
     private String inphonNo;
-    private String inputrId;
+    private UserSimpleDTO inputr;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date lastLoginDtm;
     private int loginErrCnt;
@@ -44,7 +44,7 @@ public class UserDTO {
     private String salt;
     private String tel;
     private String telPubYn;
-    private String updtrId;
+    private UserSimpleDTO updtr;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date useEndDtm;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")

@@ -27,7 +27,7 @@ public class UserUpdateDTO {
     private String emplNo;
     private String freeYn;
     private String inphonNo;
-    private String inputrId;
+    //private String inputr;
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     //private Date lastLoginDtm;
     //private int loginErrCnt;
@@ -39,7 +39,7 @@ public class UserUpdateDTO {
     private String salt;
     private String tel;
     private String telPubYn;
-    private String updtrId;
+    private UserSimpleDTO updtr;
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     //private Date useEndDtm;
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")

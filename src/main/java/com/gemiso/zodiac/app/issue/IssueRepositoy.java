@@ -18,7 +18,7 @@ public interface IssueRepositoy extends JpaRepository<Issue, Long>, QuerydslPred
     Optional<Issue> findByIssuId(@Param("issuId")Long issuId);
 
    /* @Query("select a.chDivCd , a.issuDtm, a.issuOrd, a.issuKwd, a.issuCtt, a.issuFnshYn," +
-            " a.issuDelYn, a.issuFnshDtm, a.issuOrgId, a.inputrId from Issue a " +
+            " a.issuDelYn, a.issuFnshDtm, a.issuOrgId, a.inputr from Issue a " +
             "where a.issuId =:issuId and a.issuDelYn ='N'")
     Issue findOrgIssue(@Param("issuId")Long issuId);*/
 }

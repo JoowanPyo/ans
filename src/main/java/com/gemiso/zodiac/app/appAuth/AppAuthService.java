@@ -6,6 +6,8 @@ import com.gemiso.zodiac.app.appAuth.dto.AppAuthUpdateDTO;
 import com.gemiso.zodiac.app.appAuth.mapper.AppAuthCreateMapper;
 import com.gemiso.zodiac.app.appAuth.mapper.AppAuthMapper;
 import com.gemiso.zodiac.app.appAuth.mapper.AppAuthUpdateMapper;
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,8 @@ public class AppAuthService{
     private final AppAuthMapper appAuthMapper;
     private final AppAuthCreateMapper appAuthCreateMapper;
     private final AppAuthUpdateMapper appAuthUpdateMapper;
+
+    private final UserAuthService userAuthService;
 
     public List<AppAuthDTO> findAll(String useYn, String delYn, String hrnkAppAuthCd, String searchWord){
 
@@ -69,6 +73,10 @@ public class AppAuthService{
 
         }
 
+        String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        appAuthCreatDTO.setInputr(userSimpleDTO);
+
         AppAuth appAuth = appAuthCreateMapper.toEntity(appAuthCreatDTO);
 
         appAuthRepository.save(appAuth);
@@ -91,7 +99,9 @@ public class AppAuthService{
         AppAuth appAuth = appAuthFindOrFail(appAuthId);
 
         appAuthUpdateDTO.setAppAuthId(appAuthId);
-        appAuthUpdateDTO.setUpdtrId("updtrId");
+        String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        appAuthUpdateDTO.setUpdtr(userSimpleDTO);
 
         appAuthUpdateMapper.updateFromDto(appAuthUpdateDTO, appAuth);
 
@@ -105,7 +115,9 @@ public class AppAuthService{
         AppAuthDTO appAuthDTO = appAuthMapper.toDto(appAuthEntity);
 
         appAuthDTO.setDelYn("Y");
-        appAuthDTO.setDelrId("삭제자 아이디");
+        String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        appAuthDTO.setDelr(userSimpleDTO);
         appAuthDTO.setDelDtm(new Date());
 
         AppAuth appAuth = appAuthMapper.toEntity(appAuthDTO);
@@ -144,7 +156,7 @@ public class AppAuthService{
             booleanBuilder.and(qAppAuth.appAuthNm.contains(searchWord));
         }
 
-        //.and((Predicate) Sort.by((List<Sort.ArticleOrder>) qAppAuth.ord).descending());
+        //.and((Predicate) Sort.by((List<Sort.articleOrder>) qAppAuth.ord).descending());
 
         return booleanBuilder;
     }

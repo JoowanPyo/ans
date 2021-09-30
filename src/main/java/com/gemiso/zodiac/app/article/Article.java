@@ -1,15 +1,12 @@
 package com.gemiso.zodiac.app.article;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.issue.Issue;
-import com.gemiso.zodiac.app.ArticleOrder.ArticleOrder;
+import com.gemiso.zodiac.app.articleOrder.ArticleOrder;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
@@ -152,17 +149,21 @@ public class Article extends BaseEntity {
     @JoinColumn(name = "updtr_id")
     private User updtr;
 
-    @Column(name = "delr_id", length = 50)
-    private String delrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delr_id")
+    private User delr;
 
-    @Column(name = "apprvr_id", length = 50)
-    private String apprvrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "apprvr_id")
+    private User apprvr;
 
-    @Column(name = "lckr_id", length = 50)
-    private String lckrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lckr_id")
+    private User lckr;
 
-    @Column(name = "rptr_id", length = 50)
-    private String rptrId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rptr_id")
+    private User rptr;
 
     @Column(name = "artcl_ctt_time")
     private Integer artclCttTime;

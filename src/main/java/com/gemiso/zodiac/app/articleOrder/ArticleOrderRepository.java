@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.ArticleOrder;
+package com.gemiso.zodiac.app.articleOrder;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

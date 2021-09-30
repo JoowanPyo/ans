@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheetItemCap.dto;
 
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,7 +31,7 @@ public class CueSheetItemCapCreateDTO {
     private Date inputDtm;
     //private Date updtDtm;
     private Long capTmpltId;
-    private String inputrId;
+    private UserSimpleDTO inputr;
     //private String updtrId;
     //private String delrId;
 }

@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaUpdateDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaCreateMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaUpdateMapper;
+import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -58,8 +59,10 @@ public class ArticleMediaService {
 
     public Long create(ArticleMediaCreateDTO articleMediaCreateDTO) {
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        articleMediaCreateDTO.setInputrId(userId);
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        articleMediaCreateDTO.setInputr(userSimpleDTO);
 
         ArticleMedia articleMedia = articleMediaCreateMapper.toEntity(articleMediaCreateDTO);
 
@@ -73,8 +76,10 @@ public class ArticleMediaService {
 
         ArticleMedia articleMedia = articleMediaFindOrFail(artclMediaId);
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        articleMediaUpdateDTO.setUpdtrId(userId);
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        articleMediaUpdateDTO.setUpdtr(userSimpleDTO);
 
         articleMediaUpdateMapper.updateFromDto(articleMediaUpdateDTO, articleMedia);
 
@@ -88,8 +93,10 @@ public class ArticleMediaService {
 
         ArticleMediaDTO articleMediaDTO = articleMediaMapper.toDto(articleMedia);
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        articleMediaDTO.setDelrId(userId);
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        articleMediaDTO.setDelr(userSimpleDTO);
         articleMediaDTO.setDelDtm(new Date());
         articleMediaDTO.setDelYn("Y");
 

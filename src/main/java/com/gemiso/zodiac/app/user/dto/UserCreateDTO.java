@@ -32,7 +32,7 @@ public class UserCreateDTO {
     private String emplNo;
     private String freeYn;
     private String inphonNo;
-    private String inputrId;
+    private UserSimpleDTO inputr;
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     //private Date lastLoginDtm;
     //private int loginErrCnt;
