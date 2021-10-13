@@ -40,7 +40,7 @@ public class ArticleUpdateDTO {
     private String lckYn;
     private Date lckDtm;
     private Date apprvDtm;
-    private Integer artclOrd;
+    //private Integer artclOrd;
     private Integer brdcCnt;
     private Long orgArtclId;
     private String urgYn;
@@ -69,6 +69,7 @@ public class ArticleUpdateDTO {
     private Integer videoTime;
     private String deptCd;
     private String deviceCd;
+    private Long parentArtlcId;
     private IssueDTO issue;
     //private List<ArticleMediaDTO> articleMedia;
     private List<ArticleCapSimpleDTO> articleCap;

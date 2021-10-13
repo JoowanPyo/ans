@@ -49,7 +49,7 @@ public class AddUserGroupController {
     @PostMapping(path = "/{userGrpId}")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<List<UserGroupUserDTO>> create(@Parameter(name = "userGrpId", required = true) @PathVariable("userGrpId") Long userGrpId,
-                                       @Parameter(name = "userId", required = true) @RequestParam(value = "userId", required = true) List<String> userIds) {
+                                                      @Parameter(name = "userId", required = true) @RequestParam(value = "userId", required = true) List<String> userIds) {
 
         addUserGroupService.create(userIds, userGrpId);
 

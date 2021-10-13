@@ -4,6 +4,7 @@ import com.gemiso.zodiac.app.issue.dto.IssueCopyDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueCreateDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueUpdateDTO;
+import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.ApiResponse;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import io.swagger.annotations.Api;
@@ -14,8 +15,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -37,11 +40,19 @@ public class IssueController {
                                                @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
                                                @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                @Parameter(name = "issu_del_yn", description = "삭제여부 (N , Y)")
-                                               @RequestParam(value = "issu_del_yn", required = false) String issu_del_yn) {
+                                               @RequestParam(value = "issu_del_yn", required = false) String issu_del_yn) throws Exception {
 
-        log.info("Issue Controller :"+sdate+edate+issu_del_yn);
-        List<IssueDTO> issueList = issueService.findAll(sdate, edate, issu_del_yn);
+        List<IssueDTO> issueList = new ArrayList<>();
 
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
+            //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
+            SearchDate searchDate = new SearchDate(sdate, edate);
+
+            issueList = issueService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), issu_del_yn);
+
+        }else {
+            issueList = issueService.findAll(null, null, issu_del_yn);
+        }
         return new ApiResponse<>(issueList);
     }
 

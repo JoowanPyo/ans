@@ -73,6 +73,7 @@ public class ArticleDTO {
     private String deptCd;
     private String deviceCd;
     private IssueDTO issue;
+    private Long parentArtlcId;
     //private List<ArticleHistSimpleDTO> articleHistDTO = new ArrayList<>();
     private List<ArticleCapSimpleDTO> articleCapDTO = new ArrayList<>();
     private List<ArticleMediaSimpleDTO> articleMediaDTO = new ArrayList<>();

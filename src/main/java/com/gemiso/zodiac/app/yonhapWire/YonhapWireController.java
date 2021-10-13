@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.yonhapWire;
 
 import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireCreateDTO;
 import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireDTO;
+import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -30,19 +32,29 @@ public class YonhapWireController {
 
     @Operation(summary = "연합외신 목록조회", description = "연합외신 목록조회")
     @GetMapping(path = "")
-    public ApiResponse<List<YonhapWireDTO>> findAll(@Parameter(name = "sdate", description = "검색시작일[yyyy-MM-dd HH:mm:ss]", required = true)
+    public ApiResponse<List<YonhapWireDTO>> findAll(@Parameter(name = "sdate", description = "검색시작일[yyyy-MM-dd HH:mm:ss]", required = false)
                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date sdate,
-                                                    @Parameter(name = "edate", description = "검색종료일[yyyy-MM-dd HH:mm:ss]", required = true)
+                                                    @Parameter(name = "edate", description = "검색종료일[yyyy-MM-dd HH:mm:ss]", required = false)
                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date edate,
-                                                    @Parameter(name = "agcyCd", description = "통신사코드", required = true)
+                                                    @Parameter(name = "agcyCd", description = "통신사코드")
                                                     @RequestParam(value = "agcyCd", required = false) String agcyCd,
-                                                    @Parameter(name = "searchWord", description = "검색어", required = true)
+                                                    @Parameter(name = "searchWord", description = "검색어")
                                                     @RequestParam(value = "searchWord", required = false) String searchWord,
-                                                    @Parameter(name = "imprt", description = "중요도 List<String>", required = true)
-                                                    @RequestParam(value = "imprt", required = false) List<String> imprtList) {
+                                                    @Parameter(name = "imprt", description = "중요도 List<String>", required = false)
+                                                    @RequestParam(value = "imprt", required = false) List<String> imprtList) throws Exception {
 
-        List<YonhapWireDTO> yonhapWireDTOList = yonhapWireService.findAll(sdate, edate, agcyCd, searchWord, imprtList);
+        List<YonhapWireDTO> yonhapWireDTOList = new ArrayList<>();
 
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
+            //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
+            SearchDate searchDate = new SearchDate(sdate, edate);
+
+            yonhapWireDTOList = yonhapWireService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), agcyCd, searchWord, imprtList);
+
+        }else {
+
+            yonhapWireDTOList = yonhapWireService.findAll(null, null, agcyCd, searchWord, imprtList);
+        }
         return new ApiResponse<>(yonhapWireDTOList);
     }
 

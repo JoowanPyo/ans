@@ -29,7 +29,7 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "사용자 목록 조회", description = "조회조건으로 사용자 목록 조회")
-    @GetMapping
+    @GetMapping(path = "")
     public ApiResponse<List<UserDTO>> findAll(@Parameter(name = "userId", description = "사용자 아이디", in = ParameterIn.QUERY) @RequestParam(value = "userId", required = false) String userId,
                                               @Parameter(name = "userNm", description = "사용자명", in = ParameterIn.QUERY) @RequestParam(value = "userNm", required = false) String userNm,
                                               @Parameter(name = "delYn", description = "삭제 여부", in = ParameterIn.QUERY) @RequestParam(value = "delYn", required = false) String delYn) {

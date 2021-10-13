@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheetMedia.dto;
 
+import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSimpleDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,4 +34,5 @@ public class CueSheetMediaCreateDTO {
     private UserSimpleDTO inputr;
     //private String updtrId;
     //private String delrId;
+    private CueSheetItemSimpleDTO cueSheetItem;
 }

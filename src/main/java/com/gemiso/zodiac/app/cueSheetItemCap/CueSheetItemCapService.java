@@ -83,22 +83,26 @@ public class CueSheetItemCapService {
 
     public void createList(List<CueSheetItemCapCreateDTO> cueSheetItemCapCreateDTOList, Long cueId, Long cueItemId){
 
-        if (!ObjectUtils.isEmpty(cueSheetItemCapCreateDTOList)){
+        if (ObjectUtils.isEmpty(cueSheetItemCapCreateDTOList) == false) {
+            log.error("cueSheetItemCapCreateDTOList is empty");
+            return;
+        }
 
-            cueSheetItemCapRepotitory.deleteCueSheeItemCap(cueItemId, cueSheetItemCapCreateDTOList.get(0).getCueItemCapDivCd());
+        String divcd = cueSheetItemCapCreateDTOList.get(0).getCueItemCapDivCd();
+        cueSheetItemCapRepotitory.deleteCueSheeItemCap(cueItemId, divcd);
 
-            for (CueSheetItemCapCreateDTO cueSheetItemCapCreateDTO : cueSheetItemCapCreateDTOList){ //큐시트 아이템 자막 저장
-                cueSheetItemCapCreateDTO.setCueItemId(cueItemId);
+        for (CueSheetItemCapCreateDTO cueSheetItemCapCreateDTO : cueSheetItemCapCreateDTOList){ //큐시트 아이템 자막 저장
+            cueSheetItemCapCreateDTO.setCueItemId(cueItemId);
 
-                // 토큰 인증된 사용자 아이디를 입력자로 등록
-                String userId = userAuthService.authUser.getUserId();
-                UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-                cueSheetItemCapCreateDTO.setInputr(userSimpleDTO);//등록자 아이디 추가.
+            // 토큰 인증된 사용자 아이디를 입력자로 등록
+            String userId = userAuthService.authUser.getUserId();
+            UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+            cueSheetItemCapCreateDTO.setInputr(userSimpleDTO);//등록자 아이디 추가.
 
-                CueSheetItemCap cueSheetItemCap = cueSheetItemCapCreateMapper.toEntity(cueSheetItemCapCreateDTO);
-                cueSheetItemCapRepotitory.save(cueSheetItemCap);
-            }
-        }//수정. cueId 큐시트 아이디로?????
+            CueSheetItemCap cueSheetItemCap = cueSheetItemCapCreateMapper.toEntity(cueSheetItemCapCreateDTO);
+            cueSheetItemCapRepotitory.save(cueSheetItemCap);
+        }
+        //수정. cueId 큐시트 아이디로?????
 
     }
 

@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.yonhap;
 
 import com.gemiso.zodiac.app.yonhap.dto.YonhapCreateDTO;
 import com.gemiso.zodiac.app.yonhap.dto.YonhapDTO;
+import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,8 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,19 +30,29 @@ public class YonhapController {
 
     @Operation(summary = "연합 목록조회", description = "연합 목록조회")
     @GetMapping(path = "")
-    public ApiResponse<List<YonhapDTO>> findAll(@Parameter(name = "sdate", description = "검색시작일[yyyy-MM-dd HH:mm:ss]", required = true)
+    public ApiResponse<List<YonhapDTO>> findAll(@Parameter(name = "sdate", description = "검색시작일[yyyy-MM-dd HH:mm:ss]", required = false)
                                                 @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
-                                                @Parameter(name = "edate", description = "검색종료일[yyyy-MM-dd HH:mm:ss]", required = true)
+                                                @Parameter(name = "edate", description = "검색종료일[yyyy-MM-dd HH:mm:ss]", required = false)
                                                 @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                @Parameter(name = "artcl_cate_cds", description = "분류코드", required = true)
+                                                @Parameter(name = "artcl_cate_cds", description = "분류코드")
                                                 @RequestParam(value = "artcl_cate_cds", required = false) List<String> artcl_cate_cds,
-                                                @Parameter(name = "region_cds", description = "통신사코드", required = true)
+                                                @Parameter(name = "region_cds", description = "통신사코드")
                                                 @RequestParam(value = "region_cds", required = false) List<String> region_cds,
-                                                @Parameter(name = "search_word", description = "통신사코드", required = true)
-                                                @RequestParam(value = "search_word", required = false) String search_word) {
+                                                @Parameter(name = "search_word", description = "통신사코드")
+                                                @RequestParam(value = "search_word", required = false) String search_word) throws Exception {
 
-        List<YonhapDTO> yonhapDTOList = yonhapService.findAll(sdate, edate, artcl_cate_cds, region_cds, search_word);
+        List<YonhapDTO> yonhapDTOList = new ArrayList<>();
 
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
+            //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
+            SearchDate searchDate = new SearchDate(sdate, edate);
+
+            yonhapDTOList = yonhapService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), artcl_cate_cds, region_cds, search_word);
+
+        }else {
+            yonhapDTOList = yonhapService.findAll(null, null, artcl_cate_cds, region_cds, search_word);
+
+        }
         return new ApiResponse<>(yonhapDTOList);
     }
 

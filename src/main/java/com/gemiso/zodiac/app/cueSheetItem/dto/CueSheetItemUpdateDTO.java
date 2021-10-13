@@ -1,6 +1,8 @@
 package com.gemiso.zodiac.app.cueSheetItem.dto;
 
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,5 +53,5 @@ public class CueSheetItemUpdateDTO {
     //private UserSimpleDTO delr;
     private UserSimpleDTO lckr;
     private Long cueId;
-    private ArticleDTO article;
+    private ArticleUpdateDTO article;
 }

@@ -28,6 +28,7 @@ public class ArticleCreateDTO {
     private String artclTypCd;
     private String artclTypDtlCd;
     private String artclCateCd;
+
     private String artclTitl;
     private String artclTitlEn;
     private String artclCtt;
@@ -44,6 +45,7 @@ public class ArticleCreateDTO {
     private Long orgArtclId;
     private String urgYn;
     private String frnotiYn;
+
     private String embgYn;
     private Date embgDtm;
     private String inputrNm;

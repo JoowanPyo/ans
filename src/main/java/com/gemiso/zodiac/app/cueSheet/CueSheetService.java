@@ -80,6 +80,8 @@ public class CueSheetService {
 
         CueSheet cueSheet = cueSheetFindOrFail(cueId);
 
+        //cueSheet.setProgram(null);
+
         cueSheetUpdateDTO.setCueId(cueId);
 
         cueSheetUpdateMapper.updateFromDto(cueSheetUpdateDTO, cueSheet);

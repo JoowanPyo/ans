@@ -2,14 +2,19 @@ package com.gemiso.zodiac.app.cueSheetItem;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.user.User;
+import com.gemiso.zodiac.app.user.UserGroupUser;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_cue_item")
@@ -18,7 +23,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = "article")
+@ToString(exclude = {"article","cueSheetItemSymbol"})
 @DynamicUpdate
 public class CueSheetItem extends BaseEntity {
 
@@ -134,8 +139,13 @@ public class CueSheetItem extends BaseEntity {
     @JoinColumn(name = "artcl_id")
     @JsonBackReference
     private Article article;
+
+    @OneToMany(mappedBy = "cueSheetItem")
+    @JsonManagedReference
+    private List<CueSheetMedia> cueSheetMedia = new ArrayList<>();
       /*@Column(name = "artcl_id", length = 21)
     private String artclId;*/
+
 
     @PrePersist
     public void prePersist() {

@@ -1,9 +1,6 @@
 package com.gemiso.zodiac.core.mapper;
 
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;

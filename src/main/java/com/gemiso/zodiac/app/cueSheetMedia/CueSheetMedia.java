@@ -1,5 +1,8 @@
 package com.gemiso.zodiac.app.cueSheetMedia;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
@@ -77,8 +80,13 @@ public class CueSheetMedia extends BaseEntity {
     @JoinColumn(name = "delr_id")
     private User delr;
 
-    @Column(name = "cue_item_id", nullable = false)
-    private Long cueItemId;
+    /*@Column(name = "cue_item_id", nullable = false)
+    private Long cueItemId;*/
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "cue_item_id")
+    @JsonBackReference
+    private CueSheetItem cueSheetItem;
 
     @PrePersist
     public void prePersist() {

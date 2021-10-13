@@ -5,6 +5,7 @@ import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetUpdateDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupCreateDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupUpdateDTO;
+import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,9 +15,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,9 +44,19 @@ public class CueSheetController {
                                                   @Parameter(name = "brdcPgmNm", description = "프로그램구분코드")
                                                   @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
                                                   @Parameter(name = "searchWord", description = "프로그램구분코드")
-                                                  @RequestParam(value = "searchWord", required = false) String searchWord) {
+                                                  @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
 
-        List<CueSheetDTO> cueSheetDTOList = cueSheetService.findAll(sdate, edate, brdcPgmId, brdcPgmNm, searchWord);
+        List<CueSheetDTO> cueSheetDTOList = new ArrayList<>();
+
+        //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
+            SearchDate searchDate = new SearchDate(sdate, edate);
+            cueSheetDTOList = cueSheetService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), brdcPgmId, brdcPgmNm, searchWord);
+
+        }else {
+            cueSheetDTOList = cueSheetService.findAll(null, null, brdcPgmId, brdcPgmNm, searchWord);
+
+        }
 
         return new ApiResponse<>(cueSheetDTOList);
 

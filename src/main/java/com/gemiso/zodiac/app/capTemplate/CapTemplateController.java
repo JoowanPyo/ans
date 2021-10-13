@@ -27,13 +27,13 @@ public class CapTemplateController {
     @Operation(summary = "자막 템플릿 조회", description = "자막 템플릿 조회")
     @GetMapping(path = "")
     public ApiResponse<List<CapTemplateDTO>> findAll(@Parameter(name = "brdc_pgm_id", description = "방송프로그램 아이디")
-                                             @RequestParam(value = "brdc_pgm_id", required = false) Long brdc_pgm_id,
+                                                     @RequestParam(value = "brdc_pgm_id", required = false) Long brdc_pgm_id,
                                                      @Parameter(name = "cap_class_cd", description = "자막 분류 코드")
-                                             @RequestParam(value = "cap_class_cd", required = false) String cap_class_cd,
+                                                     @RequestParam(value = "cap_class_cd", required = false) String cap_class_cd,
                                                      @Parameter(name = "use_yn", description = "사용여부")
-                                             @RequestParam(value = "use_yn", required = false) String use_yn,
+                                                     @RequestParam(value = "use_yn", required = false) String use_yn,
                                                      @Parameter(name = "search_word", description = "검색어")
-                                             @RequestParam(value = "search_word", required = false) String search_word
+                                                     @RequestParam(value = "search_word", required = false) String search_word
     ) {
 
         List<CapTemplateDTO> capTemplateDTOList = capTemplateService.findAll(brdc_pgm_id, cap_class_cd, use_yn, search_word);
@@ -45,7 +45,7 @@ public class CapTemplateController {
     @Operation(summary = "자막 템플릿 상세정보 조회", description = "자막 템플릿 상세정보 조회")
     @GetMapping(path = "/{capTmpltId}")
     public ApiResponse<CapTemplateDTO> find(@Parameter(name = "capTmpltId", description = "자막 템플릿 아이디")
-                                    @PathVariable("capTmpltId") Long capTmpltId) {
+                                            @PathVariable("capTmpltId") Long capTmpltId) {
 
         CapTemplateDTO capTemplateDTO = capTemplateService.find(capTmpltId);
 
@@ -57,7 +57,7 @@ public class CapTemplateController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<CapTemplateDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                      @RequestBody @Valid CapTemplateCreateDTO capTemplateCreateDTO) {
+                                              @RequestBody @Valid CapTemplateCreateDTO capTemplateCreateDTO) {
 
         Long capTmpltId = capTemplateService.create(capTemplateCreateDTO);
 
@@ -70,9 +70,9 @@ public class CapTemplateController {
     @Operation(summary = "자막 템플릿 수정", description = "자막 템플릿 수정")
     @PutMapping(path = "/{capTmpltId}")
     public ApiResponse<CapTemplateDTO> update(@Parameter(description = "필수값<br> ", required = true)
-                                      @RequestBody @Valid CapTemplateUpdateDTO capTemplateUpdateDTO,
+                                              @RequestBody @Valid CapTemplateUpdateDTO capTemplateUpdateDTO,
                                               @Parameter(name = "capTmpltId", description = "자막 템플릿 아이디")
-                                      @PathVariable("capTmpltId") Long capTmpltId) {
+                                              @PathVariable("capTmpltId") Long capTmpltId) {
 
         capTemplateService.update(capTemplateUpdateDTO, capTmpltId);
 

@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.cueTemplate;
+package com.gemiso.zodiac.app.cueSheetTemplate;
 
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.user.User;
@@ -21,7 +21,7 @@ import java.util.Date;
 @Setter
 @ToString(exclude = "program")
 @DynamicUpdate
-public class CueTemplate extends BaseEntity {
+public class CueSheetTemplate extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,7 +55,7 @@ public class CueTemplate extends BaseEntity {
     @Column(name = "rmk", length = 500)
     private String rmk;
 
-    @Column(name = "pgmsch_time", length = 6)
+    @Column(name = "pgmsch_time", length = 8)
     private String pgmschTime;
 
     @Column(name = "cap_hil_clr_rgb_1", length = 12)
@@ -73,17 +73,21 @@ public class CueTemplate extends BaseEntity {
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'")
     private String delYn;
 
-    @Column(name = "pd_1_id", length = 50)
-    private String pd1Id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pd_1_id", nullable = false)
+    private User pd1;
 
-    @Column(name = "pd_2_id", length = 50)
-    private String pd2Id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pd_2_id", nullable = false)
+    private User pd2;
 
-    @Column(name = "anc_1_id", length = 50)
-    private String anc1Id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "anc_1_id", nullable = false)
+    private User anc1;
 
-    @Column(name = "anc_2_id", length = 50)
-    private String anc2Id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "anc_2_id", nullable = false)
+    private User anc2;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inputr_id", nullable = false)

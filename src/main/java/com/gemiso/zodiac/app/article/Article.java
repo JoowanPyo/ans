@@ -183,6 +183,9 @@ public class Article extends BaseEntity {
     @Column(name = "device_cd", length = 50, nullable = false)
     private String deviceCd;
 
+    @Column(name = "parent_artlc_id")
+    private Long parentArtlcId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "issu_id")
     private Issue issue;

@@ -31,6 +31,7 @@ public class UserGroupController {
 
     @Operation(summary = "사용자 그룹 목록조회", description = "사용자 그룹 목록조회")
     @GetMapping(path = "")
+    @CrossOrigin(origins = "*")
     public ApiResponse<List<UserGroupDTO>> findAll(@Parameter(name = "userGrpNm", description = "그룹 명")
                                                    @RequestParam(value = "userGrpNm", required = false) String userGrpNm,
                                                    @Parameter(name = "useYn", description = "사용 여부")

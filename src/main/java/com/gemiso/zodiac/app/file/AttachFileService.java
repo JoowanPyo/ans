@@ -39,7 +39,7 @@ public class AttachFileService {
 
     private final AttachFileMapper attachFileMapper;
 
-    private UserAuthService userAuthService;
+    private final UserAuthService userAuthService;
 
 
     //파일 업로드

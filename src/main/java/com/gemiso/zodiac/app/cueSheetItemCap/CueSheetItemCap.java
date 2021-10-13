@@ -1,11 +1,16 @@
 package com.gemiso.zodiac.app.cueSheetItemCap;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.gemiso.zodiac.app.articleHist.ArticleHist;
+import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.user.User;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_cue_item_cap")
@@ -76,6 +81,7 @@ public class CueSheetItemCap {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delr_id")
     private User delr;
+    
 
     @PrePersist
     public void prePersist() {

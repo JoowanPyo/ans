@@ -1,6 +1,8 @@
 package com.gemiso.zodiac.app.symbol;
 
+import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.file.AttachFileRepository;
+import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.mapper.AttachFileMapper;
 import com.gemiso.zodiac.app.symbol.dto.SymbolCreateDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
@@ -8,6 +10,7 @@ import com.gemiso.zodiac.app.symbol.dto.SymbolUpdateDTO;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolCreateMapper;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolMapper;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolUpdateMapper;
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -107,11 +110,21 @@ public class SymbolService {
 
         Symbol symbol = userFindOrFail(symbolId);
 
-
         // 토큰 인증된 사용자 아이디를 입력자로 등록
+        User updtr = symbol.getUpdtr();
+        if (ObjectUtils.isEmpty(updtr) == false){
+            symbol.setUpdtr(null);
+        }
         String userId = userAuthService.authUser.getUserId();
         UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
         symbolUpdateDTO.setUpdtr(userSimpleDTO); // 수정자 추가.
+
+        //수정.
+        //파일이 바뀐경우 엔티티에서 파일을 지우고 새로운 파일로 업데이트,이유=update가 안댐[jpa]
+        AttachFileDTO attachFileDTO = symbolUpdateDTO.getAttachFile();
+        if (ObjectUtils.isEmpty(attachFileDTO)){
+            symbol.setAttachFile(null);
+        }
 
         symbolUpdateMapper.updateFromDto(symbolUpdateDTO, symbol);
         symbolRepository.save(symbol);
@@ -144,7 +157,7 @@ public class SymbolService {
 
         Optional<Symbol> symbol = symbolRepository.findBySymbolId(symbolId);
 
-        if (!symbol.isPresent()){
+        if (symbol.isPresent() == false){
             throw new ResourceNotFoundException("방송아이콘에 등록된 방송아이콘 아이디가 없습니다. : " + symbolId);
         }
 

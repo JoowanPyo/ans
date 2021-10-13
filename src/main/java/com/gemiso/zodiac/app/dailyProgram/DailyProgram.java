@@ -18,7 +18,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = "brdc_pgm_id")
+@ToString(exclude = "program")
 @DynamicUpdate
 public class DailyProgram extends BaseEntity {
 

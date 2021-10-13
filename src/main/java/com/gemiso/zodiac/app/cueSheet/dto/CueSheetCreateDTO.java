@@ -40,5 +40,6 @@ public class CueSheetCreateDTO {
     private UserSimpleDTO lckr;
     private UserSimpleDTO td1;
     private UserSimpleDTO td2;
+    private String remark;
     private ProgramDTO program;
 }

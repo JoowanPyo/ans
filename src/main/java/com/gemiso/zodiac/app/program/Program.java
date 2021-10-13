@@ -1,7 +1,7 @@
 package com.gemiso.zodiac.app.program;
 
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
-import com.gemiso.zodiac.app.cueTemplate.CueTemplate;
+import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgram;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"cueTemplate","dailyProgram","cueSheet"})
+@ToString(exclude = {"cueSheetTemplate","dailyProgram"})
 @DynamicUpdate
 public class Program extends BaseEntity {
 
@@ -74,13 +74,13 @@ public class Program extends BaseEntity {
     private User delr;
 
     @OneToMany(mappedBy = "program")
-    private List<CueTemplate> cueTemplate;
+    private List<CueSheetTemplate> cueSheetTemplate;
 
     @OneToMany(mappedBy = "program")
     private List<DailyProgram> dailyProgram;
 
-    @OneToMany(mappedBy = "program")
-    private List<CueSheet> cueSheet;
+    /*@OneToMany(mappedBy = "program")
+    private List<CueSheet> cueSheet;*/
 
     @PrePersist
     public void prePersist() {

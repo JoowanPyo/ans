@@ -222,6 +222,8 @@ public class UserService {
 
         if(!StringUtils.isEmpty(delYn)){
             booleanBuilder.and(quser.delYn.eq(delYn));
+        }else {
+            booleanBuilder.and(quser.delYn.eq("N"));
         }
         if(!StringUtils.isEmpty(userNm)){
             booleanBuilder.and(quser.userNm.contains(userNm));

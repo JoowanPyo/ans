@@ -10,7 +10,8 @@ import java.util.Optional;
 
 public interface CueSheetItemRepository extends JpaRepository<CueSheetItem, Long>, QuerydslPredicateExecutor<CueSheetItem> {
 
-    @Query("select a from CueSheetItem a where a.cueId = :cueId and a.delYn = 'N' order by a.cueItemOrd asc")
+    @Query("select a from CueSheetItem a left outer join Article b on b.artclId = a.article.artclId " +
+            "where a.cueId = :cueId  and a.delYn = 'N' order by a.cueItemOrd asc")
     List<CueSheetItem> findByCueItemList(@Param("cueId")Long cueId);
 
     @Query("select a from CueSheetItem a where a.cueItemId = :cueItemId and a.delYn = 'N'")

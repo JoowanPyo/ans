@@ -11,7 +11,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, String> , QuerydslPredicateExecutor<User> {
 
     @Query("select a, c.userGroupAuths from User a left outer join UserGroupUser bb on bb.user = a.userId " +
-            "left outer join UserGroup c on c.userGrpId = bb.userGroup.userGrpId where a.userId = :userId")
+            "left outer join UserGroup c on c.userGrpId = bb.userGroup.userGrpId where a.userId = :userId " +
+            "and a.delYn = 'N'")
     User getUserWithGroup(@Param("userId") String userId);
 
     @Query("select a from User a where a.userId =:userId and a.delYn = 'N'")

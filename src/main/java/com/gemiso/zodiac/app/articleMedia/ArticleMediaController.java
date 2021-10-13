@@ -4,6 +4,7 @@ package com.gemiso.zodiac.app.articleMedia;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaCreateDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaUpdateDTO;
+import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,9 +13,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,10 +38,19 @@ public class ArticleMediaController {
                                                       @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                       @Parameter(name = "trnsfFileNm", description = "전송 파일 명")
-                                                      @RequestParam(value = "trnsfFileNm", required = false) String trnsfFileNm) {
+                                                      @RequestParam(value = "trnsfFileNm", required = false) String trnsfFileNm) throws Exception {
 
-        List<ArticleMediaDTO> articleMediaDTOList = articleMediaService.findAll(sdate, edate, trnsfFileNm);
+        List<ArticleMediaDTO> articleMediaDTOList = new ArrayList<>();
 
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
+            //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
+            SearchDate searchDate = new SearchDate(sdate, edate);
+
+            articleMediaDTOList = articleMediaService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), trnsfFileNm);
+
+        }else {
+            articleMediaDTOList = articleMediaService.findAll(null, null, trnsfFileNm);
+        }
         return new ApiResponse<>(articleMediaDTOList);
     }
 

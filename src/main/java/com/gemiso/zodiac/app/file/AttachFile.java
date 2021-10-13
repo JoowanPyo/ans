@@ -13,16 +13,13 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "tb_strg_file",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "file_fileId_unique", columnNames = "file_id")
-        })
+@Table(name = "tb_strg_file")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"yonhapAttchFiles", "symbol"})
+@ToString
 @DynamicUpdate
 public class AttachFile {
 
@@ -63,11 +60,11 @@ public class AttachFile {
         private User inputr;
 
 
-        @OneToMany(mappedBy="attachFile")
-        private List<YonhapAttchFile> yonhapAttchFiles;
+        /*@OneToMany(mappedBy="attachFile")
+        private List<YonhapAttchFile> yonhapAttchFiles;*/
 
-        @OneToMany(mappedBy="attachFile")
-        private List<Symbol> symbol;
+        /*@OneToMany(mappedBy="attachFile")
+        private List<Symbol> symbol;*/
 
 
         @PrePersist
