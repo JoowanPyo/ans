@@ -1,11 +1,14 @@
 package com.gemiso.zodiac.app.cueSheet;
 
-import com.gemiso.zodiac.app.cueSheet.dto.CueSheetCreateDTO;
-import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
-import com.gemiso.zodiac.app.cueSheet.dto.CueSheetUpdateDTO;
+import com.gemiso.zodiac.app.cueSheet.dto.*;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetCreateMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
+import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetOrderLockMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetUpdateMapper;
+import com.gemiso.zodiac.app.program.Program;
+import com.gemiso.zodiac.app.program.ProgramService;
+import com.gemiso.zodiac.app.program.dto.ProgramDTO;
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.app.userGroup.QUserGroup;
 import com.gemiso.zodiac.app.userGroup.UserGroup;
@@ -16,9 +19,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,12 +38,13 @@ public class CueSheetService {
     private final CueSheetMapper cueSheetMapper;
     private final CueSheetCreateMapper cueSheetCreateMapper;
     private final CueSheetUpdateMapper cueSheetUpdateMapper;
+    private final CueSheetOrderLockMapper cueSheetOrderLockMapper;
 
     private final UserAuthService userAuthService;
 
+    private final ProgramService programService;
 
-
-    public List<CueSheetDTO> findAll(Date sdate, Date edate, Long brdcPgmId, String brdcPgmNm, String searchWord){
+    public CueSheetFindAllDTO findAll(Date sdate, Date edate, Long brdcPgmId, String brdcPgmNm, String searchWord){
 
         BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm,  searchWord);
 
@@ -46,10 +52,40 @@ public class CueSheetService {
 
         List<CueSheetDTO> cueSheetDTOList = cueSheetMapper.toDtoList(cueSheets);
 
-        return cueSheetDTOList;
+        CueSheetFindAllDTO cueSheetFindAllDTO = unionPgm(cueSheetDTOList); //큐시트 유니온 방송프로그램.
+
+        return cueSheetFindAllDTO;
+
 
     }
 
+    public CueSheetFindAllDTO unionPgm(List<CueSheetDTO> cueSheetDTOList){
+        //방송프로그램 전체조회.
+        List<ProgramDTO> programDTOList = programService.findAll("");
+
+        //조회된 큐시트에서 사용(중복)된 프로그램을 삭제한다.
+        for (CueSheetDTO cueSheet : cueSheetDTOList){
+
+            Long getBrdcPgmId =  Optional.ofNullable(cueSheet.getProgram().getBrdcPgmId()).orElse(0L);
+
+            //ConcurrentModificationException에러가 나서 이터레이터로 수정.
+            Iterator<ProgramDTO> iter = programDTOList.listIterator();
+            while (iter.hasNext()){
+                ProgramDTO programDTO = iter.next();
+                Long orgBrdcPgmId = programDTO.getBrdcPgmId();
+                if (getBrdcPgmId.equals(orgBrdcPgmId)){
+                    iter.remove();
+                }
+
+            }
+        }
+        //조회된 큐시트 + 방송프로그램
+        CueSheetFindAllDTO cueSheetFindAllDTO = new CueSheetFindAllDTO();
+        cueSheetFindAllDTO.setCueSheetDTO(cueSheetDTOList);
+        cueSheetFindAllDTO.setProgramDTO(programDTOList);
+
+        return cueSheetFindAllDTO;
+    }
     public CueSheetDTO find(Long cueId){
 
         CueSheet cueSheet = cueSheetFindOrFail(cueId);
@@ -147,5 +183,27 @@ public class CueSheetService {
         }
 
         return booleanBuilder;
+    }
+
+    public void cueSheetOrderLock(CueSheetOrderLockDTO cueSheetOrderLockDTO, Long cueId){
+
+        CueSheet cueSheet = cueSheetFindOrFail(cueId);
+
+        User user = cueSheet.getLckr();
+        if (ObjectUtils.isEmpty(user) == false){
+            User setUser = User.builder().build();
+            cueSheet.setLckr(setUser);
+        }
+
+        String userId = userAuthService.authUser.getUserId();
+        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        cueSheetOrderLockDTO.setLckr(userSimpleDTO);
+        cueSheetOrderLockDTO.setLckDtm(new Date());
+        cueSheetOrderLockDTO.setLckYn("Y");
+
+        cueSheetOrderLockMapper.updateFromDto(cueSheetOrderLockDTO, cueSheet);
+
+        cueSheetRepository.save(cueSheet);
+
     }
 }

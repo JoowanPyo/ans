@@ -19,15 +19,16 @@ public class SearchDate {
 
         Calendar cal = Calendar.getInstance();
 
-        cal.setTime(simpleDateFormat.parse(startDateFormat));
+        cal.setTime(simpleDateFormat.parse(endDateFormat));
         cal.add(Calendar.HOUR, 23);
         cal.add(Calendar.MINUTE, 59);
         cal.add(Calendar.SECOND, 55);
 
         // 2021-09-28 12:12:00 => 2021-09-28 00:00:00
-        this.startDate = cal.getTime();
+        this.startDate = simpleDateFormat.parse(startDateFormat);
         // 2021-09-28 12:12:00 => 2021-09-28 23:59:59
-        this.endDate = simpleDateFormat.parse(endDateFormat);
+        this.endDate = cal.getTime();
+
     }
 
     public Date getStartDate() {

@@ -45,12 +45,14 @@ public class JwtFilter implements Filter {
     public final void init(FilterConfig filterConfig) throws ServletException {
 
         String excludePattern = "/swagger-ui/index.html,/swagger-ui/springfox.css,/swagger-ui/swagger-ui-standalone-preset.js"
-                + "/swagger-ui/springfox.css,/swagger-ui/swagger-ui-bundle.js,/swagger-ui/springfox.js,/swagger-ui/favicon-32x32.png"
+                + ",/swagger-ui/springfox.css,/swagger-ui/swagger-ui-bundle.js,/swagger-ui/springfox.js,/swagger-ui/favicon-32x32.png"
                 + ",/swagger-ui/favicon-16x16.png, /swagger-ui/swagger-ui-standalone-preset.js,/swagger-ui/swagger-ui-standalone-preset.js"
                 + ",/swagger-ui/favicon-32x32.png,/swagger-ui/favicon-16x16.png,/swagger-resources/configuration/ui"
                 + ",/swagger-resources/configuration/security,/swagger-resources,/swagger-ui/swagger-ui-standalone-preset.js"
-                + ",/swagger-ui/favicon-32x32.png,/swagger-resources/configuration/ui,/v3/api-docs"
-                + ",/swagger-ui/swagger-ui.css,/error,/auth/createToken,/yonhapInternational,/yonhap";
+                + ",/swagger-ui/favicon-32x32.png,/swagger-resources/configuration/ui,/v3/api-docs,/swagger-ui/swagger-ui.css,/error"
+                + ",/auth/createToken,/yonhapInternational,/yonhap,/interface/cuesheet,/interface/cuesheetitem,/interface"
+                + ",/swagger-ui/index.html/swagger-resources,/swagger-ui/index.html/swagger-resources/configuration/ui"
+                + ",/swagger-ui/index.html/swagger-resources/configuration/security,/auth/login,againlogin";
         excludedUrls = Arrays.asList(excludePattern.split(","));
 
     }
@@ -67,7 +69,7 @@ public class JwtFilter implements Filter {
         if (!StringUtils.pathEquals(httpServletRequest.getMethod(), "OPTIONS")) {
 
 
-            if (!excludedUrls.contains(path)) {
+            if (excludedUrls.contains(path) == false) {
 
                 try {
                     final StringBuilder logMessage = new StringBuilder("TOKEN FILTER API - ");
@@ -79,7 +81,7 @@ public class JwtFilter implements Filter {
 
                     if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
                         //헤더에 있는 Bearer Substring => 토큰값을 빼기 위함.
-                        jwtToken = requestTokenHeader.substring(7);
+                        jwtToken = requestTokenHeader.substring(6);
                         Claims claims = Jwts.parser()
                                 .setSigningKey(secretKey.getBytes("UTF-8")) // Set Key
                                 .parseClaimsJws(jwtToken) // 파싱 및 검증, 실패 시 에러
@@ -117,15 +119,16 @@ public class JwtFilter implements Filter {
 
                     log.info(String.valueOf(logMessage));
 
+
                 } catch (Throwable a) {
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     PrintStream pinrtStream = new PrintStream(out);
                     a.printStackTrace(pinrtStream);
                     log.error(out.toString());
+                    httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "EXPIRED_ACCESSTOKEN");
                 }
             }
         }
-
         chain.doFilter(request, response);
 
     }

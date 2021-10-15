@@ -26,7 +26,7 @@ public class AuthController {
     private final AuthService authService;
 
     @Operation(summary = "사용자 로그인", description = "사용자 로그인")
-    @PostMapping(path = "/createToken")
+    @PostMapping(path = "/login")//login
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<JwtDTO> login(@Parameter(name = "loginDTO", required = true, description = "필수값<br> userId , password")
                                      @Valid @RequestBody AuthRequestDTO authRequestDTO
@@ -38,7 +38,7 @@ public class AuthController {
     }
 
     @Operation(summary = "Access Token 재발급", description = "Access Token 재발급")
-    @PostMapping(path = "/refresh")
+    @PostMapping(path = "/againlogin")//againlogin
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<JwtDTO> reissuance(@Parameter(name = "authorization", description = "엑세스토큰")
                                           @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {

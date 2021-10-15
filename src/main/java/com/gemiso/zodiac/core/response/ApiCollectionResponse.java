@@ -39,11 +39,11 @@ import java.util.List;
  */
 @Data
 public class ApiCollectionResponse<T> extends BaseApiResponse {
-    private final List<T> data;
+   // private final List<T> data;
     private final PageResultDTO page;
 
-    public ApiCollectionResponse(List<T> data, PageResultDTO page) {
-        this.data = data;
+    public ApiCollectionResponse(/*List<T> data,*/ PageResultDTO page) {
+        //this.data = data;
         this.page = page;
         this.status = HttpStatus.OK;
         this.success = true;

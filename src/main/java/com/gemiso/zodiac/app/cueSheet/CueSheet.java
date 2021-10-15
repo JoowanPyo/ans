@@ -6,6 +6,7 @@ import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -21,6 +22,7 @@ import java.util.Date;
 @ToString
 @Setter
 @DynamicUpdate
+@EntityListeners(value = {AuditingEntityListener.class})
 public class CueSheet {
 
     @Id

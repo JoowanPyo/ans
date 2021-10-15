@@ -3,6 +3,8 @@ package com.gemiso.zodiac.app.yonhapWire;
 
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -18,6 +20,7 @@ import java.util.Date;
 @ToString
 @Setter
 @DynamicUpdate
+@EntityListeners(value = {AuditingEntityListener.class})
 public class YonhapWire {
 
     @Id
@@ -64,6 +67,7 @@ public class YonhapWire {
     @Column(name = "trnsf_dtm")
     private Date trnsfDtm;
 
+    @CreatedDate
     @Column(name = "input_dtm")
     private Date inputDtm;
 

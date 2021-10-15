@@ -1,9 +1,7 @@
 package com.gemiso.zodiac.app.symbol;
 
 import com.gemiso.zodiac.app.file.AttachFile;
-import com.gemiso.zodiac.app.file.AttachFileRepository;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
-import com.gemiso.zodiac.app.file.mapper.AttachFileMapper;
 import com.gemiso.zodiac.app.symbol.dto.SymbolCreateDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolUpdateDTO;
@@ -120,10 +118,13 @@ public class SymbolService {
         symbolUpdateDTO.setUpdtr(userSimpleDTO); // 수정자 추가.
 
         //수정.
-        //파일이 바뀐경우 엔티티에서 파일을 지우고 새로운 파일로 업데이트,이유=update가 안댐[jpa]
+        //파일이 바뀐경우 엔티티에서 파일을 지우고 새로운 파일로 업데이트,이유=update가 안댐[file_id가 필수값.]
         AttachFileDTO attachFileDTO = symbolUpdateDTO.getAttachFile();
-        if (ObjectUtils.isEmpty(attachFileDTO)){
-            symbol.setAttachFile(null);
+        Long newFileId = Optional.ofNullable(attachFileDTO.getFileId()).orElse(0L);
+        Long orgFileId = Optional.ofNullable(symbol.getAttachFile().getFileId()).orElse(0L);
+        if (newFileId.equals(orgFileId) == false){
+            AttachFile attachFile = AttachFile.builder().build();
+            symbol.setAttachFile(attachFile);
         }
 
         symbolUpdateMapper.updateFromDto(symbolUpdateDTO, symbol);

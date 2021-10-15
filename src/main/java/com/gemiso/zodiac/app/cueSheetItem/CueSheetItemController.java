@@ -52,7 +52,7 @@ public class CueSheetItemController {
     }
 
     @Operation(summary = "큐시트 아이템 저장", description = "큐시트 아이템 저장")
-    @PostMapping(path = "/{cueId}")
+    @PostMapping(path = "/{cueId}/item")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<CueSheetItemDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                                @RequestBody @Valid CueSheetItemCreateDTO cueSheetItemCreateDTO,
@@ -67,7 +67,7 @@ public class CueSheetItemController {
     }
 
     @Operation(summary = "큐시트 아이템 수정", description = "큐시트 아이템 수정")
-    @PutMapping(path = "/{cueId}/{cueItemId}")
+    @PutMapping(path = "/{cueId}/item/{cueItemId}")
     public ApiResponse<CueSheetItemDTO> update(@Parameter(description = "필수값<br> ", required = true)
                                                @RequestBody @Valid CueSheetItemUpdateDTO cueSheetItemUpdateDTO,
                                                @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드")
@@ -93,7 +93,7 @@ public class CueSheetItemController {
     }
 
     @Operation(summary = "큐시트 아이템 삭제", description = "큐시트 아이템 삭제")
-    @DeleteMapping(path = "/{cueId}/{cueItemId}")
+    @DeleteMapping(path = "/{cueId}/item/{cueItemId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ApiResponse<?> delete(@Parameter(name = "cueId", description = "큐시트아이디")
                                  @PathVariable("cueId") Long cueId,
@@ -106,7 +106,7 @@ public class CueSheetItemController {
     }
 
     @Operation(summary = "큐시트 아이템 순서변경", description = "큐시트 아이템 순서변경")
-    @PutMapping(path = "/{cueId}/{cueItemId}/ord")
+    @PutMapping(path = "/{cueId}/item/{cueItemId}/ord")
     public ApiResponse<List<CueSheetItemDTO>> ordUpdate(@Parameter(name = "cueId", description = "큐시트아이디")
                                                         @PathVariable("cueId") Long cueId,
                                                         @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
@@ -123,7 +123,7 @@ public class CueSheetItemController {
     }
 
     @Operation(summary = "큐시트 아이템 생성[Drag and Drop]", description = "큐시트 아이템 생성[Drag and Drop]")
-    @PostMapping(path = "/{cueId}/{artclId}")
+    @PostMapping(path = "/{cueId}/item/{artclId}")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<List<CueSheetItemDTO>> createCueItem(@Parameter(name = "cueId", description = "큐시트아이디")
                                                             @PathVariable("cueId") Long cueId,
@@ -141,7 +141,7 @@ public class CueSheetItemController {
     }
 
     @Operation(summary = "큐시트 아이템 생성[Drag and Drop] List", description = "큐시트 아이템 생성[Drag and Drop] List")
-    @PostMapping(path = "/{cueId}/createList")
+    @PostMapping(path = "/{cueId}/item/createList")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<List<CueSheetItemDTO>> createCueItemList(@Parameter(description = "필수값<br> ", required = true)
                                                                 @RequestBody @Valid List<CueSheetItemCreateListDTO> cueSheetItemCreateListDTO,

@@ -1,8 +1,10 @@
 package com.gemiso.zodiac.app.article;
 
-import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderSimpleDTO;
-import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderSimpleMapper;
-import com.gemiso.zodiac.app.article.dto.*;
+import com.gemiso.zodiac.app.appAuth.AppAuth;
+import com.gemiso.zodiac.app.article.dto.ArticleCreateDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleLockDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.article.mapper.ArticleCreateMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleLockMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
@@ -15,14 +17,13 @@ import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapMapper;
 import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapSimpleMapper;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.articleHist.ArticleHistRepository;
-import com.gemiso.zodiac.app.articleHist.dto.ArticleHistSimpleDTO;
 import com.gemiso.zodiac.app.articleHist.mapper.ArticleHistSimpleMapper;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
-import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderSimpleDTO;
+import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderSimpleMapper;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
-import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.user.QUser;
 import com.gemiso.zodiac.app.user.User;
@@ -30,7 +31,10 @@ import com.gemiso.zodiac.app.user.UserGroupUser;
 import com.gemiso.zodiac.app.user.UserGroupUserRepository;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.app.userGroup.UserGroup;
-import com.gemiso.zodiac.core.fixEnum.FixAuth;
+import com.gemiso.zodiac.app.userGroup.UserGroupAuth;
+import com.gemiso.zodiac.app.userGroup.UserGroupAuthRepository;
+import com.gemiso.zodiac.core.helper.PageHelper;
+import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.service.ProcessArticleFix;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -38,6 +42,9 @@ import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -47,6 +54,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.function.Function;
 
 @Service
 @Slf4j
@@ -59,6 +67,7 @@ public class ArticleService {
     private final ArticleHistRepository articleHistRepository;
     private final CueSheetItemRepository cueSheetItemRepository;
     private final UserGroupUserRepository userGroupUserRepository;
+    private final UserGroupAuthRepository userGroupAuthRepository;
 
     private final ArticleMapper articleMapper;
     private final ArticleCreateMapper articleCreateMapper;
@@ -76,16 +85,37 @@ public class ArticleService {
     private String fileUrl;
 
 
-    public List<ArticleDTO> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, Long brdcPgmId,
-                                    String artclDivCd, String artclTypCd, String searchDivCd, String searchWord) {
+    public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, Long brdcPgmId,
+                                    String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
+                                                      Integer page, Integer limit) {
+
+        /*page = Optional.ofNullable(page).orElse(0);
+        limit = Optional.ofNullable(limit).orElse(50);
+
+        Pageable pageable = PageRequest.of(page, limit, Sort.by("artclId","inputDtm").descending());
 
         BooleanBuilder booleanBuilder = getSearch(sdate, edate, rcvDt, rptrId, brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord);
 
-        List<Article> articleList = (List<Article>) articleRepository.findAll(booleanBuilder);
+        List<Article> articleList = (List<Article>) articleRepository.findAll(booleanBuilder,pageable);
 
         List<ArticleDTO> articleDTOList = articleMapper.toDtoList(articleList);
 
-        return articleDTOList;
+        return articleDTOList;*/
+
+        PageHelper pageHelper = new PageHelper(page, limit);
+        /*page = Optional.ofNullable(page).orElse(0);
+        limit = Optional.ofNullable(limit).orElse(50);*/
+
+        //Pageable pageable = PageRequest.of(page, limit, Sort.by("artclId","inputDtm").descending());
+        Pageable pageable = pageHelper.getPageInfo();
+
+        BooleanBuilder booleanBuilder = getSearch(sdate, edate, rcvDt, rptrId, brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord);
+
+        Page<Article> result = articleRepository.findAll(booleanBuilder,pageable);
+
+        Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
+
+        return new PageResultDTO<ArticleDTO, Article>(result, fn);
     }
 
     // 큐시트에서 기사 목록 조회
@@ -451,7 +481,7 @@ public class ArticleService {
         String userId = userAuthService.authUser.getUserId();
 
         //현재접속자 그룹정보를 그룹이넘 리스트로 불러온다.
-        List<Long> fixAuthList = getAppAuth(userId);
+        List<String> fixAuthList = getAppAuth(userId);
 
         //ProcessArticleFix에 fix구분할 date값 set
         ProcessArticleFix paf = new ProcessArticleFix();
@@ -460,7 +490,7 @@ public class ArticleService {
 
         //유저 Id
         if (paf.getFixStatus(userId, fixAuthList) == false) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
         long finish = System.currentTimeMillis();
@@ -482,6 +512,7 @@ public class ArticleService {
     }
 
 
+ /*   //그룹으로 제어하지말고 권한으로 제어.
     public List<Long> getAppAuth(String userId) {
 
         // 사용자에 대한 그룹 정보
@@ -498,6 +529,32 @@ public class ArticleService {
                 appAuthList.add(id);
         }
         return appAuthList;
+    }*/
+
+    public List<String> getAppAuth(String userId) {
+
+        // 사용자에 대한 그룹 정보
+        List<UserGroupUser> userGroupUserList = userGroupUserRepository.findByUserId(userId);
+
+        List<String> appAuthList = new ArrayList<>(); //리턴할 권한 List
+
+        for (UserGroupUser userGroupUser : userGroupUserList) {
+
+            Long groupId = userGroupUser.getUserGroup().getUserGrpId();
+
+            List<UserGroupAuth> findUserGroupAuthList = userGroupAuthRepository.findByUserGrpId(groupId);
+
+            for (UserGroupAuth userGroupAuth : findUserGroupAuthList) {
+
+                String appAuthCD = userGroupAuth.getAppAuth().getAppAuthCd();
+                if (appAuthList.contains(appAuthCD) == false) {
+                    appAuthList.add(appAuthCD);
+                }
+            }
+        }
+
+        return appAuthList;
+
     }
 
 }

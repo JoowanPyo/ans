@@ -4,8 +4,9 @@ import com.gemiso.zodiac.app.article.dto.ArticleCreateDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleLockDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
+import com.gemiso.zodiac.core.page.PageResultDTO;
+import com.gemiso.zodiac.core.response.ApiCollectionResponse;
 import com.gemiso.zodiac.core.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +35,7 @@ public class ArticleController {
 
     @Operation(summary = "기사 목록조회", description = "기사 목록조회")
     @GetMapping(path = "")
-    public ApiResponse<List<ArticleDTO>> findAll(
+    public ApiCollectionResponse<?> findAll(
             @Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
             @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
             @Parameter(name = "rcvDt", description = "수신일자(yyyyMMdd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date rcvDt,
@@ -43,22 +44,27 @@ public class ArticleController {
             @Parameter(name = "artclDivCd", description = "기사구분코드(01:일반, 02:예정, 03:엠바고)") @RequestParam(value = "artclDivCd", required = false) String artclDivCd,
             @Parameter(name = "artclTypCd", description = "기사유형코드(01:스트레이트, 02:리포트, 03:C/T, 04:하단롤, 05:긴급자막)") @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
             @Parameter(name = "searchDivCd", description = "검색구분코드<br>01 - 기사제목<br>02 - 기자명") @RequestParam(value = "searchDivCd", required = false) String searchDivCd,
-            @Parameter(name = "searchWord", description = "검색키워드") @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
+            @Parameter(name = "searchWord", description = "검색키워드") @RequestParam(value = "searchWord", required = false) String searchWord,
+            @Parameter(name = "page", description = "시작페이지") @RequestParam(value = "page", required = false) Integer page,
+            @Parameter(name = "limit", description = "한 페이지에 데이터 수") @RequestParam(value = "limit", required = false) Integer limit) throws Exception {
 
-        List<ArticleDTO> articleDTOList = new ArrayList<>();
+        PageResultDTO<ArticleDTO, Article> pageList = null;
+        //List<ArticleDTO> articleDTOList = new ArrayList<>();
 
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
 
             SearchDate searchDate = new SearchDate(sdate, edate);
 
-            articleDTOList = articleService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), rcvDt, rptrId, brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord);
+            pageList = articleService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), rcvDt, rptrId, brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit);
 
+           // articleDTOList =  pageList.getDtoList();
         } else {
-            articleDTOList = articleService.findAll(null, null, rcvDt, rptrId, brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord);
+            pageList = articleService.findAll(null, null, rcvDt, rptrId, brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit);
 
+           // articleDTOList =  pageList.getDtoList();
         }
 
-        return new ApiResponse<>(articleDTOList);
+        return new ApiCollectionResponse<>( pageList);
     }
 
     @Operation(summary = "기사 목록조회[큐시트]", description = "기사 목록조회[큐시트]")
@@ -165,7 +171,8 @@ public class ArticleController {
     @PutMapping(path = "/{artclId}/fix")
     public ApiResponse<ArticleDTO> fix(@Parameter(name = "artclId", description = "기사 아이디")
                                             @PathVariable("artclId") Long artclId,
-                                            @Parameter(name = "apprvDivCd", description = "픽스 상태 코드")
+                                            @Parameter(name = "apprvDivCd", description = "픽스 상태 코드(none[픽스가 없는상태]" +
+                                                    ", articlefix[기자 픽스], editorfix[에디터 픽스], anchorfix[앵커 픽스], deskfix[데스크 픽스])")
                                             @RequestParam(value = "apprvDivCd", required = true)String apprvDivCd){
 
 

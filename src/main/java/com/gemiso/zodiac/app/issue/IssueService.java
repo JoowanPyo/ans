@@ -150,6 +150,8 @@ public class IssueService {
         }
         if (!StringUtils.isEmpty(issuDelYn)){
             booleanBuilder.and(qIssue.issuDelYn.eq(issuDelYn));
+        }else {
+            booleanBuilder.and(qIssue.issuDelYn.eq("N"));
         }
 
         return booleanBuilder;

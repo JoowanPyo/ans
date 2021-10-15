@@ -102,7 +102,7 @@ public class AddUserGroupAuthService {
 
         Optional<UserGroup> userGroup = userGroupRepository.findByUserGroupId(userGrpId);
 
-        if (!userGroup.isPresent()){
+        if (userGroup.isPresent()==false){
             throw new ResourceNotFoundException("UserGroupId not found. UserGroupId : " + userGrpId);
         }
         return userGroup.get();

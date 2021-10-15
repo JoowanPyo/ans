@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,21 +63,20 @@ public class YonhapWireController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> create(@Parameter(description = "필수값<br> ", required = true)
-                                    @RequestBody YonhapWireCreateDTO yonhapWireCreateDTO /*UriComponentsBuilder ucBuilder*/
+                                    @RequestBody YonhapWireCreateDTO yonhapWireCreateDTO, UriComponentsBuilder ucBuilder
     ) {
-        /* HttpHeaders headers = null;*/
+         HttpHeaders headers = null;
 
         YonhapWireDTO yonhapWireDTO = new YonhapWireDTO();
 
         try {
-            Long yhWireId = yonhapWireService.create(yonhapWireCreateDTO);
+            Long yh_artcl_id = yonhapWireService.create(yonhapWireCreateDTO);
 
-            if (!ObjectUtils.isEmpty(yhWireId)) {
+            if (ObjectUtils.isEmpty(yh_artcl_id) == false) {
 
-               /* headers = new HttpHeaders();
+                headers = new HttpHeaders();
                 headers.setLocation(ucBuilder.path("/yonhapInternational/{yh_artcl_id}").buildAndExpand(yh_artcl_id).toUri());
-*/
-                yonhapWireDTO = yonhapWireService.find(yhWireId);
+                yonhapWireDTO = yonhapWireService.find(yh_artcl_id);
             }
 
 
@@ -85,7 +85,7 @@ public class YonhapWireController {
             log.error("yonhap : " + e.getMessage());
             return new ResponseEntity<YonhapWireDTO>(yonhapWireDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<YonhapWireDTO>(yonhapWireDTO, HttpStatus.CREATED);
+        return new ResponseEntity<YonhapWireDTO>(yonhapWireDTO, headers, HttpStatus.CREATED);
     }
 
 }

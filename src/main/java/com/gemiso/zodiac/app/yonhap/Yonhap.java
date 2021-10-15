@@ -2,6 +2,8 @@ package com.gemiso.zodiac.app.yonhap;
 
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,9 +18,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString
+@ToString(exclude = "yonhapAttchFiles")
 @Setter
 @DynamicUpdate
+@EntityListeners(value = {AuditingEntityListener.class})
 public class Yonhap {
 
     @Id
@@ -89,6 +92,7 @@ public class Yonhap {
     @Column(name = "embg_dtm")
     private Date embgDtm;
 
+    @CreatedDate
     @Column(name = "input_dtm")
     private Date inputDtm;
 

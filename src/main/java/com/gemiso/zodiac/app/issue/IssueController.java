@@ -39,8 +39,8 @@ public class IssueController {
                                                @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
                                                @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                               @Parameter(name = "issu_del_yn", description = "삭제여부 (N , Y)")
-                                               @RequestParam(value = "issu_del_yn", required = false) String issu_del_yn) throws Exception {
+                                               @Parameter(name = "issuDelYn", description = "삭제여부 (N , Y)")
+                                               @RequestParam(value = "issuDelYn", required = false) String issuDelYn) throws Exception {
 
         List<IssueDTO> issueList = new ArrayList<>();
 
@@ -48,10 +48,10 @@ public class IssueController {
             //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
             SearchDate searchDate = new SearchDate(sdate, edate);
 
-            issueList = issueService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), issu_del_yn);
+            issueList = issueService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), issuDelYn);
 
         }else {
-            issueList = issueService.findAll(null, null, issu_del_yn);
+            issueList = issueService.findAll(null, null, issuDelYn);
         }
         return new ApiResponse<>(issueList);
     }

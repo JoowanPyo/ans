@@ -1,8 +1,6 @@
 package com.gemiso.zodiac.app.cueSheet;
 
-import com.gemiso.zodiac.app.cueSheet.dto.CueSheetCreateDTO;
-import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
-import com.gemiso.zodiac.app.cueSheet.dto.CueSheetUpdateDTO;
+import com.gemiso.zodiac.app.cueSheet.dto.*;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupCreateDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
@@ -35,25 +33,25 @@ public class CueSheetController {
 
     @Operation(summary = "큐시트 목록조회", description = "큐시트 목록조회")
     @GetMapping(path = "")
-    public ApiResponse<List<CueSheetDTO>> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
-                                                  @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
-                                                  @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
-                                                  @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                  @Parameter(name = "brdcPgmId", description = "프로그램구분코드")
-                                                  @RequestParam(value = "brdcPgmId", required = false) Long brdcPgmId,
-                                                  @Parameter(name = "brdcPgmNm", description = "프로그램구분코드")
-                                                  @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
-                                                  @Parameter(name = "searchWord", description = "프로그램구분코드")
-                                                  @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
+    public ApiResponse<CueSheetFindAllDTO> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
+                                                   @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                   @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
+                                                   @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                   @Parameter(name = "brdcPgmId", description = "프로그램구분코드")
+                                                   @RequestParam(value = "brdcPgmId", required = false) Long brdcPgmId,
+                                                   @Parameter(name = "brdcPgmNm", description = "프로그램구분코드")
+                                                   @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
+                                                   @Parameter(name = "searchWord", description = "프로그램구분코드")
+                                                   @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
 
-        List<CueSheetDTO> cueSheetDTOList = new ArrayList<>();
+        CueSheetFindAllDTO cueSheetDTOList = new CueSheetFindAllDTO();
 
         //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
-        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
             SearchDate searchDate = new SearchDate(sdate, edate);
             cueSheetDTOList = cueSheetService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), brdcPgmId, brdcPgmNm, searchWord);
 
-        }else {
+        } else {
             cueSheetDTOList = cueSheetService.findAll(null, null, brdcPgmId, brdcPgmNm, searchWord);
 
         }
@@ -111,11 +109,33 @@ public class CueSheetController {
     @DeleteMapping(path = "/{cueId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ApiResponse<?> delete(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                           @PathVariable("cueId") Long cueId) {
+                                 @PathVariable("cueId") Long cueId) {
 
         cueSheetService.delete(cueId);
 
         return ApiResponse.noContent();
+    }
+
+    @Operation(summary = "큐시트 오더락", description = "큐시트 오더락")
+    @PutMapping(path = "/{cueId}/orderLock")
+    public ApiResponse<CueSheetDTO> cueSheetOrderLock(@Parameter(name = "cueSheetUpdateDTO", required = true, description = "필수값<br>")
+                                                      @Valid @RequestBody CueSheetOrderLockDTO cueSheetOrderLockDTO,
+                                                      @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
+                                                      @PathVariable("cueId") Long cueId) {
+
+        cueSheetService.cueSheetOrderLock(cueSheetOrderLockDTO, cueId);
+
+        CueSheetDTO cueSheetDTO = cueSheetService.find(cueId);
+
+        return new ApiResponse<>(cueSheetDTO);
+
+    }
+
+    @Operation(summary = "큐시트 잠금해제", description = "큐시트 잠금해제")
+    @PutMapping(path = "/{}/unOrderLock")
+    public ApiResponse<CueSheetDTO> cueSheetUnOrderLock(){
+
+        return null;
     }
 
 

@@ -1,6 +1,8 @@
 package com.gemiso.zodiac.core.service;
 
+import com.gemiso.zodiac.app.appAuth.AppAuth;
 import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.core.fixEnum.AuthEnum;
 import com.gemiso.zodiac.core.fixEnum.FixAuth;
 import com.gemiso.zodiac.core.fixEnum.FixEnum;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +37,7 @@ public class ProcessArticleFix {
     }
 
 
-    public boolean getFixStatus(String userId, List<Long> fixAuthList) {
+    public boolean getFixStatus(String userId, List<String> fixAuthList) {
 
         if (ObjectUtils.isEmpty(originalArticle)){
             return false;
@@ -45,7 +47,7 @@ public class ProcessArticleFix {
         String apprvrId = originalArticle.getApprvr().getUserId();
 
         //픽스 권한 리스트로 들어온 파라미터 중 최상위 권한 get
-        FixAuth fixAuth = FixAuth.FixMaxAuth(fixAuthList);
+        AuthEnum fixAuth = AuthEnum.certity(fixAuthList);
 
         FixEnum getOrgApprveCode =getFixEnum(orgApproveCode);
         FixEnum getNewApproveCode = getFixEnum(approveCode);
@@ -84,22 +86,22 @@ public class ProcessArticleFix {
         return returnFixCode;
     }
 
-    public boolean isFix( FixAuth auth,  FixEnum DbApprove , FixEnum newApprove, String apprvrId, String userId )
+    public boolean isFix( AuthEnum auth,  FixEnum DbApprove , FixEnum newApprove, String apprvrId, String userId )
     {
         if( DbApprove.equals(newApprove))
             return false;
 
-        if( auth.equals( FixAuth.REPORTER) )
+        if( auth.equals( AuthEnum.ArticleFix) )
             return isReporter(DbApprove, newApprove, apprvrId, userId);
-        else if( auth.equals( FixAuth.EDITOR) )
+        else if( auth.equals( AuthEnum.EditorFix) )
             return isEditor(DbApprove, newApprove,  apprvrId,  userId);
-        else if (auth.equals(FixAuth.ANCHOR))
+        else if (auth.equals(AuthEnum.AnchorFix))
             return isAnchor(DbApprove, newApprove,  apprvrId,  userId);
-        else if (auth.equals(FixAuth.DESK))
+        else if (auth.equals(AuthEnum.DeskFix))
             return isDesk(DbApprove, newApprove);
-        else if (auth.equals(FixAuth.PD))
+        else if (auth.equals(AuthEnum.PD))
             return isPD(DbApprove, newApprove);
-        else if (auth.equals(FixAuth.ADMIN))
+        else if (auth.equals(AuthEnum.AdminWrite))
             return isAdmin(DbApprove, newApprove);
         //return isEditor(DbApprove, newApprove);
 
