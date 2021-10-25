@@ -1,8 +1,12 @@
 package com.gemiso.zodiac.app.appInterface;
 
+import com.gemiso.zodiac.app.appInterface.dto.ParentCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.dto.TakerCueSheetDTO;
+import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
+import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,31 +33,30 @@ public class InterfaceController {
 
     @Operation(summary = "큐시트 목록조회[Taker]", description = "큐시트 목록조회[Taker]")
     @GetMapping(path = "/cuesheet")
-    public ApiResponse<List<CueSheetDTO>> cueFindAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
-                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
-                                                     @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
-                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                     @Parameter(name = "brdcPgmId", description = "프로그램구분코드")
-                                                     @RequestParam(value = "brdcPgmId", required = false) Long brdcPgmId,
-                                                     @Parameter(name = "brdcPgmNm", description = "프로그램구분코드")
-                                                     @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
-                                                     @Parameter(name = "searchWord", description = "프로그램구분코드")
-                                                     @RequestParam(value = "searchWord", required = false) String searchWord,
-                                                     @RequestHeader(value = "securityKey") String securityKey) throws Exception {
+    public String cueFindAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
+                                                          @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                          @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
+                                                          @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                          @RequestHeader(value = "securityKey") String securityKey) throws Exception {
 
-        List<CueSheetDTO> cueSheetDTOList = new ArrayList<CueSheetDTO>();
+        PageResultDTO<ParentCueSheetDTO, CueSheet> pageResultDTO = null;
+        String takerCueSheetDTO = "";
 
         //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
             SearchDate searchDate = new SearchDate(sdate, edate);
-            cueSheetDTOList = interfaceService.cueFindAll(searchDate.getStartDate(), searchDate.getEndDate(), brdcPgmId, brdcPgmNm, searchWord);
+            pageResultDTO = interfaceService.cueFindAll(searchDate.getStartDate(), searchDate.getEndDate());
 
+            takerCueSheetDTO = interfaceService.toXml(pageResultDTO);
         } else {
-            cueSheetDTOList = interfaceService.cueFindAll(null, null, brdcPgmId, brdcPgmNm, searchWord);
+            pageResultDTO = interfaceService.cueFindAll(null, null);
 
+            takerCueSheetDTO = interfaceService.toXml(pageResultDTO);
         }
 
-        return new ApiResponse<>(cueSheetDTOList);
+        System.out.println("controller xml :" + takerCueSheetDTO);
+
+        return takerCueSheetDTO;
 
     }
 

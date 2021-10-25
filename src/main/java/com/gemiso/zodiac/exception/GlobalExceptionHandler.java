@@ -2,6 +2,7 @@ package com.gemiso.zodiac.exception;
 
 
 import com.gemiso.zodiac.core.response.ApiErrorResponse;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,13 +11,17 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.servlet.ServletException;
 import javax.validation.ConstraintViolationException;
+import java.security.InvalidParameterException;
 import java.time.ZonedDateTime;
 
+@RestControllerAdvice
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
@@ -73,4 +78,29 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(value = { ExpiredJwtException.class })
+    public ResponseEntity<Object> handleExpiredJwtException(ExpiredJwtException ex){
+        ApiErrorResponse.Error error =
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.EXPIRED_ACCESSTOKEN, ex.getLocalizedMessage());
+        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = { TokenFailedException.class })
+    public ResponseEntity<Object> handleTokenFailedException(TokenFailedException ex){
+        ApiErrorResponse.Error error =
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.EXPIRED_ACCESSTOKEN, ex.getLocalizedMessage());
+        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = { ServletException.class })
+    public ResponseEntity<Object> handleServletException(ServletException ex){
+        ApiErrorResponse.Error error =
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.EXPIRED_ACCESSTOKEN, ex.getLocalizedMessage());
+        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
 }

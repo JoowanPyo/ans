@@ -78,8 +78,7 @@ public class CueSheetController {
     public ApiResponse<CueSheetDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                            @RequestBody @Valid CueSheetCreateDTO cueSheetCreateDTO,
                                            @Parameter(name = "cueTmpltId", description = "큐시트템플릿아이디", in = ParameterIn.QUERY)
-                                           @RequestParam(value = "cueTmpltId", required = false) Long cueTmpltId
-    ) {
+                                           @RequestParam(value = "cueTmpltId", required = false) Long cueTmpltId ) {
 
         Long cueId = cueSheetService.create(cueSheetCreateDTO);
 
@@ -132,10 +131,15 @@ public class CueSheetController {
     }
 
     @Operation(summary = "큐시트 잠금해제", description = "큐시트 잠금해제")
-    @PutMapping(path = "/{}/unOrderLock")
-    public ApiResponse<CueSheetDTO> cueSheetUnOrderLock(){
+    @PutMapping(path = "/{cue_id}/unLock")
+    public ApiResponse<CueSheetDTO> cueSheetUnLock(@Parameter(name = "cue_id", required = true, description = "큐시트 아이디")
+                                                        @PathVariable("cue_id") Long cue_id) {
 
-        return null;
+        cueSheetService.cueSheetUnLock(cue_id);
+
+        CueSheetDTO cueSheetDTO = cueSheetService.find(cue_id);
+
+        return new ApiResponse<>(cueSheetDTO);
     }
 
 

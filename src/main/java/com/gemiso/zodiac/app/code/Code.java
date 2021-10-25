@@ -1,18 +1,18 @@
 package com.gemiso.zodiac.app.code;
 
 import com.gemiso.zodiac.app.user.User;
+import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(
-        name = "tb_cd",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "code_cdId_unique", columnNames = "cd_id")
-        }
+        name = "tb_cd"
 )
 @Builder
 @AllArgsConstructor
@@ -21,7 +21,7 @@ import java.util.Date;
 @ToString
 @Setter
 @DynamicUpdate
-public class Code {
+public class Code extends BaseEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,26 +49,29 @@ public class Code {
     @Column(name = "cd_ord")
     private Integer cdOrd;
 
-    @Column(name = "input_dtm")
-    private Date inputDtm;
-
-    @Column(name = "updt_dtm")
-    private Date updtDtm;
-
     @Column(name = "del_dtm")
     private Date delDtm;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inputr_id", nullable = false)
-    private User inputr;
+    @Column(name = "inputr_id")
+    private String inputrId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updtr_id")
-    private User updtr;
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
+    private String inputrNm;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delr_id")
-    private User delr;
+    @Column(name = "updtr_id")
+    private String updtrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
+    private String updtrNm;
+
+    @Column(name = "delr_id")
+    private String delrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
+    private String delrNm;
 
     @PrePersist
     public void prePersist() {

@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.dailyProgram.dto;
 
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.user.User;
@@ -8,8 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Builder
@@ -23,13 +26,19 @@ public class DailyProgramDTO {
     private String brdcStartTime;
     private String brdcEndClk;
     private String brdcDivCd;
+    private String brdcDivCdNm;
     private String brdcPgmNm;
     private String srcDivCd;
+    private String srcDivCdNm;
     private String stdioId;
     private String subrmId;
     private String pgmschYn;
     private String rmk;
-    private UserSimpleDTO inputr;
-    private UserSimpleDTO updtr;
+    private Date inputDtm;
+    private Date updtDtm;
+    private String inputrId;
+    private String inputrNm;
+    private String updtrId;
+    private String updtrNm;
     private ProgramDTO program;
 }

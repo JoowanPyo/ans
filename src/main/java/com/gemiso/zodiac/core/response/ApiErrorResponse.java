@@ -30,7 +30,7 @@ import java.util.*;
  * }
  */
 @Getter
-public class ApiErrorResponse extends BaseApiResponse {
+public class ApiErrorResponse /*extends BaseApiResponse*/ {
     /**
      * 에러코드 열거형
      */
@@ -38,7 +38,8 @@ public class ApiErrorResponse extends BaseApiResponse {
         InvalidArguments("invalid_input_values"),
         ResourceNotFound("resource_not_found"),
         NoHandler("no_handler"),
-        InternalServerError("internal_server_error");
+        InternalServerError("internal_server_error"),
+        EXPIRED_ACCESSTOKEN("EXPIRED_ACCESSTOKEN");
 
         @JsonValue
         private final String errorCode;
@@ -81,6 +82,8 @@ public class ApiErrorResponse extends BaseApiResponse {
     /**
      * 여기부터 필드 시작
      */
+    HttpStatus status;
+    boolean success;
     private final Error error;
 
     public ApiErrorResponse(Error error) {

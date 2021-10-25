@@ -1,6 +1,6 @@
 package com.gemiso.zodiac;
 
-import com.gemiso.zodiac.core.fixEnum.FixEnum;
+import com.gemiso.zodiac.core.Enum.FixEnum;
 import com.gemiso.zodiac.core.service.ProcessArticleFix;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,13 +8,22 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class RestfulApiExampleApplicationTests {
 
+
     @Test
     void contextLoads() {
 
-        System.out.println( "hello world" );
+        Long[] longArr = new Long[4];
+        longArr[0] = 123L;
+        longArr[1] = 123L;
+        longArr[2] = 123L;
+        longArr[3] = 1234L;
 
-        boolean ret = ProcessArticleFix.isReporter( FixEnum.ANCHOR_FIX, FixEnum.FIX_NONE , "gemiso", "joowan");
+
+        System.out.println( longArr.toString());
+
+       // boolean ret = ProcessArticleFix.articleFix( FixEnum.ANCHOR_FIX, FixEnum.FIX_NONE , "gemiso", "joowan");
 
     }
+
 
 }

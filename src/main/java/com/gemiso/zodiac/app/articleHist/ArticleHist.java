@@ -3,6 +3,7 @@ package com.gemiso.zodiac.app.articleHist;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.code.Code;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -28,7 +29,7 @@ public class ArticleHist {
     @Column(name = "artcl_hist_id", nullable = false)
     private Long artclHistId;
 
-    @Column(name = "ch_div_cd", length = 50, nullable = false)
+    @Column(name = "ch_div_cd")
     private String chDivCd;
 
     @Column(name = "artcl_titl", length = 500)

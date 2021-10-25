@@ -1,10 +1,12 @@
 package com.gemiso.zodiac.app.capTemplateGrp;
 
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
+import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.List;
@@ -25,8 +27,11 @@ public class CapTemplateGrp extends BaseEntity {
     @Column(name = "tmplt_grp_id", nullable = false)
     private Long tmpltGrpId;
 
-    @Column(name = "ch_div_cd", length = 50)
+    @Column(name = "ch_div_cd")
     private String chDivCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = ch_div_cd)")
+    private String chDivCdNm;
 
     @Column(name = "tmplt_grp_nm", length = 150, nullable = false)
     private String tmpltGrpNm;
@@ -34,13 +39,19 @@ public class CapTemplateGrp extends BaseEntity {
     @Column(name = "brdc_pgm_id", length = 21)
     private String brdcPgmId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inputr_id", nullable = false)
-    private User inputr;
+    @Column(name = "inputr_id")
+    private String inputrId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updtr_id")
-    private User updtr;
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
+    private String inputrNm;
+
+    @Column(name = "updtr_id")
+    private String updtrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
+    private String updtrNm;
 
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'")
     private String delYn;

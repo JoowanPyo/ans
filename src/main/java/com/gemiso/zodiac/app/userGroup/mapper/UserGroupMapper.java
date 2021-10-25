@@ -10,9 +10,9 @@ import org.mapstruct.*;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface UserGroupMapper {
+public interface UserGroupMapper extends GenericMapper<UserGroupDTO, UserGroup, UserGroupDTO>{
 
-    @Mapping(target = "inputr.userId", source = "inputr.userId")
+    /*@Mapping(target = "inputr.userId", source = "inputr.userId")
     @Mapping(target = "inputr.userNm", source = "inputr.userNm")
     @Mapping(target = "updtr.userId", source = "updtr.userId")
     @Mapping(target = "updtr.userNm", source = "updtr.userNm")
@@ -30,5 +30,5 @@ public interface UserGroupMapper {
     List<UserGroup> toEntityList(List<UserGroupDTO> listD);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateFromDto(UserGroupDTO updateDto, @MappingTarget UserGroup entity);
+    void updateFromDto(UserGroupDTO updateDto, @MappingTarget UserGroup entity);*/
 }

@@ -1,7 +1,9 @@
 package com.gemiso.zodiac.app.auth;
 
+import com.gemiso.zodiac.app.code.Code;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -45,8 +47,11 @@ public class Auth {
     @Column(name = "logout_dtm")
     private Date logoutDtm;
 
-    @Column(name = "st_cd", length = 50)
+    @Column(name = "st_cd")
     private String stCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = st_cd)")
+    private String stCdNm;
 
     @Column(name = "client_ver", length = 50)
     private String clientVer;

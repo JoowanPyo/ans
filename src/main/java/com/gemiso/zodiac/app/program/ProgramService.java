@@ -60,8 +60,7 @@ public class ProgramService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        programCreateDTO.setInputr(userSimpleDTO);
+        programCreateDTO.setInputrId(userId);
 
         Program program = programCrateMapper.toEntity(programCreateDTO);
 
@@ -77,8 +76,7 @@ public class ProgramService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        programUpdateDTO.setUpdtr(userSimpleDTO);
+        programUpdateDTO.setUpdtrId(userId);
 
         programUpdateMapper.updateFromDto(programUpdateDTO, program);
         programRepository.save(program);
@@ -93,8 +91,7 @@ public class ProgramService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        programDTO.setDelr(userSimpleDTO);
+        programDTO.setDelrId(userId);
         programDTO.setDelDtm(new Date());
         programDTO.setDelYn("Y");
 

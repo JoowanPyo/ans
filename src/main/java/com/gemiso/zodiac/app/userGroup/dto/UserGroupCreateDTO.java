@@ -21,7 +21,7 @@ public class UserGroupCreateDTO {
     //private Date inputDtm;
     //private Date updtDtm;
     //private Date delDtm;
-    private UserSimpleDTO inputr;
+    private String inputrId;
     //private String updtrId;
     //private String delrId;
     //private List<UserGroupAuthDTO> userGroupAuthDTOS = new ArrayList<>();

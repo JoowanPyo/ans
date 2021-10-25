@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.file;
 
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.dto.StatusCodeFileDTO;
 import com.gemiso.zodiac.app.file.mapper.AttachFileMapper;
@@ -110,8 +111,7 @@ public class AttachFileService {
             fb.setFileLoc(upDir);
             // 토큰 인증된 사용자 아이디를 입력자로 등록
             String userId = userAuthService.authUser.getUserId();
-            UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-            fb.setInputr(userSimpleDTO);
+            fb.setInputrId(userId);
             //로그인 아이디로 바꿔야 함?
             //	fb.setFile_upldr_id("system");
 

@@ -22,7 +22,7 @@ public class UserGroupUpdateDTO {
     //private Date updtDtm;
     //private Date delDtm;
     //private String inputr;
-    private UserSimpleDTO updtr;
+    private String updtrId;
     //private String delrId;
     //private List<UserGroupAuthDTO> userGroupAuthDTOS = new ArrayList<>();
 }

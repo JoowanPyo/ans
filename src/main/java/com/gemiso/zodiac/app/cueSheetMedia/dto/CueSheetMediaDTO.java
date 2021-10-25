@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.cueSheetMedia.dto;
 
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSimpleDTO;
@@ -21,22 +22,28 @@ public class CueSheetMediaDTO {
     private Long cueMediaId;
     private Long cueItemId;
     private String mediaTypCd;
+    private String mediaTypCdNm;
     private int mediaOrd;
     private int contId;
     private String trnsfFileNm;
     private String mediaDurtn;
     private Date mediaMtchDtm;
     private String trnsfStCd;
+    private String trnsfStCdNm;
     private String assnStCd;
+    private String assnStCdNm;
     private String videoEdtrNm;
     private String delYn;
     private Date delDtm;
     private Date inputDtm;
     private Date updtDtm;
     private String videoEdtrId;
-    private UserSimpleDTO inputr;
-    private UserSimpleDTO updtr;
-    private UserSimpleDTO delr;
+    private String inputrId;
+    private String updtrId;
+    private String delrId;
+    private String inputrNm;
+    private String updtrNm;
+    private String delrNm;
     private CueSheetItemSimpleDTO cueSheetItem;
 
 }

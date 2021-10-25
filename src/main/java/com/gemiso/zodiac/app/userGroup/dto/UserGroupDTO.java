@@ -26,10 +26,13 @@ public class UserGroupDTO {
     private Date inputDtm;
     private Date updtDtm;
     private Date delDtm;
-    private UserSimpleDTO inputr;
-    private UserSimpleDTO updtr;
-    private UserSimpleDTO delr;
-    private List<UserGroupAuthDTO> userGroupAuthDTOS = new ArrayList<>();
+    private String inputrId;
+    private String inputrNm;
+    private String updtrId;
+    private String updtrNm;
+    private String delrId;
+    private String delrNm;
+    private List<UserGroupAuthDTO> userGroupAuthDTO = new ArrayList<>();
 
 
 }

@@ -44,7 +44,7 @@ public class AddUserGroupAuthService {
 
         if (!CollectionUtils.isEmpty(userGroupAuthList)) {
 
-            List<UserGroupAuthDTO> userGroupAuthDTOList = userGroupAuthMapper.dtoList(userGroupAuthList);
+            List<UserGroupAuthDTO> userGroupAuthDTOList = userGroupAuthMapper.toDtoList(userGroupAuthList);
 
             //맵핑테이블에 그룹권한 정보만 빼서 보여주기 위함
             List<UserGroupAuthDTO> returnUserGroupAuthDTOS = new ArrayList<>();
@@ -54,7 +54,7 @@ public class AddUserGroupAuthService {
                 userGroupAuthDto.setAppAuth(userGroupAuthDTO.getAppAuth());
                 returnUserGroupAuthDTOS.add(userGroupAuthDto);
             }
-            userGroupDTO.setUserGroupAuthDTOS(returnUserGroupAuthDTOS);
+            userGroupDTO.setUserGroupAuthDTO(returnUserGroupAuthDTOS);
         }
 
         return userGroupDTO;

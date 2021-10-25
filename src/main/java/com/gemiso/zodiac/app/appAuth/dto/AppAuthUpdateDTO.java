@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.appAuth.dto;
 
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +25,7 @@ public class AppAuthUpdateDTO {
     //private Date inputDtm;
     //private Date updtDtm;
     //private Date delDtm;
-    //private String inputr;
-    private UserSimpleDTO updtr;
+    //private String inputrId;
+    private String updtrId;
     //private String delrId;
 }

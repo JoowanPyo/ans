@@ -1,9 +1,12 @@
 package com.gemiso.zodiac.app.userGroup;
 
+import com.gemiso.zodiac.app.user.UserGroupUser;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
+import com.gemiso.zodiac.app.userGroup.dto.UserGroupAuthDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupCreateDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupUpdateDTO;
+import com.gemiso.zodiac.app.userGroup.mapper.UserGroupAuthMapper;
 import com.gemiso.zodiac.app.userGroup.mapper.UserGroupCreateMapper;
 import com.gemiso.zodiac.app.userGroup.mapper.UserGroupMapper;
 import com.gemiso.zodiac.app.userGroup.mapper.UserGroupUpdateMapper;
@@ -33,6 +36,7 @@ public class UserGroupService {
     private final UserGroupMapper userGroupMapper;
     private final UserGroupCreateMapper userGroupCreateMapper;
     private final UserGroupUpdateMapper userGroupUpdateMapper;
+    private final UserGroupAuthMapper userGroupAuthMapper;
 
     private final UserAuthService userAuthService;
 
@@ -53,8 +57,7 @@ public class UserGroupService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        userGroupCreateDTO.setInputr(userSimpleDTO);
+        userGroupCreateDTO.setInputrId(userId);
 
         UserGroup userGroup = userGroupCreateMapper.toEntity(userGroupCreateDTO);
 
@@ -67,9 +70,14 @@ public class UserGroupService {
 
         UserGroup userGroupEntity = userGroupFindOrFail(userGrpId);
 
-        //System.out.println(userGroupEntity.getUserGroupUsers());
-
         UserGroupDTO userGroupDTO = userGroupMapper.toDto(userGroupEntity);
+
+        //조회된 권한 List get :: 맵핑테이블 안에 유저그룹이 있기 때문에 맵퍼변환시 무한루프[스텍오버플로우]
+        List<UserGroupAuth> userGroupAuth = userGroupEntity.getUserGroupAuths();
+
+        List<UserGroupAuthDTO> userGroupAuthDTOList = userGroupAuthMapper.toDtoList(userGroupAuth);
+
+        userGroupDTO.setUserGroupAuthDTO(userGroupAuthDTOList);//권한 set
 
         return userGroupDTO;
     }
@@ -82,8 +90,7 @@ public class UserGroupService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        userGroupUpdateDTO.setUpdtr(userSimpleDTO);
+        userGroupUpdateDTO.setUpdtrId(userId);
 
         userGroupUpdateMapper.updateFromDto(userGroupUpdateDTO, userGroup);
 
@@ -99,8 +106,7 @@ public class UserGroupService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        userGroupDTO.setDelr(userSimpleDTO);
+        userGroupDTO.setDelrId(userId);
         userGroupDTO.setDelDtm(new Date());
         userGroupDTO.setDelYn("Y");
 

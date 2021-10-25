@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.articleCap.dto;
 
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ public class ArticleCapUpdateDTO {
 
     private Long artclCapId;
     private String capDivCd;
+    private String chDivCdNm;
     private int lnNo;
     private String capCtt;
     private String capRmk;

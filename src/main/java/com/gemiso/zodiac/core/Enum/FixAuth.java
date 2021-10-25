@@ -1,6 +1,5 @@
-package com.gemiso.zodiac.core.fixEnum;
+package com.gemiso.zodiac.core.Enum;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public enum FixAuth {

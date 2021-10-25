@@ -10,8 +10,8 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface UserGroupUserMapper extends GenericMapper<UserGroupUserDTO, UserGroupUser, UserGroupUserDTO> {
 
-    List<UserGroupUserDTO> dtoList(List<UserGroupUser> userGroupUsers);
+    /*List<UserGroupUserDTO> dtoList(List<UserGroupUser> userGroupUsers);
 
-    List<UserGroupUser> toEntityList(List<UserGroupUserDTO> userGroupUserDTOList);
+    List<UserGroupUser> toEntityList(List<UserGroupUserDTO> userGroupUserDTOList);*/
 
 }

@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.file;
 
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.dto.StatusCodeFileDTO;
 import com.gemiso.zodiac.core.response.ApiResponse;

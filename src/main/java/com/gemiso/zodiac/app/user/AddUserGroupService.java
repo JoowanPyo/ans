@@ -77,7 +77,7 @@ public class AddUserGroupService {
         //Set<UserGroupUser> userGroupUserSet = userEntity.getUserGroupUser();
 
         if (!CollectionUtils.isEmpty(userGroupUserList)) {
-            List<UserGroupUserDTO> userGroupUserDTOs = userGroupUserMapper.dtoList(userGroupUserList);
+            List<UserGroupUserDTO> userGroupUserDTOs = userGroupUserMapper.toDtoList(userGroupUserList);
 
             List<UserGroupUserDTO> returnUserGroupUserDTO = new ArrayList<>();
 

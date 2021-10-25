@@ -26,6 +26,10 @@ public class CodeUpdateDTO {
     private Date updtDtm;
     //private Date delDtm;
     //private String inputr;
-    private UserSimpleDTO updtr;
+    //private String inputrId;
+    //private String inputrNm;
+    private String updtrId;
+    //private String updtrNm;
     //private String delrId;
+    //private String delrNm;
 }

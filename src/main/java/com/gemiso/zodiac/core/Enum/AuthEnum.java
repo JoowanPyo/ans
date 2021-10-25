@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.core.fixEnum;
+package com.gemiso.zodiac.core.Enum;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public enum AuthEnum {
     AdminWrite("admin.write"),
     AdminRead("admin.read"),
     PD("Pd"),
-    Empty("");
+    Empty(""),;
 
     private static String ArticleFix_cd = "article.articlefix";
     private static String EditorFix_cd = "article.editorfix";
@@ -34,6 +34,10 @@ public enum AuthEnum {
     AuthEnum(String ahth) {
 
         this.auth = ahth;
+    }
+
+    public String getAuth(){
+        return auth;
     }
 
     public static AuthEnum certity(List<String> certityList){

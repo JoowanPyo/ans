@@ -72,8 +72,7 @@ public class CapTemplateService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        capTemplateCreateDTO.setInputr(userSimpleDTO); //등록자 추가.
+        capTemplateCreateDTO.setInputrId(userId); //등록자 추가.
         
         if (capTemplateCreateDTO.getCapTmpltOrd() == 0){ //Ord값이 빈값으로 들어왔을경우 max(ord)값 셋팅
             Optional<Integer> capTmplOrd = capTemplateRepository.findOrd(); //max Ord값 get
@@ -132,8 +131,7 @@ public class CapTemplateService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        capTemplateUpdateDTO.setUpdtr(userSimpleDTO); //수정자 추가
+        capTemplateUpdateDTO.setUpdtrId(userId); //수정자 추가
 
         capTemplateUpdateMapper.updateFromDto(capTemplateUpdateDTO, capTemplate);
         capTemplateRepository.save(capTemplate); //update
@@ -174,8 +172,7 @@ public class CapTemplateService {
 
             // 토큰 인증된 사용자 아이디를 입력자로 등록
             String userId = userAuthService.authUser.getUserId();
-            UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-            capTemplateDTO.setDelr(userSimpleDTO);
+            capTemplateDTO.setDelrId(userId);
             capTemplateDTO.setDelDtm(new Date());
             capTemplateDTO.setDelYn("Y");
 

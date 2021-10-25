@@ -4,7 +4,10 @@ import com.gemiso.zodiac.app.article.dto.ArticleCreateDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleLockDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
+import com.gemiso.zodiac.core.Enum.AuthEnum;
+import com.gemiso.zodiac.core.Enum.CodeEnum;
 import com.gemiso.zodiac.core.helper.SearchDate;
+import com.gemiso.zodiac.core.service.UserAuthChkService;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.response.ApiCollectionResponse;
 import com.gemiso.zodiac.core.response.ApiResponse;
@@ -17,9 +20,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +35,7 @@ public class ArticleController {
 
     private final ArticleService articleService;
 
+    private final UserAuthChkService userAuthService;
 
     @Operation(summary = "기사 목록조회", description = "기사 목록조회")
     @GetMapping(path = "")
@@ -41,27 +45,38 @@ public class ArticleController {
             @Parameter(name = "rcvDt", description = "수신일자(yyyyMMdd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date rcvDt,
             @Parameter(name = "rptrId", description = "기자 아이디") @RequestParam(value = "rptrId", required = false) String rptrId,
             @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디") @RequestParam(value = "brdcPgmId", required = false) Long brdcPgmId,
-            @Parameter(name = "artclDivCd", description = "기사구분코드(01:일반, 02:예정, 03:엠바고)") @RequestParam(value = "artclDivCd", required = false) String artclDivCd,
+            @Parameter(name = "artclDivCd", description = "기사구분코드(01:일반, 02:전체, 03:이슈)") @RequestParam(value = "artclDivCd", required = false) String artclDivCd,
             @Parameter(name = "artclTypCd", description = "기사유형코드(01:스트레이트, 02:리포트, 03:C/T, 04:하단롤, 05:긴급자막)") @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
             @Parameter(name = "searchDivCd", description = "검색구분코드<br>01 - 기사제목<br>02 - 기자명") @RequestParam(value = "searchDivCd", required = false) String searchDivCd,
             @Parameter(name = "searchWord", description = "검색키워드") @RequestParam(value = "searchWord", required = false) String searchWord,
             @Parameter(name = "page", description = "시작페이지") @RequestParam(value = "page", required = false) Integer page,
-            @Parameter(name = "limit", description = "한 페이지에 데이터 수") @RequestParam(value = "limit", required = false) Integer limit) throws Exception {
+            @Parameter(name = "limit", description = "한 페이지에 데이터 수") @RequestParam(value = "limit", required = false) Integer limit,
+            @Parameter(name = "issuId", description = "이슈아이디") @RequestParam(value = "issuId", required = false) Long issuId) throws Exception {
 
         PageResultDTO<ArticleDTO, Article> pageList = null;
         //List<ArticleDTO> articleDTOList = new ArrayList<>();
 
+        //기사읽기 권한이 없는 사용자 error.forbidden
+        List<String> userAuth = userAuthService.authChk();
+        if (userAuth.contains(AuthEnum.ArticleRead.getAuth()) == false ||
+                userAuth.contains(AuthEnum.AdminRead.getAuth()) == false){ //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        //articleDivCd가 이슈["02"]일 경우에 이슈아이디로 조회.
+        //검색조건 날짜형식이 들어왔을경우
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
 
             SearchDate searchDate = new SearchDate(sdate, edate);
 
-            pageList = articleService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), rcvDt, rptrId, brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit);
-
-           // articleDTOList =  pageList.getDtoList();
+            pageList = articleService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), rcvDt, rptrId,
+                    brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit, issuId);
+            //검색조건 날짜형식이 안들어왔을경우
         } else {
-            pageList = articleService.findAll(null, null, rcvDt, rptrId, brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit);
 
-           // articleDTOList =  pageList.getDtoList();
+            pageList = articleService.findAll(null, null, rcvDt, rptrId, brdcPgmId, artclDivCd,
+                    artclTypCd, searchDivCd, searchWord, page, limit, issuId);
+
         }
 
         return new ApiCollectionResponse<>( pageList);

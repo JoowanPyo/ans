@@ -1,8 +1,10 @@
 package com.gemiso.zodiac.app.user;
 
+import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
@@ -43,8 +45,11 @@ public class User extends BaseEntity {
     @Column(name = "dept_id", length = 21)
     private String deptId;
 
-    @Column(name = "duty_cd", length = 50)
+    @Column(name = "duty_cd")
     private String dutyCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = duty_cd)")
+    private String dutyCdNm;
 
     @Column(name = "chief_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String chiefYn;
@@ -58,8 +63,11 @@ public class User extends BaseEntity {
     @Column(name = "tel_pub_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String telPubYn;
 
-    @Column(name = "user_div_cd", length = 50)
+    @Column(name = "user_div_cd")
     private String userDivCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = user_div_cd)")
+    private String userDivCdNm;
 
     @Column(name = "memo", length = 1000)
     private String memo;
@@ -77,8 +85,11 @@ public class User extends BaseEntity {
     @Column(name = "pwd_chg_dtm")
     private Date pwdChgDtm;
 
-    @Column(name = "user_st_cd", length = 50)
-    private String userStDt;
+    @Column(name = "user_st_cd")
+    private String userStCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = user_st_cd)")
+    private String userStCdNm;
 
     @Column(name = "use_start_dtm")
     private Date useStartDtm;
@@ -92,17 +103,26 @@ public class User extends BaseEntity {
     @Column(name = "del_yn",columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inputr_id", nullable = false)
-    private User inputr;
+    @Column(name = "inputr_id")
+    private String inputrId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updtr_id")
-    private User updtr;
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
+    private String inputrNm;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delr_id")
-    private User delr;
+    @Column(name = "updtr_id")
+    private String updtrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
+    private String updtrNm;
+
+    @Column(name = "delr_id")
+    private String delrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
+    private String delrNm;
 
     @LastModifiedDate
     @Column(name = "del_dtm")

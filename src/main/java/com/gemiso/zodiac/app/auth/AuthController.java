@@ -60,7 +60,7 @@ public class AuthController {
     }
 
     @Operation(summary = "사용자 로그인 정보 조회", description = "사용자 로그인 정보 조회")
-    @GetMapping(path = "")
+    @GetMapping(path = "/me")
     public ApiResponse<AuthDTO> find(@Parameter(name = "authorization", description = "엑세스토큰", in = ParameterIn.PATH)
                                       @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {
 

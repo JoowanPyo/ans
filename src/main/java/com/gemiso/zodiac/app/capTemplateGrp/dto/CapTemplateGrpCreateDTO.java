@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.capTemplateGrp.dto;
 
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,11 +17,14 @@ public class CapTemplateGrpCreateDTO {
 
     //private Long tmpltGrpId;
     private String chDivCd;
+    //private String chDivCdNm;
     private String tmpltGrpNm;
     private String brdcPgmId;
-    private UserSimpleDTO inputr;
+    private String inputrId;
+    //private String inputrNm;
     //private String updtrId;
-    private String delYn;
+    //private String updtrNm;
+    //private String delYn;
     private Date inputDtm;
     //private Date updtDtm;
 }

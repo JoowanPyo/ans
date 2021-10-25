@@ -44,8 +44,7 @@ public class CueSheetMediaService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        cueSheetMediaCreateDTO.setInputr(userSimpleDTO);
+        cueSheetMediaCreateDTO.setInputrId(userId);
 
         CueSheetMedia cueSheetMedia = cueSheetMediaCreateMapper.toEntity(cueSheetMediaCreateDTO);
 
@@ -60,8 +59,7 @@ public class CueSheetMediaService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        cueSheetMediaUpdateDTO.setUpdtr(userSimpleDTO);
+        cueSheetMediaUpdateDTO.setUpdtrId(userId);
 
         cueSheetMediaUpdateMapper.updateFromDto(cueSheetMediaUpdateDTO, cueSheetMedia);
 
@@ -77,8 +75,7 @@ public class CueSheetMediaService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        cueSheetMediaDTO.setDelr(userSimpleDTO);
+        cueSheetMediaDTO.setDelrId(userId);
         cueSheetMediaDTO.setDelDtm(new Date());
         cueSheetMediaDTO.setDelYn("Y");
 

@@ -106,9 +106,7 @@ public class CueSheetItemService {
         cueSheetItemCreateDTO.setCueId(cueId);
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
         String userId = userAuthService.authUser.getUserId();
-        //입력자 등록[ 현재 Entity에 입력자가 타입이 유저이기 때문에 빌드시켜서 set]
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        cueSheetItemCreateDTO.setInputr(userSimpleDTO);
+        cueSheetItemCreateDTO.setInputrId(userId);
 
         CueSheetItem cueSheetItem = cueSheetItemCreateMapper.toEntity(cueSheetItemCreateDTO);
         cueSheetItemRepository.save(cueSheetItem); //큐시트아이템 등록
@@ -147,8 +145,7 @@ public class CueSheetItemService {
         cueSheetItemUpdateDTO.setCueItemId(cueItemId);
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        cueSheetItemUpdateDTO.setUpdtr(userSimpleDTO);
+        cueSheetItemUpdateDTO.setUpdtrId(userId);
 
         cueSheetItemUpdateMapper.updateFromDto(cueSheetItemUpdateDTO, cueSheetItem);
 
@@ -163,8 +160,7 @@ public class CueSheetItemService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        cueSheetItemDTO.setDelr(userSimpleDTO);
+        cueSheetItemDTO.setDelrId(userId);
         cueSheetItemDTO.setDelYn("Y");
         cueSheetItemDTO.setDelDtm(new Date());
 
@@ -267,14 +263,12 @@ public class CueSheetItemService {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
         String userId = userAuthService.authUser.getUserId();
-        //입력자 등록[ 현재 Entity에 입력자가 타입이 유저이기 때문에 빌드시켜서 set]
-        User user = User.builder().userId(userId).build();
 
         //큐시트아이템create 빌드
         CueSheetItem cueSheetItem = CueSheetItem.builder()
                 .cueId(cueId)
                 .cueItemOrd(cueItemOrd)
-                .inputr(user)
+                .inputrId(userId)
                 .article(copyArtcl)
                 .build();
 
@@ -301,14 +295,12 @@ public class CueSheetItemService {
 
             //토큰 사용자 Id(현재 로그인된 사용자 ID)
             String userId = userAuthService.authUser.getUserId();
-            //입력자 등록[ 현재 Entity에 입력자가 타입이 유저이기 때문에 빌드시켜서 set]
-            User user = User.builder().userId(userId).build();
 
             //큐시트아이템create 빌드
             CueSheetItem cueSheetItem = CueSheetItem.builder()
                     .cueId(cueId)
                     .cueItemOrd(cueItemOrd)
-                    .inputr(user)
+                    .inputrId(userId)
                     .article(copyArtcl)
                     .build();
 
@@ -454,12 +446,12 @@ public class CueSheetItemService {
                 .regAppTyp(article.getRegAppTyp())
                 .brdcPgmId(article.getBrdcPgmId())
                 .brdcSchdDtm(article.getBrdcSchdDtm())
-                .inputr(article.getInputr())
-                .updtr(article.getUpdtr())
-                .delr(article.getDelr())
-                .apprvr(article.getApprvr())
-                .lckr(article.getLckr())
-                .rptr(article.getRptr())
+                .inputrId(article.getInputrId())
+                .updtrId(article.getUpdtrId())
+                .delrId(article.getDelrId())
+                .apprvrId(article.getApprvrId())
+                .lckrId(article.getLckrId())
+                .rptrId(article.getRptrId())
                 .artclCttTime(article.getArtclCttTime())
                 .ancMentCttTime(article.getAncMentCttTime())
                 .artclExtTime(article.getArtclExtTime())
@@ -497,9 +489,9 @@ public class CueSheetItemService {
                 .videoEdtrNm(articleMedia.getVideoEdtrNm())
                 .delYn(articleMedia.getDelYn())
                 .delDtm(articleMedia.getDelDtm())
-                .inputr(articleMedia.getInputr())
-                .updtr(articleMedia.getUpdtr())
-                .delr(articleMedia.getDelr())
+                .inputrId(articleMedia.getInputrId())
+                .updtrId(articleMedia.getUpdtrId())
+                .delrId(articleMedia.getDelrId())
                 .videoEdtrId(articleMedia.getVideoEdtrId())
                 .article(articleEntity)
                 .build();

@@ -22,8 +22,11 @@ import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderSimpleDTO;
 import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderSimpleMapper;
+import com.gemiso.zodiac.app.code.Code;
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
+import com.gemiso.zodiac.app.issue.IssueRepositoy;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.user.QUser;
 import com.gemiso.zodiac.app.user.User;
@@ -68,6 +71,7 @@ public class ArticleService {
     private final CueSheetItemRepository cueSheetItemRepository;
     private final UserGroupUserRepository userGroupUserRepository;
     private final UserGroupAuthRepository userGroupAuthRepository;
+    private final IssueRepositoy issueRepositoy;
 
     private final ArticleMapper articleMapper;
     private final ArticleCreateMapper articleCreateMapper;
@@ -87,7 +91,7 @@ public class ArticleService {
 
     public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, Long brdcPgmId,
                                     String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
-                                                      Integer page, Integer limit) {
+                                                      Integer page, Integer limit, Long issuId) {
 
         /*page = Optional.ofNullable(page).orElse(0);
         limit = Optional.ofNullable(limit).orElse(50);
@@ -96,9 +100,9 @@ public class ArticleService {
 
         BooleanBuilder booleanBuilder = getSearch(sdate, edate, rcvDt, rptrId, brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord);
 
-        List<Article> articleList = (List<Article>) articleRepository.findAll(booleanBuilder,pageable);
+        List<Article> confirmList = (List<Article>) articleRepository.findAll(booleanBuilder,pageable);
 
-        List<ArticleDTO> articleDTOList = articleMapper.toDtoList(articleList);
+        List<ArticleDTO> articleDTOList = articleMapper.toDtoList(confirmList);
 
         return articleDTOList;*/
 
@@ -107,10 +111,13 @@ public class ArticleService {
         limit = Optional.ofNullable(limit).orElse(50);*/
 
         //Pageable pageable = PageRequest.of(page, limit, Sort.by("artclId","inputDtm").descending());
-        Pageable pageable = pageHelper.getPageInfo();
+        Pageable pageable = pageHelper.getArticlePageInfo();
 
-        BooleanBuilder booleanBuilder = getSearch(sdate, edate, rcvDt, rptrId, brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord);
+        //검색조건생성 [where생성]
+        BooleanBuilder booleanBuilder = getSearch(sdate, edate, rcvDt, rptrId, brdcPgmId, artclDivCd, artclTypCd,
+                searchDivCd, searchWord, issuId);
 
+        //전체조회[page type]
         Page<Article> result = articleRepository.findAll(booleanBuilder,pageable);
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
@@ -126,23 +133,23 @@ public class ArticleService {
 
         BooleanBuilder booleanBuilder = getSearchCue(sdate, edate, searchWord);
 
-        List<Article> articleList = (List<Article>) articleRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "inputDtm"));
+        List<Article> confirmList = (List<Article>) articleRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "inputDtm"));
 
         //큐시트 아이템으로 포함된 기사 조회정보에서 삭제.
         if (ObjectUtils.isEmpty(cueSheetItemList) == false) {
             for (CueSheetItem cueSheetItem : cueSheetItemList) {
                 if (ObjectUtils.isEmpty(cueSheetItem.getArticle()) == false) { //기사 아이디가 있으면 조회된 기사리트와 검사하여 포함된 기사 삭제
                     Long cueArticleId = cueSheetItem.getArticle().getArtclId(); //큐시트 아이템으로 포함되어 있는 기사아이디 get
-                    for (int i = articleList.size() - 1; i >= 0; i--) {
-                        Long artclId = articleList.get(i).getArtclId();
+                    for (int i = confirmList.size() - 1; i >= 0; i--) {
+                        Long artclId = confirmList.get(i).getArtclId();
                         if (cueArticleId.equals(artclId)) {
-                            articleList.remove(i);
+                            confirmList.remove(i);
                         }
                     }
                 }
             }
         }
-        List<ArticleDTO> articleDTOList = articleMapper.toDtoList(articleList);
+        List<ArticleDTO> articleDTOList = articleMapper.toDtoList(confirmList);
 
         return articleDTOList;
     }
@@ -169,13 +176,15 @@ public class ArticleService {
 
                 symbolDTO = articleCapSimpleDTO.getSymbol();
 
-                String fileLoc = articleCapSimpleDTO.getSymbol().getAttachFile().getFileLoc();
-                String url = fileUrl + fileLoc;
+                if (ObjectUtils.isEmpty(symbolDTO) == false) {
+                    String fileLoc = articleCapSimpleDTO.getSymbol().getAttachFile().getFileLoc();
+                    String url = fileUrl + fileLoc;
 
-                symbolDTO.setUrl(url);
+                    symbolDTO.setUrl(url);
 
-                articleCapSimpleDTO.setSymbol(symbolDTO);
-                setArticleCapDTOList.add(articleCapSimpleDTO);
+                    articleCapSimpleDTO.setSymbol(symbolDTO);
+                    setArticleCapDTOList.add(articleCapSimpleDTO);
+                }
             }
         }
 
@@ -194,8 +203,7 @@ public class ArticleService {
     public Long create(ArticleCreateDTO articleCreateDTO) { // 기사등록[기사 이력, 자막]
 
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        articleCreateDTO.setInputr(userSimpleDTO); //등록자 아이디 추가.
+        articleCreateDTO.setInputrId(userId); //등록자 아이디 추가.
         articleCreateDTO.setArtclOrd(0);
 
         Article article = articleCreateMapper.toEntity(articleCreateDTO);
@@ -205,14 +213,15 @@ public class ArticleService {
 
 
         //기사 자막 create
-        ArrayList<ArticleCapDTO> articleCapDTOS = new ArrayList<ArticleCapDTO>(articleCreateDTO.getArticleCap());
+
+        List<ArticleCapSimpleDTO> articleCapDTOS = articleCreateDTO.getArticleCap();
 
         if (!ObjectUtils.isEmpty(articleCapDTOS)) {
-            for (ArticleCapDTO articleCapDTO : articleCapDTOS) {
+            for (ArticleCapSimpleDTO articleCapDTO : articleCapDTOS) {
 
                 Article articleSimple = Article.builder().artclId(articleDTO.getArtclId()).build();
 
-                ArticleCap articleCap = articleCapMapper.toEntity(articleCapDTO);
+                ArticleCap articleCap = articleCapSimpleMapper.toEntity(articleCapDTO);
                 articleCap.setArticle(articleSimple);
                 articleCapRepository.save(articleCap);
             }
@@ -227,14 +236,11 @@ public class ArticleService {
 
         Article article = articleFindOrFail(artclId);
 
-        User user = User.builder().userId("").build();
-        article.setUpdtr(user);
         //기사 자막 Update
         articleCapUpdate(article, articleUpdateDTO);
 
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        articleUpdateDTO.setUpdtr(userSimpleDTO);
+        articleUpdateDTO.setUpdtrId(userId);
 
         articleUpdateMapper.updateFromDto(articleUpdateDTO, article);
 
@@ -254,8 +260,7 @@ public class ArticleService {
         //삭제정보 등록
         articleDTO.setDelDtm(new Date());
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        articleDTO.setDelr(userSimpleDTO);
+        articleDTO.setDelrId(userId);
         articleDTO.setDelYn("Y");
 
         articleMapper.updateFromDto(articleDTO, article);
@@ -303,11 +308,10 @@ public class ArticleService {
             articleLockDTO.setLckDtm(new Date());
             // 토큰 인증된 사용자 아이디를 입력자로 등록
             String userId = userAuthService.authUser.getUserId();
-            UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-            articleLockDTO.setLckr(userSimpleDTO);
+            articleLockDTO.setLckr(userId);
         } else {
             article.setLckDtm(null);
-            article.setLckr(null);
+            article.setLckrId(null);
         }
 
         articleLockMapper.updateFromDto(articleLockDTO, article);
@@ -323,7 +327,7 @@ public class ArticleService {
 
         if (articleLockDTO.getLckYn().equals("N")) {
             article.setLckDtm(null);
-            article.setLckr(null);
+            article.setLckrId(null);
         }
 
         articleLockMapper.updateFromDto(articleLockDTO, article);
@@ -345,7 +349,7 @@ public class ArticleService {
     }
 
     public BooleanBuilder getSearch(Date sdate, Date edate, Date rcvDt, String rptrId, Long brdcPgmId,
-                                    String artclDivCd, String artclTypCd, String searchDivCd, String searchWord) {
+                                    String artclDivCd, String artclTypCd, String searchDivCd, String searchWord, Long issuId) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -374,16 +378,16 @@ public class ArticleService {
         }
         //기자 아이디로 조회
         if (!StringUtils.isEmpty(rptrId)) {
-            booleanBuilder.and(qArticle.rptr.userId.eq(rptrId));
+            booleanBuilder.and(qArticle.rptrId.eq(rptrId));
         }
         //방송 프로그램 아이디로 조회
         if (!StringUtils.isEmpty(brdcPgmId)) {
             booleanBuilder.and(qArticle.brdcPgmId.eq(brdcPgmId));
         }
         //기사 구분 코드로 조회
-        if (!StringUtils.isEmpty(artclDivCd)) {
-            booleanBuilder.and(qArticle.artclDivCd.eq(artclDivCd));
-        }
+        /*if (!StringUtils.isEmpty(artclDivCd)) {
+            booleanBuilder.and(qArticle.artclDivCd.cd.eq(artclDivCd));
+        }*/
         //기사 타입 코드로 조회
         if (!StringUtils.isEmpty(artclTypCd)) {
             booleanBuilder.and(qArticle.artclTypCd.eq(artclTypCd));
@@ -396,9 +400,13 @@ public class ArticleService {
             }
             //검색구분코드 02 일때 기자이름으로 검색
             if (searchDivCd.equals("02")) {
-                booleanBuilder.and(qArticle.rptr.userId.eq(String.valueOf(qUser.userNm.contains(searchWord))));
+                booleanBuilder.and(qArticle.rptrId.eq(String.valueOf(qUser.userNm.contains(searchWord))));
             }
 
+        }
+        //기사 타입 코드로 조회
+        if (!StringUtils.isEmpty(issuId)) {
+            booleanBuilder.and(qArticle.issue.issuId.eq(issuId));
         }
 
 
@@ -442,6 +450,7 @@ public class ArticleService {
 
         articleHistRepository.save(articleHist);
     }
+
 
     public void updateArticleHist(Article article) {
 
@@ -499,8 +508,7 @@ public class ArticleService {
 
         ArticleDTO articleDTO = articleMapper.toDto(article);
         articleDTO.setApprvDivCd(apprvDivCd); //픽스 구분코드 변경.
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        articleDTO.setApprvr(userSimpleDTO);//픽스 승인자 변경.
+        articleDTO.setApprvrId(userId);//픽스 승인자 변경.
 
         articleMapper.updateFromDto(articleDTO, article);
         articleRepository.save(article);
@@ -538,7 +546,7 @@ public class ArticleService {
 
         List<String> appAuthList = new ArrayList<>(); //리턴할 권한 List
 
-        for (UserGroupUser userGroupUser : userGroupUserList) {
+        for (UserGroupUser userGroupUser : userGroupUserList) { //등록된 사용자 그룹에 포함한 권한을 모두 불러온다.
 
             Long groupId = userGroupUser.getUserGroup().getUserGrpId();
 
@@ -546,15 +554,36 @@ public class ArticleService {
 
             for (UserGroupAuth userGroupAuth : findUserGroupAuthList) {
 
-                String appAuthCD = userGroupAuth.getAppAuth().getAppAuthCd();
+                String appAuthCD = userGroupAuth.getAppAuth().getAppAuthCd(); //코드네임 get
                 if (appAuthList.contains(appAuthCD) == false) {
                     appAuthList.add(appAuthCD);
                 }
             }
         }
-
+        //권한 리스트 리턴
         return appAuthList;
 
     }
+
+    // artcl_div_cd[기사구분코드가] 이슈로 들어왔을 경우 해당이슈로  작성된 기사들 출력.
+/*    public PageResultDTO<ArticleDTO, Article> findAllIssue(Long issuId){
+
+        PageHelper pageHelper = new PageHelper(null, null);
+        *//*page = Optional.ofNullable(page).orElse(0);
+        limit = Optional.ofNullable(limit).orElse(50);*//*
+
+        //Pageable pageable = PageRequest.of(page, limit, Sort.by("artclId","inputDtm").descending());
+        Pageable pageable = pageHelper.getArticlePageInfo();
+
+        BooleanBuilder booleanBuilder = getSearch(null, null, null, null, null,
+                null, null, null, null, issuId);
+
+        Page<Article> result = articleRepository.findAll(booleanBuilder,pageable);
+
+        Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
+
+        return new PageResultDTO<ArticleDTO, Article>(result, fn);
+
+    }*/
 
 }

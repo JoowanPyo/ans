@@ -1,10 +1,12 @@
 package com.gemiso.zodiac.app.cueSheet;
 
+import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -30,11 +32,17 @@ public class CueSheet {
     @Column(name = "cue_id", nullable = false)
     private Long cueId;
 
-    @Column(name = "cue_div_cd", length = 50)
+    @Column(name = "cue_div_cd")
     private String cueDivCd;
 
-    @Column(name = "ch_div_cd", length = 50)
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_div_cd)")
+    private String cueDivCdNm;
+
+    @Column(name = "ch_div_cd")
     private String chDivCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = ch_div_cd)")
+    private String chDivCdNm;
 
     @Column(name = "brdc_dt", length = 10)
     private String brdcDt;
@@ -51,8 +59,11 @@ public class CueSheet {
     @Column(name = "brdc_pgm_nm", length = 450)
     private String brdcPgmNm;
 
-    @Column(name = "cue_st_cd", length = 50)
+    @Column(name = "cue_st_cd")
     private String cueStCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_st_cd)")
+    private String cueStCdNm;
 
     @Column(name = "stdio_id", length = 10)
     private String stdioId;
@@ -76,41 +87,68 @@ public class CueSheet {
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inputr_id", nullable = false)
-    private User inputr;
+    @Column(name = "inputr_id")
+    private String inputrId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delr_id")
-    private User delr;
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
+    private String inputrNm;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pd_1_id")
-    private User pd1;
+    @Column(name = "delr_id")
+    private String delrId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
+    private String delrNm;
+
+    @Column(name = "pd_1_id")
+    private String pd1Id;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = pd_1_id)")
+    private String pd1Nm;
+
     @JoinColumn(name = "pd_2_id")
-    private User pd2;
+    private String pd2Id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = pd_2_id)")
+    private String pd2Nm;
+
     @JoinColumn(name = "anc_1_id")
-    private User anc1;
+    private String anc1Id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = anc_1_id)")
+    private String anc1Nm;
+
     @JoinColumn(name = "anc_2_id")
-    private User anc2;
+    private String anc2Id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = anc_2_id)")
+    private String anc2Nm;
+
     @JoinColumn(name = "lckr_id")
-    private User lckr;
+    private String lckrId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = lckr_id)")
+    private String lckrNm;
+
     @JoinColumn(name = "td_1_id")
-    private User td1;
+    private String td1Id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = td_1_id)")
+    private String td1Nm;
+
     @JoinColumn(name = "td_2_id")
-    private User td2;
+    private String td2Id;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = td_2_id)")
+    private String td2Nm;
 
     @Column(name = "remark", length = 500)
     private String remark;

@@ -61,8 +61,7 @@ public class ArticleMediaService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        articleMediaCreateDTO.setInputr(userSimpleDTO);
+        articleMediaCreateDTO.setInputrId(userId);
 
         ArticleMedia articleMedia = articleMediaCreateMapper.toEntity(articleMediaCreateDTO);
 
@@ -78,8 +77,7 @@ public class ArticleMediaService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        articleMediaUpdateDTO.setUpdtr(userSimpleDTO);
+        articleMediaUpdateDTO.setUpdtrId(userId);
 
         articleMediaUpdateMapper.updateFromDto(articleMediaUpdateDTO, articleMedia);
 
@@ -95,8 +93,7 @@ public class ArticleMediaService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        articleMediaDTO.setDelr(userSimpleDTO);
+        articleMediaDTO.setDelrId(userId);
         articleMediaDTO.setDelDtm(new Date());
         articleMediaDTO.setDelYn("Y");
 

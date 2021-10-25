@@ -1,9 +1,15 @@
 package com.gemiso.zodiac.app.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -12,6 +18,42 @@ import lombok.NoArgsConstructor;
 public class UserUpdateDTO {
 
     private String userId;
+    private String userNm;
+    private String pwd;
+    private String emplNo;
+    private String freeYn;
+    private String deptId;
+    private String dutyCd;
+    private String dutyCdNm;
+    private String chiefYn;
+    private String email;
+    private String tel;
+    private String telPubYn;
+    private String userDivCd;
+    private String userDivCdNm;
+    private String memo;
+    private String rmk;
+    //private Date lastLoginDtm;
+    //private int loginErrCnt;
+    private Date pwdChgDtm;
+    private String userStCd;
+    //private String userStCdNm;
+    //private Date useStartDtm;
+    //private Date useEndDtm;
+    private String useYn;
+    //private String delYn;
+    //private String inputrId;
+    //private String inputrNm;
+    private String updtrId;
+    //private String updtrNm;
+    //private String delrId;
+    //private String delrNm;
+    //private Date delDtm;
+    private String inphonNo;
+    private String salt;
+    private List<UserGroupUserDTO> userGroupUserDTO = new ArrayList<>();
+
+    /*private String userId;
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     //private Date inputDtm;
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
@@ -22,7 +64,7 @@ public class UserUpdateDTO {
     //private String delYn;
     //private String delrId;
     private String deptId;
-    private String dutyCd;
+    private CodeSimpleDTO dutyCd;
     private String email;
     private String emplNo;
     private String freeYn;
@@ -45,8 +87,8 @@ public class UserUpdateDTO {
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     //private Date useStartDtm;
     private String useYn;
-    private String userDivCd;
+    private CodeSimpleDTO userDivCd;
     private String userNm;
-    private String userStCd;
-    //private List<UserGroupUserDTO> userGroupUserDTO = new ArrayList<>();
+    private CodeSimpleDTO userStCd;
+    //private List<UserGroupUserDTO> userGroupUserDTO = new ArrayList<>();*/
 }

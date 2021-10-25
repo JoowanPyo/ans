@@ -1,10 +1,12 @@
 package com.gemiso.zodiac.app.dailyProgram;
 
+import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 
@@ -41,14 +43,20 @@ public class DailyProgram extends BaseEntity {
     @Column(name = "brdc_end_clk", columnDefinition = "bpchar(6)", nullable = false)
     private String brdcEndClk;
 
-    @Column(name = "brdc_div_cd", length = 50)
+    @Column(name = "brdc_div_cd")
     private String brdcDivCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = brdc_div_cd)")
+    private String brdcDivCdNm;
 
     @Column(name = "brdc_pgm_nm", length = 450)
     private String brdcPgmNm;
 
-    @Column(name = "src_div_cd", length = 50)
+    @Column(name = "src_div_cd")
     private String srcDivCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = src_div_cd)")
+    private String srcDivCdNm;
 
     @Column(name = "stdio_id", length = 10)
     private String stdioId;
@@ -62,13 +70,19 @@ public class DailyProgram extends BaseEntity {
     @Column(name = "rmk", length = 500)
     private String rmk;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inputr_id", nullable = false)
-    private User inputr;
+    @Column(name = "inputr_id")
+    private String inputrId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updtr_id")
-    private User updtr;
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
+    private String inputrNm;
+
+    @Column(name = "updtr_id")
+    private String updtrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
+    private String updtrNm;
 
 
     /*@Column(name = "brdc_pgm_id")*/

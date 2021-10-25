@@ -40,6 +40,16 @@ public class CodeController {
         return new ApiResponse<>(codeDTOList);
     }
 
+    @Operation(summary = "기사 유형코드 조회", description = "기사 유형코드 조회")
+    @GetMapping(path = "/articletype")
+    public ApiResponse<List<CodeDTO>> findArticleType(@Parameter(name = "artclTypCd", description = "기사유형 코드")
+                                                      @RequestParam(value = "artclTypCd", required = false)Long artclTypCd) {
+
+        List<CodeDTO> codeDTOList = codeService.findArticleType(artclTypCd);
+
+        return new ApiResponse<>(codeDTOList);
+    }
+
     @Operation(summary = "코드 상세 조회", description = "코드 상세 조회")
     @GetMapping(path = "/{cdId}")
     public ApiResponse<CodeDTO> find(@Parameter(name = "cdId", description = "코드 아이디") @PathVariable Long cdId) {
@@ -52,21 +62,19 @@ public class CodeController {
     @Operation(summary = "코드 등록", description = "코드 등록")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<CodeDTO> create(@Parameter(description = "필수값<br> ", required = true) @RequestBody CodeCreateDTO codeCreateDTO,
-                                       @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {
+    public ApiResponse<CodeDTO> create(@Parameter(description = "필수값<br> ", required = true) @RequestBody CodeCreateDTO codeCreateDTO) {
 
-        CodeDTO returnCodeDTO = codeService.create(codeCreateDTO, authorization);
+        CodeDTO returnCodeDTO = codeService.create(codeCreateDTO);
 
         return new ApiResponse<>(returnCodeDTO);
     }
 
     @Operation(summary = "코드 수정", description = "코드 수정")
     @PutMapping(path = "/{cdId}")
-    public ApiResponse<CodeDTO> update(@Parameter(name = "codeUpdateDTO", required = true, description = "필수값<br>")@Valid @RequestBody CodeUpdateDTO codeUpdateDTO,
-                                       @Parameter(name = "cdId", required = true) @PathVariable("cdId") Long cdId,
-                                       @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {
+    public ApiResponse<CodeDTO> update(@Parameter(name = "codeUpdateDTO", required = true, description = "필수값<br>") @Valid @RequestBody CodeUpdateDTO codeUpdateDTO,
+                                       @Parameter(name = "cdId", required = true) @PathVariable("cdId") Long cdId) {
 
-        codeService.update(codeUpdateDTO, cdId, authorization);
+        codeService.update(codeUpdateDTO, cdId);
 
         CodeDTO codeDTO = codeService.find(cdId);
 
@@ -76,10 +84,9 @@ public class CodeController {
     @Operation(summary = "코드 삭제", description = "코드 삭제")
     @DeleteMapping(path = "/{cdId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResponse<CodeDTO> delete(@Parameter(name = "cdId", description = "코드 아이디") @PathVariable("userId") Long cdId,
-                                       @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {
+    public ApiResponse<CodeDTO> delete(@Parameter(name = "cdId", description = "코드 아이디") @PathVariable("cdId") Long cdId) {
 
-        codeService.delete(cdId, authorization);
+        codeService.delete(cdId);
 
         return ApiResponse.noContent();
     }

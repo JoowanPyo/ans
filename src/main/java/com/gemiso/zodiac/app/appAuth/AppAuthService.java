@@ -74,8 +74,8 @@ public class AppAuthService{
         }
 
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        appAuthCreatDTO.setInputr(userSimpleDTO);
+        //UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
+        appAuthCreatDTO.setInputrId(userId);
 
         AppAuth appAuth = appAuthCreateMapper.toEntity(appAuthCreatDTO);
 
@@ -100,8 +100,7 @@ public class AppAuthService{
 
         appAuthUpdateDTO.setAppAuthId(appAuthId);
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        appAuthUpdateDTO.setUpdtr(userSimpleDTO);
+        appAuthUpdateDTO.setUpdtrId(userId);
 
         appAuthUpdateMapper.updateFromDto(appAuthUpdateDTO, appAuth);
 
@@ -116,8 +115,7 @@ public class AppAuthService{
 
         appAuthDTO.setDelYn("Y");
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        appAuthDTO.setDelr(userSimpleDTO);
+        appAuthDTO.setDelrId(userId);
         appAuthDTO.setDelDtm(new Date());
 
         AppAuth appAuth = appAuthMapper.toEntity(appAuthDTO);

@@ -2,10 +2,12 @@ package com.gemiso.zodiac.app.articleOrder;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 
@@ -31,8 +33,11 @@ public class ArticleOrder extends BaseEntity {
     @Column(name ="order_ctt", columnDefinition = "text")
     private String orderCtt;
 
-    @Column(name = "order_div_cd", length = 50)
+    @Column(name = "order_div_cd")
     private String orderDivCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = order_div_cd)")
+    private String orderDivCdNm;
 
     @Column(name = "order_status", length = 30)
     private String orderStatus;
@@ -46,13 +51,19 @@ public class ArticleOrder extends BaseEntity {
     @Column(name = "ord_rmk", columnDefinition = "text")
     private String ordRmk;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inputr_id", nullable = false)
-    private User inputr;
+    @Column(name = "inputr_id")
+    private String inputrId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updtr_id")
-    private User updtr;
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
+    private String inputrNm;
+
+    @Column(name = "updtr_id")
+    private String updtrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
+    private String updtrNm;
 
     @Column(name = "workr_id", length = 50)
     private String workrId;

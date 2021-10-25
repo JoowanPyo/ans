@@ -3,10 +3,12 @@ package com.gemiso.zodiac.app.capTemplate;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrp;
+import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -39,8 +41,11 @@ public class CapTemplate extends BaseEntity {
     @Column(name = "cap_tmplt_file_nm", length = 1000)
     private String capTmpltFileNm;
 
-    @Column(name = "cap_class_cd", length = 50)
+    @Column(name = "cap_class_cd")
     private String capClassCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = cap_class_cd)")
+    private String capClassCdNm;
 
     @Column(name = "cap_ln_num")
     private int capLnNum;
@@ -84,17 +89,26 @@ public class CapTemplate extends BaseEntity {
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inputr_id", nullable = false)
-    private User inputr;
+    @Column(name = "inputr_id")
+    private String inputrId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updtr_id")
-    private User updtr;
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
+    private String inputrNm;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delr_id")
-    private User delr;
+    @Column(name = "updtr_id")
+    private String updtrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
+    private String updtrNm;
+
+    @Column(name = "delr_id")
+    private String delrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
+    private String delrNm;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tmplt_grp_id")

@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserGroupUser;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -41,20 +43,32 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "cue_item_ord")
     private int cueItemOrd;
 
-    @Column(name = "cue_item_ord_cd", length = 5)
+    @Column(name = "cue_item_ord_cd")
     private String cueItemOrdCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_ord_cd)")
+    private String cueItemOrdCdNm;
 
     @Column(name = "cue_item_time")
     private int cueItemTime;
 
-    @Column(name = "cue_item_frm_cd", length = 50)
+    @Column(name = "cue_item_frm_cd")
     private String cueItemFrmCd;
 
-    @Column(name = "cue_item_div_cd", length = 50)
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_frm_cd)")
+    private String cueItemFrmCdNm;
+
+    @Column(name = "cue_item_div_cd")
     private String cueItemDivCd;
 
-    @Column(name = "brdc_st_cd", length = 50)
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_div_cd)")
+    private String cueItemDivCdNm;
+
+    @Column(name = "brdc_st_cd")
     private String brdcStCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = brdc_st_cd)")
+    private String brdcStCdNm;
 
     @Column(name = "brdc_clk", length = 6)
     private String brdcClk;
@@ -65,8 +79,11 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "chrgr_nm", length = 100)
     private String chrgrNm;
 
-    @Column(name = "artcl_cap_st_cd", length = 50)
+    @Column(name = "artcl_cap_st_cd")
     private String artclCapStCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_cap_st_cd)")
+    private String artclCapStCdNm;
 
     @Column(name = "cue_artcl_cap_chg_yn", columnDefinition = "bpchar(1) default 'N'")
     private String cueArtclCapChgYn;
@@ -74,8 +91,11 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "cue_artcl_cap_chg_dtm")
     private Date cueArtclCapChgDtm;
 
-    @Column(name = "cue_artcl_cap_st_cd", length = 50)
+    @Column(name = "cue_artcl_cap_st_cd")
     private String cueArtclCapStCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_artcl_cap_st_cd)")
+    private String cueArtclCapStCdNm;
 
     @Column(name = "rmk", length = 500)
     private String rmk;
@@ -92,8 +112,11 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "lck_dtm")
     private Date lckDtm;
 
-    @Column(name = "cue_item_typ_cd", length = 50)
+    @Column(name = "cue_item_typ_cd")
     private String cueItemTypCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_typ_cd)")
+    private String cueItemTypCdNm;
 
     @Column(name = "cue_item_brdc_dtm")
     private Date cueItemBrdcDtm;
@@ -104,11 +127,17 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "cap_chg_dtm")
     private Date capChgDtm;
 
-    @Column(name = "cap_st_cd", length = 50)
+    @Column(name = "cap_st_cd")
     private String capStCd;
 
-    @Column(name = "artcl_st_cd", length = 50)
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = cap_st_cd)")
+    private String capStCdNm;
+
+    @Column(name = "artcl_st_cd")
     private String artclStCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_st_cd)")
+    private String artclStCdNm;
 
     @Column(name = "media_durtn", length = 20)
     private String mediaDurtn;
@@ -116,21 +145,33 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "news_break_yn", columnDefinition = "bpchar(1) default 'N'")
     private String newsBreakYn;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inputr_id", nullable = false)
-    private User inputr;
+    @Column(name = "inputr_id")
+    private String inputrId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updtr_id")
-    private User updtr;
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
+    private String inputrNm;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delr_id")
-    private User delr;
+    @Column(name = "updtr_id")
+    private String updtrId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lckr_id")
-    private User lckr;
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
+    private String updtrNm;
+
+    @Column(name = "delr_id")
+    private String delrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
+    private String delrNm;
+
+    @Column(name = "lckr_id")
+    private String lckrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = lckr_id)")
+    private String lckrNm;
 
     @Column(name = "cue_id", nullable = false)
     private Long cueId;

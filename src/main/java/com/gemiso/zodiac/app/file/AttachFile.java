@@ -1,10 +1,12 @@
 package com.gemiso.zodiac.app.file;
 
+import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.yonhap.YonhapAttchFile;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -55,9 +57,12 @@ public class AttachFile {
         @Column(name = "org_file_nm", length = 600)
         private String orgFileNm;
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "inputr_id", nullable = false)
-        private User inputr;
+        @Column(name = "inputr_id", nullable = false)
+        private String inputrId;
+
+        @Basic(fetch = FetchType.LAZY)
+        @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
+        private String updtrNm;
 
 
         /*@OneToMany(mappedBy="attachFile")

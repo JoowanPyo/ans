@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.capTemplate.dto;
 
 import com.gemiso.zodiac.app.capTemplateGrp.dto.CapTemplateGrpDTO;
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,7 @@ public class CapTemplateCreateDTO {
     private String capTmpltNm;
     private String capTmpltFileNm;
     private String capClassCd;
+    //private String capClassCdNm;
     private int capLnNum;
     private int capLttrNum;
     private String capCellDlmtr;
@@ -34,9 +36,12 @@ public class CapTemplateCreateDTO {
     //private Date delDtm;
     private Date inputDtm;
     //private Date updtDtm;
-    private String delYn;
-    private UserSimpleDTO inputr;
+    //private String delYn;
+    private String inputrId;
+    //private String inputrNm;
     //private String updtrId;
+    //private String updtrNm;
     //private String delrId;
-    private CapTemplateGrpDTO template;
+    //private String delrNm;
+    private CapTemplateGrpDTO capTemplateGrp;
 }

@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.articleHist.dto;
 
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

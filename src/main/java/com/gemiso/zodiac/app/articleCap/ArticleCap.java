@@ -3,9 +3,11 @@ package com.gemiso.zodiac.app.articleCap;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
+import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 
@@ -28,8 +30,11 @@ public class ArticleCap {
     @Column(name = "artcl_cap_id", nullable = false)
     private Long artclCapId;
 
-    @Column(name = "cap_div_cd", length = 50)
+    @Column(name = "cap_div_cd")
     private String capDivCd;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = ch_div_cd)")
+    private String chDivCdNm;
 
     @Column(name = "ln_no")
     private int lnNo;

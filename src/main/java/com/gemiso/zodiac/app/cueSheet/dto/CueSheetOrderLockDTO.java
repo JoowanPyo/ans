@@ -41,7 +41,7 @@ public class CueSheetOrderLockDTO {
     private UserSimpleDTO pd2;
     private UserSimpleDTO anc1;
     private UserSimpleDTO anc2;*/
-    private UserSimpleDTO lckr;
+    private String lckrId;
     /*private UserSimpleDTO td1;
     private UserSimpleDTO td2;
     private String remark;

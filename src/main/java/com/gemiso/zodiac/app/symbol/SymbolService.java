@@ -93,8 +93,7 @@ public class SymbolService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        symbolCreateDTO.setInputr(userSimpleDTO); //등록자 추가.
+        symbolCreateDTO.setInputrId(userId); //등록자 추가.
 
         Symbol symbol = symbolCreateMapper.toEntity(symbolCreateDTO); //DTO -> Entity로 변환
 
@@ -108,14 +107,8 @@ public class SymbolService {
 
         Symbol symbol = userFindOrFail(symbolId);
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        User updtr = symbol.getUpdtr();
-        if (ObjectUtils.isEmpty(updtr) == false){
-            symbol.setUpdtr(null);
-        }
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        symbolUpdateDTO.setUpdtr(userSimpleDTO); // 수정자 추가.
+        symbolUpdateDTO.setUpdtrId(userId); // 수정자 추가.
 
         //수정.
         //파일이 바뀐경우 엔티티에서 파일을 지우고 새로운 파일로 업데이트,이유=update가 안댐[file_id가 필수값.]
@@ -141,8 +134,7 @@ public class SymbolService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        symbolDTO.setDelr(userSimpleDTO);
+        symbolDTO.setDelrId(userId);
         symbolDTO.setDelYn("Y");
         symbolDTO.setDelDtm(new Date());
 

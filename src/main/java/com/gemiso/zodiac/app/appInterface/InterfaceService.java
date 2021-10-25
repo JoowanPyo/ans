@@ -1,5 +1,9 @@
 package com.gemiso.zodiac.app.appInterface;
 
+import com.gemiso.zodiac.app.appInterface.dto.TakerCueDataDTO;
+import com.gemiso.zodiac.app.appInterface.dto.ParentCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.dto.TakerCueResultDTO;
+import com.gemiso.zodiac.app.appInterface.dto.TakerCueSheetDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.QCueSheet;
@@ -10,10 +14,16 @@ import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolDTO;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemSymbolMapper;
+import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
+import com.gemiso.zodiac.core.helper.PageHelper;
+import com.gemiso.zodiac.core.page.PageResultDTO;
+import com.gemiso.zodiac.core.service.AnsToTaker;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +33,7 @@ import org.springframework.util.StringUtils;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @Slf4j
@@ -39,17 +50,78 @@ public class InterfaceService {
     private final CueSheetItemSymbolMapper cueSheetItemSymbolMapper;
 
 
-    public List<CueSheetDTO> cueFindAll(Date sdate, Date edate, Long brdcPgmId, String brdcPgmNm, String searchWord){
 
-        BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm,  searchWord);
+    public PageResultDTO<ParentCueSheetDTO, CueSheet> cueFindAll(Date sdate, Date edate) {
+
+        PageHelper pageHelper = new PageHelper(null, null);
+
+        Pageable pageable = pageHelper.getTakerCue();
+
+        BooleanBuilder booleanBuilder = getSearch( sdate,  edate);
+
+        Page<CueSheet> result = cueSheetRepository.findAll(booleanBuilder,pageable);
+
+        AnsToTaker taker = new AnsToTaker();
+        /*taker.SetCuesheet(cueSheets);
+        List<ParentCueSheetDTO> cueSheetDTOList = taker.ToSTringXML();
+        System.out.println(" xml : " + cueSheetDTOList );*/
+
+        Function<CueSheet, ParentCueSheetDTO> fn = (entity -> taker.ToStringXML(entity));
+
+        return new PageResultDTO<ParentCueSheetDTO, CueSheet>(result, fn);
+
+    }
+
+    public String toXml(PageResultDTO<ParentCueSheetDTO, CueSheet> pageResultDTO){
+
+        //큐시트목록 xml을 담는 DTO
+        TakerCueSheetDTO takerCueSheetDTO = new TakerCueSheetDTO();
+        //success="true" msg="ok" 담는DTO
+        TakerCueResultDTO takerCueResultDTO = new TakerCueResultDTO();
+        //<data totalcount="6" curpage="0" rowcount="0">&&List<cue>
+        TakerCueDataDTO takerCueDataDTO = new TakerCueDataDTO();
+
+        takerCueResultDTO.setXuccess("true");
+        takerCueResultDTO.setMsg("ok");
+
+        //조회된 큐시트 데이터  set
+        List<ParentCueSheetDTO> parentCueSheetDTOList = pageResultDTO.getDtoList();
+        takerCueDataDTO.setParentCueSheetDTOList(parentCueSheetDTOList);
+        takerCueDataDTO.setTotalcount(parentCueSheetDTOList.stream().count());
+        takerCueDataDTO.setCurpage(pageResultDTO.getPage());
+        takerCueDataDTO.setRowcount(0);
+
+
+        takerCueSheetDTO.setResult(takerCueResultDTO);
+        takerCueSheetDTO.setData(takerCueDataDTO);
+
+
+        String xml = JAXBXmlHelper.marshal(takerCueSheetDTO, TakerCueSheetDTO.class);
+
+        System.out.println("xml : " + xml);
+        return xml;
+    }
+
+        /*BooleanBuilder booleanBuilder = getSearch( sdate,  edate);
 
         List<CueSheet> cueSheets = (List<CueSheet>) cueSheetRepository.findAll(booleanBuilder);
 
-        List<CueSheetDTO> cueSheetDTOList = cueSheetMapper.toDtoList(cueSheets);
+        AnsToTaker taker = new AnsToTaker();
+        taker.SetCuesheet(cueSheets);
+        List<ParentCueSheetDTO> cueSheetDTOList = taker.ToSTringXML();
+        System.out.println(" xml : " + cueSheetDTOList );
 
-        return cueSheetDTOList;
+        TakerCueSheetDTO takerCueSheetDTO = new TakerCueSheetDTO();
+        takerCueSheetDTO.setParentCueSheetDTOList(cueSheetDTOList);
 
-    }
+        String xml = JAXBXmlHelper.marshal(takerCueSheetDTO, TakerCueSheetDTO.class);
+
+        System.out.println(" xml : " + xml );
+
+        return xml;*/
+
+
+
 
     public List<CueSheetItemDTO> cueItemFindAll(Long artclId, Long cueId){
 
@@ -74,7 +146,7 @@ public class InterfaceService {
 
     }
 
-    private BooleanBuilder getSearch(Date sdate, Date edate, Long brdcPgmId, String brdcPgmNm, String searchWord) {
+    private BooleanBuilder getSearch(Date sdate, Date edate) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -85,7 +157,7 @@ public class InterfaceService {
         if (!StringUtils.isEmpty(sdate) && !StringUtils.isEmpty(edate)){
             booleanBuilder.and(qCueSheet.inputDtm.between(sdate, edate));
         }
-        if(!StringUtils.isEmpty(brdcPgmId)){
+     /*   if(!StringUtils.isEmpty(brdcPgmId)){
             booleanBuilder.and(qCueSheet.program.brdcPgmId.eq(brdcPgmId));
         }
         if(!StringUtils.isEmpty(brdcPgmNm)){
@@ -94,7 +166,7 @@ public class InterfaceService {
         if(!StringUtils.isEmpty(searchWord)){
             booleanBuilder.and(qCueSheet.brdcPgmNm.contains(searchWord).or(qCueSheet.pd1.userNm.contains(searchWord))
                     .or(qCueSheet.pd2.userNm.contains(searchWord)));
-        }
+        }*/
 
         return booleanBuilder;
     }

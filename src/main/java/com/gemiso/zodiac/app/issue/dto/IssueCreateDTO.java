@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.issue.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +32,7 @@ public class IssueCreateDTO {
     private Date inputDtm;
     //private Date updtDtm;
     //private Long issuOrgId;
-    private UserSimpleDTO inputr;
+    private String inputrId;
     //private String updtrId;
     //private String delrId;
 

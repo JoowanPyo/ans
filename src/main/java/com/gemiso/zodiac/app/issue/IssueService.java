@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.app.issue;
 
+import com.gemiso.zodiac.app.code.Code;
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueCopyDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueCreateDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
@@ -7,17 +9,19 @@ import com.gemiso.zodiac.app.issue.dto.IssueUpdateDTO;
 import com.gemiso.zodiac.app.issue.mapper.IssueCreateMapper;
 import com.gemiso.zodiac.app.issue.mapper.IssueMapper;
 import com.gemiso.zodiac.app.issue.mapper.IssueUpdateMapper;
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
+import com.gemiso.zodiac.core.service.CodeUpdateService;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -39,6 +43,7 @@ public class IssueService {
     private final IssueUpdateMapper issueUpdateMapper;
 
     private final UserAuthService userAuthService;
+    private final CodeUpdateService codeUpdateService;
 
 
     public List<IssueDTO> findAll(Date sdate, Date edate, String issuDelYn){
@@ -83,8 +88,7 @@ public class IssueService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        issueCreateDTO.setInputr(userSimpleDTO);
+        issueCreateDTO.setInputrId(userId);
 
         Issue issue = issueCreateMapper.toEntity(issueCreateDTO);
         issueRepositoy.save(issue);
@@ -96,10 +100,25 @@ public class IssueService {
 
         Issue issue = issueFindOrFail(issuId);
 
+
+  /*      Code orgChDivCd = issue.getChDivCd();
+        CodeSimpleDTO newChDivCd = issueUpdateDTO.getChDivCd();
+        //update code값이 새로 들어오면 entity 값 null set
+        //code PK값을 foreign키로 갖고있기때문에 PK값을 삭제 후 재등록.
+        if (codeUpdateService.codeUpdateCheck(orgChDivCd, newChDivCd)){
+            issue.setChDivCd(null);
+        }
+
+        //기존에 등록된 수정자가 있으면 수정자 삭제
+        //수정자가 User 엔티티에 PK값을 사용하기 때문에 delete 후 재등록.
+        User user = issue.getUpdtr();
+        if (ObjectUtils.isEmpty(user) == false){
+            issue.setUpdtr(null);
+        }*/
+
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        issueUpdateDTO.setUpdtr(userSimpleDTO);
+        issueUpdateDTO.setUpdtrId(userId);
 
 
         issueUpdateMapper.updateFromDto(issueUpdateDTO, issue);
@@ -118,8 +137,7 @@ public class IssueService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        issueDto.setDelr(userSimpleDTO);
+        issueDto.setDelrId(userId);
 
         issueMapper.updateFromDto(issueDto, issue);
 
@@ -161,9 +179,8 @@ public class IssueService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
 
-        if (!CollectionUtils.isEmpty(issueCopyDTO)){
+        if (!CollectionUtils.isEmpty(issueCopyDTO)){ //이슈 복사하기위한 원복 issueDTO를 새로운 엔티티로 빌드
             for (IssueCopyDTO issueCopyDto : issueCopyDTO){
 
                 Long issueId = issueCopyDto.getIssuId();
@@ -182,10 +199,10 @@ public class IssueService {
                 issueDTOCopy.setIssuDelYn(issueDTO.getIssuDelYn());
                 issueDTOCopy.setIssuFnshDtm(issueDTO.getIssuFnshDtm());
                 issueDTOCopy.setIssuOrgId(issueDTO.getIssuOrgId());
-                issueDTOCopy.setUpdtr(issueDTO.getUpdtr());
+                issueDTOCopy.setUpdtrId(issueDTO.getUpdtrId());
                 issueDTOCopy.setUpdtDtm(issueDTO.getUpdtDtm());
                 issueDTOCopy.setInputDtm(targetDate);
-                issueDTOCopy.setInputr(userSimpleDTO);
+                issueDTOCopy.setInputrId(userId);
 
                 Issue issueEntity = issueMapper.toEntity(issueDTOCopy);
                 issueRepositoy.save(issueEntity);

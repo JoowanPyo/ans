@@ -17,8 +17,12 @@ public class PageHelper {
         this.limit = Optional.ofNullable(limit).orElse(50);
     }
 
-    public Pageable getPageInfo(){
+    public Pageable getArticlePageInfo(){
 
         return PageRequest.of(page, limit, Sort.by("artclId","inputDtm").descending());
+    }
+
+    public Pageable getTakerCue(){
+        return PageRequest.of(page, limit, Sort.by("cueId").descending());
     }
 }

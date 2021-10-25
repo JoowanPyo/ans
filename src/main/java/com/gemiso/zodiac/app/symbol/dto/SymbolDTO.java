@@ -7,7 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
+import javax.persistence.*;
 import java.util.Date;
 
 @Data
@@ -25,10 +27,14 @@ public class SymbolDTO {
     private Date inputDtm;
     private Date updtDtm;
     private Date delDtm;
-    private UserSimpleDTO inputr;
-    private UserSimpleDTO updtr;
-    private UserSimpleDTO delr;
+    private String inputrId;
+    private String inputrNm;
+    private String updtrId;
+    private String updtrNm;
+    private String delrId;
+    private String delrNm;
     private String typCd;
+    private String typCdNm;
     private AttachFileDTO attachFile;
     private String url;
 }

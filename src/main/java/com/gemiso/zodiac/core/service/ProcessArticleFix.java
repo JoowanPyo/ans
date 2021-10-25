@@ -1,10 +1,8 @@
 package com.gemiso.zodiac.core.service;
 
-import com.gemiso.zodiac.app.appAuth.AppAuth;
 import com.gemiso.zodiac.app.article.Article;
-import com.gemiso.zodiac.core.fixEnum.AuthEnum;
-import com.gemiso.zodiac.core.fixEnum.FixAuth;
-import com.gemiso.zodiac.core.fixEnum.FixEnum;
+import com.gemiso.zodiac.core.Enum.AuthEnum;
+import com.gemiso.zodiac.core.Enum.FixEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -44,7 +42,7 @@ public class ProcessArticleFix {
         }
         //원본 기사 승인구분코드 get
         String orgApproveCode = originalArticle.getApprvDivCd();
-        String apprvrId = originalArticle.getApprvr().getUserId();
+        String apprvrId = originalArticle.getApprvrId(); // null일경우, 에러
 
         //픽스 권한 리스트로 들어온 파라미터 중 최상위 권한 get
         AuthEnum fixAuth = AuthEnum.certity(fixAuthList);
@@ -88,22 +86,22 @@ public class ProcessArticleFix {
 
     public boolean isFix( AuthEnum auth,  FixEnum DbApprove , FixEnum newApprove, String apprvrId, String userId )
     {
-        if( DbApprove.equals(newApprove))
+        if( newApprove.equals(DbApprove))
             return false;
 
         if( auth.equals( AuthEnum.ArticleFix) )
-            return isReporter(DbApprove, newApprove, apprvrId, userId);
+            return articleFix(DbApprove, newApprove, apprvrId, userId);
         else if( auth.equals( AuthEnum.EditorFix) )
-            return isEditor(DbApprove, newApprove,  apprvrId,  userId);
+            return editorFix(DbApprove, newApprove,  apprvrId,  userId);
         else if (auth.equals(AuthEnum.AnchorFix))
-            return isAnchor(DbApprove, newApprove,  apprvrId,  userId);
+            return anchorFix(DbApprove, newApprove,  apprvrId,  userId);
         else if (auth.equals(AuthEnum.DeskFix))
-            return isDesk(DbApprove, newApprove);
+            return destFix(DbApprove, newApprove);
         else if (auth.equals(AuthEnum.PD))
-            return isPD(DbApprove, newApprove);
+            return pdFix(DbApprove, newApprove);
         else if (auth.equals(AuthEnum.AdminWrite))
-            return isAdmin(DbApprove, newApprove);
-        //return isEditor(DbApprove, newApprove);
+            return adminFix(DbApprove, newApprove);
+        //return editorFix(DbApprove, newApprove);
 
         return false;
 
@@ -114,9 +112,9 @@ public class ProcessArticleFix {
         return newf.ordinal() > oldf.ordinal();
     }
 
-    public static boolean isReporter( FixEnum DbApprove , FixEnum newApprove ,String apprvrId, String userId )
+    public static boolean articleFix( FixEnum DbApprove , FixEnum newApprove ,String apprvrId, String userId )
     {
-        List<FixEnum> articleList = new ArrayList<>();
+        List<FixEnum> confirmList = new ArrayList<>();
 
         if( IsUnfix( DbApprove, newApprove) )//비교값넣기 맵index로 FixEnum.valueOf(DbApprove.toString()) < newApprove
         {   // 해제
@@ -124,123 +122,123 @@ public class ProcessArticleFix {
                 return false;
             }
 
-            articleList.add(FixEnum.FIX_NONE);
+            confirmList.add(FixEnum.FIX_NONE);
         }
         else
         {   // Fix 하기
-            articleList.add(FixEnum.ARTICLE_FIX);
+            confirmList.add(FixEnum.ARTICLE_FIX);
         }
 
-        return articleList.contains(newApprove);
+        return confirmList.contains(newApprove);
     }
 
-    public  boolean isEditor( FixEnum DbApprove , FixEnum newApprove, String apprvrId, String userId )
+    public  boolean editorFix( FixEnum DbApprove , FixEnum newApprove, String apprvrId, String userId )
     {
-        List<FixEnum> articleList = new ArrayList<>();
+        List<FixEnum> confirmList = new ArrayList<>();
 
         if (IsUnfix( DbApprove, newApprove) )
         {
             if (apprvrId.equals(userId)== false) {
                 return false;
             }
-            articleList.add(FixEnum.ARTICLE_FIX);
+            confirmList.add(FixEnum.ARTICLE_FIX);
         }
         else
         {
-            articleList.add(FixEnum.EDITOR_FIX);
+            confirmList.add(FixEnum.EDITOR_FIX);
         }
 
 
-        return articleList.contains(newApprove);
+        return confirmList.contains(newApprove);
     }
 
-    public boolean isAnchor( FixEnum DbApprove , FixEnum newApprove, String apprvrId, String userId )
+    public boolean anchorFix( FixEnum DbApprove , FixEnum newApprove, String apprvrId, String userId )
     {
 
-        List<FixEnum> articleList = new ArrayList<>();
+        List<FixEnum> confirmList = new ArrayList<>();
 
         if (IsUnfix( DbApprove, newApprove) )
         {
             if (apprvrId.equals(userId)) {
-                articleList.add(FixEnum.EDITOR_FIX);
+                confirmList.add(FixEnum.EDITOR_FIX);
             }else {
-                articleList.add(FixEnum.FIX_NONE);
-                articleList.add(FixEnum.ARTICLE_FIX);
+                confirmList.add(FixEnum.FIX_NONE);
+                confirmList.add(FixEnum.ARTICLE_FIX);
             }
         }
         else
         {
-            articleList.add(FixEnum.EDITOR_FIX);
-            articleList.add(FixEnum.ANCHOR_FIX);
+            confirmList.add(FixEnum.EDITOR_FIX);
+            confirmList.add(FixEnum.ANCHOR_FIX);
         }
 
-        return articleList.contains(newApprove);
+        return confirmList.contains(newApprove);
 
     }
 
-    public boolean isDesk( FixEnum DbApprove , FixEnum newApprove )
+    public boolean destFix( FixEnum DbApprove , FixEnum newApprove )
     {
-        List<FixEnum> articleList = new ArrayList<>();
+        List<FixEnum> confirmList = new ArrayList<>();
 
         if (IsUnfix( DbApprove, newApprove) )
         {
-            articleList.add(FixEnum.FIX_NONE);
-            articleList.add(FixEnum.ARTICLE_FIX);
-            articleList.add(FixEnum.EDITOR_FIX);
-            articleList.add(FixEnum.ANCHOR_FIX);
+            confirmList.add(FixEnum.FIX_NONE);
+            confirmList.add(FixEnum.ARTICLE_FIX);
+            confirmList.add(FixEnum.EDITOR_FIX);
+            confirmList.add(FixEnum.ANCHOR_FIX);
         }
         else
         {
-            //    articleList.add(ARTICLE_FIX);
-            articleList.add(FixEnum.EDITOR_FIX);
-            articleList.add(FixEnum.ANCHOR_FIX);
-            articleList.add(FixEnum.DESK_FIX);
+            //    confirmList.add(ARTICLE_FIX);
+            confirmList.add(FixEnum.EDITOR_FIX);
+            confirmList.add(FixEnum.ANCHOR_FIX);
+            confirmList.add(FixEnum.DESK_FIX);
         }
 
-        return articleList.contains(newApprove);
+        return confirmList.contains(newApprove);
     }
 
 
-    public boolean isPD( FixEnum DbApprove , FixEnum newApprove )
+    public boolean pdFix( FixEnum DbApprove , FixEnum newApprove )
     {
-        List<FixEnum> articleList = new ArrayList<>();
+        List<FixEnum> confirmList = new ArrayList<>();
 
         if (IsUnfix( DbApprove, newApprove) )
         {
-            articleList.add(FixEnum.FIX_NONE);
-            articleList.add(FixEnum.ARTICLE_FIX);
-            articleList.add(FixEnum.EDITOR_FIX);
-            articleList.add(FixEnum.ANCHOR_FIX);
+            confirmList.add(FixEnum.FIX_NONE);
+            confirmList.add(FixEnum.ARTICLE_FIX);
+            confirmList.add(FixEnum.EDITOR_FIX);
+            confirmList.add(FixEnum.ANCHOR_FIX);
         }
         else
         {
             return false;
         }
 
-        return articleList.contains(newApprove);
+        return confirmList.contains(newApprove);
     }
 
-    public boolean isAdmin( FixEnum DbApprove , FixEnum newApprove )
+    public boolean adminFix( FixEnum DbApprove , FixEnum newApprove )
     {
-        List<FixEnum> articleList = new ArrayList<>();
+        List<FixEnum> confirmList = new ArrayList<>();
 
         if (IsUnfix( DbApprove, newApprove) )
         {
-            articleList.add(FixEnum.FIX_NONE);
-            articleList.add(FixEnum.ARTICLE_FIX);
-            articleList.add(FixEnum.EDITOR_FIX);
-            articleList.add(FixEnum.ANCHOR_FIX);
+            confirmList.add(FixEnum.FIX_NONE);
+            confirmList.add(FixEnum.ARTICLE_FIX);
+            confirmList.add(FixEnum.EDITOR_FIX);
+            confirmList.add(FixEnum.ANCHOR_FIX);
         }
         else
         {
-            articleList.add(FixEnum.ARTICLE_FIX);
-            articleList.add(FixEnum.EDITOR_FIX);
-            articleList.add(FixEnum.ANCHOR_FIX);
-            articleList.add(FixEnum.DESK_FIX);
+            confirmList.add(FixEnum.ARTICLE_FIX);
+            confirmList.add(FixEnum.EDITOR_FIX);
+            confirmList.add(FixEnum.ANCHOR_FIX);
+            confirmList.add(FixEnum.DESK_FIX);
         }
 
 
-        return articleList.contains(newApprove);
+        return confirmList.contains(newApprove);
     }
 
 }

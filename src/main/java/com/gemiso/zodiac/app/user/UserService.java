@@ -64,7 +64,7 @@ public class UserService {
             List<UserGroupUser> userGroupUserList = userGroupUserRepository.findByUserId(findUserId);
 
             if (!CollectionUtils.isEmpty(userGroupUserList)) {
-                List<UserGroupUserDTO> userGroupUserDTOs = userGroupUserMapper.dtoList(userGroupUserList);
+                List<UserGroupUserDTO> userGroupUserDTOs = userGroupUserMapper.toDtoList(userGroupUserList);
 
                 List<UserGroupUserDTO> userGroupUserDTO = new ArrayList<>();
 
@@ -92,7 +92,7 @@ public class UserService {
         //Set<UserGroupUser> userGroupUserSet = userEntity.getUserGroupUser();
 
         if (!CollectionUtils.isEmpty(userGroupUserList)){
-            List<UserGroupUserDTO> userGroupUserDTOs = userGroupUserMapper.dtoList(userGroupUserList);
+            List<UserGroupUserDTO> userGroupUserDTOs = userGroupUserMapper.toDtoList(userGroupUserList);
 
             List<UserGroupUserDTO> userGroupUserDTO = new ArrayList<>();
 
@@ -115,8 +115,7 @@ public class UserService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String tokenUserId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(tokenUserId).build();
-        userCreateDTO.setInputr(userSimpleDTO);
+        userCreateDTO.setInputrId(tokenUserId);
 
         User userEntity = userCreateMapper.toEntity(userCreateDTO);
 
@@ -173,8 +172,7 @@ public class UserService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String tokenUserId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(tokenUserId).build();
-        userUpdateDTO.setUpdtr(userSimpleDTO);
+        userUpdateDTO.setUpdtrId(tokenUserId);
         userUpdateDTO.setUserId(userId);
        // User userEntity = userUpdateMapper.toEntity(userUpdateDTO);
        // userEntity.setPwd(user.getPwd());
@@ -193,8 +191,7 @@ public class UserService {
         userDTO.setDelDtm(new Date());
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String tokenUserId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(tokenUserId).build();
-        userDTO.setDelr(userSimpleDTO);
+        userDTO.setDelrId(tokenUserId);
 
         userMapper.updateFromDto(userDTO, user);
 

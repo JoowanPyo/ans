@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.app.articleOrder.dto;
 
+import com.gemiso.zodiac.app.article.dto.ArticleDTO;
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,12 +19,15 @@ public class ArticleOrderSimpleDTO {
     private Long orderId;
     private String orderCtt;
     private String orderDivCd;
+    private String orderDivCdNm;
     private String orderStatus;
     private int contentId;
     private String title;
     private String ordRmk;
-    private UserSimpleDTO inputr;
-    private UserSimpleDTO updtr;
+    private String inputrId;
+    private String inputrNm;
+    private String updtrId;
+    private String updtrNm;
     private String workrId;
     private String clientId;
     private Date inputDtm;

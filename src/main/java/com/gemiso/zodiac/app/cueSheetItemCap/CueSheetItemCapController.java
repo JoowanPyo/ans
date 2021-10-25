@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheetItemCap;
 
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapUpdateDTO;
@@ -66,7 +67,9 @@ public class CueSheetItemCapController {
 
         cueSheetItemCapService.createList(cueSheetItemCapCreateDTOList, cueId, cueItemId);
 
-        List<CueSheetItemCapDTO> cueSheetItemCapDTOList = cueSheetItemCapService.findAll(cueId, cueItemId, cueSheetItemCapCreateDTOList.get(0).getCueItemCapDivCd());
+        String cueItemCapDivCd = cueSheetItemCapCreateDTOList.get(0).getCueItemCapDivCd();
+
+        List<CueSheetItemCapDTO> cueSheetItemCapDTOList = cueSheetItemCapService.findAll(cueId, cueItemId, cueItemCapDivCd);
 
         return new ApiResponse<>(cueSheetItemCapDTOList);
     }

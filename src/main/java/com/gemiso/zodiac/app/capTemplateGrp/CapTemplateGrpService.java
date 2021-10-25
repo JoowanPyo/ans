@@ -61,8 +61,7 @@ public class CapTemplateGrpService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        capTemplateGrpCreateDTO.setInputr(userSimpleDTO);//입력자 추가.
+        capTemplateGrpCreateDTO.setInputrId(userId);//입력자 추가.
 
         CapTemplateGrp capTemplateGrp = capTemplateGrpCreateMapper.toEntity(capTemplateGrpCreateDTO);
 
@@ -78,8 +77,7 @@ public class CapTemplateGrpService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        capTemplateGrpUpdateDTO.setUpdtr(userSimpleDTO);//수정자 추가.
+        capTemplateGrpUpdateDTO.setUpdtrId(userId);//수정자 추가.
 
         capTemplateGrpUpdateMapper.updateFromDto(capTemplateGrpUpdateDTO, capTemplateGrp);
         capTemplateGrpRepository.save(capTemplateGrp);

@@ -42,8 +42,7 @@ public class ArticleOrderService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        articleOrderCreateDTO.setInputr(userSimpleDTO);
+        articleOrderCreateDTO.setInputrId(userId);
 
         ArticleOrder articleOrder = articleOrderCreateMapper.toEntity(articleOrderCreateDTO);
 
@@ -58,8 +57,7 @@ public class ArticleOrderService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        articleOrderUpdateDTO.setUpdtr(userSimpleDTO);
+        articleOrderUpdateDTO.setUpdtrId(userId);
 
         articleOrderUpdateMapper.updateFromDto(articleOrderUpdateDTO, articleOrder);
 

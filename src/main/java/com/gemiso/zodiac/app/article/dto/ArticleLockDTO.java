@@ -16,6 +16,6 @@ public class ArticleLockDTO {
 
     private String lckYn;
     private Date lckDtm;
-    private UserSimpleDTO lckr;
+    private String lckr;
 
 }

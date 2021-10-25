@@ -1,16 +1,20 @@
 package com.gemiso.zodiac.core.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserRepository;
 import com.gemiso.zodiac.app.user.dto.UserDTO;
+import com.gemiso.zodiac.core.response.ApiErrorResponse;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.*;
@@ -20,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +40,10 @@ public class JwtFilter implements Filter {
 
     @Autowired
     private UserAuthService userAuthService;
+
+   /* @Autowired //강제로 filer error잡는방법, 필터는 서블릿 전단계라 exceptionhandler가 못잡는다.
+    @Qualifier("handlerExceptionResolver")
+    private HandlerExceptionResolver resolver;*/
 
     private List<String> excludedUrls = null;
 
@@ -52,13 +61,13 @@ public class JwtFilter implements Filter {
                 + ",/swagger-ui/favicon-32x32.png,/swagger-resources/configuration/ui,/v3/api-docs,/swagger-ui/swagger-ui.css,/error"
                 + ",/auth/createToken,/yonhapInternational,/yonhap,/interface/cuesheet,/interface/cuesheetitem,/interface"
                 + ",/swagger-ui/index.html/swagger-resources,/swagger-ui/index.html/swagger-resources/configuration/ui"
-                + ",/swagger-ui/index.html/swagger-resources/configuration/security,/auth/login,againlogin";
+                + ",/swagger-ui/index.html/swagger-resources/configuration/security,/auth/login,/auth/againlogin,";
         excludedUrls = Arrays.asList(excludePattern.split(","));
 
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ExpiredJwtException, ServletException, IOException {
 
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
@@ -80,6 +89,7 @@ public class JwtFilter implements Filter {
 
 
                     if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
+
                         //헤더에 있는 Bearer Substring => 토큰값을 빼기 위함.
                         jwtToken = requestTokenHeader.substring(6);
                         Claims claims = Jwts.parser()
@@ -87,14 +97,15 @@ public class JwtFilter implements Filter {
                                 .parseClaimsJws(jwtToken) // 파싱 및 검증, 실패 시 에러
                                 .getBody();
 
+
                         Date expiration = claims.get("exp", Date.class);
                         Date nowDate = new Date();
 
                         //토큰만료 시간 체크
                         if (expiration.before(nowDate)) {
                             //Header header, Claims claims, String message
-                            //throw new ExpiredJwtException(null, null, "EXPIRED_ACCESSTOKEN");
-                            //((HttpServletResponse) response).sendError(401, "ExpiredJwtException error");
+                            //throw new UserExpiredJwtException(null, null, "EXPIRED_ACCESSTOKEN");
+                            //((HttpServletResponse) response).sendError(401, "UserExpiredJwtException error");
                             httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "EXPIRED_ACCESSTOKEN");
                         } else {
                             logMessage.append(" [TOKEN EXPIRATION TIME:").append(expiration.toString()).append("]");
@@ -120,6 +131,23 @@ public class JwtFilter implements Filter {
                     log.info(String.valueOf(logMessage));
 
 
+                } catch (ExpiredJwtException ex) {
+                    log.error(ex.toString());
+
+                    //에러리스폰스 작성.
+                    ApiErrorResponse.Error error =
+                            new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.EXPIRED_ACCESSTOKEN, ex.getLocalizedMessage());
+                    ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
+
+                    //에러리스폰스를 json형식으로
+                    ObjectMapper mapper = new ObjectMapper();
+
+                    PrintWriter out = httpServletResponse.getWriter();
+                    out.println(mapper.writeValueAsString(apiErrorResponse));
+                    out.flush();
+
+                    return;
+                    /*resolver.resolveException(httpServletRequest, httpServletResponse, null, ex);//filter error handling방법*/
                 } catch (Throwable a) {
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     PrintStream pinrtStream = new PrintStream(out);

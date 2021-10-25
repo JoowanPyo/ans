@@ -100,8 +100,7 @@ public class CueSheetService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        cueSheetCreateDTO.setInputr(userSimpleDTO);
+        cueSheetCreateDTO.setInputrId(userId);
 
         CueSheet cueSheet = cueSheetCreateMapper.toEntity(cueSheetCreateDTO);
 
@@ -137,8 +136,7 @@ public class CueSheetService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        cueSheetDTO.setDelr(userSimpleDTO);
+        cueSheetDTO.setDelrId(userId);
         cueSheetDTO.setDelDtm(new Date());
         cueSheetDTO.setDelYn("Y");
 
@@ -178,8 +176,8 @@ public class CueSheetService {
             booleanBuilder.and(qCueSheet.brdcPgmNm.contains(brdcPgmNm));
         }
         if(!StringUtils.isEmpty(searchWord)){
-            booleanBuilder.and(qCueSheet.brdcPgmNm.contains(searchWord).or(qCueSheet.pd1.userNm.contains(searchWord))
-                    .or(qCueSheet.pd2.userNm.contains(searchWord)));
+            booleanBuilder.and(qCueSheet.brdcPgmNm.contains(searchWord).or(qCueSheet.anc1Nm.contains(searchWord))
+                    .or(qCueSheet.pd2Nm.contains(searchWord)));
         }
 
         return booleanBuilder;
@@ -189,19 +187,32 @@ public class CueSheetService {
 
         CueSheet cueSheet = cueSheetFindOrFail(cueId);
 
-        User user = cueSheet.getLckr();
-        if (ObjectUtils.isEmpty(user) == false){
-            User setUser = User.builder().build();
-            cueSheet.setLckr(setUser);
+        String lckYn = cueSheetOrderLockDTO.getLckYn();
+
+        if (lckYn != null && lckYn.equals("Y")) { //락 여부값이 Y 가 아닐경우 lck값 초기화
+            String userId = userAuthService.authUser.getUserId();
+            cueSheetOrderLockDTO.setLckrId(userId);
+            cueSheetOrderLockDTO.setLckDtm(new Date());
+            cueSheetOrderLockDTO.setLckYn("Y");
+        } else {
+            cueSheet.setLckrId(null);
+            cueSheet.setLckDtm(null);
         }
 
-        String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        cueSheetOrderLockDTO.setLckr(userSimpleDTO);
-        cueSheetOrderLockDTO.setLckDtm(new Date());
-        cueSheetOrderLockDTO.setLckYn("Y");
-
         cueSheetOrderLockMapper.updateFromDto(cueSheetOrderLockDTO, cueSheet);
+
+        cueSheetRepository.save(cueSheet);
+
+    }
+
+    public void cueSheetUnLock(Long cueId){
+
+        CueSheet cueSheet = cueSheetFindOrFail(cueId);
+
+        //큐시트 lock정보 초기화
+        cueSheet.setLckrId(null);
+        cueSheet.setLckDtm(null);
+        cueSheet.setLckYn("N");
 
         cueSheetRepository.save(cueSheet);
 

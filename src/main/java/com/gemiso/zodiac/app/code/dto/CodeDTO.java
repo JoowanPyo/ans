@@ -25,7 +25,10 @@ public class CodeDTO {
     private Date inputDtm;
     private Date updtDtm;
     private Date delDtm;
-    private UserSimpleDTO inputr;
-    private UserSimpleDTO updtr;
-    private UserSimpleDTO delr;
+    private String inputrId;
+    private String inputrNm;
+    private String updtrId;
+    private String updtrNm;
+    private String delrId;
+    private String delrNm;
 }

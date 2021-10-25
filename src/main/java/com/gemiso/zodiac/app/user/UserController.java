@@ -63,7 +63,7 @@ public class UserController {
         return new ApiResponse<>(userDto);
     }*/
     @Operation(summary = "사용자 등록", description = "사용자 등록")
-    @PostMapping
+    @PostMapping(path = "/createuser")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<UserDTO> create(
             @Parameter(name = "userCreateDTO", required = true, description = "필수값<br> userNm , password") @Valid @RequestBody UserCreateDTO userCreateDTO

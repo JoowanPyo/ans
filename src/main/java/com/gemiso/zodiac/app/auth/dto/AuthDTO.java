@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.auth.dto;
 
+import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class AuthDTO {
     private String loginIp;
     private Date logoutDtm;
     private String stCd;
+    private String stCdNm;
     private String clientVer;
     private String userId;
 

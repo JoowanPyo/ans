@@ -12,5 +12,4 @@ import java.util.List;
 )
 public interface UserGroupAuthMapper extends GenericMapper<UserGroupAuthDTO, UserGroupAuth, UserGroupAuthDTO> {
 
-    List<UserGroupAuthDTO> dtoList(List<UserGroupAuth> userGroupAuth);
 }

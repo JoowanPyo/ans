@@ -16,18 +16,22 @@ import java.util.Date;
 @NoArgsConstructor
 public class SymbolUpdateDTO {
 
-    private Long symbolId;
+    //private Long symbolId;
     private String symbolNm;
     private String expl;
-    private String delYn;
+    //private String delYn;
     private String useYn;
     private String cap_tmplt_yn;
     //private Date inputDtm;
     private Date updtDtm;
     //private Date delDtm;
-    //private String inputr;
-    private UserSimpleDTO updtr;
+    //private String inputrId;
+    //private String inputrNm;
+    private String updtrId;
+    //private String updtrNm;
     //private String delrId;
+    //private String delrNm;
     private String typCd;
+    //private String typCdNm;
     private AttachFileDTO attachFile;
 }

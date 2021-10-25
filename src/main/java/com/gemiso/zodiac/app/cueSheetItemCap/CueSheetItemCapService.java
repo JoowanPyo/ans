@@ -69,8 +69,7 @@ public class CueSheetItemCapService {
         cueSheetItemCapCreateDTO.setCueItemId(cueItemId);//큐아이템 아이디 추가.
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        cueSheetItemCapCreateDTO.setInputr(userSimpleDTO);//등록자 아이디 추가.
+        cueSheetItemCapCreateDTO.setInputrId(userId);//등록자 아이디 추가.
 
         CueSheetItemCap cueSheetItemCap = cueSheetItemCapCreateMapper.toEntity(cueSheetItemCapCreateDTO);
 
@@ -96,8 +95,7 @@ public class CueSheetItemCapService {
 
             // 토큰 인증된 사용자 아이디를 입력자로 등록
             String userId = userAuthService.authUser.getUserId();
-            UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-            cueSheetItemCapCreateDTO.setInputr(userSimpleDTO);//등록자 아이디 추가.
+            cueSheetItemCapCreateDTO.setInputrId(userId);//등록자 아이디 추가.
 
             CueSheetItemCap cueSheetItemCap = cueSheetItemCapCreateMapper.toEntity(cueSheetItemCapCreateDTO);
             cueSheetItemCapRepotitory.save(cueSheetItemCap);
@@ -114,8 +112,7 @@ public class CueSheetItemCapService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        cueSheetItemCapUpdateDTO.setUpdtr(userSimpleDTO);
+        cueSheetItemCapUpdateDTO.setUpdtrId(userId);
 
         cueSheetItemCapUpdateMapper.updateFromDto(cueSheetItemCapUpdateDTO, cueSheetItemCap);
 

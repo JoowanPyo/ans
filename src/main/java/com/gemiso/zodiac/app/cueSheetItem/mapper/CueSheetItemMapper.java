@@ -8,9 +8,9 @@ import org.mapstruct.*;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface CueSheetItemMapper {
+public interface CueSheetItemMapper extends GenericMapper<CueSheetItemDTO, CueSheetItem, CueSheetItemDTO>{
 
-    @Mapping(target = "inputr.userId", source = "inputr.userId")
+    /*@Mapping(target = "inputr.userId", source = "inputr.userId")
     @Mapping(target = "inputr.userNm", source = "inputr.userNm")
     @Mapping(target = "updtr.userId", source = "updtr.userId")
     @Mapping(target = "updtr.userNm", source = "updtr.userNm")
@@ -24,5 +24,5 @@ public interface CueSheetItemMapper {
     List<CueSheetItem> toEntityList(List<CueSheetItemDTO> listD);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateFromDto(CueSheetItemDTO updateDto, @MappingTarget CueSheetItem entity);
+    void updateFromDto(CueSheetItemDTO updateDto, @MappingTarget CueSheetItem entity);*/
 }

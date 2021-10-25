@@ -1,10 +1,12 @@
 package com.gemiso.zodiac.app.appAuth;
 
+import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.userGroup.UserGroupAuth;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
@@ -31,7 +33,7 @@ public class AppAuth extends BaseEntity {
     @Column(name = "APP_AUTH_NM", length = 100)
     private String appAuthNm;
 
-    @Column(name = "APP_AUTH_CD", length = 50)
+    @Column(name = "app_auth_cd", length = 50)
     private String appAuthCd;
 
     @Column(name = "ORD", length = 4)
@@ -52,21 +54,29 @@ public class AppAuth extends BaseEntity {
     @Column(name = "DEL_YN", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
 
-    @LastModifiedDate
     @Column(name = "DEL_DTM")
     private Date delDtm;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inputr_id")
-    private User inputr;
+    @Column(name = "inputr_id")
+    private String inputrId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updtr_id")
-    private User updtr;
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
+    private String inputrNm;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delr_id")
-    private User delr;
+    @Column(name = "updtr_id")
+    private String updtrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
+    private String updtrNm;
+
+    @Column(name = "delr_id")
+    private String delrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
+    private String delrNm;
 
     @OneToMany(mappedBy="appAuth")
     private List<UserGroupAuth> userGroupAuth = new ArrayList<>();

@@ -41,8 +41,7 @@ public class DailyProgramService {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
-        dailyProgramCreateDTO.setInputr(userSimpleDTO);
+        dailyProgramCreateDTO.setInputrId(userId);
 
         DailyProgram dailyProgram = dailyProgramCreateMapper.toEntity(dailyProgramCreateDTO);
 

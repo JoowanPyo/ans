@@ -10,9 +10,9 @@ import org.mapstruct.*;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface ArticleMapper {
+public interface ArticleMapper extends GenericMapper<ArticleDTO, Article, ArticleDTO>{
 
-    @Mapping(target = "inputr.userId", source = "inputr.userId")
+    /*@Mapping(target = "inputr.userId", source = "inputr.userId")
     @Mapping(target = "inputr.userNm", source = "inputr.userNm")
     @Mapping(target = "updtr.userId", source = "updtr.userId")
     @Mapping(target = "updtr.userNm", source = "updtr.userNm")
@@ -38,9 +38,9 @@ public interface ArticleMapper {
     @Mapping(target = "lckr.userNm", source = "lckr.userNm")
     @Mapping(target = "rptr.userId", source = "rptr.userId")
     @Mapping(target = "rptr.userNm", source = "rptr.userNm")
-    List<ArticleDTO> toDtoList(List<Article> articleList);
+    List<ArticleDTO> toDtoList(List<Article> confirmList);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateFromDto(ArticleDTO articleDTO, @MappingTarget Article article);
+    void updateFromDto(ArticleDTO articleDTO, @MappingTarget Article article);*/
 
 }
