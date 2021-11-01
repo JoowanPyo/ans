@@ -4,8 +4,6 @@ import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateCreateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplate.mapper.CueSheetTemplateCreateMapper;
 import com.gemiso.zodiac.app.cueSheetTemplate.mapper.CueSheetTemplateMapper;
-import com.gemiso.zodiac.app.issue.QIssue;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 

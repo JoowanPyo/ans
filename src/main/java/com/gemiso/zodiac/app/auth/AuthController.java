@@ -2,15 +2,15 @@ package com.gemiso.zodiac.app.auth;
 
 
 import com.gemiso.zodiac.app.auth.dto.AuthDTO;
-import com.gemiso.zodiac.app.auth.dto.JwtDTO;
 import com.gemiso.zodiac.app.auth.dto.AuthRequestDTO;
+import com.gemiso.zodiac.app.auth.dto.JwtDTO;
 import com.gemiso.zodiac.core.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +18,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 @Api(description = "로그인 API")
 public class AuthController {

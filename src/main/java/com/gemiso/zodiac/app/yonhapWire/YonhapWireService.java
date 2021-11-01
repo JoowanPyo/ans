@@ -7,19 +7,18 @@ import com.gemiso.zodiac.app.yonhapWire.mapper.YonhapWireMapper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 @Service
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class YonhapWireService {

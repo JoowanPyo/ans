@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.file;
 
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.dto.StatusCodeFileDTO;
 import com.gemiso.zodiac.core.response.ApiResponse;
@@ -8,7 +7,6 @@ import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 

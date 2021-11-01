@@ -1,8 +1,6 @@
 package com.gemiso.zodiac.app.cueSheet;
 
 import com.gemiso.zodiac.app.cueSheet.dto.*;
-import com.gemiso.zodiac.app.userGroup.dto.UserGroupCreateDTO;
-import com.gemiso.zodiac.app.userGroup.dto.UserGroupUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.ApiResponse;
 import io.swagger.annotations.Api;
@@ -10,21 +8,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Api(description = "큐시트 API")
 @RestController
 @RequestMapping("/cuesheet")
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 public class CueSheetController {
 
@@ -78,7 +74,7 @@ public class CueSheetController {
     public ApiResponse<CueSheetDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                            @RequestBody @Valid CueSheetCreateDTO cueSheetCreateDTO,
                                            @Parameter(name = "cueTmpltId", description = "큐시트템플릿아이디", in = ParameterIn.QUERY)
-                                           @RequestParam(value = "cueTmpltId", required = false) Long cueTmpltId ) {
+                                           @RequestParam(value = "cueTmpltId", required = false) Long cueTmpltId) {
 
         Long cueId = cueSheetService.create(cueSheetCreateDTO);
 
@@ -131,15 +127,29 @@ public class CueSheetController {
     }
 
     @Operation(summary = "큐시트 잠금해제", description = "큐시트 잠금해제")
-    @PutMapping(path = "/{cue_id}/unLock")
-    public ApiResponse<CueSheetDTO> cueSheetUnLock(@Parameter(name = "cue_id", required = true, description = "큐시트 아이디")
-                                                        @PathVariable("cue_id") Long cue_id) {
+    @PutMapping(path = "/{cueId}/unLock")
+    public ApiResponse<CueSheetDTO> cueSheetUnLock(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
+                                                   @PathVariable("cueId") Long cueId) {
 
-        cueSheetService.cueSheetUnLock(cue_id);
+        cueSheetService.cueSheetUnLock(cueId);
 
-        CueSheetDTO cueSheetDTO = cueSheetService.find(cue_id);
+        CueSheetDTO cueSheetDTO = cueSheetService.find(cueId);
 
         return new ApiResponse<>(cueSheetDTO);
+    }
+
+    @Operation(summary = "큐시트 복사", description = "큐시트 복사")
+    @PostMapping(path = "/{cueId}/cuesheetcopy")
+    public ApiResponse<CueSheetSimpleDTO> cueSheetCopy(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
+                                                 @PathVariable("cueId") Long cueId) {
+
+        CueSheetSimpleDTO cueSheetSimpleDTO = new CueSheetSimpleDTO();
+
+        Long cueSheetId = cueSheetService.copy(cueId);
+
+        cueSheetSimpleDTO.setCueId(cueSheetId);
+
+        return new ApiResponse<>(cueSheetSimpleDTO);
     }
 
 

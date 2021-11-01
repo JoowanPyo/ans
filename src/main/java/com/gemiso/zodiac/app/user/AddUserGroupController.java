@@ -9,7 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/addUserGroups")
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 //@Tag(name = "User Controllers", description = "User API")
 @Api(description = "사용자 그룹 추가 API")

@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.appInterface.dto;
+package com.gemiso.zodiac.app.appInterface.cueFindAllDTO;
 
 import lombok.Data;
 

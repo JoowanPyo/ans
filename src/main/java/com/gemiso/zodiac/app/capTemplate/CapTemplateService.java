@@ -7,8 +7,6 @@ import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateCreateMapper;
 import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateMapper;
 import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateUpdateMapper;
 import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrpService;
-import com.gemiso.zodiac.app.capTemplateGrp.dto.CapTemplateGrpDTO;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;

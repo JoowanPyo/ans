@@ -1,9 +1,9 @@
 package com.gemiso.zodiac.app.appInterface;
 
-import com.gemiso.zodiac.app.appInterface.dto.TakerCueDataDTO;
-import com.gemiso.zodiac.app.appInterface.dto.ParentCueSheetDTO;
-import com.gemiso.zodiac.app.appInterface.dto.TakerCueResultDTO;
-import com.gemiso.zodiac.app.appInterface.dto.TakerCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.ParentCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueDataDTO;
+import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueResultDTO;
+import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueSheetDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.QCueSheet;
@@ -185,7 +185,7 @@ public class InterfaceService {
         }
         //쿼리 where 조건 추가.
         if (StringUtils.isEmpty(cueId) == false){
-            booleanBuilder.and(qCueSheetItem.cueId.eq(cueId));
+            //booleanBuilder.and(qCueSheetItem.cueId.eq(cueId));
         }
 
 

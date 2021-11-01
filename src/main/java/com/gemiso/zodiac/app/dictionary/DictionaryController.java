@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.dictionary;
 
-import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateCreateDTO;
 import com.gemiso.zodiac.app.dictionary.dto.DictionaryCreateDTO;
 import com.gemiso.zodiac.app.dictionary.dto.DictionaryDTO;
 import com.gemiso.zodiac.app.dictionary.dto.DictionaryUpdateDTO;

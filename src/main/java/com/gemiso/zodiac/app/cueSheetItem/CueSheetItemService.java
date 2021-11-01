@@ -2,25 +2,24 @@ package com.gemiso.zodiac.app.cueSheetItem;
 
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.ArticleRepository;
-import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
+import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.*;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemSymbolMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemUpdateMapper;
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.user.UserGroupUserRepository;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
-import com.gemiso.zodiac.app.userGroup.UserGroupAuthRepository;
+import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,20 +36,23 @@ import java.util.Optional;
 @Transactional
 public class CueSheetItemService {
 
+    @Value("${files.url-key}")
+    private String fileUrl;
+
     private final CueSheetItemRepository cueSheetItemRepository;
     private final ArticleRepository articleRepository;
     private final ArticleCapRepository articleCapRepository;
     private final ArticleMediaRepository articleMediaRepository;
-    private final UserGroupUserRepository userGroupUserRepository;
-    private final UserGroupAuthRepository userGroupAuthRepository;
     private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
+    //private final UserGroupUserRepository userGroupUserRepository;
+    //private final UserGroupAuthRepository userGroupAuthRepository;
     //private final CueSheetRepository cueSheetRepository;
 
     private final CueSheetItemMapper cueSheetItemMapper;
     private final CueSheetItemCreateMapper cueSheetItemCreateMapper;
     private final CueSheetItemUpdateMapper cueSheetItemUpdateMapper;
     private final CueSheetItemSymbolMapper cueSheetItemSymbolMapper;
-    private final ArticleMapper articleMapper;
+    //private final ArticleMapper articleMapper;
 
     private final UserAuthService userAuthService;
 
@@ -76,9 +78,22 @@ public class CueSheetItemService {
             //아이템 아이디로 방송아이콘 맵핑테이블 조회
             List<CueSheetItemSymbol> cueSheetItemSymbolList = cueSheetItemSymbolRepository.findSymbol(cueItemId);
 
-            if (ObjectUtils.isEmpty(cueSheetItemSymbolList) == false){
+            if (ObjectUtils.isEmpty(cueSheetItemSymbolList) == false){ //조회된 방송아콘 맵핑테이블 List가 있으면 url추가후 큐시트 아이템DTO에 추가
 
                 List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTO = cueSheetItemSymbolMapper.toDtoList(cueSheetItemSymbolList);
+
+                for (CueSheetItemSymbolDTO getCueSheetItemSymbol : cueSheetItemSymbolDTO){
+
+                    SymbolDTO symbolDTO = getCueSheetItemSymbol.getSymbol();
+
+                    String fileLoc = symbolDTO.getAttachFile().getFileLoc();//파일로그 get
+                    String url = fileUrl + fileLoc; //url + 파일로그
+
+                    symbolDTO.setUrl(url);//방송아이콘이 저장된 url set
+
+                    getCueSheetItemSymbol.setSymbol(symbolDTO);//url 추가 DTO set
+                }
+
 
                 cueSheetItemDTO.setCueSheetItemSymbolDTO(cueSheetItemSymbolDTO); //아이템에 set방송아이콘List
 
@@ -89,11 +104,17 @@ public class CueSheetItemService {
 
     }
 
-    public CueSheetItemDTO find(Long cueItemId){
+    public CueSheetItemDTO find(Long cueItemId){//큐시트 아이템 상세 조회
 
+        //큐시트 아이템 조회
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
+        //큐시트 아이템 방송아이콘 List 조회
+        List<CueSheetItemSymbol> cueSheetItemSymbol = cueSheetItemSymbolRepository.findSymbol(cueItemId);
+
+        List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTO = cueSheetItemSymbolMapper.toDtoList(cueSheetItemSymbol);
 
         CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
+        cueSheetItemDTO.setCueSheetItemSymbolDTO(cueSheetItemSymbolDTO);
 
         return cueSheetItemDTO;
 
@@ -103,7 +124,8 @@ public class CueSheetItemService {
 
 
         //큐시트 아이디 등록
-        cueSheetItemCreateDTO.setCueId(cueId);
+        CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
+        cueSheetItemCreateDTO.setCueSheet(cueSheetDTO);
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
         String userId = userAuthService.authUser.getUserId();
         cueSheetItemCreateDTO.setInputrId(userId);
@@ -141,7 +163,8 @@ public class CueSheetItemService {
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
 
-        cueSheetItemUpdateDTO.setCueId(cueId);
+        CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
+        cueSheetItemUpdateDTO.setCueSheet(cueSheetDTO);
         cueSheetItemUpdateDTO.setCueItemId(cueItemId);
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
@@ -233,7 +256,7 @@ public class CueSheetItemService {
         }
         //쿼리 where 조건 추가.
         if (StringUtils.isEmpty(cueId) == false){
-            booleanBuilder.and(qCueSheetItem.cueId.eq(cueId));
+            //booleanBuilder.and(qCueSheetItem.cueId.eq(cueId));
         }
 
 
@@ -250,7 +273,7 @@ public class CueSheetItemService {
         booleanBuilder.and(qCueSheetItem.delYn.eq("N"));
         //쿼리 where 조건 추가.
         if (StringUtils.isEmpty(cueId) == false){
-            booleanBuilder.and(qCueSheetItem.cueId.eq(cueId));
+            //booleanBuilder.and(qCueSheetItem.cueId.eq(cueId));
         }
 
         return booleanBuilder;
@@ -263,10 +286,11 @@ public class CueSheetItemService {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
         String userId = userAuthService.authUser.getUserId();
-
+        //큐시트아이디 큐시트엔티티로 빌드 :: 큐시트아이템에 큐시트 아이디set해주기 위해
+        CueSheet cueSheet = CueSheet.builder().cueId(cueId).build();
         //큐시트아이템create 빌드
         CueSheetItem cueSheetItem = CueSheetItem.builder()
-                .cueId(cueId)
+                .cueSheet(cueSheet)
                 .cueItemOrd(cueItemOrd)
                 .inputrId(userId)
                 .article(copyArtcl)
@@ -295,10 +319,12 @@ public class CueSheetItemService {
 
             //토큰 사용자 Id(현재 로그인된 사용자 ID)
             String userId = userAuthService.authUser.getUserId();
+            //큐시트아이디 큐시트엔티티로 빌드 :: 큐시트아이템에 큐시트 아이디set해주기 위해
+            CueSheet cueSheet = CueSheet.builder().cueId(cueId).build();
 
             //큐시트아이템create 빌드
             CueSheetItem cueSheetItem = CueSheetItem.builder()
-                    .cueId(cueId)
+                    .cueSheet(cueSheet)
                     .cueItemOrd(cueItemOrd)
                     .inputrId(userId)
                     .article(copyArtcl)

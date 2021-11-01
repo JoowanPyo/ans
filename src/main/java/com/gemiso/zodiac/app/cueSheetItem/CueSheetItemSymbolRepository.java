@@ -10,4 +10,5 @@ public interface CueSheetItemSymbolRepository extends JpaRepository<CueSheetItem
 
     @Query("select a from CueSheetItemSymbol a where a.cueSheetItem.cueItemId = :cueItemId")
     List<CueSheetItemSymbol> findSymbol(@Param("cueItemId")Long cueItemId);
+
 }

@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.article;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.gemiso.zodiac.app.articleCap.AnchorCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
@@ -112,7 +113,6 @@ public class Article extends BaseEntity {
     private String ancMentCtt;
 
     @Column(name = "rptr_nm", length = 100)
-    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = rptr_id)")
     private String rptrNm;
 
@@ -233,7 +233,10 @@ public class Article extends BaseEntity {
     @Column(name = "parent_artlc_id")
     private Long parentArtlcId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "memo", columnDefinition = "TEXT")
+    private String memo;
+
+    @ManyToOne
     @JoinColumn(name = "issu_id")
     private Issue issue;
 
@@ -256,6 +259,10 @@ public class Article extends BaseEntity {
     @OneToMany(mappedBy = "article")
     @JsonManagedReference
     private List<ArticleCap> articleCap = new ArrayList<>();
+
+    @OneToMany(mappedBy = "article")
+    @JsonManagedReference
+    private List<AnchorCap> anchorCap = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {

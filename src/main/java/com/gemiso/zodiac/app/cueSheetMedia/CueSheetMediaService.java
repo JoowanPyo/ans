@@ -6,7 +6,6 @@ import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaUpdateDTO;
 import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaCreateMapper;
 import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaMapper;
 import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaUpdateMapper;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;

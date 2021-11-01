@@ -18,7 +18,7 @@ public class ArticleCapDTO {
 
     private Long artclCapId;
     private String capDivCd;
-    private String chDivCdNm;
+    private String capDivCdNm;
     private int lnNo;
     private String capCtt;
     private String capRmk;

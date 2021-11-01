@@ -11,7 +11,7 @@ import com.gemiso.zodiac.app.userGroup.mapper.UserGroupAuthMapper;
 import com.gemiso.zodiac.app.userGroup.mapper.UserGroupMapper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class AddUserGroupAuthService {

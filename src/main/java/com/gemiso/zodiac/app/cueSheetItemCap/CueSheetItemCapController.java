@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.cueSheetItemCap;
 
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapUpdateDTO;
@@ -17,7 +16,7 @@ import java.util.List;
 
 @Api(description = "큐시트 아이템 자막 API")
 @RestController
-@RequestMapping("/cueitemcap")
+@RequestMapping("/cueitemcaps")
 @Slf4j
 @RequiredArgsConstructor
 public class CueSheetItemCapController {

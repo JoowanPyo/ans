@@ -18,8 +18,11 @@ import org.springframework.http.HttpStatus;
  * }
  */
 @Data
-public class ApiResponse<T> extends BaseApiResponse {
+public class ApiResponse<T> /*extends BaseApiResponse*/ {
+    private final HttpStatus status;
+    private final boolean success;
     private final T data;
+
 
     public ApiResponse(T data) {
         this.data = data;

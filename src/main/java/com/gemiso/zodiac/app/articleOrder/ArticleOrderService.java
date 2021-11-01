@@ -6,16 +6,15 @@ import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderUpdateDTO;
 import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderCreateMapper;
 import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderMapper;
 import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderUpdateMapper;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class ArticleOrderService {

@@ -6,27 +6,23 @@ import com.gemiso.zodiac.app.code.dto.CodeUpdateDTO;
 import com.gemiso.zodiac.app.code.mapper.CodeCreateMapper;
 import com.gemiso.zodiac.app.code.mapper.CodeMapper;
 import com.gemiso.zodiac.app.code.mapper.CodeUpdateMapper;
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
-import com.gemiso.zodiac.core.helper.JWTParser;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class CodeService {
@@ -179,6 +175,7 @@ public class CodeService {
 
         QCode qCode = QCode.code;
 
+        booleanBuilder.and(qCode.delYn.eq("N"));
         if (!StringUtils.isEmpty(searchWord)) {
             booleanBuilder.and(qCode.cdNm.contains(searchWord));
         }

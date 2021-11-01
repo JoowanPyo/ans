@@ -6,7 +6,6 @@ import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapUpdateDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.mapper.CueSheetItemCapCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItemCap.mapper.CueSheetItemCapMapper;
 import com.gemiso.zodiac.app.cueSheetItemCap.mapper.CueSheetItemCapUpdateMapper;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;

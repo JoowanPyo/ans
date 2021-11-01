@@ -1,16 +1,13 @@
 package com.gemiso.zodiac.app.file;
 
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.dto.StatusCodeFileDTO;
 import com.gemiso.zodiac.app.file.mapper.AttachFileMapper;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.core.util.PropertyUtil;
 import com.gemiso.zodiac.core.util.UploadFileBean;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

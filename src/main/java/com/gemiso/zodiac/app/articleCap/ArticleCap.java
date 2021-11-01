@@ -33,8 +33,8 @@ public class ArticleCap {
     @Column(name = "cap_div_cd")
     private String capDivCd;
 
-    @Formula("(select a.cd_nm from tb_cd a where a.cd = ch_div_cd)")
-    private String chDivCdNm;
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = cap_div_cd)")
+    private String capDivCdNm;
 
     @Column(name = "ln_no")
     private int lnNo;

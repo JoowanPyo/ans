@@ -1,16 +1,12 @@
 package com.gemiso.zodiac.app.article;
 
-import com.gemiso.zodiac.app.article.dto.ArticleCreateDTO;
-import com.gemiso.zodiac.app.article.dto.ArticleDTO;
-import com.gemiso.zodiac.app.article.dto.ArticleLockDTO;
-import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
+import com.gemiso.zodiac.app.article.dto.*;
 import com.gemiso.zodiac.core.Enum.AuthEnum;
-import com.gemiso.zodiac.core.Enum.CodeEnum;
 import com.gemiso.zodiac.core.helper.SearchDate;
-import com.gemiso.zodiac.core.service.UserAuthChkService;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.response.ApiCollectionResponse;
 import com.gemiso.zodiac.core.response.ApiResponse;
+import com.gemiso.zodiac.core.service.UserAuthChkService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -57,9 +53,8 @@ public class ArticleController {
         //List<ArticleDTO> articleDTOList = new ArrayList<>();
 
         //기사읽기 권한이 없는 사용자 error.forbidden
-        List<String> userAuth = userAuthService.authChk();
-        if (userAuth.contains(AuthEnum.ArticleRead.getAuth()) == false ||
-                userAuth.contains(AuthEnum.AdminRead.getAuth()) == false){ //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
+        //List<String> userAuth = userAuthService.authChk(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth());
+        if (userAuthService.authChk(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth())){ //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -114,28 +109,33 @@ public class ArticleController {
     @Operation(summary = "기사 등록", description = "기사 등록")
     @PostMapping(name = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<ArticleDTO> create(@Parameter(description = "필수값<br> ", required = true)
+    public ApiResponse<ArticleSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                           @RequestBody @Valid ArticleCreateDTO articleCreateDTO) {
 
-        Long artclId = articleService.create(articleCreateDTO);
+        ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
 
-        ArticleDTO articleDTO = articleService.find(artclId);
+        Long artclId = articleService.create(articleCreateDTO);
+        articleDTO.setArtclId(artclId);
+
 
         return new ApiResponse<>(articleDTO);
     }
 
     @Operation(summary = "기사 수정", description = "기사 수정")
     @PutMapping(path = "/{artclId}")
-    public ApiResponse<ArticleDTO> update(@Parameter(description = "필수값<br> ", required = true)
+    public ApiResponse<ArticleSimpleDTO> update(@Parameter(description = "필수값<br> ", required = true)
                                           @RequestBody @Valid ArticleUpdateDTO articleUpdateDTO,
                                           @Parameter(name = "artclId", required = true, description = "기사 아이디")
                                           @PathVariable("artclId") long artclId) {
 
         //수정. 잠금사용자확인
 
+        ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
+
         articleService.update(articleUpdateDTO, artclId);
 
-        ArticleDTO articleDTO = articleService.find(artclId);
+       /* ArticleDTO articleDTO = articleService.find(artclId);*/
+        articleDTO.setArtclId(artclId);
 
         return new ApiResponse<>(articleDTO);
 

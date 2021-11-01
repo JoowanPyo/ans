@@ -4,7 +4,6 @@ import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramCreateDTO;
 import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
 import com.gemiso.zodiac.app.dailyProgram.mapper.DailyProgramCreateMapper;
 import com.gemiso.zodiac.app.dailyProgram.mapper.DailyProgramMapper;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;

@@ -2,7 +2,6 @@ package com.gemiso.zodiac.core.util;
 
 import com.gemiso.zodiac.core.util.common.Config;
 import com.gemiso.zodiac.core.util.common.Configuration;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.jdom2.Document;
 import org.jdom2.Element;

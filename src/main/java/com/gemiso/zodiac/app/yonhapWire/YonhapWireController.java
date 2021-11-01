@@ -8,7 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/yonhapInternational")
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 //@Tag(name = "User Controllers", description = "User API")
 @Api(description = "연합 외신 API")
@@ -33,10 +33,10 @@ public class YonhapWireController {
 
     @Operation(summary = "연합외신 목록조회", description = "연합외신 목록조회")
     @GetMapping(path = "")
-    public ApiResponse<List<YonhapWireDTO>> findAll(@Parameter(name = "sdate", description = "검색시작일[yyyy-MM-dd HH:mm:ss]", required = false)
-                                                    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date sdate,
-                                                    @Parameter(name = "edate", description = "검색종료일[yyyy-MM-dd HH:mm:ss]", required = false)
-                                                    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date edate,
+    public ApiResponse<List<YonhapWireDTO>> findAll(@Parameter(name = "sdate", description = "검색시작일[yyyy-MM-dd]", required = false)
+                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                    @Parameter(name = "edate", description = "검색종료일[yyyy-MM-dd]", required = false)
+                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                     @Parameter(name = "agcyCd", description = "통신사코드")
                                                     @RequestParam(value = "agcyCd", required = false) String agcyCd,
                                                     @Parameter(name = "searchWord", description = "검색어")

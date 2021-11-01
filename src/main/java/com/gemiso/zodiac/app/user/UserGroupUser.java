@@ -22,12 +22,12 @@ public class UserGroupUser {
     /*@NotFound(
            action = NotFoundAction.IGNORE)*/
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name = "user_id")
     private User user;
 
     /*@NotFound(
            action = NotFoundAction.IGNORE)*/
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "USER_GRP_ID")
+    @JoinColumn(name = "user_grp_id")
     private UserGroup userGroup;
 }

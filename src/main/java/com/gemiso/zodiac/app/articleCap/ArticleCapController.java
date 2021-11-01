@@ -16,7 +16,7 @@ import java.util.List;
 
 @Api(description = "기사자막 API")
 @RestController
-@RequestMapping("/articlecap")
+@RequestMapping("/articlecaps")
 @RequiredArgsConstructor
 @Slf4j
 public class ArticleCapController {

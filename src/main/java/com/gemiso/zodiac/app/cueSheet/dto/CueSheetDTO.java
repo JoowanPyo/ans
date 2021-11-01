@@ -2,6 +2,9 @@ package com.gemiso.zodiac.app.cueSheet.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
+import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
+import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
@@ -9,7 +12,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.xml.bind.annotation.XmlElement;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -59,4 +65,5 @@ public class CueSheetDTO {
     private String td2Nm;
     private String remark;
     private ProgramDTO program;
+    private List<CueSheetItemDTO> cueSheetItem = new ArrayList<>();
 }

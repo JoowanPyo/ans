@@ -1,7 +1,6 @@
 package com.gemiso.zodiac.app.appInterface;
 
-import com.gemiso.zodiac.app.appInterface.dto.ParentCueSheetDTO;
-import com.gemiso.zodiac.app.appInterface.dto.TakerCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.ParentCueSheetDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
@@ -17,7 +16,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -73,7 +71,7 @@ public class InterfaceController {
     }
 
     @Operation(summary = "큐시트 아이템 목록조회[Taker]", description = "큐시트 아이템 목록조회[Taker]")
-    @GetMapping(path = "/cuesheet/{cueId}/cuesheetitem")
+    @GetMapping(path = "/cuesheet/{cueId}/cuesheetitems")
     public ApiResponse<List<CueSheetItemDTO>> cueItemFindAll(@Parameter(name = "artlcId", description = "기사 아이디")
                                                              @RequestParam(value = "artlcId", required = false) Long artlcId,
                                                              @Parameter(name = "cueId", description = "큐시트 아이디")

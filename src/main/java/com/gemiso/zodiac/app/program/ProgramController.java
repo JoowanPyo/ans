@@ -3,30 +3,21 @@ package com.gemiso.zodiac.app.program;
 import com.gemiso.zodiac.app.program.dto.ProgramCreateDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramUpdateDTO;
-import com.gemiso.zodiac.app.userGroup.dto.UserGroupUpdateDTO;
-import com.gemiso.zodiac.app.yonhap.dto.YonhapDTO;
-import com.gemiso.zodiac.core.helper.JWTParser;
-import com.gemiso.zodiac.core.response.ApiErrorResponse;
 import com.gemiso.zodiac.core.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/programs")
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 @Api(description = "프로그램 API")
 public class ProgramController {

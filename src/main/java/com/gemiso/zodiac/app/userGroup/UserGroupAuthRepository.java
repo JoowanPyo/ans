@@ -11,4 +11,7 @@ public interface UserGroupAuthRepository extends JpaRepository<UserGroupAuth, Lo
 
     @Query("select a from UserGroupAuth a where a.userGroup.userGrpId = :userGrpId")
     List<UserGroupAuth> findByUserGrpId(@Param("userGrpId") Long userGrpId);
+
+    @Query("select a from UserGroupAuth a where a.userGroup.userGrpId IN (:userGrpId)")
+    List<UserGroupAuth> findByUserGrpIdArr(@Param("userGrpId") Long[] userGrpId);
 }

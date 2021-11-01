@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.article;
 
-import com.gemiso.zodiac.app.appAuth.AppAuth;
 import com.gemiso.zodiac.app.article.dto.ArticleCreateDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleLockDTO;
@@ -9,10 +8,13 @@ import com.gemiso.zodiac.app.article.mapper.ArticleCreateMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleLockMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleUpdateMapper;
+import com.gemiso.zodiac.app.articleCap.AnchorCap;
+import com.gemiso.zodiac.app.articleCap.AnchorCapRepository;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
-import com.gemiso.zodiac.app.articleCap.dto.ArticleCapDTO;
+import com.gemiso.zodiac.app.articleCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
+import com.gemiso.zodiac.app.articleCap.mapper.AnchorCapSimpleMapper;
 import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapMapper;
 import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapSimpleMapper;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
@@ -22,18 +24,14 @@ import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderSimpleDTO;
 import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderSimpleMapper;
-import com.gemiso.zodiac.app.code.Code;
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.issue.IssueRepositoy;
+import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.user.QUser;
-import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserGroupUser;
 import com.gemiso.zodiac.app.user.UserGroupUserRepository;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
-import com.gemiso.zodiac.app.userGroup.UserGroup;
 import com.gemiso.zodiac.app.userGroup.UserGroupAuth;
 import com.gemiso.zodiac.app.userGroup.UserGroupAuthRepository;
 import com.gemiso.zodiac.core.helper.PageHelper;
@@ -46,7 +44,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -71,6 +68,7 @@ public class ArticleService {
     private final CueSheetItemRepository cueSheetItemRepository;
     private final UserGroupUserRepository userGroupUserRepository;
     private final UserGroupAuthRepository userGroupAuthRepository;
+    private final AnchorCapRepository anchorCapRepository;
     private final IssueRepositoy issueRepositoy;
 
     private final ArticleMapper articleMapper;
@@ -82,6 +80,7 @@ public class ArticleService {
     private final ArticleOrderSimpleMapper articleOrderSimpleMapper;
     private final ArticleUpdateMapper articleUpdateMapper;
     private final ArticleLockMapper articleLockMapper;
+    private final AnchorCapSimpleMapper anchorCapSimpleMapper;
 
     private final UserAuthService userAuthService;
 
@@ -165,10 +164,59 @@ public class ArticleService {
         List<ArticleCapSimpleDTO> articleCapDTOList = articleCapSimpleMapper.toDtoList(article.getArticleCap()); //기사자막정보 DTO변환
         List<ArticleMediaSimpleDTO> articleMediaSimpleDTOList = articleMediaSimpleMapper.toDtoList(article.getArticleMedia()); //기사미디어정보 DTO변환
         List<ArticleOrderSimpleDTO> articleOrderSimpleDTOList = articleOrderSimpleMapper.toDtoList(article.getArticleOrder()); //기사의뢰정보 DTO변환
+        List<AnchorCapSimpleDTO> anchorCapSimpleDTOList = anchorCapSimpleMapper.toDtoList(article.getAnchorCap());//앵커기사정보 DTO 변환
 
+
+        //방송아이콘 이미지 Url 추가. 기사자막 방송아이콘 url set
+         List<ArticleCapSimpleDTO> setArticleCapDTOList = setUrlArticleCap(articleCapDTOList);
+        //방송아이콘 이미지 Url 추가. 앵커자막 방송아이콘 url set
+        List<AnchorCapSimpleDTO> setAnchorCapDTOList = setUrlAnchorCap(anchorCapSimpleDTOList);
+
+        //기사이력, 자막, 미디어, 의뢰 정보 set
+        //articleDTO.setArticleHistDTO(articleHistDTOList);
+        articleDTO.setArticleCapDTO(setArticleCapDTOList);
+        articleDTO.setAnchorCap(setAnchorCapDTOList);
+        articleDTO.setArticleMediaDTO(articleMediaSimpleDTOList);
+        articleDTO.setArticleOrderDTO(articleOrderSimpleDTOList);
+
+
+
+        return articleDTO;
+
+    }
+
+    public List<AnchorCapSimpleDTO> setUrlAnchorCap(List<AnchorCapSimpleDTO> anchorCapSimpleDTOList){//앵커자막 방송아이콘 url set
+
+        //방송아이콘 이미지 Url 추가.
+        List<AnchorCapSimpleDTO> setArticleCapDTOList = new ArrayList<>();
+
+        if (ObjectUtils.isEmpty(anchorCapSimpleDTOList) == false) {
+            for (AnchorCapSimpleDTO anchorCapSimpleDTO : anchorCapSimpleDTOList) {
+
+                SymbolDTO symbolDTO = new SymbolDTO();
+
+                symbolDTO = anchorCapSimpleDTO.getSymbol();
+
+                if (ObjectUtils.isEmpty(symbolDTO) == false) {
+                    String fileLoc = anchorCapSimpleDTO.getSymbol().getAttachFile().getFileLoc();
+                    String url = fileUrl + fileLoc; //url + 파일로그
+
+                    symbolDTO.setUrl(url);
+
+                    anchorCapSimpleDTO.setSymbol(symbolDTO);//방송아이콘에 url set
+                    setArticleCapDTOList.add(anchorCapSimpleDTO); //앵커자막에 url추가된 방송아이콘 set
+                }
+            }
+        }
+
+        return setArticleCapDTOList;
+    }
+
+    public List<ArticleCapSimpleDTO> setUrlArticleCap(List<ArticleCapSimpleDTO> articleCapDTOList){ //기사자막 방송아이콘 url set
 
         //방송아이콘 이미지 Url 추가.
         List<ArticleCapSimpleDTO> setArticleCapDTOList = new ArrayList<>();
+
         if (ObjectUtils.isEmpty(articleCapDTOList) == false) {
             for (ArticleCapSimpleDTO articleCapSimpleDTO : articleCapDTOList) {
 
@@ -178,25 +226,17 @@ public class ArticleService {
 
                 if (ObjectUtils.isEmpty(symbolDTO) == false) {
                     String fileLoc = articleCapSimpleDTO.getSymbol().getAttachFile().getFileLoc();
-                    String url = fileUrl + fileLoc;
+                    String url = fileUrl + fileLoc; //url + 파일로그
 
                     symbolDTO.setUrl(url);
 
-                    articleCapSimpleDTO.setSymbol(symbolDTO);
-                    setArticleCapDTOList.add(articleCapSimpleDTO);
+                    articleCapSimpleDTO.setSymbol(symbolDTO);//방송아이콘에 url set
+                    setArticleCapDTOList.add(articleCapSimpleDTO); //기사자막에 url추가된 방송아이콘 set
                 }
             }
         }
 
-        //기사이력, 자막, 미디어, 의뢰 정보 set
-        //articleDTO.setArticleHistDTO(articleHistDTOList);
-        articleDTO.setArticleCapDTO(setArticleCapDTOList);
-        articleDTO.setArticleMediaDTO(articleMediaSimpleDTOList);
-        articleDTO.setArticleOrderDTO(articleOrderSimpleDTOList);
-
-
-        return articleDTO;
-
+        return setArticleCapDTOList;
     }
 
 
@@ -211,33 +251,59 @@ public class ArticleService {
 
         ArticleDTO articleDTO = articleMapper.toDto(article);
 
+        Long articleId = articleDTO.getArtclId();
 
         //기사 자막 create
-
         List<ArticleCapSimpleDTO> articleCapDTOS = articleCreateDTO.getArticleCap();
+        List<AnchorCapSimpleDTO> anchorCapDTOS = articleCreateDTO.getAnchorCap();
+        createArticleCap(articleCapDTOS, articleId);//기사자막 create
+        createAnchorCap(anchorCapDTOS, articleId);//앵커자막 create.
 
-        if (!ObjectUtils.isEmpty(articleCapDTOS)) {
-            for (ArticleCapSimpleDTO articleCapDTO : articleCapDTOS) {
-
-                Article articleSimple = Article.builder().artclId(articleDTO.getArtclId()).build();
-
-                ArticleCap articleCap = articleCapSimpleMapper.toEntity(articleCapDTO);
-                articleCap.setArticle(articleSimple);
-                articleCapRepository.save(articleCap);
-            }
-        }
         //기사 이력 create
         createArticleHist(article);
 
         return article.getArtclId();
     }
 
+    public void createAnchorCap(List<AnchorCapSimpleDTO> anchorCapDTOS, Long articleId){ //앵커자막 create.
+
+        if (ObjectUtils.isEmpty(anchorCapDTOS) == false){
+            for (AnchorCapSimpleDTO anchorCapSimpleDTO : anchorCapDTOS){
+
+                Article articleSimple = Article.builder().artclId(articleId).build();//자막에 들어갈 기사 아이디
+                AnchorCap anchorCap = anchorCapSimpleMapper.toEntity(anchorCapSimpleDTO);
+                anchorCap.setArticle(articleSimple);
+                anchorCapRepository.save(anchorCap);
+            }
+        }
+
+    }
+
+    public void createArticleCap(List<ArticleCapSimpleDTO> articleCapDTOS, Long articleId){//기사자막 create
+
+        if (ObjectUtils.isEmpty(articleCapDTOS) == false) {
+            for (ArticleCapSimpleDTO articleCapDTO : articleCapDTOS) {
+
+                Article articleSimple = Article.builder().artclId(articleId).build();//자막에 들어갈 기사 아이디
+                ArticleCap articleCap = articleCapSimpleMapper.toEntity(articleCapDTO);
+                articleCap.setArticle(articleSimple);
+                articleCapRepository.save(articleCap);
+            }
+        }
+    }
+
     public void update(ArticleUpdateDTO articleUpdateDTO, Long artclId) {
 
         Article article = articleFindOrFail(artclId);
 
+        IssueDTO issueDTO = articleUpdateDTO.getIssue(); //이슈 업데이트 경우 이슈는 PK값으로 되어있기 때문에 삭제후 등록.
+        if (ObjectUtils.isEmpty(issueDTO) == false){
+            article.setIssue(null);
+        }
+
         //기사 자막 Update
         articleCapUpdate(article, articleUpdateDTO);
+        anchorCapupdate(article, articleUpdateDTO);
 
         String userId = userAuthService.authUser.getUserId();
         articleUpdateDTO.setUpdtrId(userId);
@@ -269,38 +335,41 @@ public class ArticleService {
 
     }
 
-    private void articleCapUpdate(Article article, ArticleUpdateDTO articleUpdateDTO) {
+    private void articleCapUpdate(Article article, ArticleUpdateDTO articleUpdateDTO) { //기사자막 수정.
 
-
-        List<ArticleCap> articleCapList = article.getArticleCap();
+        Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
+        List<ArticleCap> articleCapList = article.getArticleCap(); //원본기사 자막 get
 
         if (ObjectUtils.isEmpty(articleCapList) == false) { //기존에 등록되어 있던 기사자막 삭제
             for (ArticleCap articleCap : articleCapList) {
-
                 Long artclCapId = articleCap.getArtclCapId();
-
                 articleCapRepository.deleteById(artclCapId);
-
             }
         }
-
         List<ArticleCapSimpleDTO> capSimpleDTOList = articleUpdateDTO.getArticleCap(); //update로 들어온 기사 등록
-        if (ObjectUtils.isEmpty(capSimpleDTOList) == false) {
+        createArticleCap(capSimpleDTOList, articleId); //기사자막 등록
 
-            for (ArticleCapSimpleDTO articleCapSimpleDTO : capSimpleDTOList) {
-
-                Article articleSimple = Article.builder().artclId(article.getArtclId()).build();
-
-                ArticleCap articleCap = articleCapSimpleMapper.toEntity(articleCapSimpleDTO);
-                articleCap.setArticle(articleSimple);
-                articleCapRepository.save(articleCap);
-            }
-
-        }
 
     }
 
-    public void articleLock(Long artclId, ArticleLockDTO articleLockDTO) {
+    private void anchorCapupdate(Article article, ArticleUpdateDTO articleUpdateDTO){//앵커자막 수정.
+
+        Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
+
+        List<AnchorCap> anchorCaps = article.getAnchorCap();//원본 앵커기사 List get
+        if (ObjectUtils.isEmpty(anchorCaps) == false){ //원본 앵커기사 delete;
+            for (AnchorCap anchorCap : anchorCaps){
+                Long anchorCapId = anchorCap.getArtclCapId();
+                anchorCapRepository.deleteById(anchorCapId);
+            }
+        }
+
+        List<AnchorCapSimpleDTO> anchorCapSimpleDTOList = articleUpdateDTO.getAnchorCap();
+        createAnchorCap(anchorCapSimpleDTOList, articleId);//앵커자막 등록
+
+    }
+
+    public void articleLock(Long artclId, ArticleLockDTO articleLockDTO) {// 기사 잠금
 
         Article article = articleFindOrFail(artclId);
 
@@ -321,7 +390,7 @@ public class ArticleService {
 
     }
 
-    public void articleUnlock(Long artclId, ArticleLockDTO articleLockDTO) {
+    public void articleUnlock(Long artclId, ArticleLockDTO articleLockDTO) {//기사 잠금 해제
 
         Article article = articleFindOrFail(artclId);
 
@@ -331,12 +400,11 @@ public class ArticleService {
         }
 
         articleLockMapper.updateFromDto(articleLockDTO, article);
-
         articleRepository.save(article);
 
     }
 
-    public Article articleFindOrFail(Long artclId) {
+    public Article articleFindOrFail(Long artclId) { //기사 존재여부 확인
 
         Optional<Article> article = articleRepository.findArticle(artclId);
 
@@ -348,6 +416,7 @@ public class ArticleService {
 
     }
 
+    //기사 목록조회시 조건
     public BooleanBuilder getSearch(Date sdate, Date edate, Date rcvDt, String rptrId, Long brdcPgmId,
                                     String artclDivCd, String artclTypCd, String searchDivCd, String searchWord, Long issuId) {
 
@@ -385,9 +454,9 @@ public class ArticleService {
             booleanBuilder.and(qArticle.brdcPgmId.eq(brdcPgmId));
         }
         //기사 구분 코드로 조회
-        /*if (!StringUtils.isEmpty(artclDivCd)) {
-            booleanBuilder.and(qArticle.artclDivCd.cd.eq(artclDivCd));
-        }*/
+        if (!StringUtils.isEmpty(artclDivCd)) {
+            booleanBuilder.and(qArticle.artclDivCd.eq(artclDivCd));
+        }
         //기사 타입 코드로 조회
         if (!StringUtils.isEmpty(artclTypCd)) {
             booleanBuilder.and(qArticle.artclTypCd.eq(artclTypCd));
@@ -413,6 +482,7 @@ public class ArticleService {
         return booleanBuilder;
     }
 
+    //큐시트 기사자막 조회 조건
     public BooleanBuilder getSearchCue(Date sdate, Date edate, String searchWord) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
@@ -544,24 +614,26 @@ public class ArticleService {
         // 사용자에 대한 그룹 정보
         List<UserGroupUser> userGroupUserList = userGroupUserRepository.findByUserId(userId);
 
-        List<String> appAuthList = new ArrayList<>(); //리턴할 권한 List
+        List<String> appAuthList = new ArrayList<>();//리턴할 권한 List
+        Long[] appAuthArr = new Long[userGroupUserList.size()]; //inquery로 조회할 유저그룹아이디 LongArray
 
-        for (UserGroupUser userGroupUser : userGroupUserList) { //등록된 사용자 그룹에 포함한 권한을 모두 불러온다.
+        for (int i = 0; i < userGroupUserList.size(); i++) { //등록된 사용자 그룹에 포함한 권한을 모두 불러온다.
+            Long groupId = userGroupUserList.get(i).getUserGroup().getUserGrpId();
+            appAuthArr[i] = groupId;
+        }
+        List<UserGroupAuth> findUserGroupAuthList = userGroupAuthRepository.findByUserGrpIdArr(appAuthArr);
 
-            Long groupId = userGroupUser.getUserGroup().getUserGrpId();
+        for (UserGroupAuth userGroupAuth : findUserGroupAuthList) {
 
-            List<UserGroupAuth> findUserGroupAuthList = userGroupAuthRepository.findByUserGrpId(groupId);
-
-            for (UserGroupAuth userGroupAuth : findUserGroupAuthList) {
-
-                String appAuthCD = userGroupAuth.getAppAuth().getAppAuthCd(); //코드네임 get
-                if (appAuthList.contains(appAuthCD) == false) {
-                    appAuthList.add(appAuthCD);
-                }
+            String appAuthCD = userGroupAuth.getAppAuth().getAppAuthCd();
+            if (appAuthList.contains(appAuthCD) == false) {
+                appAuthList.add(appAuthCD);
             }
         }
+
         //권한 리스트 리턴
         return appAuthList;
+    }
 
     }
 
@@ -586,4 +658,3 @@ public class ArticleService {
 
     }*/
 
-}

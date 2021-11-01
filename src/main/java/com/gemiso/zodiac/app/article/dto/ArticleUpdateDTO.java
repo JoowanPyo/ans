@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.article.dto;
 
+import com.gemiso.zodiac.app.articleCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
@@ -10,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -83,10 +85,12 @@ public class ArticleUpdateDTO {
     private Integer videoTime;
     private String deptCd;
     private String deviceCd;
+    private String memo;
     private IssueDTO issue;
     private Long parentArtlcId;
     //private List<ArticleMediaDTO> articleMedia;
-    private List<ArticleCapSimpleDTO> articleCap;
+    private List<ArticleCapSimpleDTO> articleCap = new ArrayList<>();
+    private List<AnchorCapSimpleDTO> anchorCap = new ArrayList<>();
     //private List<ArticleOrderDTO> articleOrder;
     //private List<ArticleHistDTO> articleHist;
 }

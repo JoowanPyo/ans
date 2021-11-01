@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ import java.util.List;
 @Api(description = "코드 API")
 @RestController
 @RequestMapping("/codes")
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 public class CodeController {
 

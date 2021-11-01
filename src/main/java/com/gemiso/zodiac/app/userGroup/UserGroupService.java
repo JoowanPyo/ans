@@ -1,7 +1,5 @@
 package com.gemiso.zodiac.app.userGroup;
 
-import com.gemiso.zodiac.app.user.UserGroupUser;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupAuthDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupCreateDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupDTO;
@@ -14,7 +12,6 @@ import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;

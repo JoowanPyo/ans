@@ -6,7 +6,6 @@ import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateListDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemUpdateDTO;
 import com.gemiso.zodiac.core.response.ApiResponse;
-import com.gemiso.zodiac.core.service.ProcessArticleFix;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +20,7 @@ import java.util.List;
 
 @Api(description = "큐시트 아이템 API")
 @RestController
-@RequestMapping("/cuesheetitem")
+@RequestMapping("/cuesheetitems")
 @RequiredArgsConstructor
 @Slf4j
 public class CueSheetItemController {

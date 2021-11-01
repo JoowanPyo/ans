@@ -45,7 +45,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
 
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return new ResponseEntity<>(ApiErrorResponse.makeNoHandlerErrorResponse(ex), HttpStatus.UNPROCESSABLE_ENTITY);
+         return new ResponseEntity<>(ApiErrorResponse.makeNoHandlerErrorResponse(ex), HttpStatus.UNPROCESSABLE_ENTITY);
 
     }
 

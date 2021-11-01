@@ -1,10 +1,9 @@
 package com.gemiso.zodiac.core.service;
 
-import com.gemiso.zodiac.app.appInterface.dto.ParentCueSheetDTO;
-import com.gemiso.zodiac.app.appInterface.dto.TakerCueProgramDTO;
+import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.ParentCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueProgramDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.program.Program;
-import com.gemiso.zodiac.app.user.User;
 
 import java.util.ArrayList;
 import java.util.List;

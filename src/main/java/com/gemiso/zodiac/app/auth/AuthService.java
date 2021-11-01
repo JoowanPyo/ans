@@ -14,10 +14,8 @@ import com.gemiso.zodiac.app.user.mapper.UserMapper;
 import com.gemiso.zodiac.core.helper.JWTBuilder;
 import com.gemiso.zodiac.core.helper.JWTParser;
 import com.gemiso.zodiac.exception.PasswordFailedException;
-import com.gemiso.zodiac.exception.ResourceNotFoundException;
-import com.gemiso.zodiac.exception.TokenFailedException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Date;
 
 @Service
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class AuthService {

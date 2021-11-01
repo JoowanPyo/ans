@@ -1,7 +1,6 @@
 package com.gemiso.zodiac.app.articleCap;
 
 import com.gemiso.zodiac.app.article.Article;
-import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapCreateDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapUpdateDTO;

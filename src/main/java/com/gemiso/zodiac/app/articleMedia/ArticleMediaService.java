@@ -6,7 +6,6 @@ import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaUpdateDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaCreateMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaUpdateMapper;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;

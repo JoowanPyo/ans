@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.code.Code;
+import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserGroupUser;
@@ -25,7 +26,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"article","cueSheetItemSymbol"})
+@ToString(exclude = {"article","cueSheetItemSymbol","cueId"})
 @DynamicUpdate
 public class CueSheetItem extends BaseEntity {
 
@@ -173,8 +174,10 @@ public class CueSheetItem extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = lckr_id)")
     private String lckrNm;
 
-    @Column(name = "cue_id", nullable = false)
-    private Long cueId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "cue_id", nullable = false)
+    @JsonBackReference
+    private CueSheet cueSheet;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artcl_id")
@@ -186,6 +189,10 @@ public class CueSheetItem extends BaseEntity {
     private List<CueSheetMedia> cueSheetMedia = new ArrayList<>();
       /*@Column(name = "artcl_id", length = 21)
     private String artclId;*/
+
+   /* @OneToMany(mappedBy = "cueSheetItem")
+    @JsonManagedReference
+    private List<CueSheetItemSymbol> cueSheetItemSymbol = new ArrayList<>();*/
 
 
     @PrePersist

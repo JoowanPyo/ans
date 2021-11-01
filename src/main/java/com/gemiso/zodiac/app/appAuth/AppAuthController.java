@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,14 +20,14 @@ import java.util.List;
 @Api(description = "권한 API")
 @RestController
 @RequestMapping("/auths")
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 public class AppAuthController {
 
     private final AppAuthService appAuthService;
 
     @Operation(summary = "권한 상세조회", description = "권한 상세조회")
-    @GetMapping
+    @GetMapping(path = "")
     public ApiResponse<List<AppAuthDTO>> findAll(@Parameter(name = "useYn", description = "사용 여부", in = ParameterIn.QUERY) @RequestParam(value = "useYn", required = false) String useYn,
                                                  @Parameter(name = "delYn", description = "삭제 여부", in = ParameterIn.QUERY) @RequestParam(value = "delYn", required = false) String delYn,
                                                  @Parameter(name = "hrnkAppAuthCd", description = "상위코드", in = ParameterIn.QUERY) @RequestParam(value = "hrnkAppAuthCd", required = false) String hrnkAppAuthCd,
@@ -48,7 +48,7 @@ public class AppAuthController {
     }
 
     @Operation(summary = "권한 등록", description = "권한 등록")
-    @PostMapping
+    @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<AppAuthDTO> create(@Parameter(name = "appAuthCreatDTO", required = true, description = "필수값<br> 권한 명")
                                           @Valid @RequestBody AppAuthCreateDTO appAuthCreatDTO) {

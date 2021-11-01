@@ -1,6 +1,9 @@
 package com.gemiso.zodiac.app.cueSheet;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.gemiso.zodiac.app.articleCap.AnchorCap;
 import com.gemiso.zodiac.app.code.Code;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
@@ -11,7 +14,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(
@@ -21,7 +26,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString
+@ToString(exclude = {"cueSheetItem","program"})
 @Setter
 @DynamicUpdate
 @EntityListeners(value = {AuditingEntityListener.class})
@@ -157,6 +162,10 @@ public class CueSheet {
     @ManyToOne
     @JoinColumn(name = "brdc_pgm_id")
     private Program program;
+
+    @OneToMany(mappedBy = "cueSheet")
+    @JsonManagedReference
+    private List<CueSheetItem> cueSheetItem = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {

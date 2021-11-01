@@ -1,29 +1,24 @@
 package com.gemiso.zodiac.app.dictionary;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gemiso.zodiac.app.dictionary.dto.DictionaryCreateDTO;
 import com.gemiso.zodiac.app.dictionary.dto.DictionaryDTO;
 import com.gemiso.zodiac.app.dictionary.dto.DictionaryUpdateDTO;
 import com.gemiso.zodiac.app.dictionary.mapper.DictionaryCreateMapper;
 import com.gemiso.zodiac.app.dictionary.mapper.DictionaryMapper;
 import com.gemiso.zodiac.app.dictionary.mapper.DictionaryUpdateMapper;
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -207,7 +202,7 @@ public class DictionaryService {
 
         List<DictionaryDTO> dictionaryDTOList = new ArrayList<>();
 
-        if (searchWord == null || "".equals(searchWord)) //검색조건이 안들어와 왔을경우 entity to dto 변환후 List 리턴
+        if (searchWord == null || "".equals(searchWord)) //검색조건이 안들어와 왔을경우 entity to cueFindAllDTO 변환후 List 리턴
         {
             for (Dictionary dictionary : dictionaryList) {
                 DictionaryDTO dictionaryDTO = DictionaryDTO.builder()

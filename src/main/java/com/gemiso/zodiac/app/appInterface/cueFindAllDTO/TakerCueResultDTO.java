@@ -1,9 +1,6 @@
-package com.gemiso.zodiac.app.appInterface.dto;
+package com.gemiso.zodiac.app.appInterface.cueFindAllDTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

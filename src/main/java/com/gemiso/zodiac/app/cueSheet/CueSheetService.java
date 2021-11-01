@@ -5,13 +5,12 @@ import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetCreateMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetOrderLockMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetUpdateMapper;
-import com.gemiso.zodiac.app.program.Program;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
+import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateDTO;
+import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemCreateMapper;
 import com.gemiso.zodiac.app.program.ProgramService;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
-import com.gemiso.zodiac.app.userGroup.QUserGroup;
-import com.gemiso.zodiac.app.userGroup.UserGroup;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -19,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
@@ -34,11 +32,13 @@ import java.util.Optional;
 public class CueSheetService {
 
     private final CueSheetRepository cueSheetRepository;
+    private final CueSheetItemRepository cueSheetItemRepository;
 
     private final CueSheetMapper cueSheetMapper;
     private final CueSheetCreateMapper cueSheetCreateMapper;
     private final CueSheetUpdateMapper cueSheetUpdateMapper;
     private final CueSheetOrderLockMapper cueSheetOrderLockMapper;
+    private final CueSheetItemCreateMapper cueSheetItemCreateMapper;
 
     private final UserAuthService userAuthService;
 
@@ -66,17 +66,23 @@ public class CueSheetService {
         //조회된 큐시트에서 사용(중복)된 프로그램을 삭제한다.
         for (CueSheetDTO cueSheet : cueSheetDTOList){
 
-            Long getBrdcPgmId =  Optional.ofNullable(cueSheet.getProgram().getBrdcPgmId()).orElse(0L);
+            Optional<ProgramDTO> getProgramDTO =  Optional.ofNullable(cueSheet.getProgram());
+            //Optional<Long> getBrdcPgmId = Optional.ofNullable(cueSheet.getProgram().getBrdcPgmId());
 
-            //ConcurrentModificationException에러가 나서 이터레이터로 수정.
-            Iterator<ProgramDTO> iter = programDTOList.listIterator();
-            while (iter.hasNext()){
-                ProgramDTO programDTO = iter.next();
-                Long orgBrdcPgmId = programDTO.getBrdcPgmId();
-                if (getBrdcPgmId.equals(orgBrdcPgmId)){
-                    iter.remove();
+            if (getProgramDTO.isPresent()) {
+                ProgramDTO ProgramDTO = getProgramDTO.get();
+                Long getBrdcPgmId = ProgramDTO.getBrdcPgmId();
+
+                //ConcurrentModificationException에러가 나서 이터레이터로 수정.
+                Iterator<ProgramDTO> iter = programDTOList.listIterator();
+                while (iter.hasNext()) {
+                    ProgramDTO programDTO = iter.next();
+                    Long orgBrdcPgmId = programDTO.getBrdcPgmId();
+                    if (getBrdcPgmId.equals(orgBrdcPgmId)) {
+                        iter.remove();
+                    }
+
                 }
-
             }
         }
         //조회된 큐시트 + 방송프로그램
@@ -197,6 +203,7 @@ public class CueSheetService {
         } else {
             cueSheet.setLckrId(null);
             cueSheet.setLckDtm(null);
+            //cueSheetOrderLockDTO.setLckYn("N");
         }
 
         cueSheetOrderLockMapper.updateFromDto(cueSheetOrderLockDTO, cueSheet);
@@ -215,6 +222,43 @@ public class CueSheetService {
         cueSheet.setLckYn("N");
 
         cueSheetRepository.save(cueSheet);
+
+    }
+
+    public Long copy(Long cueId){
+
+        CueSheet getCueSheet = cueSheetFindOrFail(cueId);//원본 큐시트 get
+
+        CueSheetCreateDTO cueSheetCreateDTO = cueSheetCreateMapper.toDto(getCueSheet);//원본 큐시트의 데이터를 createDTO에set
+
+        String userId = userAuthService.authUser.getUserId(); // 로그인 Id로 입력자 set
+        cueSheetCreateDTO.setInputrId(userId);
+        cueSheetCreateDTO.setInputDtm(null); // 원본 큐시트 입력시간 초기화
+
+        CueSheet cueSheet = cueSheetCreateMapper.toEntity(cueSheetCreateDTO);
+        cueSheetRepository.save(cueSheet);
+
+        Long newCueId = cueSheet.getCueId(); //복사된 큐시트 아이디 get
+
+        copyCueItem(cueId, newCueId);//복사된 큐시트의 아이템 리스트 복사
+
+
+        return newCueId;
+
+    }
+    public void copyCueItem( Long orgCueId, Long newCueId){ //복사된 큐시트의 아이템 리스트 복사
+
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(orgCueId); //원본 큐시트에 입력된 아이템 get
+
+        List<CueSheetItemCreateDTO> cueSheetCreateDTOS = cueSheetItemCreateMapper.toDtoList(cueSheetItemList); //큐시트아이템 리스트 get
+
+
+        for (CueSheetItemCreateDTO cueItemDTO : cueSheetCreateDTOS){
+            CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(newCueId).build();
+            cueItemDTO.setCueSheet(cueSheetDTO); //복사된 큐시트 아이디 set
+            CueSheetItem cueSheetItem = cueSheetItemCreateMapper.toEntity(cueItemDTO);
+            cueSheetItemRepository.save(cueSheetItem);
+        }
 
     }
 }

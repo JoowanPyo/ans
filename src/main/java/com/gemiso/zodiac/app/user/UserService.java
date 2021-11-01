@@ -1,6 +1,9 @@
 package com.gemiso.zodiac.app.user;
 
-import com.gemiso.zodiac.app.user.dto.*;
+import com.gemiso.zodiac.app.user.dto.UserCreateDTO;
+import com.gemiso.zodiac.app.user.dto.UserDTO;
+import com.gemiso.zodiac.app.user.dto.UserGroupUserDTO;
+import com.gemiso.zodiac.app.user.dto.UserUpdateDTO;
 import com.gemiso.zodiac.app.user.mapper.UserCreateMapper;
 import com.gemiso.zodiac.app.user.mapper.UserGroupUserMapper;
 import com.gemiso.zodiac.app.user.mapper.UserMapper;
@@ -11,7 +14,7 @@ import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class UserService {
