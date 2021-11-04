@@ -5,8 +5,8 @@ public class ApiRequestException extends RuntimeException {
         super(message);
     }
 
-    public ApiRequestException(String message, Throwable cause) {
+   /* public ApiRequestException(String message, Throwable cause) {
         super(message, cause);
-    }
+    }*/
 }
 

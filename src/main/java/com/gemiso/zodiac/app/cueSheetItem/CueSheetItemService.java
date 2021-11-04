@@ -36,6 +36,7 @@ import java.util.Optional;
 @Transactional
 public class CueSheetItemService {
 
+    //방송아이콘 url저장 주소
     @Value("${files.url-key}")
     private String fileUrl;
 

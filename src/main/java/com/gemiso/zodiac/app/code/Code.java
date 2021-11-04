@@ -12,7 +12,7 @@ import java.util.Date;
 
 @Entity
 @Table(
-        name = "tb_cd"
+        name = "tb_cd_backup"
 )
 @Builder
 @AllArgsConstructor
@@ -38,7 +38,7 @@ public class Code extends BaseEntity implements Serializable {
     private String cdExpl;
 
     @Column(name = "hrnk_cd_id", length = 21)
-    private Long hrnkCdId;
+    private String hrnkCdId;
 
     @Column(name = "use_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String useYn;

@@ -69,8 +69,8 @@ public class CueSheetItemController {
     @PutMapping(path = "/{cueId}/item/{cueItemId}")
     public ApiResponse<CueSheetItemDTO> update(@Parameter(description = "필수값<br> ", required = true)
                                                @RequestBody @Valid CueSheetItemUpdateDTO cueSheetItemUpdateDTO,
-                                               @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드")
-                                               @RequestParam(value = "cueItemDivCd", required = false) String cueItemDivCd,
+                                               @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드", required = true)
+                                               @RequestParam(value = "cueItemDivCd") String cueItemDivCd,
                                                @Parameter(name = "cueId", description = "큐시트아이디")
                                                @PathVariable("cueId") Long cueId,
                                                @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")

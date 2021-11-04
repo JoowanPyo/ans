@@ -5,6 +5,8 @@ import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
+import com.gemiso.zodiac.app.tag.ArticleTag;
+import com.gemiso.zodiac.app.tag.dto.ArticleTagDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -92,6 +94,7 @@ public class ArticleDTO {
     private List<AnchorCapSimpleDTO> anchorCap = new ArrayList<>();
     private List<ArticleMediaSimpleDTO> articleMediaDTO = new ArrayList<>();
     private List<ArticleOrderSimpleDTO> articleOrderDTO = new ArrayList<>();
+    private List<ArticleTagDTO> articleTag = new ArrayList<>();
 
 
 }

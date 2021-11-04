@@ -65,6 +65,7 @@ public class JWTParser {
 
     }
 
+    //jwt파싱으로 하면 토큰만료시간이 되면 에러가 나기때문에 만료시간에러없이 파싱하는 서비스
     public String refreshTokenVerification(String refreshToken) throws ParseException {
 
         Base64.Decoder decoder = Base64.getUrlDecoder();

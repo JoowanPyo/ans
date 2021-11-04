@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.core.Enum;
+package com.gemiso.zodiac.core.enumeration;
 
 import java.util.List;
 

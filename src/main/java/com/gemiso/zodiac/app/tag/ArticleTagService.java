@@ -56,7 +56,7 @@ public class ArticleTagService {
 
             TagIdDTO tagIdDTO = TagIdDTO.builder().tagId(tagId).build(); //테그DTO 빌드 (테그 아이디) 
             ArticleSimpleDTO articleId = ArticleSimpleDTO.builder().artclId(artclId).build();//기사DTO 빌드 (기사 아이디) 
-            articleTagCreateDTO.setArtcl(articleId);
+            articleTagCreateDTO.setArticle(articleId);
             articleTagCreateDTO.setTag(tagIdDTO);
 
             ArticleTag articleTag = articleTagCreateMapper.toEntity(articleTagCreateDTO);//기사테그 등록 엔티티 변환

@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.tag;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.user.User;
 import lombok.*;
@@ -32,5 +33,6 @@ public class ArticleTag {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artcl_id")
+    @JsonBackReference
     private Article article;
 }

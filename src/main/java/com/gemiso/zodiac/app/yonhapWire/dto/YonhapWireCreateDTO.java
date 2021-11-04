@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class YonhapWireCreateDTO {
 
-    private Long yh_artcl_id;
+    private Long wire_id;
     private String cont_id;
     private String imprt;
     private String svc_typ;

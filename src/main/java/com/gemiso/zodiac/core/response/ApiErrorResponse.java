@@ -30,7 +30,7 @@ import java.util.*;
  * }
  */
 @Getter
-public class ApiErrorResponse /*extends BaseApiResponse*/ {
+public class ApiErrorResponse extends BaseApiResponse {
     /**
      * 에러코드 열거형
      */
@@ -88,14 +88,14 @@ public class ApiErrorResponse /*extends BaseApiResponse*/ {
 
     public ApiErrorResponse(Error error) {
         this.error = error;
-        this.status = HttpStatus.OK;
-        this.success = true;
+        /*this.status = HttpStatus.OK;
+        this.success = true;*/
     }
 
     public ApiErrorResponse(Error error, HttpStatus status) {
         this.error = error;
         this.status = status;
-        this.success = true;
+        this.success = false;
     }
 
     /**

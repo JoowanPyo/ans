@@ -33,7 +33,7 @@ public class CodeController {
                                               @Parameter(name = "useYn", description = "사용 여부")
                                               @RequestParam(value = "useYn", required = false) String useYn,
                                               @Parameter(name = "hrnkCdIds", description = "상위코드 아이디(List<Long>)", in = ParameterIn.PATH)
-                                              @RequestParam(value = "hrnkCdIds", required = false) List<Long> hrnkCdIds) {
+                                              @RequestParam(value = "hrnkCdIds", required = false) List<String> hrnkCdIds) {
 
         List<CodeDTO> codeDTOList = codeService.findAll(searchWord, useYn, hrnkCdIds);
 
@@ -43,7 +43,7 @@ public class CodeController {
     @Operation(summary = "기사 유형코드 조회", description = "기사 유형코드 조회")
     @GetMapping(path = "/articletype")
     public ApiResponse<List<CodeDTO>> findArticleType(@Parameter(name = "artclTypCd", description = "기사유형 코드")
-                                                      @RequestParam(value = "artclTypCd", required = false)Long artclTypCd) {
+                                                      @RequestParam(value = "artclTypCd", required = false) Long artclTypCd) {
 
         List<CodeDTO> codeDTOList = codeService.findArticleType(artclTypCd);
 
@@ -62,7 +62,8 @@ public class CodeController {
     @Operation(summary = "코드 등록", description = "코드 등록")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<CodeDTO> create(@Parameter(description = "필수값<br> ", required = true) @RequestBody CodeCreateDTO codeCreateDTO) {
+    public ApiResponse<CodeDTO> create(@Parameter(description = "필수값<br> ", required = true)
+                                       @RequestBody CodeCreateDTO codeCreateDTO) {
 
         CodeDTO returnCodeDTO = codeService.create(codeCreateDTO);
 
@@ -71,7 +72,8 @@ public class CodeController {
 
     @Operation(summary = "코드 수정", description = "코드 수정")
     @PutMapping(path = "/{cdId}")
-    public ApiResponse<CodeDTO> update(@Parameter(name = "codeUpdateDTO", required = true, description = "필수값<br>") @Valid @RequestBody CodeUpdateDTO codeUpdateDTO,
+    public ApiResponse<CodeDTO> update(@Parameter(name = "codeUpdateDTO", required = true, description = "필수값<br>")
+                                       @Valid @RequestBody CodeUpdateDTO codeUpdateDTO,
                                        @Parameter(name = "cdId", required = true) @PathVariable("cdId") Long cdId) {
 
         codeService.update(codeUpdateDTO, cdId);

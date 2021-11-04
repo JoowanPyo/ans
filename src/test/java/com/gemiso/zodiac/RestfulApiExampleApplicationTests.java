@@ -1,7 +1,5 @@
 package com.gemiso.zodiac;
 
-import com.gemiso.zodiac.core.Enum.FixEnum;
-import com.gemiso.zodiac.core.service.ProcessArticleFix;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

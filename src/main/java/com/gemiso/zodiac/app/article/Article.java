@@ -10,6 +10,7 @@ import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.issue.Issue;
 import com.gemiso.zodiac.app.articleOrder.ArticleOrder;
+import com.gemiso.zodiac.app.tag.ArticleTag;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
@@ -263,6 +264,10 @@ public class Article extends BaseEntity {
     @OneToMany(mappedBy = "article")
     @JsonManagedReference
     private List<AnchorCap> anchorCap = new ArrayList<>();
+
+    @OneToMany(mappedBy = "article")
+    @JsonManagedReference
+    private List<ArticleTag> articleTag = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {

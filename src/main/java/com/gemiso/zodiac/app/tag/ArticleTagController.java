@@ -25,8 +25,8 @@ public class ArticleTagController {
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<List<ArticleTagDTO>> create(@Parameter(name = "artclId", required = true, description = "기사 아이디")
                                                    @PathVariable("artclId") long artclId,
-                                                   @Parameter(name = "tag", description = "테그", required = true)
-                                                   @RequestParam(value = "tag") List<String> tagList) {
+                                                   @Parameter(name = "tag", description = "테그")
+                                                   @RequestParam(value = "tag", required = false) List<String> tagList) {
 
         articleTagService.create(artclId, tagList);
 

@@ -62,6 +62,10 @@ import java.util.function.Function;
 @Transactional
 public class ArticleService {
 
+
+    @Value("${files.url-key}")
+    private String fileUrl;
+
     private final ArticleRepository articleRepository;
     private final ArticleCapRepository articleCapRepository;
     private final ArticleHistRepository articleHistRepository;
@@ -83,9 +87,6 @@ public class ArticleService {
     private final AnchorCapSimpleMapper anchorCapSimpleMapper;
 
     private final UserAuthService userAuthService;
-
-    @Value("${files.url-key}")
-    private String fileUrl;
 
 
     public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, Long brdcPgmId,

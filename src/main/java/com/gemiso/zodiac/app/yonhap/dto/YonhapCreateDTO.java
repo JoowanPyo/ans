@@ -24,9 +24,11 @@ public class YonhapCreateDTO {
     private String credit;
     private String source;
     private String artcl_cate_cd;
+    private String artcl_cate_nm; //코드네임
     private String region_cd;
     private String region_nm;
     private String ctt_class_cd;
+    private String ctt_class_nm;
     private String ctt_class_add_cd;
     private String issu_cd;
     private String stock_cd;

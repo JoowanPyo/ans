@@ -1,8 +1,8 @@
 package com.gemiso.zodiac.core.service;
 
 import com.gemiso.zodiac.app.article.Article;
-import com.gemiso.zodiac.core.Enum.AuthEnum;
-import com.gemiso.zodiac.core.Enum.FixEnum;
+import com.gemiso.zodiac.core.enumeration.AuthEnum;
+import com.gemiso.zodiac.core.enumeration.FixEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;

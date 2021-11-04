@@ -89,12 +89,15 @@ public class CueSheetItemSymbolService {
         List<CueSheetItemSymbol> cueSheetItemSymbol = cueSheetItemSymbolRepository.findSymbol(cueItemId);
 
         int newOrd = cueSheetItemSymbolCreateDTO.getOrd();//새로 등록할 큐시트아이템 방송아이콘 순번 get
+        String newTypCd = cueSheetItemSymbolCreateDTO.getSymbol().getTypCd();// "tv", "radio" new구분코드
 
         if (ObjectUtils.isEmpty(cueSheetItemSymbol) == false){
             for (CueSheetItemSymbol getCueItemSymbol : cueSheetItemSymbol){
                 int orgOrd = getCueItemSymbol.getOrd(); //등록되어 있던 큐시트아이템 방송아이콘 순번 get.
-                if (orgOrd == newOrd){ //새로등록할 큐시트아이템 방송아이콘 순번과, 이미등록되어있던 방손아이콘 순번이 같으면 에러.
-                    throw new ApiRequestException("이미 등록된 방송아이콘이 있습니다.");
+                Long orgId = getCueItemSymbol.getId();//기존아이디 get
+                String ordTypCd = getCueItemSymbol.getSymbol().getTypCd();//기본 구분코드 get
+                if (orgOrd == newOrd && ordTypCd.equals(newTypCd)){ //새로등록할 큐시트아이템 방송아이콘 순번과,그분타입 이미등록되어있던 방손아이콘 순번이 같으면 에러.
+                    cueSheetItemSymbolRepository.deleteById(orgId); //새로 들어온 순번에 들어가 있던 방송아이콘 삭제.
                 }
             }
 
@@ -116,7 +119,7 @@ public class CueSheetItemSymbolService {
     }
 
     //큐시트아이템 방송아이콘 업데이트
-    public void update(CueSheetItemSymbolUpdateDTO cueSheetItemSymbolUpdateDTO, Long cueItemId){
+    public Long update(CueSheetItemSymbolUpdateDTO cueSheetItemSymbolUpdateDTO, Long cueItemId){
 
         //큐시트 아이템에 등록된 방송아이콘 List조회
         List<CueSheetItemSymbol> cueSheetItemSymbol = cueSheetItemSymbolRepository.findSymbol(cueItemId); 
@@ -135,6 +138,8 @@ public class CueSheetItemSymbolService {
         CueSheetItemSymbol cueSheetItemSymbolEntity = cueSheetItemSymbolUpdateMapper.toEntity(cueSheetItemSymbolUpdateDTO);
 
         cueSheetItemSymbolRepository.save(cueSheetItemSymbolEntity);
+
+        return cueSheetItemSymbolEntity.getId();
 
     }
 

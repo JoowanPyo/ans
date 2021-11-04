@@ -4,12 +4,15 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.user.User;
+import com.gemiso.zodiac.app.user.UserGroupUser;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_order"/*,
@@ -21,7 +24,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = "article")
+@ToString(exclude = {"article","articleOrderFile"})
 @DynamicUpdate
 public class ArticleOrder extends BaseEntity {
 
@@ -68,13 +71,24 @@ public class ArticleOrder extends BaseEntity {
     @Column(name = "workr_id", length = 50)
     private String workrId;
 
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = workr_id)")
+    private String workrNm;
+
     @Column(name = "client_id", length = 50)
     private String clientId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = client_id)")
+    private String clientNm;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artcl_id")
     @JsonBackReference
     private Article article;
+
+    @OneToMany(mappedBy="articleOrder")//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제?
+    private List<ArticleOrderFile> articleOrderFile = new ArrayList<>();
 
 
 

@@ -14,5 +14,5 @@ public class ArticleTagCreateDTO {
 
     //private Long id;
     private TagIdDTO tag;
-    private ArticleSimpleDTO artcl;
+    private ArticleSimpleDTO article;
 }

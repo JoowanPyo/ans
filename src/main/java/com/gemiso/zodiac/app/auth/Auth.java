@@ -29,7 +29,7 @@ public class Auth {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "token", length = 200 ,nullable = false)
+    @Column(name = "token", length = 200)
     private String token;
 
     @Column(name = "user_nm", length = 100)

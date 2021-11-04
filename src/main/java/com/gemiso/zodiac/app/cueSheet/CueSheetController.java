@@ -42,8 +42,9 @@ public class CueSheetController {
 
         CueSheetFindAllDTO cueSheetDTOList = new CueSheetFindAllDTO();
 
-        //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
+
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
+            //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 24:00:00)
             SearchDate searchDate = new SearchDate(sdate, edate);
             cueSheetDTOList = cueSheetService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), brdcPgmId, brdcPgmNm, searchWord);
 

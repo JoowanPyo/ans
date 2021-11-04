@@ -1,6 +1,9 @@
 package com.gemiso.zodiac.app.articleOrder.dto;
 
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
+import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
+import com.gemiso.zodiac.app.articleOrder.ArticleOrderFile;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
@@ -8,7 +11,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -29,8 +34,11 @@ public class ArticleOrderDTO {
     private String updtrId;
     private String updtrNm;
     private String workrId;
+    private String workrNm;
     private String clientId;
+    private String clientNm;
     private Date inputDtm;
     private Date updtDtm;
-    private ArticleDTO article;
+    private ArticleSimpleDTO article;
+    private List<ArticleOrderFileDTO> articleOrderFile = new ArrayList<>();
 }

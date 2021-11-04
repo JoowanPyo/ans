@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.cueSheetItem;
 
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolDTO;
+import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolResponseDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolUpdateDTO;
 import com.gemiso.zodiac.core.response.ApiResponse;
 import io.swagger.annotations.Api;
@@ -37,30 +38,36 @@ public class CueSheetItemSymbolController {
     @Operation(summary = "큐시트 아이템 심볼 등록", description = "큐시트 아이템 심볼 등록")
     @PostMapping(path = "/{cueItemId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<CueSheetItemSymbolDTO> create(@Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
+    public ApiResponse<CueSheetItemSymbolResponseDTO> create(@Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
                                                      @PathVariable("cueItemId") Long cueItemId,
                                                      @Parameter(description = "필수값<br> ", required = true)
                                                      @RequestBody @Valid CueSheetItemSymbolCreateDTO cueSheetItemSymbolCreateDTO) {
 
+        CueSheetItemSymbolResponseDTO cueSheetItemSymbolDTO = new CueSheetItemSymbolResponseDTO();
+
         Long id = cueSheetItemSymbolService.create(cueSheetItemSymbolCreateDTO, cueItemId);
 
-        CueSheetItemSymbolDTO cueSheetItemSymbolDTO = cueSheetItemSymbolService.find(id);
+        cueSheetItemSymbolDTO.setCueItemSymbolId(id);
+      /*  CueSheetItemSymbolDTO cueSheetItemSymbolDTO = cueSheetItemSymbolService.find(id);*/
 
-        return new ApiResponse<CueSheetItemSymbolDTO>(cueSheetItemSymbolDTO);
+        return new ApiResponse<CueSheetItemSymbolResponseDTO>(cueSheetItemSymbolDTO);
     }
 
     @Operation(summary = "큐시트 아이템 심볼 수정", description = "큐시트 아이템 심볼 수정")
     @PutMapping(path = "/{cueItemId}")
-    public ApiResponse<CueSheetItemSymbolDTO> update(@Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
+    public ApiResponse<CueSheetItemSymbolResponseDTO> update(@Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
                                                      @PathVariable("cueItemId") Long cueItemId,
                                                      @Parameter(description = "필수값<br> ", required = true)
                                                      @RequestBody @Valid CueSheetItemSymbolUpdateDTO cueSheetItemSymbolUpdateDTO) {
 
-        cueSheetItemSymbolService.update(cueSheetItemSymbolUpdateDTO, cueItemId);
+        CueSheetItemSymbolResponseDTO cueSheetItemSymbolDTO = new CueSheetItemSymbolResponseDTO();
 
-        CueSheetItemSymbolDTO cueSheetItemSymbolDTO = cueSheetItemSymbolService.find(cueItemId);
+        Long id = cueSheetItemSymbolService.update(cueSheetItemSymbolUpdateDTO, cueItemId);
 
-        return new ApiResponse<CueSheetItemSymbolDTO>(cueSheetItemSymbolDTO);
+        cueSheetItemSymbolDTO.setCueItemSymbolId(id);
+        /*CueSheetItemSymbolDTO cueSheetItemSymbolDTO = cueSheetItemSymbolService.find(cueItemId);*/
+
+        return new ApiResponse<CueSheetItemSymbolResponseDTO>(cueSheetItemSymbolDTO);
     }
 
     @Operation(summary = "큐시트 아이템 심볼 삭제", description = "큐시트 아이템 심볼 삭제")

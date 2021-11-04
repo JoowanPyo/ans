@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class ArticleTagDTO {
 
     private Long id;
-    private TagDTO tagId;
-    private ArticleSimpleDTO artclId;
+    private TagDTO tag;
+    private ArticleSimpleDTO article;
 }

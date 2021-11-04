@@ -36,7 +36,7 @@ public class CodeService {
     private final UserAuthService userAuthService;
 
 
-    public List<CodeDTO> findAll(String searchWord, String useYn, List<Long> hrnkCdIds) {
+    public List<CodeDTO> findAll(String searchWord, String useYn, List<String> hrnkCdIds) {
 
         BooleanBuilder booleanBuilder = getSearch(searchWord, useYn, hrnkCdIds);
 
@@ -56,10 +56,10 @@ public class CodeService {
 
 
         //ConcurrentModificationException 에러가 나기때문에 for문을 두번돌려서 모든 기사유형코드 add
-        Long[] listArr = new Long[codeList.size()];
+        String[] listArr = new String[codeList.size()];
         int i = 0;
-        for (Code code : codeList) { //상위코드값 Id를 담는다[하위값 조회하기 위해]
-            Long id = code.getCdId();
+        for (Code code : codeList) { //상위코드값 담는다[하위값 조회하기 위해]
+            String id = code.getCd();
             listArr[i] = id;
             i++;
         }
@@ -85,12 +85,12 @@ public class CodeService {
 
     public CodeDTO create(CodeCreateDTO codeCreateDTO) {
 
-        Long hrnkCd = codeCreateDTO.getHrnkCdId(); //상위코드값 get
+        String hrnkCd = codeCreateDTO.getHrnkCdId(); //상위코드값 get
 
         if (ObjectUtils.isEmpty(hrnkCd)) { //상위코드 일 경우
             Optional<Integer> cdOrd = codeRepository.findHrnkOrd(); // 순서번호 최대값 가져오기 null값 방지를 위해 Optional사용
 
-            if (!cdOrd.isPresent()) { //최초 코드일 경우 기본값(0) set
+            if (cdOrd.isPresent() == false) { //최초 코드일 경우 기본값(0) set
                 codeCreateDTO.setCdOrd(0);
             } else {
                 codeCreateDTO.setCdOrd(cdOrd.get() + 1); //조회된 MAX Ord값 +1 set
@@ -100,7 +100,7 @@ public class CodeService {
 
             Optional<Integer> cdOrd = codeRepository.findOrd(hrnkCd); // 순서번호 최대값 가져오기
 
-            if (!cdOrd.isPresent()) {
+            if (cdOrd.isPresent() == false) {
                 codeCreateDTO.setCdOrd(0); //최초 하위코드일 경우 기본값(0) set
             } else {
                 codeCreateDTO.setCdOrd(cdOrd.get() + 1); //조회된 MAX Ord값 +1 set
@@ -169,7 +169,7 @@ public class CodeService {
 
     }
 
-    private BooleanBuilder getSearch(String searchWord, String useYn, List<Long> hrnkCdIds) {
+    private BooleanBuilder getSearch(String searchWord, String useYn, List<String> hrnkCdIds) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -182,13 +182,13 @@ public class CodeService {
         if (!StringUtils.isEmpty(useYn)) {
             booleanBuilder.and(qCode.useYn.eq(useYn));
         }
-        if (!ObjectUtils.isEmpty(hrnkCdIds)) {
+        if (!StringUtils.isEmpty(hrnkCdIds)) {
             /*System.out.println(hrnkCdIds.length);
             for (Long hrnkCdId : hrnkCdIds){
                 booleanBuilder.and(qCode.hrnkCdId.eq(hrnkCdId)); //이걸 한개는 and 나머지는 or로 처리 해야한다.
             }*/
             for (int i = 0; i < hrnkCdIds.size(); i++) {
-                Long hrnkCdId = hrnkCdIds.get(i);
+                String hrnkCdId = hrnkCdIds.get(i);
                 if (i == 0) {
                     booleanBuilder.and(qCode.hrnkCdId.eq(hrnkCdId)); //이걸 한개는 and 나머지는 or로 처리 해야한다.
                 } else {

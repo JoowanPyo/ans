@@ -70,13 +70,13 @@ public class YonhapWireController {
         YonhapWireDTO yonhapWireDTO = new YonhapWireDTO();
 
         try {
-            Long yh_artcl_id = yonhapWireService.create(yonhapWireCreateDTO);
+            Long wireId = yonhapWireService.create(yonhapWireCreateDTO);
 
-            if (ObjectUtils.isEmpty(yh_artcl_id) == false) {
+            if (ObjectUtils.isEmpty(wireId) == false) {
 
                 headers = new HttpHeaders();
-                headers.setLocation(ucBuilder.path("/yonhapInternational/{yh_artcl_id}").buildAndExpand(yh_artcl_id).toUri());
-                yonhapWireDTO = yonhapWireService.find(yh_artcl_id);
+                headers.setLocation(ucBuilder.path("/yonhapInternational/{yh_artcl_id}").buildAndExpand(wireId).toUri());
+                yonhapWireDTO = yonhapWireService.find(wireId);
             }
 
 

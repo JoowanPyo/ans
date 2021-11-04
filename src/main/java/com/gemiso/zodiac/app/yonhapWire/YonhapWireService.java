@@ -51,14 +51,14 @@ public class YonhapWireService {
 
         //기존연합이 있을경우 updqte
         if (ObjectUtils.isEmpty(yonhapWireList)) {
-            Long OrgYhArtclId = yonhapWireList.get(0).getYhArtclId();
-            yonhapWireCreateDTO.setYh_artcl_id(OrgYhArtclId);
+            Long OrgYhArtclId = yonhapWireList.get(0).getWireId();
+            yonhapWireCreateDTO.setWire_id(OrgYhArtclId);
 
             YonhapWire yonhapWire = updateBuildToEntity(yonhapWireCreateDTO);
 
             yonhapWireRepository.save(yonhapWire);
 
-            yhWireId = yonhapWire.getYhArtclId();
+            yhWireId = yonhapWire.getWireId();
 
         } else { //기존연합이 없는경우 post
 
@@ -66,7 +66,7 @@ public class YonhapWireService {
 
             yonhapWireRepository.save(yonhapWire);
 
-            yhWireId = yonhapWire.getYhArtclId();
+            yhWireId = yonhapWire.getWireId();
         }
 
         return yhWireId;
@@ -91,7 +91,7 @@ public class YonhapWireService {
         int artclqnty = Integer.parseInt(yonhapWireCreateDTO.getArtclqnty());
 
         YonhapWire yonhapWire = YonhapWire.builder()
-                .yhArtclId(yonhapWireCreateDTO.getYh_artcl_id())
+                .wireId(yonhapWireCreateDTO.getWire_id())
                 .contId(yonhapWireCreateDTO.getCont_id())
                 .imprt(yonhapWireCreateDTO.getImprt())
                 .svcTyp(yonhapWireCreateDTO.getSvc_typ())

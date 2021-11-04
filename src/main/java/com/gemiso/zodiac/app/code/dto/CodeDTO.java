@@ -18,7 +18,7 @@ public class CodeDTO {
     private String cd;
     private String cdNm;
     private String cdExpl;
-    private Long hrnkCdId;
+    private String hrnkCdId;
     private String useYn;
     private String delYn;
     private Integer cdOrd;

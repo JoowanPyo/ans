@@ -1,7 +1,7 @@
 package com.gemiso.zodiac.app.article;
 
 import com.gemiso.zodiac.app.article.dto.*;
-import com.gemiso.zodiac.core.Enum.AuthEnum;
+import com.gemiso.zodiac.core.enumeration.AuthEnum;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.response.ApiCollectionResponse;

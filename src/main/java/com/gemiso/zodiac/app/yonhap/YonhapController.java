@@ -56,6 +56,7 @@ public class YonhapController {
 
     @Operation(summary = "연합 등록", description = "연합 등록")
     @PostMapping(path = "")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> create(@Parameter(description = "필수값<br> ", required = true) @RequestBody YonhapCreateDTO yonhapCreateDTO
     ) throws Exception {
 

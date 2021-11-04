@@ -167,7 +167,16 @@ public class AuthService {
 
     public void logout(String authorization) throws Exception {
 
+       /* String userId = jwtParser.acTokenParser(authorization);*/
         String userId = jwtParser.acTokenParser(authorization);
+
+        Auth auth = authRepository.findByLogin(userId);//로그인정보를 불러온다.
+        String token = auth.getToken();//저장된 사용자 토큰 get
+        if (StringUtils.isEmpty(token)){ //저장된 사용자 토큰이 없는경우 이미 로그아웃되어 있기때문에 에러없이 처리. return;
+            return;
+        }
+
+        //에러없이 처리 [로그아웃 되어있는대 로그아웃 할 경우]
 
         UserToken userToken = userTokenRepository.findUserToken(userId);
 
@@ -177,9 +186,10 @@ public class AuthService {
         }
 
         //사용자 로그인 정보를 조회 -> 로그아웃 기록추가(logoutDtm 로그아웃 시간 등록)
-        Auth auth = authRepository.findByLogin(userId);
+
         AuthDTO authDTO = authMapper.toDto(auth);
         authDTO.setLogoutDtm(new Date());
+        authDTO.setToken(null);
         Auth authEntity = authMapper.toEntity(authDTO);
         authRepository.save(authEntity);
 

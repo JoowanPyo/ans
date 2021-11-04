@@ -11,11 +11,11 @@ import java.util.Optional;
 
 public interface CodeRepository extends JpaRepository<Code, Long> , QuerydslPredicateExecutor<Code> {
 
-    @Query("select max(a.cdOrd) from Code a where a.hrnkCdId = 0")
+    @Query("select max(a.cdOrd) from Code a where a.hrnkCdId = ''")
     Optional<Integer> findHrnkOrd();
 
     @Query("select max(a.cdOrd) from Code a where a.hrnkCdId =:hrnkCd")
-    Optional<Integer> findOrd(@Param("hrnkCd")Long hrnkCd);
+    Optional<Integer> findOrd(@Param("hrnkCd")String hrnkCd);
 
     @Query("select a from Code a where a.cdId =:cdId and a.delYn = 'N'")
     Optional<Code> findByCodeId(@Param("cdId")Long cdId);
@@ -24,5 +24,5 @@ public interface CodeRepository extends JpaRepository<Code, Long> , QuerydslPred
     List<Code> findArticleTypeCD(@Param("artclTypCd")Long artclTypCd);
 
     @Query("select a from Code a where a.hrnkCdId IN (:underArtclTypCd)")
-    List<Code> findUnderArticleTypeCD(@Param("underArtclTypCd")Long[] underArtclTypCd);
+    List<Code> findUnderArticleTypeCD(@Param("underArtclTypCd")String[] underArtclTypCd);
 }

@@ -25,8 +25,8 @@ public class YonhapWire {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "yh_artcl_id", nullable = false)
-    private Long yhArtclId;
+    @Column(name = "wire_id", nullable = false)
+    private Long wireId;
 
     @Column(name = "cont_id")
     private String contId;

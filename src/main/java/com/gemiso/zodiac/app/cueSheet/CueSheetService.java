@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
@@ -172,16 +173,16 @@ public class CueSheetService {
 
         booleanBuilder.and(qCueSheet.delYn.eq("N"));
 
-        if (!StringUtils.isEmpty(sdate) && !StringUtils.isEmpty(edate)){
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
             booleanBuilder.and(qCueSheet.inputDtm.between(sdate, edate));
         }
-        if(!StringUtils.isEmpty(brdcPgmId)){
+        if(ObjectUtils.isEmpty(brdcPgmId) == false){
             booleanBuilder.and(qCueSheet.program.brdcPgmId.eq(brdcPgmId));
         }
-        if(!StringUtils.isEmpty(brdcPgmNm)){
+        if(StringUtils.isEmpty(brdcPgmNm) == false){
             booleanBuilder.and(qCueSheet.brdcPgmNm.contains(brdcPgmNm));
         }
-        if(!StringUtils.isEmpty(searchWord)){
+        if(StringUtils.isEmpty(searchWord) == false){
             booleanBuilder.and(qCueSheet.brdcPgmNm.contains(searchWord).or(qCueSheet.anc1Nm.contains(searchWord))
                     .or(qCueSheet.pd2Nm.contains(searchWord)));
         }
