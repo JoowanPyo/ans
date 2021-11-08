@@ -44,10 +44,10 @@ public class ArticleOrderService {
 
 
     public List<ArticleOrderDTO> findAll(Date sdate, Date edate,
-                                         String order_div_cd, String order_status, String workr_id, Long artclId){
+                                         String orderDivCd, String orderStatus, String workrId, Long artclId){
 
         //목록조회 조건 build
-        BooleanBuilder booleanBuilder = getSearch(sdate, edate, order_div_cd, order_status, workr_id, artclId);
+        BooleanBuilder booleanBuilder = getSearch(sdate, edate, orderDivCd, orderStatus, workrId, artclId);
 
         //조회조건으로 전체조회
         List<ArticleOrder> articleOrderList = (List<ArticleOrder>) articleOrderRepository.findAll(booleanBuilder,
@@ -137,6 +137,14 @@ public class ArticleOrderService {
         articleOrderRepository.save(articleOrder);
 
     }
+    
+    public void delete(long orderId){
+
+        ArticleOrder articleOrder = articleOrderFindOrFail(orderId); //해당 기사의뢰 존재유무 확인.
+        
+        articleOrderRepository.deleteById(orderId);//기사의뢰 삭제.
+        
+    }
 
     private ArticleOrder articleOrderFindOrFail(Long orderId){
 
@@ -147,7 +155,7 @@ public class ArticleOrderService {
 
     //목록조회 조건 build
     public BooleanBuilder getSearch(Date sdate, Date edate,
-                                    String order_div_cd, String order_status, String workr_id, Long artclId){
+                                    String orderDivCd, String orderStatus, String workrId, Long artclId){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -158,16 +166,16 @@ public class ArticleOrderService {
             booleanBuilder.and(qArticleOrder.inputDtm.between(sdate, edate));
         }
         //의뢰구분코드로 조회
-        if (StringUtils.isEmpty(order_div_cd) == false) {
-            booleanBuilder.and(qArticleOrder.orderDivCd.eq(order_div_cd));
+        if (StringUtils.isEmpty(orderDivCd) == false) {
+            booleanBuilder.and(qArticleOrder.orderDivCd.eq(orderDivCd));
         }
         //의뢰 상태로 조회
-        if (StringUtils.isEmpty(order_status) == false) {
-            booleanBuilder.and(qArticleOrder.orderStatus.eq(order_status));
+        if (StringUtils.isEmpty(orderStatus) == false) {
+            booleanBuilder.and(qArticleOrder.orderStatus.eq(orderStatus));
         }
         //작업자 아이디로 조회
-        if (StringUtils.isEmpty(workr_id) == false) {
-            booleanBuilder.and(qArticleOrder.workrId.eq(workr_id));
+        if (StringUtils.isEmpty(workrId) == false) {
+            booleanBuilder.and(qArticleOrder.workrId.eq(workrId));
         }
         //작업자 아이디로 조회
         if (ObjectUtils.isEmpty(artclId) == false) {

@@ -17,7 +17,10 @@ import java.util.List;
 
 @Entity
 @Table(
-        name = "tb_symbol"
+        name = "tb_symbol",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "symbol_symbolId_unique", columnNames = "symbol_id")
+        }
 )
 @Builder
 @AllArgsConstructor
@@ -29,9 +32,8 @@ import java.util.List;
 public class Symbol extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "symbol_id", nullable = false)
-    private Long symbolId;
+    private String symbolId;
 
     @Column(name = "symbol_nm", length = 50)
     private String symbolNm;

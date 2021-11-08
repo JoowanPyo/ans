@@ -1,12 +1,8 @@
 package com.gemiso.zodiac.app.cueSheet;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.gemiso.zodiac.app.articleCap.AnchorCap;
-import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.program.Program;
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
@@ -113,42 +109,42 @@ public class CueSheet {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = pd_1_id)")
     private String pd1Nm;
 
-    @JoinColumn(name = "pd_2_id")
+    @Column(name = "pd_2_id")
     private String pd2Id;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = pd_2_id)")
     private String pd2Nm;
 
-    @JoinColumn(name = "anc_1_id")
+    @Column(name = "anc_1_id")
     private String anc1Id;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = anc_1_id)")
     private String anc1Nm;
 
-    @JoinColumn(name = "anc_2_id")
+    @Column(name = "anc_2_id")
     private String anc2Id;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = anc_2_id)")
     private String anc2Nm;
 
-    @JoinColumn(name = "lckr_id")
+    @Column(name = "lckr_id")
     private String lckrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = lckr_id)")
     private String lckrNm;
 
-    @JoinColumn(name = "td_1_id")
+    @Column(name = "td_1_id")
     private String td1Id;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = td_1_id)")
     private String td1Nm;
 
-    @JoinColumn(name = "td_2_id")
+    @Column(name = "td_2_id")
     private String td2Id;
 
     @Basic(fetch = FetchType.LAZY)

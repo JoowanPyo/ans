@@ -12,7 +12,7 @@ import java.util.Date;
 
 @Entity
 @Table(
-        name = "tb_cd_backup"
+        name = "tb_cd"
 )
 @Builder
 @AllArgsConstructor

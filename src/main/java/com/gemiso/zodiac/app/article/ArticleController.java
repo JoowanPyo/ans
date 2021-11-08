@@ -112,6 +112,7 @@ public class ArticleController {
     public ApiResponse<ArticleSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                           @RequestBody @Valid ArticleCreateDTO articleCreateDTO) {
 
+
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
 
         Long artclId = articleService.create(articleCreateDTO);
@@ -129,6 +130,9 @@ public class ArticleController {
                                           @PathVariable("artclId") long artclId) {
 
         //수정. 잠금사용자확인
+        if(articleService.chkOrderLock(artclId)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //해당기사 잠금여부가 Y일 경우 NOT_FOUND EXPCEPTION.
+        }
 
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
 

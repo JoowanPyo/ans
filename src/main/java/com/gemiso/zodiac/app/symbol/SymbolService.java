@@ -70,7 +70,7 @@ public class SymbolService {
     }
 
 
-    public SymbolDTO find(Long symbolId){ //방송 아이콘 상세(단건) 조회
+    public SymbolDTO find(String symbolId){ //방송 아이콘 상세(단건) 조회
 
         //수정! 1:1관계에서 조인이 잘 되지 않음.
         Symbol symbol = userFindOrFail(symbolId);
@@ -87,7 +87,7 @@ public class SymbolService {
         return symbolDTO;
     }
 
-    public Long create(SymbolCreateDTO symbolCreateDTO){ //방송 아이콘 등록 서비스
+    public String create(SymbolCreateDTO symbolCreateDTO){ //방송 아이콘 등록 서비스
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
@@ -101,7 +101,7 @@ public class SymbolService {
 
     }
 
-    public void update(SymbolUpdateDTO symbolUpdateDTO, Long symbolId){
+    public void update(SymbolUpdateDTO symbolUpdateDTO, String symbolId){
 
         Symbol symbol = userFindOrFail(symbolId);
 
@@ -123,7 +123,7 @@ public class SymbolService {
 
     }
 
-    public void delete(Long symbolId){
+    public void delete(String symbolId){
 
         Symbol symbol = userFindOrFail(symbolId);
 
@@ -144,7 +144,7 @@ public class SymbolService {
     }
 
 
-    public Symbol userFindOrFail(Long symbolId){ //방송 아이콘 Id로 등록된 방송아이콘 유무 검증.
+    public Symbol userFindOrFail(String symbolId){ //방송 아이콘 Id로 등록된 방송아이콘 유무 검증.
 
         Optional<Symbol> symbol = symbolRepository.findBySymbolId(symbolId);
 

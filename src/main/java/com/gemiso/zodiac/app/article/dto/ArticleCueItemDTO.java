@@ -1,12 +1,9 @@
 package com.gemiso.zodiac.app.article.dto;
 
-import com.gemiso.zodiac.app.articleCap.dto.AnchorCapSimpleDTO;
+import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
-import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderSimpleDTO;
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

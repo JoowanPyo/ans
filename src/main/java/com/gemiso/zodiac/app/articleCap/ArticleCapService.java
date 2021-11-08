@@ -89,7 +89,7 @@ public class ArticleCapService {
 
         Long articleId = articleCapCreateDTO.getArticleId();
         Long capTmpltId = articleCapCreateDTO.getCapTmpltId();
-        Long symbolId = articleCapCreateDTO.getSymbolId();
+        String symbolId = articleCapCreateDTO.getSymbolId();
 
         //DTO로 받은 아이디를 Entity로 생성
         Article article = Article.builder().artclId(articleId).build();
@@ -108,7 +108,7 @@ public class ArticleCapService {
 
         //Long articleId = articleCapUpdateDTO.getArticleId();
         Long capTmpltId = articleCapUpdateDTO.getCapTmpltId();
-        Long symbolId = articleCapUpdateDTO.getSymbolId();
+        String symbolId = articleCapUpdateDTO.getSymbolId();
 
         //DTO로 받은 아이디를 Entity로 생성
         //Article article = Article.builder().artclId(articleId).build();

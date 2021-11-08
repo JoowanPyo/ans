@@ -16,7 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class SymbolUpdateDTO {
 
-    //private Long symbolId;
+    //private String symbolId;
     private String symbolNm;
     private String expl;
     //private String delYn;

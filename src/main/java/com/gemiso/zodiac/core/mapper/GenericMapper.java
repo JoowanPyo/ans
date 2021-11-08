@@ -3,6 +3,7 @@ package com.gemiso.zodiac.core.mapper;
 import org.mapstruct.*;
 import org.springframework.context.annotation.Configuration;
 
+import javax.persistence.Column;
 import java.util.List;
 
 /**

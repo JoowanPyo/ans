@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.articleOrder;
 
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderCreateDTO;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderDTO;
+import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderResponseDTO;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.ApiResponse;
@@ -36,12 +37,12 @@ public class ArticleOrderController {
                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                       @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                      @Parameter(name = "order_div_cd", description = "의뢰 구분 코드(분류)")
-                                                      @RequestParam(value = "order_div_cd", required = false) String order_div_cd,
-                                                      @Parameter(name = "order_status", description = "의뢰 상태")
-                                                      @RequestParam(value = "order_status", required = false) String order_status,
-                                                      @Parameter(name = "workr_id", description = "작업자 아이디")
-                                                      @RequestParam(value = "workr_id", required = false) String workr_id,
+                                                      @Parameter(name = "orderDivCd", description = "의뢰 구분 코드(분류)")
+                                                      @RequestParam(value = "orderDivCd", required = false) String orderDivCd,
+                                                      @Parameter(name = "orderStatus", description = "의뢰 상태")
+                                                      @RequestParam(value = "orderStatus", required = false) String orderStatus,
+                                                      @Parameter(name = "workrId", description = "작업자 아이디")
+                                                      @RequestParam(value = "workrId", required = false) String workrId,
                                                       @Parameter(name = "artclId", description = "기사 아이디")
                                                       @RequestParam(value = "artclId", required = false) Long artclId) throws Exception {
 
@@ -53,11 +54,11 @@ public class ArticleOrderController {
             SearchDate searchDate = new SearchDate(sdate, edate);
 
             articleOrderDTOList = articleOrderService.findAll(searchDate.getStartDate(), searchDate.getEndDate(),
-                    order_div_cd, order_status, workr_id, artclId);
+                    orderDivCd, orderStatus, workrId, artclId);
         } else {
 
             articleOrderDTOList = articleOrderService.findAll(null, null,
-                    order_div_cd, order_status, workr_id, artclId);
+                    orderDivCd, orderStatus, workrId, artclId);
         }
 
         return new ApiResponse<>(articleOrderDTOList);
@@ -76,32 +77,36 @@ public class ArticleOrderController {
     @Operation(summary = "기사의뢰 등록", description = "기사의뢰 등록")
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<ArticleOrderDTO> create(@Parameter(description = "필수값<br>", required = true)
+    public ApiResponse<ArticleOrderResponseDTO> create(@Parameter(description = "필수값<br>", required = true)
                                                @RequestBody @Valid ArticleOrderCreateDTO articleOrderCreateDTO) {
+
+        ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();
 
         Long orderId = articleOrderService.create(articleOrderCreateDTO);
 
-        ArticleOrderDTO articleOrderDTO = articleOrderService.find(orderId);
+        responseDTO.setOrderId(orderId); //Id set[ response =  id]
 
-        return new ApiResponse<>(articleOrderDTO);
+        return new ApiResponse<>(responseDTO);
     }
 
     @Operation(summary = "기사의뢰 수정", description = "기사의뢰 수정")
     @PutMapping(path = "/{orderId}")
-    public ApiResponse<ArticleOrderDTO> update(@Parameter(description = "필수값<br>", required = true)
+    public ApiResponse<ArticleOrderResponseDTO> update(@Parameter(description = "필수값<br>", required = true)
                                                @RequestBody @Valid ArticleOrderUpdateDTO articleOrderUpdateDTO,
                                                @Parameter(name = "orderId", required = true, description = "의뢰 아이디")
                                                @PathVariable("orderId") long orderId) {
 
+        ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();
+
         articleOrderService.update(articleOrderUpdateDTO, orderId);
 
-        ArticleOrderDTO articleOrderDTO = articleOrderService.find(orderId);
+        responseDTO.setOrderId(orderId); //Id set[ response =  id]
 
-        return new ApiResponse<>(articleOrderDTO);
+        return new ApiResponse<>(responseDTO);
     }
 
     //삭제처리 API가 없는듯.
-  /*  @Operation(summary = "기사의뢰 삭제", description = "기사의뢰 삭제")
+    @Operation(summary = "기사의뢰 삭제", description = "기사의뢰 삭제")
     @DeleteMapping(path = "/{orderId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ApiResponse<?> delete(@Parameter(name = "orderId", required = true, description = "의뢰 아이디")
@@ -110,7 +115,7 @@ public class ArticleOrderController {
         articleOrderService.delete(orderId);
 
         return ApiResponse.noContent();
-    }*/
+    }
 
 
 }

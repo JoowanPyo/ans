@@ -1,7 +1,7 @@
-package com.gemiso.zodiac.app.articleCap.mapper;
+package com.gemiso.zodiac.app.anchorCap.mapper;
 
-import com.gemiso.zodiac.app.articleCap.AnchorCap;
-import com.gemiso.zodiac.app.articleCap.dto.AnchorCapSimpleDTO;
+import com.gemiso.zodiac.app.anchorCap.AnchorCap;
+import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.core.mapper.GenericMapper;
 import org.mapstruct.Mapper;
 

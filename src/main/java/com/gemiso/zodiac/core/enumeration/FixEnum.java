@@ -29,6 +29,10 @@ public enum FixEnum {
         return enumFix.get(label);
     }
 
+    public String getFixeum(FixEnum fixEnum){
+        return this.approveCode;
+    }
+
    /* public boolean isFix( FixAuth auth,  FixEnum DbApprove , FixEnum newApprove, String apprvrId, String userId )
     {
         if( DbApprove.equals(newApprove))

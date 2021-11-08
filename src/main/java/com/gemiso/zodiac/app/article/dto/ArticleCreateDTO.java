@@ -1,6 +1,8 @@
 package com.gemiso.zodiac.app.article.dto;
 
-import com.gemiso.zodiac.app.articleCap.dto.AnchorCapSimpleDTO;
+import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapCreateDTO;
+import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
+import com.gemiso.zodiac.app.articleCap.dto.ArticleCapCreateDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import lombok.AllArgsConstructor;
@@ -87,8 +89,8 @@ public class ArticleCreateDTO {
     private Long parentArtlcId;
 
     //private List<ArticleMediaDTO> articleMedia;
-    private List<ArticleCapSimpleDTO> articleCap = new ArrayList<>();;
-    private List<AnchorCapSimpleDTO> anchorCap = new ArrayList<>();
+    private List<ArticleCapCreateDTO> articleCap = new ArrayList<>();;
+    private List<AnchorCapCreateDTO> anchorCap = new ArrayList<>();
     //private List<ArticleOrderDTO> articleOrder;
     //private List<ArticleHistDTO> articleHist;
 }

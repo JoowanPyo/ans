@@ -57,7 +57,7 @@ public class ProcessArticleFix {
                 apprvrId,
                 userId);
 
-        return ret;
+         return ret;
     }
 
     public FixEnum getFixEnum(String approveCode){

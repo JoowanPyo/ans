@@ -1,17 +1,14 @@
 package com.gemiso.zodiac.app.article;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.gemiso.zodiac.app.articleCap.AnchorCap;
+import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
-import com.gemiso.zodiac.app.code.Code;
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.issue.Issue;
 import com.gemiso.zodiac.app.articleOrder.ArticleOrder;
 import com.gemiso.zodiac.app.tag.ArticleTag;
-import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;

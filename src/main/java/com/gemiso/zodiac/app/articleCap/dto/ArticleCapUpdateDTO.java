@@ -20,5 +20,5 @@ public class ArticleCapUpdateDTO {
     private String capRmk;
     private Long articleId;
     private Long capTmpltId;
-    private Long symbolId;
+    private String symbolId;
 }

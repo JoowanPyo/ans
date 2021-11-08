@@ -38,7 +38,7 @@ public class SymbolController {
     @Operation(summary = "방송아이콘 상세조회", description = "방송아이콘 상세조회")
     @GetMapping(path = "/{symbolId}")
     public ApiResponse<SymbolDTO> find(@Parameter(name = "symbolId", required = true, description = "필수값<br>")
-                                       @PathVariable("symbolId") Long symbolId) {
+                                       @PathVariable("symbolId") String symbolId) {
 
         SymbolDTO symbolDTO = symbolService.find(symbolId);
 
@@ -51,7 +51,7 @@ public class SymbolController {
     public ApiResponse<SymbolDTO> create(@Parameter(name = "symbolCreateDTO", required = true, description = "방송아이콘 아이디")
                                          @Valid @RequestBody SymbolCreateDTO symbolCreateDTO) {
 
-        Long symbolId = symbolService.create(symbolCreateDTO);
+        String symbolId = symbolService.create(symbolCreateDTO);
 
         SymbolDTO symbolDTO = symbolService.find(symbolId);
 
@@ -64,7 +64,7 @@ public class SymbolController {
     public ApiResponse<SymbolDTO> update(@Parameter(name = "symbolCreateDTO", required = true, description = "필수값<br>")
                                          @Valid @RequestBody SymbolUpdateDTO symbolUpdateDTO,
                                          @Parameter(name = "symbolId", required = true, description = "방송아이콘 아이디")
-                                         @PathVariable("symbolId") Long symbolId) {
+                                         @PathVariable("symbolId") String symbolId) {
 
         symbolService.update(symbolUpdateDTO, symbolId);
 
@@ -78,7 +78,7 @@ public class SymbolController {
     @DeleteMapping(path = "/{symbolId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ApiResponse<?> delete(@Parameter(name = "symbolId", required = true, description = "방송아이콘 아이디")
-                                 @PathVariable("symbolId") Long symbolId){
+                                 @PathVariable("symbolId") String symbolId){
 
         symbolService.delete(symbolId);
 

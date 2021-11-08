@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.articleCap;
+package com.gemiso.zodiac.app.anchorCap;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,5 +1,11 @@
 package com.gemiso.zodiac.app.article;
 
+import com.gemiso.zodiac.app.anchorCap.AnchorCap;
+import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
+import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapCreateDTO;
+import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
+import com.gemiso.zodiac.app.anchorCap.mapper.AnchorCapCreateMapper;
+import com.gemiso.zodiac.app.anchorCap.mapper.AnchorCapSimpleMapper;
 import com.gemiso.zodiac.app.article.dto.ArticleCreateDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleLockDTO;
@@ -8,13 +14,11 @@ import com.gemiso.zodiac.app.article.mapper.ArticleCreateMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleLockMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleUpdateMapper;
-import com.gemiso.zodiac.app.articleCap.AnchorCap;
-import com.gemiso.zodiac.app.articleCap.AnchorCapRepository;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
-import com.gemiso.zodiac.app.articleCap.dto.AnchorCapSimpleDTO;
+import com.gemiso.zodiac.app.articleCap.dto.ArticleCapCreateDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
-import com.gemiso.zodiac.app.articleCap.mapper.AnchorCapSimpleMapper;
+import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapCreateMapper;
 import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapMapper;
 import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapSimpleMapper;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
@@ -24,16 +28,20 @@ import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderSimpleDTO;
 import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderSimpleMapper;
+import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.issue.IssueRepositoy;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
+import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.user.QUser;
 import com.gemiso.zodiac.app.user.UserGroupUser;
 import com.gemiso.zodiac.app.user.UserGroupUserRepository;
 import com.gemiso.zodiac.app.userGroup.UserGroupAuth;
 import com.gemiso.zodiac.app.userGroup.UserGroupAuthRepository;
+import com.gemiso.zodiac.core.enumeration.FixAuth;
+import com.gemiso.zodiac.core.enumeration.FixEnum;
 import com.gemiso.zodiac.core.helper.PageHelper;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.service.ProcessArticleFix;
@@ -85,6 +93,8 @@ public class ArticleService {
     private final ArticleUpdateMapper articleUpdateMapper;
     private final ArticleLockMapper articleLockMapper;
     private final AnchorCapSimpleMapper anchorCapSimpleMapper;
+    private final ArticleCapCreateMapper articleCapCreateMapper;
+    private final AnchorCapCreateMapper anchorCapCreateMapper;
 
     private final UserAuthService userAuthService;
 
@@ -245,7 +255,8 @@ public class ArticleService {
 
         String userId = userAuthService.authUser.getUserId();
         articleCreateDTO.setInputrId(userId); //등록자 아이디 추가.
-        articleCreateDTO.setArtclOrd(0);
+        articleCreateDTO.setArtclOrd(0);//기사 순번 등록(0)set
+        articleCreateDTO.setApprvDivCd(FixEnum.FIX_NONE.getFixeum(FixEnum.FIX_NONE));//기사픽스 상태 None set[null 상태가면 fix 구분 및 셋팅시 문제.]
 
         Article article = articleCreateMapper.toEntity(articleCreateDTO);
         articleRepository.save(article);
@@ -255,8 +266,8 @@ public class ArticleService {
         Long articleId = articleDTO.getArtclId();
 
         //기사 자막 create
-        List<ArticleCapSimpleDTO> articleCapDTOS = articleCreateDTO.getArticleCap();
-        List<AnchorCapSimpleDTO> anchorCapDTOS = articleCreateDTO.getAnchorCap();
+        List<ArticleCapCreateDTO> articleCapDTOS = articleCreateDTO.getArticleCap();
+        List<AnchorCapCreateDTO> anchorCapDTOS = articleCreateDTO.getAnchorCap();
         createArticleCap(articleCapDTOS, articleId);//기사자막 create
         createAnchorCap(anchorCapDTOS, articleId);//앵커자막 create.
 
@@ -266,29 +277,58 @@ public class ArticleService {
         return article.getArtclId();
     }
 
-    public void createAnchorCap(List<AnchorCapSimpleDTO> anchorCapDTOS, Long articleId){ //앵커자막 create.
+    public void createAnchorCap(List<AnchorCapCreateDTO> anchorCapDTOS, Long articleId){ //앵커자막 create.
 
         if (ObjectUtils.isEmpty(anchorCapDTOS) == false){
-            for (AnchorCapSimpleDTO anchorCapSimpleDTO : anchorCapDTOS){
+            for (AnchorCapCreateDTO anchorCapCreateDTO : anchorCapDTOS){ //앵커자막 리스트 단건씩 저장.
 
-                Article articleSimple = Article.builder().artclId(articleId).build();//자막에 들어갈 기사 아이디
-                AnchorCap anchorCap = anchorCapSimpleMapper.toEntity(anchorCapSimpleDTO);
-                anchorCap.setArticle(articleSimple);
-                anchorCapRepository.save(anchorCap);
+                AnchorCap anchorCap = anchorCapCreateMapper.toEntity(anchorCapCreateDTO);
+
+                Long getCapTemplateId = anchorCapCreateDTO.getCapTemplateId();//앵커자막에 추가할 템플릿아이디.
+                if (ObjectUtils.isEmpty(getCapTemplateId) == false){ //등록할 템플릿이 있을경우.
+
+                    CapTemplate capTemplate = CapTemplate.builder().capTmpltId(getCapTemplateId).build();//등록할 템플릿아이디 엔티티 빌드.
+                    anchorCap.setCapTemplate(capTemplate);//템플릿아이디 엔티티set.
+                }
+                String getSymbolId = anchorCapCreateDTO.getSymbolId();//앵커자막에 추가할 방송아이콘 아이디.
+                if (StringUtils.isEmpty(getSymbolId) == false){
+
+                    Symbol symbol = Symbol.builder().symbolId(getSymbolId).build();//등록할 방송아이콘 아이디 엔티티 빌드.
+                    anchorCap.setSymbol(symbol);// 방송아이콘아이디 엔티티set.
+                }
+                Article article = Article.builder().artclId(articleId).build();//자막에 들어갈 기사 아이디.
+                anchorCap.setArticle(article);//기사아이디 엔티티set.
+
+                anchorCapRepository.save(anchorCap);//저장.
             }
         }
 
     }
 
-    public void createArticleCap(List<ArticleCapSimpleDTO> articleCapDTOS, Long articleId){//기사자막 create
+    public void createArticleCap(List<ArticleCapCreateDTO> articleCapDTOS, Long articleId){//기사자막 create.
 
         if (ObjectUtils.isEmpty(articleCapDTOS) == false) {
-            for (ArticleCapSimpleDTO articleCapDTO : articleCapDTOS) {
+            for (ArticleCapCreateDTO articleCapDTO : articleCapDTOS) { //기사자막 리스트 단건씩 저장.
 
-                Article articleSimple = Article.builder().artclId(articleId).build();//자막에 들어갈 기사 아이디
-                ArticleCap articleCap = articleCapSimpleMapper.toEntity(articleCapDTO);
-                articleCap.setArticle(articleSimple);
-                articleCapRepository.save(articleCap);
+                ArticleCap articleCap = articleCapCreateMapper.toEntity(articleCapDTO); //자막 엔티티 빌드 맵퍼.
+
+                Long getCapTemplateId = articleCapDTO.getCapTmpltId();//기사자막에 추가할 템플릿아이디.
+                if (ObjectUtils.isEmpty(getCapTemplateId) == false){
+
+                    CapTemplate capTemplate = CapTemplate.builder().capTmpltId(getCapTemplateId).build();//등록할 템플릿아이디 엔티티 빌드.
+                    articleCap.setCapTemplate(capTemplate); //템플릿아이디 엔티티set.
+                }
+                String getSymbolId = articleCapDTO.getSymbolId();//기사자막에 추가할 방송아이콘 아이디.
+                if (StringUtils.isEmpty(getSymbolId) == false){
+
+                    Symbol symbol = Symbol.builder().symbolId(getSymbolId).build();//등록할 방송아이콘 아이디 엔티티 빌드.
+                    articleCap.setSymbol(symbol); // 방송아이콘아이디 엔티티set.
+                }
+
+                Article article = Article.builder().artclId(articleId).build();//자막에 들어갈 기사 아이디
+                articleCap.setArticle(article); //기사아이디 엔티티set.
+
+                articleCapRepository.save(articleCap); //저장.
             }
         }
     }
@@ -298,7 +338,7 @@ public class ArticleService {
         Article article = articleFindOrFail(artclId);
 
         IssueDTO issueDTO = articleUpdateDTO.getIssue(); //이슈 업데이트 경우 이슈는 PK값으로 되어있기 때문에 삭제후 등록.
-        if (ObjectUtils.isEmpty(issueDTO) == false){
+        if (ObjectUtils.isEmpty(issueDTO)){
             article.setIssue(null);
         }
 
@@ -315,6 +355,20 @@ public class ArticleService {
 
         //기사이력 등록.
         updateArticleHist(article);
+
+    }
+
+    public Boolean chkOrderLock(Long artclId){ //기사 오더락 체크[다른 사용자가 기사 수정중일 경우 수정 불가.]
+
+        Article article = articleFindOrFail(artclId); //해당 기사 조회.
+
+        String lckYn = article.getLckYn(); //기사잠금 여부가 Y일 경우 return true[다른 사용자가 기사 잠금 중.]
+
+        if (lckYn.equals("Y")){
+            return true;
+        }
+
+        return false;
 
     }
 
@@ -347,7 +401,7 @@ public class ArticleService {
                 articleCapRepository.deleteById(artclCapId);
             }
         }
-        List<ArticleCapSimpleDTO> capSimpleDTOList = articleUpdateDTO.getArticleCap(); //update로 들어온 기사 등록
+        List<ArticleCapCreateDTO> capSimpleDTOList = articleUpdateDTO.getArticleCap(); //update로 들어온 기사 등록
         createArticleCap(capSimpleDTOList, articleId); //기사자막 등록
 
 
@@ -360,13 +414,13 @@ public class ArticleService {
         List<AnchorCap> anchorCaps = article.getAnchorCap();//원본 앵커기사 List get
         if (ObjectUtils.isEmpty(anchorCaps) == false){ //원본 앵커기사 delete;
             for (AnchorCap anchorCap : anchorCaps){
-                Long anchorCapId = anchorCap.getArtclCapId();
+                Long anchorCapId = anchorCap.getAnchorCapId();
                 anchorCapRepository.deleteById(anchorCapId);
             }
         }
 
-        List<AnchorCapSimpleDTO> anchorCapSimpleDTOList = articleUpdateDTO.getAnchorCap();
-        createAnchorCap(anchorCapSimpleDTOList, articleId);//앵커자막 등록
+        List<AnchorCapCreateDTO> anchorCapCreateDTOList = articleUpdateDTO.getAnchorCap();
+        createAnchorCap(anchorCapCreateDTOList, articleId);//앵커자막 등록
 
     }
 
@@ -580,6 +634,7 @@ public class ArticleService {
         ArticleDTO articleDTO = articleMapper.toDto(article);
         articleDTO.setApprvDivCd(apprvDivCd); //픽스 구분코드 변경.
         articleDTO.setApprvrId(userId);//픽스 승인자 변경.
+        articleDTO.setApprvDtm(new Date());
 
         articleMapper.updateFromDto(articleDTO, article);
         articleRepository.save(article);

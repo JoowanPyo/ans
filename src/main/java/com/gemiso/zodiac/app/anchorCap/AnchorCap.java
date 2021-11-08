@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.articleCap;
+package com.gemiso.zodiac.app.anchorCap;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gemiso.zodiac.app.article.Article;
@@ -23,8 +23,8 @@ public class AnchorCap {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "artcl_cap_id", nullable = false)
-    private Long artclCapId;
+    @Column(name = "anchor_cap_id", nullable = false)
+    private Long anchorCapId;
 
     @Column(name = "cap_div_cd")
     private String capDivCd;

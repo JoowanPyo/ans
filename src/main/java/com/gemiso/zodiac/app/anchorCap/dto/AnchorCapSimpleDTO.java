@@ -1,6 +1,5 @@
-package com.gemiso.zodiac.app.articleCap.dto;
+package com.gemiso.zodiac.app.anchorCap.dto;
 
-import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import lombok.AllArgsConstructor;
@@ -12,15 +11,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnchorCapDTO {
+public class AnchorCapSimpleDTO {
 
-    private Long artclCapId;
+    private Long anchorCapId;
     private String capDivCd;
     private String capDivCdNm;
     private int lnNo;
     private String capCtt;
     private String capRmk;
-    private ArticleSimpleDTO article;
+    //private Article article;
     private CapTemplateDTO capTemplate;
     private SymbolDTO symbol;
 }

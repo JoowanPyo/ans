@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class ArticleSimpleDTO {
 
     private Long artclId;
-/*    private String chDivCd;
+   /* private String chDivCd;
     private String artclKindCd;
     private String artclFrmCd;
     private String artclDivCd;
@@ -21,10 +21,10 @@ public class ArticleSimpleDTO {
     private String prdDivCd;
     private String artclTypCd;
     private String artclTypDtlCd;
-    private String artclCateCd;
+    private String artclCateCd;*/
     private String artclTitl;
     private String artclTitlEn;
-    private String artclCtt;
+    /*private String artclCtt;
     private String ancMentCtt;
     private String rptrNm;
     private String userGrpId;
