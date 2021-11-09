@@ -74,7 +74,7 @@ public class CueSheetTemplate extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = pd_1_id)")
     private String pd1Nm;
 
-    @JoinColumn(name = "pd_2_id")
+    @Column(name = "pd_2_id")
     private String pd2Id;
 
     @Column(name = "pd_2_nm", length = 100)
@@ -82,7 +82,7 @@ public class CueSheetTemplate extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = pd_2_id)")
     private String pd2Nm;
 
-    @JoinColumn(name = "anc_1_id")
+    @Column(name = "anc_1_id")
     private String anc1Id;
 
     @Column(name = "anc_1_nm", length = 100)
@@ -90,7 +90,7 @@ public class CueSheetTemplate extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = anc_1_id)")
     private String anc1Nm;
 
-    @JoinColumn(name = "anc_2_id")
+    @Column(name = "anc_2_id")
     private String anc2Id;
 
     @Column(name = "anc_2_nm", length = 100)

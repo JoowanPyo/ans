@@ -26,7 +26,7 @@ public class AnchorCap {
     @Column(name = "anchor_cap_id", nullable = false)
     private Long anchorCapId;
 
-    @Column(name = "cap_div_cd")
+    @Column(name = "cap_div_cd", length = 50)
     private String capDivCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cap_div_cd)")

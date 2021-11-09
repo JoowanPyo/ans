@@ -46,7 +46,7 @@ public class DailyProgramService {
 
         dailyProgramRepository.save(dailyProgram);
 
-        return dailyProgram.getId();
+        return dailyProgram.getDailyPgmId();
 
     }
 

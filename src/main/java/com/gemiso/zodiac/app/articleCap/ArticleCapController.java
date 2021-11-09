@@ -37,7 +37,7 @@ public class ArticleCapController {
     @Operation(summary = "기사자막 상세조회", description = "기사자막 상세조회")
     @GetMapping(path = "/{articleCapId}")
     public ApiResponse<ArticleCapDTO> find(@Parameter(name = "articleCapId", required = true, description = "기사자막 아이디")
-                                           @PathVariable("articleCapId") long articleCapId) {
+                                           @PathVariable("articleCapId") Long articleCapId) {
 
         ArticleCapDTO articleCapDTO = articleCapService.find(articleCapId);
 
@@ -62,7 +62,7 @@ public class ArticleCapController {
     public ApiResponse<ArticleCapDTO> update(@Parameter(description = "필수값<br>, ", required = true)
                                              @RequestBody ArticleCapUpdateDTO articleCapUpdateDTO,
                                              @Parameter(name = "articleCapId", required = true, description = "기사자막 아이디")
-                                             @PathVariable("articleCapId") long articleCapId) {
+                                             @PathVariable("articleCapId") Long articleCapId) {
 
         articleCapService.update(articleCapUpdateDTO, articleCapId);
 

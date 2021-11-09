@@ -20,7 +20,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class DailyProgramDTO {
 
-    private Long id;
+    private Long dailyPgmId;
     private String brdcDt;
     private String brdcSeq;
     private String brdcStartTime;

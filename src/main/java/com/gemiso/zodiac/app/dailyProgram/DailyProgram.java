@@ -26,8 +26,8 @@ public class DailyProgram extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Long id;
+    @Column(name = "daily_pgm_id", nullable = false)
+    private Long dailyPgmId;
 
     /*@Column(name = "brdc_pgm_id")*/
 

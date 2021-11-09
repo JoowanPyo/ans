@@ -36,7 +36,7 @@ public class ArticleOrder extends BaseEntity {
     @Column(name ="order_ctt", columnDefinition = "text")
     private String orderCtt;
 
-    @Column(name = "order_div_cd")
+    @Column(name = "order_div_cd", length = 50)
     private String orderDivCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = order_div_cd)")
@@ -54,14 +54,14 @@ public class ArticleOrder extends BaseEntity {
     @Column(name = "ord_rmk", columnDefinition = "text")
     private String ordRmk;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)

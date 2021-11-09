@@ -30,7 +30,7 @@ public class ArticleCap {
     @Column(name = "artcl_cap_id", nullable = false)
     private Long artclCapId;
 
-    @Column(name = "cap_div_cd")
+    @Column(name = "cap_div_cd", length = 50)
     private String capDivCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cap_div_cd)")

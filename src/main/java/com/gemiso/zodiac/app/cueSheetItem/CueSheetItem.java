@@ -174,6 +174,15 @@ public class CueSheetItem extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = lckr_id)")
     private String lckrNm;
 
+    @Column(name = "atop", columnDefinition = "bpchar(1) default 'N'")
+    private String atop;
+
+    @Column(name = "ahead_line", columnDefinition = "bpchar(1) default 'N'")
+    private String aheadLine;
+
+    @Column(name = "aref", columnDefinition = "bpchar(1) default 'N'")
+    private String aref;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cue_id", nullable = false)
     @JsonBackReference
@@ -212,6 +221,15 @@ public class CueSheetItem extends BaseEntity {
         }
         if (this.newsBreakYn == null || this.newsBreakYn == "") {
             this.newsBreakYn = "N";
+        }
+        if (this.atop == null || this.atop == "") {
+            this.atop = "N";
+        }
+        if (this.aheadLine == null || this.aheadLine == "") {
+            this.aheadLine = "N";
+        }
+        if (this.aref == null || this.aref == "") {
+            this.aref = "N";
         }
     }
 

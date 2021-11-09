@@ -41,14 +41,14 @@ public class YonhapAssign {
     @JoinColumn(name = "wire_id")
     private YonhapWire yonhapWire;
 
-    @Column(name = "designator_id")
+    @Column(name = "designator_id", length = 50)
     private String designatorId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = designator_id)")
     private String designatorNm;
 
-    @Column(name = "assigner_id")
+    @Column(name = "assigner_id", length = 50)
     private String assignerId;
 
     @Basic(fetch = FetchType.LAZY)

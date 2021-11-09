@@ -611,6 +611,13 @@ public class ArticleService {
 
         Article article = articleEntity.get();
 
+        String orgApprvDivcd = article.getApprvDivCd(); //조회된 기사픽스 구분코드 get
+        // 조회된 기사픽스 구분코드와 새로들어온 구분코드가 같으면 return
+        //에러를 내지않고 유지하기 위해.
+        if (apprvDivCd.equals(orgApprvDivcd)){
+            return;
+        }
+
         // 사용자 정보
         String userId = userAuthService.authUser.getUserId();
 

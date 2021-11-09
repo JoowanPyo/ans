@@ -30,7 +30,7 @@ public class AttachFile {
         @Column(name = "file_id", nullable = false)
         private Long fileId;
 
-        @Column(name = "file_div_cd", length = 3)
+        @Column(name = "file_div_cd", length = 50)
         private String fileDivCd;
 
         @Column(name = "file_nm", length = 600)
@@ -57,7 +57,7 @@ public class AttachFile {
         @Column(name = "org_file_nm", length = 600)
         private String orgFileNm;
 
-        @Column(name = "inputr_id", nullable = false)
+        @Column(name = "inputr_id", nullable = false, length = 50)
         private String inputrId;
 
         @Basic(fetch = FetchType.LAZY)

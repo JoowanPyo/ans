@@ -46,43 +46,45 @@ public class ArticleOrderFileController {
     @Operation(summary = "기사의뢰 첨부파일 등록", description = "기사의뢰 첨부파일 등록")
     @PostMapping(path = "/{orderId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<ArticleOrderFileResponseDTO> create(@Parameter(name = "orderId", required = true, description = "의뢰 첨부파일 아이디")
+    public ApiResponse<List<ArticleOrderFileDTO>> create(@Parameter(name = "orderId", required = true, description = "의뢰 첨부파일 아이디")
                                                            @PathVariable("orderId") long orderId,
                                                            @Parameter(description = "필수값<br>", required = true)
-                                                           @RequestBody @Valid ArticleOrderFileCreateDTO articleOrderFileCreateDTO) {
+                                                           @RequestBody @Valid List<ArticleOrderFileCreateDTO> articleOrderFileCreateDTOList) {
 
-        ArticleOrderFileResponseDTO responseDTO = new ArticleOrderFileResponseDTO();
+        //오더 파일등록하고 오더아이디로 등록된 파일리스트 조회 하기위해 오더아이디 response
+        /*ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();*/
 
-        Long id = articleOrderFileService.create(articleOrderFileCreateDTO, orderId);
+        articleOrderFileService.create(articleOrderFileCreateDTOList, orderId);
 
-        responseDTO.setId(id);
+        List<ArticleOrderFileDTO> articleOrderFileDTOList = articleOrderFileService.findAll(orderId);
 
-        return new ApiResponse<>(responseDTO);
+        return new ApiResponse<>(articleOrderFileDTOList);
     }
 
     @Operation(summary = "기사의뢰 첨부파일 수정", description = "기사의뢰 첨부파일 수정")
     @PutMapping(path = "/{orderId}")
-    public ApiResponse<ArticleOrderFileResponseDTO> update(@Parameter(name = "orderId", required = true, description = "의뢰 첨부파일 아이디")
+    public ApiResponse<List<ArticleOrderFileDTO>> update(@Parameter(name = "orderId", required = true, description = "의뢰 첨부파일 아이디")
                                                            @PathVariable("orderId") long orderId,
                                                            @Parameter(description = "필수값<br>", required = true)
-                                                           @RequestBody @Valid ArticleOrderFileUpdateDTO articleOrderFileUpdateDTO) {
+                                                           @RequestBody @Valid List<ArticleOrderFileCreateDTO> articleOrderFileCreateDTOList) {
 
-        ArticleOrderFileResponseDTO responseDTO = new ArticleOrderFileResponseDTO();
+        //오더 파일등록하고 오더아이디로 등록된 파일리스트 조회 하기위해 오더아이디 response
+       /* ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();*/
 
-        articleOrderFileService.update(orderId, articleOrderFileUpdateDTO);
+        articleOrderFileService.update(orderId, articleOrderFileCreateDTOList);
 
-        responseDTO.setId(orderId);
+        List<ArticleOrderFileDTO> articleOrderFileDTOList = articleOrderFileService.findAll(orderId);
 
-        return new ApiResponse<>(responseDTO);
+        return new ApiResponse<>(articleOrderFileDTOList);
     }
 
     @Operation(summary = "기사의뢰 첨부파일 삭제", description = "기사의뢰 첨부파일 삭제")
-    @DeleteMapping(path = "/{orderId}")
+    @DeleteMapping(path = "/{orderFileId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResponse<?> delete(@Parameter(name = "orderId", required = true, description = "의뢰 첨부파일 아이디")
-                                 @PathVariable("orderId") long orderId) {
+    public ApiResponse<?> delete(@Parameter(name = "orderFileId", required = true, description = "의뢰 첨부파일 아이디")
+                                 @PathVariable("orderFileId") long orderFileId) {
 
-        articleOrderFileService.delete(orderId);
+        articleOrderFileService.delete(orderFileId);
 
         return ApiResponse.noContent();
     }

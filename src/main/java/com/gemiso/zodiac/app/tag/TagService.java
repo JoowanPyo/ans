@@ -68,6 +68,8 @@ public class TagService {
 
     public Long create(TagCreateDTO tagCreateDTO){ //테그생성
 
+        tagCreateDTO.setTagClicked(0); //0으로 초기화
+        
         Tag tag = tagCreateMapper.toEntity(tagCreateDTO);
 
         tagRepository.save(tag);

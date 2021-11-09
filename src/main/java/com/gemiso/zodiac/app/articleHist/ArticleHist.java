@@ -29,7 +29,7 @@ public class ArticleHist {
     @Column(name = "artcl_hist_id", nullable = false)
     private Long artclHistId;
 
-    @Column(name = "ch_div_cd")
+    @Column(name = "ch_div_cd", length = 50)
     private String chDivCd;
 
     @Column(name = "artcl_titl", length = 500)

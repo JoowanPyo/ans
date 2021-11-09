@@ -30,7 +30,7 @@ public class Issue extends BaseEntity {
     private Long issuId;
 
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "ch_div_cd")
+    @Column(name = "ch_div_cd", length = 50)
     private String chDivCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = ch_div_cd)")
@@ -69,21 +69,21 @@ public class Issue extends BaseEntity {
     @Column(name = "issu_org_id", length = 50)
     private Long issuOrgId;
 
-    @Column(name = "inputr_id", nullable = false)
+    @Column(name = "inputr_id", length = 50, nullable = false)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
 
-    @Column(name = "delr_id")
+    @Column(name = "delr_id", length = 50)
     private String delrId;
 
     @Basic(fetch = FetchType.LAZY)

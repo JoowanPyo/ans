@@ -65,6 +65,9 @@ public class CueSheetItemUpdateDTO {
     //private String delrNm;
     //private String lckrId;
     //private String lckrNm;
+    private String atop;
+    private String aheadLine;
+    private String aref;
     private CueSheetSimpleDTO cueSheet;
     private ArticleUpdateDTO article;
 }

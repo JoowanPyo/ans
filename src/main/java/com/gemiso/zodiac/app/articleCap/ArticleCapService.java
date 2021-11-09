@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -85,40 +86,58 @@ public class ArticleCapService {
 
     }
 
+    //기사자막에 들어오는 기사, 템플릿, 방송아이콘 set
     public ArticleCap relationshipCreate(ArticleCap articleCap, ArticleCapCreateDTO articleCapCreateDTO) {
 
-        Long articleId = articleCapCreateDTO.getArticleId();
-        Long capTmpltId = articleCapCreateDTO.getCapTmpltId();
-        String symbolId = articleCapCreateDTO.getSymbolId();
+        Long articleId = articleCapCreateDTO.getArticleId(); //기사 아이디 get
+        Long capTmpltId = articleCapCreateDTO.getCapTmpltId(); //템플릿아이디 get
+        String symbolId = articleCapCreateDTO.getSymbolId(); // 방송아이콘 아이디 get
 
-        //DTO로 받은 아이디를 Entity로 생성
-        Article article = Article.builder().artclId(articleId).build();
-        CapTemplate capTemplate = CapTemplate.builder().capTmpltId(capTmpltId).build();
-        Symbol symbol = Symbol.builder().symbolId(symbolId).build();
 
-        //기사자막 엔티티에 의존엔티티 추가.
-        articleCap.setArticle(article);
-        articleCap.setCapTemplate(capTemplate);
-        articleCap.setSymbol(symbol);
+        if (ObjectUtils.isEmpty(articleId) == false) { //기사아이디가 있으면 엔엔티 빌드후 set
+            Article article = Article.builder().artclId(articleId).build();
+            articleCap.setArticle(article);
+        }
+        if (ObjectUtils.isEmpty(capTmpltId) == false){ //템플릿아이가 있으면 엔엔티 빌드후 set
+            CapTemplate capTemplate = CapTemplate.builder().capTmpltId(capTmpltId).build();
+            articleCap.setCapTemplate(capTemplate);
+        }
+        if (StringUtils.isEmpty(symbolId) == false){ //방송아이콘 아이디가 있으면 엔엔티 빌드후 set
+            Symbol symbol = Symbol.builder().symbolId(symbolId).build();
+            articleCap.setSymbol(symbol);
+        }
+
 
         return articleCap;
     }
 
     public ArticleCap relationshipUpdate(ArticleCap articleCap, ArticleCapUpdateDTO articleCapUpdateDTO){
 
-        //Long articleId = articleCapUpdateDTO.getArticleId();
-        Long capTmpltId = articleCapUpdateDTO.getCapTmpltId();
-        String symbolId = articleCapUpdateDTO.getSymbolId();
+        //Long articleId = articleCapCreateDTO.getArticleId(); //기사 아이디 get
+        Long capTmpltId = articleCapUpdateDTO.getCapTmpltId(); //템플릿아이디 get
+        String symbolId = articleCapUpdateDTO.getSymbolId(); // 방송아이콘 아이디 get
 
-        //DTO로 받은 아이디를 Entity로 생성
-        //Article article = Article.builder().artclId(articleId).build();
-        CapTemplate capTemplate = CapTemplate.builder().capTmpltId(capTmpltId).build();
-        Symbol symbol = Symbol.builder().symbolId(symbolId).build();
 
-        //기사자막 엔티티에 의존엔티티 추가.
-        //articleCap.setArticle(article);
-        articleCap.setCapTemplate(capTemplate);
-        articleCap.setSymbol(symbol);
+        /*if (ObjectUtils.isEmpty(articleId) == false) { //기사아이디가 있으면 엔엔티 빌드후 set
+            Article article = Article.builder().artclId(articleId).build();
+            articleCap.setArticle(article);
+        }*/
+        if (ObjectUtils.isEmpty(capTmpltId) == false){ //템플릿아이가 있으면 엔엔티 빌드후 set
+            CapTemplate capTemplate = CapTemplate.builder().capTmpltId(capTmpltId).build();
+            articleCap.setCapTemplate(capTemplate);
+        }
+        else
+        {
+            articleCap.setCapTemplate(null);//null이나 공백으로 들어올 경우 데이터 삭제
+        }
+        if (StringUtils.isEmpty(symbolId) == false){ //방송아이콘 아이디가 있으면 엔엔티 빌드후 set
+            Symbol symbol = Symbol.builder().symbolId(symbolId).build();
+            articleCap.setSymbol(symbol);
+        }
+        else
+        {
+            articleCap.setSymbol(null);//null이나 공백으로 들어올 경우 데이터 삭제
+        }
 
         return articleCap;
     }
