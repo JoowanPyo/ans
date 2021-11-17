@@ -30,7 +30,7 @@ public class UserGroup extends BaseEntity {
     @Column(name = "user_grp_nm", length = 100)
     private String userGrpNm;
 
-    @Column(name = "memo", length = 4000)
+    @Column(name = "memo", length = 1000)
     private String memo;
 
     @Column(name = "ord", length = 4)
@@ -46,21 +46,21 @@ public class UserGroup extends BaseEntity {
     @Column(name = "del_dtm")
     private Date delDtm;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
 
-    @Column(name = "delr_id")
+    @Column(name = "delr_id", length = 50)
     private String delrId;
 
     @Basic(fetch = FetchType.LAZY)

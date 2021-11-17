@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+@Api(description = "프로그램 API")
 @RestController
 @RequestMapping("/programs")
 @Slf4j
 @RequiredArgsConstructor
-@Api(description = "프로그램 API")
 public class ProgramController {
 
     private final ProgramService programService;

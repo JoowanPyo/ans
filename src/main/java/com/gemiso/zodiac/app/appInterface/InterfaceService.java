@@ -1,9 +1,10 @@
 package com.gemiso.zodiac.app.appInterface;
 
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.ParentCueSheetDTO;
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueDataDTO;
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueResultDTO;
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueSheetDataDTO;
+import com.gemiso.zodiac.app.appInterface.programDTO.ParentProgramDTO;
+import com.gemiso.zodiac.app.appInterface.programDTO.TakerProgramDTO;
+import com.gemiso.zodiac.app.appInterface.programDTO.TakerProgramDataDTO;
+import com.gemiso.zodiac.app.appInterface.programDTO.TakerProgramResultDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.QCueSheet;
@@ -51,7 +52,7 @@ public class InterfaceService {
 
 
 
-    public PageResultDTO<ParentCueSheetDTO, CueSheet> cueFindAll(Date sdate, Date edate) {
+    public PageResultDTO<ParentProgramDTO, CueSheet> cueFindAll(Date sdate, Date edate) {
 
         PageHelper pageHelper = new PageHelper(null, null);
 
@@ -63,40 +64,40 @@ public class InterfaceService {
 
         AnsToTaker taker = new AnsToTaker();
         /*taker.SetCuesheet(cueSheets);
-        List<ParentCueSheetDTO> cueSheetDTOList = taker.ToSTringXML();
+        List<ParentProgramDTO> cueSheetDTOList = taker.ToSTringXML();
         System.out.println(" xml : " + cueSheetDTOList );*/
 
-        Function<CueSheet, ParentCueSheetDTO> fn = (entity -> taker.ToStringXML(entity));
+        Function<CueSheet, ParentProgramDTO> fn = (entity -> taker.ToStringXML(entity));
 
-        return new PageResultDTO<ParentCueSheetDTO, CueSheet>(result, fn);
+        return new PageResultDTO<ParentProgramDTO, CueSheet>(result, fn);
 
     }
 
-    public String toXml(PageResultDTO<ParentCueSheetDTO, CueSheet> pageResultDTO){
+    public String toXml(PageResultDTO<ParentProgramDTO, CueSheet> pageResultDTO){
 
         //큐시트목록 xml을 담는 DTO
-        TakerCueSheetDTO takerCueSheetDTO = new TakerCueSheetDTO();
+        TakerProgramDTO takerProgramDTO = new TakerProgramDTO();
         //success="true" msg="ok" 담는DTO
-        TakerCueResultDTO takerCueResultDTO = new TakerCueResultDTO();
+        TakerProgramResultDTO takerProgramResultDTO = new TakerProgramResultDTO();
         //<data totalcount="6" curpage="0" rowcount="0">&&List<cue>
-        TakerCueDataDTO takerCueDataDTO = new TakerCueDataDTO();
+        TakerProgramDataDTO takerProgramDataDTO = new TakerProgramDataDTO();
 
-        takerCueResultDTO.setXuccess("true");
-        takerCueResultDTO.setMsg("ok");
+        takerProgramResultDTO.setXuccess("true");
+        takerProgramResultDTO.setMsg("ok");
 
         //조회된 큐시트 데이터  set
-        List<ParentCueSheetDTO> parentCueSheetDTOList = pageResultDTO.getDtoList();
-        takerCueDataDTO.setParentCueSheetDTOList(parentCueSheetDTOList);
-        takerCueDataDTO.setTotalcount(parentCueSheetDTOList.stream().count());
-        takerCueDataDTO.setCurpage(pageResultDTO.getPage());
-        takerCueDataDTO.setRowcount(0);
+        List<ParentProgramDTO> parentProgramDTOList = pageResultDTO.getDtoList();
+        takerProgramDataDTO.setParentProgramDTOList(parentProgramDTOList);
+        takerProgramDataDTO.setTotalcount(parentProgramDTOList.stream().count());
+        takerProgramDataDTO.setCurpage(pageResultDTO.getPage());
+        takerProgramDataDTO.setRowcount(0);
 
 
-        takerCueSheetDTO.setResult(takerCueResultDTO);
-        takerCueSheetDTO.setData(takerCueDataDTO);
+        takerProgramDTO.setResult(takerProgramResultDTO);
+        takerProgramDTO.setData(takerProgramDataDTO);
 
 
-        String xml = JAXBXmlHelper.marshal(takerCueSheetDTO, TakerCueSheetDTO.class);
+        String xml = JAXBXmlHelper.marshal(takerProgramDTO, TakerProgramDTO.class);
 
         System.out.println("xml : " + xml);
         return xml;
@@ -108,13 +109,13 @@ public class InterfaceService {
 
         AnsToTaker taker = new AnsToTaker();
         taker.SetCuesheet(cueSheets);
-        List<ParentCueSheetDTO> cueSheetDTOList = taker.ToSTringXML();
+        List<ParentProgramDTO> cueSheetDTOList = taker.ToSTringXML();
         System.out.println(" xml : " + cueSheetDTOList );
 
-        TakerCueSheetDTO takerCueSheetDTO = new TakerCueSheetDTO();
-        takerCueSheetDTO.setParentCueSheetDTOList(cueSheetDTOList);
+        TakerCueSheetDataDTO takerCueSheetDTO = new TakerCueSheetDataDTO();
+        takerCueSheetDTO.setParentProgramDTOList(cueSheetDTOList);
 
-        String xml = JAXBXmlHelper.marshal(takerCueSheetDTO, TakerCueSheetDTO.class);
+        String xml = JAXBXmlHelper.marshal(takerCueSheetDTO, TakerCueSheetDataDTO.class);
 
         System.out.println(" xml : " + xml );
 

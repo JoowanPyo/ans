@@ -32,7 +32,7 @@ import java.util.List;
 public class Symbol extends BaseEntity {
 
     @Id
-    @Column(name = "symbol_id", nullable = false)
+    @Column(name = "symbol_id", nullable = false, length = 50)
     private String symbolId;
 
     @Column(name = "symbol_nm", length = 50)
@@ -59,21 +59,21 @@ public class Symbol extends BaseEntity {
     @Column(name = "del_dtm")
     private Date delDtm;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
 
-    @Column(name = "delr_id")
+    @Column(name = "delr_id", length = 50)
     private String delrId;
 
     @Basic(fetch = FetchType.LAZY)
@@ -86,6 +86,9 @@ public class Symbol extends BaseEntity {
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = typ_cd)")
     private String typCdNm;
+
+    @Column(name = "symbol_ord")
+    private int symbolOrd;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "file_id")

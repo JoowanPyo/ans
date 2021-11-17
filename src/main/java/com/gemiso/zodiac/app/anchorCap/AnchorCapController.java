@@ -53,7 +53,9 @@ public class AnchorCapController {
 
         Long anchorCapId = anchorCapService.create(anchorCapCreateDTO);
 
-        AnchorCapDTO anchorCapDTO = anchorCapService.find(anchorCapId);
+        //앵커 자막 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        AnchorCapDTO anchorCapDTO = new AnchorCapDTO();
+        anchorCapDTO.setAnchorCapId(anchorCapId);
 
         return new ApiResponse<>(anchorCapDTO);
     }
@@ -67,7 +69,9 @@ public class AnchorCapController {
 
         anchorCapService.update(anchorCapUpdateDTO, anchorCapId);
 
-        AnchorCapDTO anchorCapDTO = anchorCapService.find(anchorCapId);
+        //앵커 자막 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        AnchorCapDTO anchorCapDTO = new AnchorCapDTO();
+        anchorCapDTO.setAnchorCapId(anchorCapId);
 
         return new ApiResponse<>(anchorCapDTO);
 

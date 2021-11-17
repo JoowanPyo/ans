@@ -25,23 +25,23 @@ public class FacilityManage extends BaseEntity {
     @Column(name = "fclty_id", nullable = false)
     private Long fcltyId;
 
-    @Column(name = "fclty_nm")
+    @Column(name = "fclty_nm", length = 200)
     private String fcltyNm;
 
-    @Column(name = "fclty_div_cd")
+    @Column(name = "fclty_div_cd", length = 50)
     private String fcltyDivCd;
 
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
 
-    @Column(name = "inputr_id", nullable = false)
+    @Column(name = "inputr_id", nullable = false, length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)

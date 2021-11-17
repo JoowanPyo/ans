@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@Api(description = "로그인 API")
 @RestController
 @RequestMapping("/auth")
 @Slf4j
 @RequiredArgsConstructor
-@Api(description = "로그인 API")
 public class AuthController {
 
     private final AuthService authService;

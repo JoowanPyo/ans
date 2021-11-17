@@ -2,7 +2,10 @@ package com.gemiso.zodiac.app.cueSheetItemCap;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
+import com.gemiso.zodiac.app.capTemplate.CapTemplate;
+import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrp;
 import com.gemiso.zodiac.app.code.Code;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.user.User;
 import lombok.*;
@@ -30,8 +33,8 @@ public class CueSheetItemCap {
     @Column(name = "cue_item_cap_id", nullable = false)
     private Long cueItemCapId;
 
-    @Column(name = "cue_item_id", length = 21, nullable = false)
-    private Long cueItemId;
+/*    @Column(name = "cue_item_id", length = 21, nullable = false)
+    private Long cueItemId;*/
 
     @Column(name = "cue_item_cap_div_cd")
     private String cueItemCapDivCd;
@@ -75,8 +78,8 @@ public class CueSheetItemCap {
     @Column(name = "del_dtm")
     private Date delDtm;
 
-    @Column(name = "cap_tmplt_id", nullable = false)
-    private Long capTmpltId;
+    /*@Column(name = "cap_tmplt_id", nullable = false)
+    private Long capTmpltId;*/
 
     @Column(name = "inputr_id")
     private String inputrId;
@@ -98,6 +101,14 @@ public class CueSheetItemCap {
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
     private String delrNm;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cap_tmplt_id")
+    private CapTemplate capTemplate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cue_item_id")
+    private CueSheetItem cueSheetItem;
     
 
     @PrePersist

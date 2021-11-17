@@ -79,9 +79,11 @@ public class CueSheetController {
 
         Long cueId = cueSheetService.create(cueSheetCreateDTO);
 
-        //수정! 큐시트아이템복사.
-
-        CueSheetDTO cueSheetDTO = cueSheetService.find(cueId);
+        //수정! 큐시트아이템복사.???
+        
+        //큐시트 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        CueSheetDTO cueSheetDTO = new CueSheetDTO();
+        cueSheetDTO.setCueId(cueId);
 
         return new ApiResponse<>(cueSheetDTO);
     }
@@ -95,7 +97,9 @@ public class CueSheetController {
 
         cueSheetService.update(cueSheetUpdateDTO, cueId);
 
-        CueSheetDTO cueSheetDTO = cueSheetService.find(cueId);
+        //큐시트 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        CueSheetDTO cueSheetDTO = new CueSheetDTO();
+        cueSheetDTO.setCueId(cueId);
 
         return new ApiResponse<>(cueSheetDTO);
 
@@ -121,7 +125,9 @@ public class CueSheetController {
 
         cueSheetService.cueSheetOrderLock(cueSheetOrderLockDTO, cueId);
 
-        CueSheetDTO cueSheetDTO = cueSheetService.find(cueId);
+        //큐시트 오더락 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        CueSheetDTO cueSheetDTO = new CueSheetDTO();
+        cueSheetDTO.setCueId(cueId);
 
         return new ApiResponse<>(cueSheetDTO);
 
@@ -134,7 +140,9 @@ public class CueSheetController {
 
         cueSheetService.cueSheetUnLock(cueId);
 
-        CueSheetDTO cueSheetDTO = cueSheetService.find(cueId);
+        //큐시트 잠금해제 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        CueSheetDTO cueSheetDTO = new CueSheetDTO();
+        cueSheetDTO.setCueId(cueId);
 
         return new ApiResponse<>(cueSheetDTO);
     }

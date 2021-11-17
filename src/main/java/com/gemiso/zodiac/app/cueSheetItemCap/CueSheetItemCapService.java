@@ -132,7 +132,7 @@ public class CueSheetItemCapService {
 
          QCueSheetItemCap qCueItemCap = QCueSheetItemCap.cueSheetItemCap;
 
-         booleanBuilder.and(qCueItemCap.cueItemId.eq(cueItemId));
+         booleanBuilder.and(qCueItemCap.cueSheetItem.cueItemId.eq(cueItemId));
 
         if(!StringUtils.isEmpty(cueItemCapDivCd)){
             booleanBuilder.and(qCueItemCap.cueItemCapDivCd.eq(cueItemCapDivCd));

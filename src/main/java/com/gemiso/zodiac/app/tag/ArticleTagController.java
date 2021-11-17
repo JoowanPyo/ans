@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.tag;
 
 import com.gemiso.zodiac.app.tag.dto.ArticleTagDTO;
 import com.gemiso.zodiac.core.response.ApiResponse;
+import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Api(description = "기사테그 API")
 @RestController
 @RequestMapping("/articletags")
 @Slf4j

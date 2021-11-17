@@ -5,6 +5,7 @@ import com.gemiso.zodiac.app.tag.dto.TagDTO;
 import com.gemiso.zodiac.app.tag.dto.TagIdDTO;
 import com.gemiso.zodiac.app.tag.dto.TagUpdateDTO;
 import com.gemiso.zodiac.core.response.ApiResponse;
+import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+//@Tag(name = "User Controllers", description = "User API")
+@Api(description = "테그 API")
 @RestController
 @RequestMapping("/tags")
 @Slf4j

@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.appInterface.cueFindAllDTO;
+package com.gemiso.zodiac.app.appInterface.programDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +17,7 @@ import java.util.Date;
 @NoArgsConstructor
 @XmlRootElement(name = "record")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ParentCueSheetDTO {
+public class ParentProgramDTO {
 
     @XmlElement(name="rd_id")
     private Long cueId;

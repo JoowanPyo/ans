@@ -35,6 +35,7 @@ public class SymbolDTO {
     private String delrNm;
     private String typCd;
     private String typCdNm;
+    private int symbolOrd;
     private AttachFileDTO attachFile;
     private String url;
 }

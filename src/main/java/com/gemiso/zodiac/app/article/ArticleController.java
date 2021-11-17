@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.article;
 
+import com.gemiso.zodiac.app.appAuth.dto.AppAuthDTO;
 import com.gemiso.zodiac.app.article.dto.*;
 import com.gemiso.zodiac.core.enumeration.AuthEnum;
 import com.gemiso.zodiac.core.helper.SearchDate;
@@ -54,7 +55,7 @@ public class ArticleController {
 
         //기사읽기 권한이 없는 사용자 error.forbidden
         //List<String> userAuth = userAuthService.authChk(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth());
-        if (userAuthService.authChk(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth())){ //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
+        if (userAuthService.authChk(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth())) { //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -74,7 +75,7 @@ public class ArticleController {
 
         }
 
-        return new ApiCollectionResponse<>( pageList);
+        return new ApiCollectionResponse<>(pageList);
     }
 
     @Operation(summary = "기사 목록조회[큐시트]", description = "기사 목록조회[큐시트]")
@@ -90,7 +91,7 @@ public class ArticleController {
 
         SearchDate searchDate = new SearchDate(sdate, edate);
 
-        List<ArticleDTO> articleDTOList = articleService.findCue(searchDate.getStartDate(), searchDate.getEndDate(), searchWord ,cueId);
+        List<ArticleDTO> articleDTOList = articleService.findCue(searchDate.getStartDate(), searchDate.getEndDate(), searchWord, cueId);
 
         return new ApiResponse<>(articleDTOList);
 
@@ -110,12 +111,12 @@ public class ArticleController {
     @PostMapping(name = "")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<ArticleSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                          @RequestBody @Valid ArticleCreateDTO articleCreateDTO) {
-
-
-        ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
+                                                @RequestBody @Valid ArticleCreateDTO articleCreateDTO) {
 
         Long artclId = articleService.create(articleCreateDTO);
+
+        //기사 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
         articleDTO.setArtclId(artclId);
 
 
@@ -125,20 +126,20 @@ public class ArticleController {
     @Operation(summary = "기사 수정", description = "기사 수정")
     @PutMapping(path = "/{artclId}")
     public ApiResponse<ArticleSimpleDTO> update(@Parameter(description = "필수값<br> ", required = true)
-                                          @RequestBody @Valid ArticleUpdateDTO articleUpdateDTO,
-                                          @Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                          @PathVariable("artclId") long artclId) {
+                                                @RequestBody @Valid ArticleUpdateDTO articleUpdateDTO,
+                                                @Parameter(name = "artclId", required = true, description = "기사 아이디")
+                                                @PathVariable("artclId") long artclId) {
 
         //수정. 잠금사용자확인
-        if(articleService.chkOrderLock(artclId)){
+        if (articleService.chkOrderLock(artclId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //해당기사 잠금여부가 Y일 경우 NOT_FOUND EXPCEPTION.
         }
 
-        ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
-
         articleService.update(articleUpdateDTO, artclId);
 
-       /* ArticleDTO articleDTO = articleService.find(artclId);*/
+        /* ArticleDTO articleDTO = articleService.find(artclId);*/
+        //기사 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
         articleDTO.setArtclId(artclId);
 
         return new ApiResponse<>(articleDTO);
@@ -189,10 +190,10 @@ public class ArticleController {
     @Operation(summary = "기사 픽스", description = "기사 픽스")
     @PutMapping(path = "/{artclId}/fix")
     public ApiResponse<ArticleDTO> fix(@Parameter(name = "artclId", description = "기사 아이디")
-                                            @PathVariable("artclId") Long artclId,
-                                            @Parameter(name = "apprvDivCd", description = "픽스 상태 코드(none[픽스가 없는상태]" +
-                                                    ", articlefix[기자 픽스], editorfix[에디터 픽스], anchorfix[앵커 픽스], deskfix[데스크 픽스])")
-                                            @RequestParam(value = "apprvDivCd", required = true)String apprvDivCd){
+                                       @PathVariable("artclId") Long artclId,
+                                       @Parameter(name = "apprvDivCd", description = "픽스 상태 코드(none[픽스가 없는상태]" +
+                                               ", articlefix[기자 픽스], editorfix[에디터 픽스], anchorfix[앵커 픽스], deskfix[데스크 픽스])")
+                                       @RequestParam(value = "apprvDivCd", required = true) String apprvDivCd) {
 
 
         articleService.vaildFixStaus(artclId, apprvDivCd);
@@ -200,5 +201,15 @@ public class ArticleController {
         ArticleDTO articleDTO = articleService.find(artclId);
 
         return new ApiResponse<>(articleDTO);
+    }
+
+    @Operation(summary = "기사 삭제자 확인", description = "기사 삭제자 확인")
+    @PutMapping(path = "/confirmuser")
+    public ApiResponse<?> confirmUser(@Parameter(name = "password", description = "사용자 비밀번호")
+                                      @RequestParam(value = "password", required = false) String password) {
+
+        articleService.confirmUser(password);
+
+        return ApiResponse.ok();
     }
 }

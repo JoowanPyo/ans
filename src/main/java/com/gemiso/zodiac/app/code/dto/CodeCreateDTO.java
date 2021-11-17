@@ -16,6 +16,7 @@ public class CodeCreateDTO {
     //private Long cdId;
     private String cd;
     private String cdNm;
+    private String cdNmKo;
     private String cdExpl;
     private String hrnkCdId;
     private String useYn;

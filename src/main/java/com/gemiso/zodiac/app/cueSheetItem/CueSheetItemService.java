@@ -134,7 +134,7 @@ public class CueSheetItemService {
         CueSheetItem cueSheetItem = cueSheetItemCreateMapper.toEntity(cueSheetItemCreateDTO);
         cueSheetItemRepository.save(cueSheetItem); //큐시트아이템 등록
 
-        //큐시트 아이템 순번 재등록
+        /*//큐시트 아이템 순번 재등록
         Long cueItemId = cueSheetItem.getCueItemId();
         List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
 
@@ -155,7 +155,7 @@ public class CueSheetItemService {
             CueSheetItem setCueSheetItem = cueSheetItemMapper.toEntity(cueSheetItemDTO);
             cueSheetItemRepository.save(setCueSheetItem);
             index++;
-        }
+        }*/
 
         return cueSheetItem.getCueItemId();
     }

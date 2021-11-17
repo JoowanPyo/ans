@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.appInterface;
 
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.ParentCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueSheetDataDTO;
+import com.gemiso.zodiac.app.appInterface.programDTO.ParentProgramDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
@@ -29,15 +30,15 @@ public class InterfaceController {
     private final InterfaceService interfaceService;
 
 
-    @Operation(summary = "큐시트 목록조회[Taker]", description = "큐시트 목록조회[Taker]")
-    @GetMapping(path = "/cuesheet")
-    public String cueFindAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
+    @Operation(summary = "일일편성 목록조회[Taker]", description = "일일편성 목록조회[Taker]")
+    @GetMapping(path = "/dailypgm")
+    public String dailyPgmFindAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
                                                           @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                           @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
                                                           @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                           @RequestHeader(value = "securityKey") String securityKey) throws Exception {
 
-        PageResultDTO<ParentCueSheetDTO, CueSheet> pageResultDTO = null;
+        PageResultDTO<ParentProgramDTO, CueSheet> pageResultDTO = null;
         String takerCueSheetDTO = "";
 
         //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
@@ -58,7 +59,7 @@ public class InterfaceController {
 
     }
 
-    @Operation(summary = "큐시트 상세조회[Taker]", description = "큐시트 상세조회[Taker]")
+    /*@Operation(summary = "큐시트 상세조회[Taker]", description = "큐시트 상세조회[Taker]")
     @GetMapping(path = "/cuesheet/{cueId}")
     public ApiResponse<CueSheetDTO> cueFind(@Parameter(name = "cueId", description = "큐시트 아이디")
                                             @PathVariable("cueId") Long cueId,
@@ -81,6 +82,27 @@ public class InterfaceController {
         List<CueSheetItemDTO> cueSheetItemDTOList = interfaceService.cueItemFindAll(artlcId, cueId);
 
         return new ApiResponse<>(cueSheetItemDTOList);
+    }*/
+
+    @Operation(summary = "큐시트 목록조회[Taker]", description = "큐시트 목록조회[Taker]")
+    @GetMapping(path = "/cuesheet")
+    public String cueFindAll(){
+
+        return null;
+    }
+
+    @Operation(summary = "방송구분코드 조회[Taker]", description = "방송구분코드 조회[Taker]")
+    @GetMapping(path = "/code")
+    public String codeFindAll(){
+
+        return null;
+    }
+
+    @Operation(summary = "영상전송상태 조회[Taker]", description = "영상전송상태 조회[Taker]")
+    @GetMapping(path = "/mediatransrate")
+    public String mediaTransRateFindAll(){
+
+        return null;
     }
 
 

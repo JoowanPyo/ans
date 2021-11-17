@@ -35,9 +35,7 @@ import com.gemiso.zodiac.app.issue.IssueRepositoy;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
-import com.gemiso.zodiac.app.user.QUser;
-import com.gemiso.zodiac.app.user.UserGroupUser;
-import com.gemiso.zodiac.app.user.UserGroupUserRepository;
+import com.gemiso.zodiac.app.user.*;
 import com.gemiso.zodiac.app.userGroup.UserGroupAuth;
 import com.gemiso.zodiac.app.userGroup.UserGroupAuthRepository;
 import com.gemiso.zodiac.core.enumeration.FixAuth;
@@ -46,6 +44,7 @@ import com.gemiso.zodiac.core.helper.PageHelper;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.service.ProcessArticleFix;
 import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.exception.PasswordFailedException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +54,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -97,6 +97,9 @@ public class ArticleService {
     private final AnchorCapCreateMapper anchorCapCreateMapper;
 
     private final UserAuthService userAuthService;
+    private final UserService userService;
+
+    private final PasswordEncoder passwordEncoder;
 
 
     public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, Long brdcPgmId,
@@ -432,7 +435,7 @@ public class ArticleService {
             articleLockDTO.setLckDtm(new Date());
             // 토큰 인증된 사용자 아이디를 입력자로 등록
             String userId = userAuthService.authUser.getUserId();
-            articleLockDTO.setLckr(userId);
+            articleLockDTO.setLckrId(userId);
         } else {
             article.setLckDtm(null);
             article.setLckrId(null);
@@ -696,6 +699,19 @@ public class ArticleService {
 
         //권한 리스트 리턴
         return appAuthList;
+    }
+
+    public void confirmUser(String password){
+
+        String userId = userAuthService.authUser.getUserId(); //토큰에서 유저 아이디를 가져온다.
+
+        User userEntity = userService.userFindOrFail(userId); //사용자 아이디로 사용자 유무 확인 및 사용자 정보조회.
+
+        if (passwordEncoder.matches(password, userEntity.getPwd()) == false) { //현재 들어온 비밀번호와 등록되어 있는 비밀번호 확인
+            throw new PasswordFailedException("Password failed.");
+        }
+
+
     }
 
     }

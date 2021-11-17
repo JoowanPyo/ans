@@ -72,7 +72,9 @@ public class ArticleMediaController {
 
         Long artclMediaId = articleMediaService.create(articleMediaCreateDTO);
 
-        ArticleMediaDTO articleMediaDTO = articleMediaService.find(artclMediaId);
+        //기사영상 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        ArticleMediaDTO articleMediaDTO = new ArticleMediaDTO();
+        articleMediaDTO.setArtclMediaId(artclMediaId);
 
         return new ApiResponse<>(articleMediaDTO);
     }
@@ -86,7 +88,9 @@ public class ArticleMediaController {
 
         articleMediaService.update(articleMediaUpdateDTO, artclMediaId);
 
-        ArticleMediaDTO articleMediaDTO = articleMediaService.find(artclMediaId);
+        //기사영상 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        ArticleMediaDTO articleMediaDTO = new ArticleMediaDTO();
+        articleMediaDTO.setArtclMediaId(artclMediaId);
 
         return new ApiResponse<>(articleMediaDTO);
 

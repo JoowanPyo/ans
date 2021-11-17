@@ -34,7 +34,7 @@ public class CueSheetMedia extends BaseEntity {
     @Column(name = "cue_media_id", nullable = false)
     private Long cueMediaId;
 
-    @Column(name = "media_typ_cd")
+    @Column(name = "media_typ_cd", length = 50)
     private String mediaTypCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = media_typ_cd)")
@@ -55,13 +55,13 @@ public class CueSheetMedia extends BaseEntity {
     @Column(name = "media_mtch_dtm")
     private Date mediaMtchDtm;
 
-    @Column(name = "trnsf_st_cd")
+    @Column(name = "trnsf_st_cd", length = 50)
     private String trnsfStCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = trnsf_st_cd)")
     private String trnsfStCdNm;
 
-    @Column(name = "assn_st_cd")
+    @Column(name = "assn_st_cd", length = 50)
     private String assnStCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = assn_st_cd)")
@@ -79,21 +79,21 @@ public class CueSheetMedia extends BaseEntity {
     @Column(name = "video_edtr_id", length = 50)
     private String videoEdtrId;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
 
-    @Column(name = "delr_id")
+    @Column(name = "delr_id", length = 50)
     private String delrId;
 
     @Basic(fetch = FetchType.LAZY)

@@ -42,10 +42,10 @@ public class User extends BaseEntity {
     @Column(name = "free_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String freeYn;
 
-    @Column(name = "dept_id", length = 21)
+    @Column(name = "dept_id", length = 50)
     private String deptId;
 
-    @Column(name = "duty_cd")
+    @Column(name = "duty_cd", length = 50)
     private String dutyCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = duty_cd)")
@@ -57,13 +57,13 @@ public class User extends BaseEntity {
     @Column(name = "email", length = 200)
     private String email;
 
-    @Column(name = "tel", length = 200)
+    @Column(name = "tel", length = 20)
     private String tel;
 
     @Column(name = "tel_pub_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String telPubYn;
 
-    @Column(name = "user_div_cd")
+    @Column(name = "user_div_cd", length = 50)
     private String userDivCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = user_div_cd)")
@@ -85,7 +85,7 @@ public class User extends BaseEntity {
     @Column(name = "pwd_chg_dtm")
     private Date pwdChgDtm;
 
-    @Column(name = "user_st_cd")
+    @Column(name = "user_st_cd", length = 50)
     private String userStCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = user_st_cd)")
@@ -103,21 +103,21 @@ public class User extends BaseEntity {
     @Column(name = "del_yn",columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
 
-    @Column(name = "delr_id")
+    @Column(name = "delr_id", length = 50)
     private String delrId;
 
     @Basic(fetch = FetchType.LAZY)

@@ -45,7 +45,7 @@ public class AppAuthService{
         return appAuthDtoList;
     }
 
-    public AppAuthDTO create(AppAuthCreateDTO appAuthCreatDTO) {
+    public Long create(AppAuthCreateDTO appAuthCreatDTO) {
 
         String hrnkCd = appAuthCreatDTO.getHrnkAppAuthCd();
 
@@ -80,7 +80,7 @@ public class AppAuthService{
 
         appAuthRepository.save(appAuth);
 
-       return appAuthMapper.toDto(appAuth);
+       return appAuth.getAppAuthId();
 
     }
 

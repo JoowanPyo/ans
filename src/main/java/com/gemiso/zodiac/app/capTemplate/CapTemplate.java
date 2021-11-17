@@ -41,7 +41,7 @@ public class CapTemplate extends BaseEntity {
     @Column(name = "cap_tmplt_file_nm", length = 1000)
     private String capTmpltFileNm;
 
-    @Column(name = "cap_class_cd")
+    @Column(name = "cap_class_cd", length = 50)
     private String capClassCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cap_class_cd)")
@@ -89,21 +89,21 @@ public class CapTemplate extends BaseEntity {
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
 
-    @Column(name = "delr_id")
+    @Column(name = "delr_id", length = 50)
     private String delrId;
 
     @Basic(fetch = FetchType.LAZY)

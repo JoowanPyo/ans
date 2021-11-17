@@ -15,19 +15,19 @@ public class PropertyUtil {
 
     public UploadFileBean getUploadInfo(String fn, String target)
     {
-        UploadFileBean pb = new UploadFileBean();
+           UploadFileBean pb = new UploadFileBean();
         Document doc = null;
 
-        SAXBuilder builder = new SAXBuilder();
+         SAXBuilder builder = new SAXBuilder();
         try
         {
-            if (log.isDebugEnabled())
+             if (log.isDebugEnabled())
             {
                 log.debug("config root: " + getConfigRoot());
                 log.debug("config file name: " + fn);
             }
             //file:/C:/FileAttach.xml
-            doc = builder.build(new File(getConfigRoot(), fn));
+             doc = builder.build(new File(getConfigRoot(), fn));
             log.info("doc           :" +doc);
             Element root = doc.getRootElement();
 

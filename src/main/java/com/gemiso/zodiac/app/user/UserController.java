@@ -17,12 +17,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+@Api(description = "사용자 API")
 @RestController
 @RequestMapping("/users")
 @Slf4j
 @RequiredArgsConstructor
-//@Tag(name = "User Controllers", description = "User API")
-@Api(description = "사용자 API")
 public class UserController {
 
     private final UserService userService;

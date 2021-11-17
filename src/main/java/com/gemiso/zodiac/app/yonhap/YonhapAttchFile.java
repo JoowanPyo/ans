@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(
-        name = "tb_yh_kr_attc_file"
+        name = "tb_yonhap_attc_file"
 )
 @Builder
 @AllArgsConstructor

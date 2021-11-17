@@ -51,7 +51,7 @@ public class UserUpdateDTO {
     //private Date delDtm;
     private String inphonNo;
     private String salt;
-    private List<UserGroupUserDTO> userGroupUserDTO = new ArrayList<>();
+    /*private List<UserGroupUserDTO> userGroupUserDTO = new ArrayList<>();*/
 
     /*private String userId;
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")

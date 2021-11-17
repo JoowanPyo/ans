@@ -38,34 +38,34 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "cue_item_titl", length = 300)
     private String cueItemTitl;
 
+    @Column(name = "cue_item_titl_en", length = 300)
+    private String cueItemTitlEn;
+
     @Column(name = "cue_item_ctt", length = 500)
     private String cueItemCtt;
 
     @Column(name = "cue_item_ord")
     private int cueItemOrd;
 
-    @Column(name = "cue_item_ord_cd")
+    @Column(name = "cue_item_ord_cd", length = 5)
     private String cueItemOrdCd;
-
-    @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_ord_cd)")
-    private String cueItemOrdCdNm;
 
     @Column(name = "cue_item_time")
     private int cueItemTime;
 
-    @Column(name = "cue_item_frm_cd")
+    @Column(name = "cue_item_frm_cd", length = 50)
     private String cueItemFrmCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_frm_cd)")
     private String cueItemFrmCdNm;
 
-    @Column(name = "cue_item_div_cd")
+    @Column(name = "cue_item_div_cd", length = 50)
     private String cueItemDivCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_div_cd)")
     private String cueItemDivCdNm;
 
-    @Column(name = "brdc_st_cd")
+    @Column(name = "brdc_st_cd", length = 50)
     private String brdcStCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = brdc_st_cd)")
@@ -80,7 +80,7 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "chrgr_nm", length = 100)
     private String chrgrNm;
 
-    @Column(name = "artcl_cap_st_cd")
+    @Column(name = "artcl_cap_st_cd", length = 50)
     private String artclCapStCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_cap_st_cd)")
@@ -92,7 +92,7 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "cue_artcl_cap_chg_dtm")
     private Date cueArtclCapChgDtm;
 
-    @Column(name = "cue_artcl_cap_st_cd")
+    @Column(name = "cue_artcl_cap_st_cd", length = 50)
     private String cueArtclCapStCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_artcl_cap_st_cd)")
@@ -113,7 +113,7 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "lck_dtm")
     private Date lckDtm;
 
-    @Column(name = "cue_item_typ_cd")
+    @Column(name = "cue_item_typ_cd", length = 50)
     private String cueItemTypCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_typ_cd)")
@@ -128,13 +128,13 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "cap_chg_dtm")
     private Date capChgDtm;
 
-    @Column(name = "cap_st_cd")
+    @Column(name = "cap_st_cd", length = 50)
     private String capStCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cap_st_cd)")
     private String capStCdNm;
 
-    @Column(name = "artcl_st_cd")
+    @Column(name = "artcl_st_cd", length = 50)
     private String artclStCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_st_cd)")
@@ -146,42 +146,42 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "news_break_yn", columnDefinition = "bpchar(1) default 'N'")
     private String newsBreakYn;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
 
-    @Column(name = "delr_id")
+    @Column(name = "delr_id", length = 50)
     private String delrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
     private String delrNm;
 
-    @Column(name = "lckr_id")
+    @Column(name = "lckr_id", length = 50)
     private String lckrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = lckr_id)")
     private String lckrNm;
 
-    @Column(name = "atop", columnDefinition = "bpchar(1) default 'N'")
-    private String atop;
+    @Column(name = "artcl_top", columnDefinition = "bpchar(1) default 'N'")
+    private String artclTop;
 
-    @Column(name = "ahead_line", columnDefinition = "bpchar(1) default 'N'")
-    private String aheadLine;
+    @Column(name = "head_ln", columnDefinition = "bpchar(1) default 'N'")
+    private String headLn;
 
-    @Column(name = "aref", columnDefinition = "bpchar(1) default 'N'")
-    private String aref;
+    @Column(name = "artcl_ref", columnDefinition = "bpchar(1) default 'N'")
+    private String artclRef;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cue_id", nullable = false)
@@ -222,14 +222,14 @@ public class CueSheetItem extends BaseEntity {
         if (this.newsBreakYn == null || this.newsBreakYn == "") {
             this.newsBreakYn = "N";
         }
-        if (this.atop == null || this.atop == "") {
-            this.atop = "N";
+        if (this.artclTop == null || this.artclTop == "") {
+            this.artclTop = "N";
         }
-        if (this.aheadLine == null || this.aheadLine == "") {
-            this.aheadLine = "N";
+        if (this.headLn == null || this.headLn == "") {
+            this.headLn = "N";
         }
-        if (this.aref == null || this.aref == "") {
-            this.aref = "N";
+        if (this.artclRef == null || this.artclRef == "") {
+            this.artclRef = "N";
         }
     }
 

@@ -50,7 +50,7 @@ public class IssueController {
 
             issueList = issueService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), issuDelYn);
 
-        }else {
+        } else {
             issueList = issueService.findAll(null, null, issuDelYn);
         }
         return new ApiResponse<>(issueList);
@@ -130,6 +130,18 @@ public class IssueController {
         return new ApiResponse<>(issueDTOList);
     }
 
+    @Operation(summary = "삭제 이슈 복구", description = "삭제 이슈 복구")
+    @PutMapping(path = "/{issuId}/restore")
+    public ApiResponse<IssueDTO> restoreIssue(@Parameter(name = "issuId", required = true, description = "이슈아이디")
+                                              @PathVariable("issuId") Long issuId) {
+
+        issueService.restoreIssue(issuId);
+
+        IssueDTO issueDto = issueService.find(issuId);
+
+        return new ApiResponse<>(issueDto);
+
+    }
 
 
 }

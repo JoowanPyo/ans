@@ -39,7 +39,7 @@ public class AppAuth extends BaseEntity {
     @Column(name = "ORD", length = 4)
     private int ord;
 
-    @Column(name = "EXPL", length = 1000)
+    @Column(name = "EXPL", length = 2000)
     private String expl;
 
     @Column(name = "MEMO", length = 1000)
@@ -57,21 +57,21 @@ public class AppAuth extends BaseEntity {
     @Column(name = "DEL_DTM")
     private Date delDtm;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
 
-    @Column(name = "delr_id")
+    @Column(name = "delr_id", length = 50)
     private String delrId;
 
     @Basic(fetch = FetchType.LAZY)

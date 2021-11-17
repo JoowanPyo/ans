@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.cueSheetTemplate;
 
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateCreateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateDTO;
+import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateUpdateDTO;
 import com.gemiso.zodiac.core.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +31,7 @@ public class CueSheetTemplateController {
                                                           @RequestParam(value = "searchWord", required = false) String searchWord,
                                                           @Parameter(name = "pgmschTime", description = "검색키워드")
                                                           @RequestParam(value = "pgmschTime", required = false) String pgmschTime
-                                                          ) {
+    ) {
 
         List<CueSheetTemplateDTO> cueSheetTemplateDTOList = cueSheetTemplateService.findAll(searchWord, pgmschTime);
 
@@ -41,7 +42,7 @@ public class CueSheetTemplateController {
     @Operation(summary = "큐시트 템플릿 상세조회", description = "큐시트 템플릿 상세조회")
     @GetMapping(path = "/{cueTmpltId}")
     public ApiResponse<CueSheetTemplateDTO> find(@Parameter(name = "cueTmpltId", required = true, description = "큐시트 템플릿 아이디")
-                                                 @PathVariable("cueTmpltId") long cueTmpltId) {
+                                                 @PathVariable("cueTmpltId") Long cueTmpltId) {
 
         CueSheetTemplateDTO cueSheetTemplateDTO = cueSheetTemplateService.find(cueTmpltId);
 
@@ -60,5 +61,31 @@ public class CueSheetTemplateController {
         CueSheetTemplateDTO cueSheetTemplateDTO = cueSheetTemplateService.find(cueTmpltId);
 
         return new ApiResponse<>(cueSheetTemplateDTO);
+    }
+
+    @Operation(summary = "큐시트 템플릿 수정", description = "큐시트 템플릿 수정")
+    @PutMapping(path = "/{cueTmpltId}")
+    public ApiResponse<CueSheetTemplateDTO> update(@Parameter(name = "cueTmpltId", required = true, description = "큐시트 템플릿 아이디")
+                                                   @PathVariable("cueTmpltId") Long cueTmpltId,
+                                                   @Parameter(description = "필수값<br> ", required = true)
+                                                   @RequestBody @Valid CueSheetTemplateUpdateDTO cueSheetTemplateUpdateDTO) {
+
+        cueSheetTemplateService.update(cueTmpltId, cueSheetTemplateUpdateDTO);
+
+        CueSheetTemplateDTO cueSheetTemplateDTO = cueSheetTemplateService.find(cueTmpltId);
+
+        return new ApiResponse<>(cueSheetTemplateDTO);
+
+    }
+
+    @Operation(summary = "큐시트 템플릿 삭제", description = "큐시트 템플릿 삭제")
+    @PostMapping(path = "/{cueTmpltId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ApiResponse<?> delete(@Parameter(name = "cueTmpltId", required = true, description = "큐시트 템플릿 아이디")
+                                 @PathVariable("cueTmpltId") Long cueTmpltId) {
+
+        cueSheetTemplateService.delete(cueTmpltId);
+
+        return ApiResponse.noContent();
     }
 }

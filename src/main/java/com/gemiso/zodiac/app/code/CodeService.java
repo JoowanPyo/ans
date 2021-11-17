@@ -48,9 +48,9 @@ public class CodeService {
 
     }
 
-    public List<CodeDTO> findArticleType(Long artclTypCd) {
+    public List<CodeDTO> findArticleType(String artclTypCd) {
 
-        artclTypCd = 14L;
+        //artclTypCd = "article_type";
 
         List<Code> codeList = codeRepository.findArticleTypeCD(artclTypCd);
 
@@ -83,7 +83,7 @@ public class CodeService {
 
     }
 
-    public CodeDTO create(CodeCreateDTO codeCreateDTO) {
+    public Long create(CodeCreateDTO codeCreateDTO) {
 
         String hrnkCd = codeCreateDTO.getHrnkCdId(); //상위코드값 get
 
@@ -117,10 +117,7 @@ public class CodeService {
 
         Long cdId = codeEntity.getCdId();
 
-        Code code = codeFindOrFail(cdId);
-        CodeDTO returnCodeDTO = codeMapper.toDto(code);
-
-        return returnCodeDTO;
+        return cdId;
 
     }
 

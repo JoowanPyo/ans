@@ -27,7 +27,7 @@ public class CapTemplateGrp extends BaseEntity {
     @Column(name = "tmplt_grp_id", nullable = false)
     private Long tmpltGrpId;
 
-    @Column(name = "ch_div_cd")
+    @Column(name = "ch_div_cd", length = 50)
     private String chDivCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = ch_div_cd)")
@@ -39,14 +39,14 @@ public class CapTemplateGrp extends BaseEntity {
     @Column(name = "brdc_pgm_id", length = 21)
     private String brdcPgmId;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)

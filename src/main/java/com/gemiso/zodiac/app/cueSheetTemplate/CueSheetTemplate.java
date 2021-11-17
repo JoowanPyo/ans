@@ -1,15 +1,18 @@
 package com.gemiso.zodiac.app.cueSheetTemplate;
 
-import com.gemiso.zodiac.app.code.Code;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbol;
 import com.gemiso.zodiac.app.program.Program;
-import com.gemiso.zodiac.app.user.User;
+import com.gemiso.zodiac.app.tag.ArticleTag;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_cue_tmplt"
@@ -36,13 +39,13 @@ public class CueSheetTemplate extends BaseEntity {
     @Column(name = "cue_tmplt_nm", length = 150)
     private String cueTmpltNm;
 
-    @Column(name = "news_div_cd")
+    @Column(name = "news_div_cd", length = 50)
     private String newsDivCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = news_div_cd)")
     private String newsDivCdNm;
 
-    @Column(name = "brdc_start_time", length = 6)
+    @Column(name = "brdc_start_time", length = 8)
     private String brdcStartTime;
 
     @Column(name = "rmk", length = 500)
@@ -66,7 +69,7 @@ public class CueSheetTemplate extends BaseEntity {
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'")
     private String delYn;
 
-    @Column(name = "pd_1_id")
+    @Column(name = "pd_1_id", length = 50)
     private String pd1Id;
 
     @Column(name = "pd_1_nm", length = 100)
@@ -74,7 +77,7 @@ public class CueSheetTemplate extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = pd_1_id)")
     private String pd1Nm;
 
-    @Column(name = "pd_2_id")
+    @Column(name = "pd_2_id", length = 50)
     private String pd2Id;
 
     @Column(name = "pd_2_nm", length = 100)
@@ -82,7 +85,7 @@ public class CueSheetTemplate extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = pd_2_id)")
     private String pd2Nm;
 
-    @Column(name = "anc_1_id")
+    @Column(name = "anc_1_id", length = 50)
     private String anc1Id;
 
     @Column(name = "anc_1_nm", length = 100)
@@ -90,7 +93,7 @@ public class CueSheetTemplate extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = anc_1_id)")
     private String anc1Nm;
 
-    @Column(name = "anc_2_id")
+    @Column(name = "anc_2_id", length = 50)
     private String anc2Id;
 
     @Column(name = "anc_2_nm", length = 100)
@@ -98,21 +101,21 @@ public class CueSheetTemplate extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = anc_2_id)")
     private String anc2Nm;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
 
-    @Column(name = "delr_id")
+    @Column(name = "delr_id", length = 50)
     private String delrId;
 
     @Basic(fetch = FetchType.LAZY)
@@ -122,6 +125,10 @@ public class CueSheetTemplate extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "brdc_pgm_id")
     private Program program;
+
+    @OneToMany(mappedBy = "cueSheetTemplate")
+    @JsonManagedReference
+    private List<CueTmplSymbol> cueTmplSymbol = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {

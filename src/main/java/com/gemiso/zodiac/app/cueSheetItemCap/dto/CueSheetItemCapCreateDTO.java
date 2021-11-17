@@ -1,6 +1,8 @@
 package com.gemiso.zodiac.app.cueSheetItemCap.dto;
 
+import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateDTO;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
+import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSimpleDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,4 +42,6 @@ public class CueSheetItemCapCreateDTO {
     //private String inputrNm;
     //private String updtrNm;
     //private String delrNm;
+    private CapTemplateDTO capTemplate;
+    private CueSheetItemSimpleDTO cueSheetItem;
 }

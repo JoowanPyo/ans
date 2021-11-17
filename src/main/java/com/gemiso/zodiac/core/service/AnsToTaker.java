@@ -1,6 +1,6 @@
 package com.gemiso.zodiac.core.service;
 
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.ParentCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.programDTO.ParentProgramDTO;
 import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueProgramDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.program.Program;
@@ -14,13 +14,13 @@ public class AnsToTaker extends AnsCueSheet{
 
     }
 
-    public List<ParentCueSheetDTO> ToStringXmlList() {
+    public List<ParentProgramDTO> ToStringXmlList() {
 
-        List<ParentCueSheetDTO> cueSheetDTOList = new ArrayList<ParentCueSheetDTO>();
+        List<ParentProgramDTO> cueSheetDTOList = new ArrayList<ParentProgramDTO>();
 
         for (CueSheet cueSheet : GetCuesheet()){
 
-            ParentCueSheetDTO pcsDto = ParentCueSheetDTO.builder()
+            ParentProgramDTO pcsDto = ParentProgramDTO.builder()
                     .cueId(cueSheet.getCueId())
                     //.cueDivCd(cueSheet.getCueDivCd())
                     .chDivCd(cueSheet.getChDivCd())
@@ -58,9 +58,9 @@ public class AnsToTaker extends AnsCueSheet{
 
         return cueSheetDTOList;
     }
-    public ParentCueSheetDTO ToStringXML(CueSheet cueSheet) {
+    public ParentProgramDTO ToStringXML(CueSheet cueSheet) {
 
-        ParentCueSheetDTO pcsDto = ParentCueSheetDTO.builder()
+        ParentProgramDTO pcsDto = ParentProgramDTO.builder()
                 .cueId(cueSheet.getCueId())
                 .chDivCd(cueSheet.getChDivCd())
                 .chDivNm("") // 수정.
@@ -151,7 +151,7 @@ public class AnsToTaker extends AnsCueSheet{
 */
 
 /*
-    ParentCueSheetDTO pcsDto = ParentCueSheetDTO.builder()
+    ParentProgramDTO pcsDto = ParentProgramDTO.builder()
             .cueId(cueSheet.getCueId())
             .cueDivCd(cueSheet.getCueDivCd())
             .chDivCd(cueSheet.getChDivCd())

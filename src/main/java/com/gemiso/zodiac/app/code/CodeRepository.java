@@ -21,7 +21,7 @@ public interface CodeRepository extends JpaRepository<Code, Long> , QuerydslPred
     Optional<Code> findByCodeId(@Param("cdId")Long cdId);
 
     @Query("select a from Code a where a.hrnkCdId = :artclTypCd and a.delYn = 'N'")
-    List<Code> findArticleTypeCD(@Param("artclTypCd")Long artclTypCd);
+    List<Code> findArticleTypeCD(@Param("artclTypCd")String artclTypCd);
 
     @Query("select a from Code a where a.hrnkCdId IN (:underArtclTypCd)")
     List<Code> findUnderArticleTypeCD(@Param("underArtclTypCd")String[] underArtclTypCd);

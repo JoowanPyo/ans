@@ -53,7 +53,9 @@ public class CapTemplateGrpController {
 
         Long tmpltGrpId = capTemplateGrpService.create(capTemplateGrpCreateDTO);
 
-        CapTemplateGrpDTO capTemplateGrpDTO = capTemplateGrpService.find(tmpltGrpId);
+        //자막템플릿 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        CapTemplateGrpDTO capTemplateGrpDTO = new CapTemplateGrpDTO();
+        capTemplateGrpDTO.setTmpltGrpId(tmpltGrpId);
 
         return new ApiResponse<>(capTemplateGrpDTO);
 
@@ -68,7 +70,9 @@ public class CapTemplateGrpController {
 
         capTemplateGrpService.update(capTemplateGrpUpdateDTO, tmpltGrpId);
 
-        CapTemplateGrpDTO capTemplateGrpDTO = capTemplateGrpService.find(tmpltGrpId);
+        //자막템플릿 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        CapTemplateGrpDTO capTemplateGrpDTO = new CapTemplateGrpDTO();
+        capTemplateGrpDTO.setTmpltGrpId(tmpltGrpId);
 
         return new ApiResponse<>(capTemplateGrpDTO);
 

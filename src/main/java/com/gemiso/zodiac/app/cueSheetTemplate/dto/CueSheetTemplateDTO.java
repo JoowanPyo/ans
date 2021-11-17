@@ -1,19 +1,16 @@
 package com.gemiso.zodiac.app.cueSheetTemplate.dto;
 
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
-import com.gemiso.zodiac.app.program.Program;
-import com.gemiso.zodiac.app.program.dto.ProgramDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbol;
+import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Formula;
 
-import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -51,4 +48,5 @@ public class CueSheetTemplateDTO {
     private String delrId;
     private String delrNm;
     private ProgramSimpleDTO program;
+    private List<CueTmplSymbolDTO> cueTmplSymbol = new ArrayList<>();
 }

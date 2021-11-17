@@ -38,6 +38,9 @@ public class Auth {
     @Column(name = "dept_id", length = 50)
     private String deptId;
 
+    @Column(name = "dept_nm", length = 100)
+    private String deptNm;
+
     @Column(name = "login_dtm", nullable = false)
     private Date loginDtm;
 
@@ -47,7 +50,7 @@ public class Auth {
     @Column(name = "logout_dtm")
     private Date logoutDtm;
 
-    @Column(name = "st_cd")
+    @Column(name = "st_cd", length = 50)
     private String stCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = st_cd)")

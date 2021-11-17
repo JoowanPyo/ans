@@ -41,9 +41,9 @@ public class CodeController {
     }
 
     @Operation(summary = "기사 유형코드 조회", description = "기사 유형코드 조회")
-    @GetMapping(path = "/articletype")
+    @GetMapping(path = "/{artclTypCd}")
     public ApiResponse<List<CodeDTO>> findArticleType(@Parameter(name = "artclTypCd", description = "기사유형 코드")
-                                                      @RequestParam(value = "artclTypCd", required = false) Long artclTypCd) {
+                                                      @RequestParam(value = "artclTypCd", required = false)String artclTypCd) {
 
         List<CodeDTO> codeDTOList = codeService.findArticleType(artclTypCd);
 
@@ -65,7 +65,11 @@ public class CodeController {
     public ApiResponse<CodeDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                        @RequestBody CodeCreateDTO codeCreateDTO) {
 
-        CodeDTO returnCodeDTO = codeService.create(codeCreateDTO);
+        Long cdId = codeService.create(codeCreateDTO);
+
+        //코드 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        CodeDTO returnCodeDTO = new CodeDTO();
+        returnCodeDTO.setCdId(cdId);
 
         return new ApiResponse<>(returnCodeDTO);
     }
@@ -78,7 +82,9 @@ public class CodeController {
 
         codeService.update(codeUpdateDTO, cdId);
 
-        CodeDTO codeDTO = codeService.find(cdId);
+        //코드 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        CodeDTO codeDTO = new CodeDTO();
+        codeDTO.setCdId(cdId);
 
         return new ApiResponse<>(codeDTO);
     }

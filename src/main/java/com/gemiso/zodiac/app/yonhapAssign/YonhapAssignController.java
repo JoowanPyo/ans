@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.yonhapAssign.dto.YonhapAssignResponseDTO;
 import com.gemiso.zodiac.app.yonhapAssign.dto.YonhapAssignUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.ApiResponse;
+import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Api(description = "연합승인 API")
 @RestController
 @RequestMapping("/yonhapassign")
 @RequiredArgsConstructor

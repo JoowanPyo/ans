@@ -1,16 +1,19 @@
 package com.gemiso.zodiac.app.article.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Schema(description = "기사 맵핑 DTO")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArticleSimpleDTO {
 
+    @Schema(description = "기사 아이디")
     private Long artclId;
    /* private String chDivCd;
     private String artclKindCd;
@@ -22,7 +25,9 @@ public class ArticleSimpleDTO {
     private String artclTypCd;
     private String artclTypDtlCd;
     private String artclCateCd;*/
+    @Schema(description = "기사 제목")
     private String artclTitl;
+    @Schema(description = "영문 기사 제목")
     private String artclTitlEn;
     /*private String artclCtt;
     private String ancMentCtt;

@@ -34,6 +34,9 @@ public class Code extends BaseEntity implements Serializable {
     @Column(name = "cd_nm", length = 100)
     private String cdNm;
 
+    @Column(name = "cd_nm_ko", length = 100)
+    private String cdNmKo;
+
     @Column(name = "cd_expl", length = 500)
     private String cdExpl;
 
@@ -52,21 +55,21 @@ public class Code extends BaseEntity implements Serializable {
     @Column(name = "del_dtm")
     private Date delDtm;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
 
-    @Column(name = "delr_id")
+    @Column(name = "delr_id", length = 50)
     private String delrId;
 
     @Basic(fetch = FetchType.LAZY)

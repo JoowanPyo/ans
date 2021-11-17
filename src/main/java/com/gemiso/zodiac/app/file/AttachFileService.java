@@ -59,7 +59,7 @@ public class AttachFileService {
             PropertyUtil xu = new PropertyUtil();
             UploadFileBean ub = new UploadFileBean();
 
-            ub = xu.getUploadInfo("FileAttach.xml", "upload" + fileDivCd);
+            ub = xu.getUploadInfo("FileAttach.xml", fileDivCd);
             int uploadsize = Integer.parseInt(ub.getMaxsize().substring(0, ub.getMaxsize().indexOf("MB")));
 
 

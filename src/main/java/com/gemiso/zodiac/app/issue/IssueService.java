@@ -339,4 +339,31 @@ public class IssueService {
 
         return edate;
     }
+
+    public void restoreIssue(Long issuId){ //삭제이슈 복구
+
+        Issue IssueEntity = deleteIssueFind(issuId);//이슈 아이디로 이슈 검색 및 존재유무 확인.
+
+        IssueDTO issueDTO = issueMapper.toDto(IssueEntity); //조회된 이슈 DTO변환
+
+        issueDTO.setIssuDelYn("N");//삭제여부 값 "N" set
+
+        issueMapper.updateFromDto(issueDTO, IssueEntity); //삭제여부값 업데이트
+
+        issueRepositoy.save(IssueEntity);// 수정.
+
+
+    }
+
+    public Issue deleteIssueFind(Long issuId){ //삭제이슈 단건조회
+
+        Optional<Issue> issue = issueRepositoy.findDelIssue(issuId); //이슈아이디로 삭제된 이슈 조회
+
+        if (issue.isPresent() == false){//조회된 이슈가 없으면 exception.
+            throw new ResourceNotFoundException("Issue not found. issueId : " + issuId);
+        }
+
+        return issue.get();
+
+    }
 }

@@ -53,8 +53,11 @@ public class AppAuthController {
     public ApiResponse<AppAuthDTO> create(@Parameter(name = "appAuthCreatDTO", required = true, description = "필수값<br> 권한 명")
                                           @Valid @RequestBody AppAuthCreateDTO appAuthCreatDTO) {
 
-        AppAuthDTO appAuthDTO = appAuthService.create(appAuthCreatDTO);
+        Long appAuthId = appAuthService.create(appAuthCreatDTO);
 
+        //권한 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        AppAuthDTO appAuthDTO = new AppAuthDTO();
+        appAuthDTO.setAppAuthId(appAuthId);
         //AppAuthDTO appAuthDto = appAuthService.getAppAuth(appAuthId);
 
         return new ApiResponse<>(appAuthDTO);
@@ -67,7 +70,9 @@ public class AppAuthController {
 
         appAuthService.update(appAuthUpdateDTO, appAuthId);
 
-        AppAuthDTO appAuthDTO = appAuthService.find(appAuthId);
+        //권한 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        AppAuthDTO appAuthDTO = new AppAuthDTO();
+        appAuthDTO.setAppAuthId(appAuthId);
 
         return new ApiResponse<>(appAuthDTO);
 

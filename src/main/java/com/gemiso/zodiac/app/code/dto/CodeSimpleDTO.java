@@ -17,6 +17,7 @@ public class CodeSimpleDTO {
     private Long cdId;
     private String cd;
     private String cdNm;
+    private String cdNmKo;
 /*    private String cdExpl;
     private Long hrnkCdId;
     private String useYn;

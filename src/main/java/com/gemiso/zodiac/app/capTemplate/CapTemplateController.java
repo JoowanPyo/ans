@@ -61,7 +61,9 @@ public class CapTemplateController {
 
         Long capTmpltId = capTemplateService.create(capTemplateCreateDTO);
 
-        CapTemplateDTO capTemplateDTO = capTemplateService.find(capTmpltId);
+        //자막템플릿 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        CapTemplateDTO capTemplateDTO = new CapTemplateDTO();
+        capTemplateDTO.setCapTmpltId(capTmpltId);
 
         return new ApiResponse<>(capTemplateDTO);
 
@@ -76,7 +78,9 @@ public class CapTemplateController {
 
         capTemplateService.update(capTemplateUpdateDTO, capTmpltId);
 
-        CapTemplateDTO capTemplateDTO = capTemplateService.find(capTmpltId);
+        //자막템플릿 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        CapTemplateDTO capTemplateDTO = new CapTemplateDTO();
+        capTemplateDTO.setCapTmpltId(capTmpltId);
 
         return new ApiResponse<>(capTemplateDTO);
 

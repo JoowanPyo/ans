@@ -5,12 +5,20 @@ import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetCreateMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetOrderLockMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetUpdateMapper;
+import com.gemiso.zodiac.app.cueSheetHist.CueSheetHist;
+import com.gemiso.zodiac.app.cueSheetHist.CueSheetHistRepository;
+import com.gemiso.zodiac.app.cueSheetHist.dto.CueSheetHistCreateDTO;
+import com.gemiso.zodiac.app.cueSheetHist.mapper.CueSheetHistCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateDTO;
+import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemCreateMapper;
+import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
 import com.gemiso.zodiac.app.program.ProgramService;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
+import com.gemiso.zodiac.core.enumeration.ActionEnum;
+import com.gemiso.zodiac.core.enumeration.FixEnum;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -25,6 +33,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -34,12 +43,15 @@ public class CueSheetService {
 
     private final CueSheetRepository cueSheetRepository;
     private final CueSheetItemRepository cueSheetItemRepository;
+    private final CueSheetHistRepository cueSheetHistRepository;
 
     private final CueSheetMapper cueSheetMapper;
     private final CueSheetCreateMapper cueSheetCreateMapper;
     private final CueSheetUpdateMapper cueSheetUpdateMapper;
     private final CueSheetOrderLockMapper cueSheetOrderLockMapper;
     private final CueSheetItemCreateMapper cueSheetItemCreateMapper;
+    private final CueSheetItemMapper cueSheetItemMapper;
+    private final CueSheetHistCreateMapper cueSheetHistCreateMapper;
 
     private final UserAuthService userAuthService;
 
@@ -113,7 +125,29 @@ public class CueSheetService {
 
         cueSheetRepository.save(cueSheet);
 
-        return cueSheet.getCueId();
+        Long cueId = cueSheet.getCueId();//생성된 큐시트 아이디.
+
+        cueSheetHistCreate(cueId, cueSheet, userId);
+
+        return cueId;
+    }
+
+    public void cueSheetHistCreate(Long cueId, CueSheet cueSheet, String userId){
+
+        //큐시트 이력에 넣어줄 큐시트 아이디 빌드
+        CueSheetSimpleDTO cueSheetSimpleDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
+
+        CueSheetHistCreateDTO cueSheetHistBuild = CueSheetHistCreateDTO.builder()
+                .cueVer(0)
+                .cueAction(ActionEnum.CREATE.getAction(ActionEnum.CREATE))
+                .inputrId(userId)
+                .cueSheet(cueSheetSimpleDTO)
+                .build();
+
+        CueSheetHist cueSheetHist = cueSheetHistCreateMapper.toEntity(cueSheetHistBuild);
+
+        cueSheetHistRepository.save(cueSheetHist);
+
     }
 
     public void update(CueSheetUpdateDTO cueSheetUpdateDTO, Long cueId){
@@ -130,8 +164,47 @@ public class CueSheetService {
 
         cueSheetRepository.save(cueSheet);
 
+        cueSheetHistUpdate(cueId, cueSheet);
 
         //수정! 버전정보 안들어가나요?
+
+    }
+
+    public void cueSheetHistUpdate(Long cueId, CueSheet cueSheet){
+
+        List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //큐시트 아이템 엔티티 조회
+
+        //조회된 큐시트 아이템 엔티티 DTO변환[ 엔티티를 바로 써버리면 필요없는 데이터가 다 보여지기 때문.]
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList); 
+        /*String cueSheetItem = String.valueOf(cueSheetItemList);*/
+
+        //큐시트 아이템 리스트를 String 으로 변환 리스트 정보를 text로 저장하기 위함.
+        String cueSheetItem = cueSheetItemDTOList.stream() 
+                .map(n -> String.valueOf(n))
+                .collect(Collectors.joining());
+
+
+        String userId = userAuthService.authUser.getUserId();//수정자 아이디 get
+        //큐시트 이력에 넣어줄 큐시트 아이디 빌드
+        CueSheetSimpleDTO cueSheetSimpleDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
+
+        //큐시트아이템 이력 버전 카운트 조회
+        int getCueVer = cueSheetHistRepository.findCueVer(cueId);
+
+        //큐시트 아이템 이력 DTO 빌드
+        CueSheetHistCreateDTO cueSheetHistBuild = CueSheetHistCreateDTO.builder()
+                .cueVer(++getCueVer)
+                .cueAction(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
+                .cueItemData(cueSheetItem)
+                .inputrId(userId)
+                .cueSheet(cueSheetSimpleDTO)
+                .build();
+
+        //빌드된 큐시트아이템 이력 DTO를 엔티티 변환
+        CueSheetHist cueSheetHist = cueSheetHistCreateMapper.toEntity(cueSheetHistBuild);
+
+        //큐시트 아이템 등록
+        cueSheetHistRepository.save(cueSheetHist);
 
     }
 

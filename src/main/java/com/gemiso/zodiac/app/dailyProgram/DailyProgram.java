@@ -37,13 +37,13 @@ public class DailyProgram extends BaseEntity {
     @Column(name = "brdc_seq", columnDefinition = "numeric(5)", nullable = false)
     private String brdcSeq;
 
-    @Column(name = "brdc_start_time", length = 6, nullable = false)
+    @Column(name = "brdc_start_time", length = 8, nullable = false)
     private String brdcStartTime;
 
     @Column(name = "brdc_end_clk", columnDefinition = "bpchar(6)", nullable = false)
     private String brdcEndClk;
 
-    @Column(name = "brdc_div_cd")
+    @Column(name = "brdc_div_cd", length = 50)
     private String brdcDivCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = brdc_div_cd)")
@@ -52,7 +52,7 @@ public class DailyProgram extends BaseEntity {
     @Column(name = "brdc_pgm_nm", length = 450)
     private String brdcPgmNm;
 
-    @Column(name = "src_div_cd")
+    @Column(name = "src_div_cd", length = 50)
     private String srcDivCd;
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = src_div_cd)")
@@ -70,14 +70,14 @@ public class DailyProgram extends BaseEntity {
     @Column(name = "rmk", length = 500)
     private String rmk;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)

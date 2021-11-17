@@ -52,7 +52,9 @@ public class ArticleCapController {
 
         Long articleCapId = articleCapService.create(articleCapCreateDTO);
 
-        ArticleCapDTO articleCapDTO = articleCapService.find(articleCapId);
+        //기사자막 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        ArticleCapDTO articleCapDTO = new ArticleCapDTO();
+        articleCapDTO.setArtclCapId(articleCapId);
 
         return new ApiResponse<>(articleCapDTO);
     }
@@ -66,7 +68,9 @@ public class ArticleCapController {
 
         articleCapService.update(articleCapUpdateDTO, articleCapId);
 
-        ArticleCapDTO articleCapDTO = articleCapService.find(articleCapId);
+        //기사자막 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        ArticleCapDTO articleCapDTO = new ArticleCapDTO();
+        articleCapDTO.setArtclCapId(articleCapId);
 
         return new ApiResponse<>(articleCapDTO);
 

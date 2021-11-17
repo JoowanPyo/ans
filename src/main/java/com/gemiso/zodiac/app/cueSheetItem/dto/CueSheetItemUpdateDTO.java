@@ -21,6 +21,7 @@ public class CueSheetItemUpdateDTO {
 
     private Long cueItemId;
     private String cueItemTitl;
+    private String cueItemTitlEn;
     private String cueItemCtt;
     private int cueItemOrd;
     private String cueItemOrdCd;
@@ -65,9 +66,9 @@ public class CueSheetItemUpdateDTO {
     //private String delrNm;
     //private String lckrId;
     //private String lckrNm;
-    private String atop;
-    private String aheadLine;
-    private String aref;
+    private String artclTop;
+    private String headLn;
+    private String artclRef;
     private CueSheetSimpleDTO cueSheet;
     private ArticleUpdateDTO article;
 }

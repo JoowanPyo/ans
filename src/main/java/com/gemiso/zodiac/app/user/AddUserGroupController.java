@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+//@Tag(name = "User Controllers", description = "User API")
+@Api(description = "사용자 그룹 추가 API")
 @RestController
 @RequestMapping("/addUserGroups")
 @Slf4j
 @RequiredArgsConstructor
-//@Tag(name = "User Controllers", description = "User API")
-@Api(description = "사용자 그룹 추가 API")
 public class AddUserGroupController {
 
     private final AddUserGroupService addUserGroupService;
