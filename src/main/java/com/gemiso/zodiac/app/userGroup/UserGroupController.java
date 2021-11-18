@@ -3,7 +3,7 @@ package com.gemiso.zodiac.app.userGroup;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupCreateDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupUpdateDTO;
-import com.gemiso.zodiac.core.response.ApiResponse;
+import com.gemiso.zodiac.core.response.AnsApiResponse;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,19 +31,19 @@ public class UserGroupController {
     @Operation(summary = "사용자 그룹 목록조회", description = "사용자 그룹 목록조회")
     @GetMapping(path = "")
     @CrossOrigin(origins = "*")
-    public ApiResponse<List<UserGroupDTO>> findAll(@Parameter(name = "userGrpNm", description = "그룹 명")
+    public AnsApiResponse<List<UserGroupDTO>> findAll(@Parameter(name = "userGrpNm", description = "그룹 명")
                                                    @RequestParam(value = "userGrpNm", required = false) String userGrpNm,
-                                                   @Parameter(name = "useYn", description = "사용 여부")
+                                                      @Parameter(name = "useYn", description = "사용 여부")
                                                    @RequestParam(value = "useYn", required = false) String useYn) {
 
         List<UserGroupDTO> userGroupUserDtoList = userGroupService.findAll(userGrpNm, useYn);
 
-        return new ApiResponse<>(userGroupUserDtoList);
+        return new AnsApiResponse<>(userGroupUserDtoList);
     }
 
     @Operation(summary = "사용자 그룹 상세 조회", description = "사용자 그룹 상세 조회")
     @GetMapping(path = "/{userGrpId}")
-    public ApiResponse<UserGroupDTO> find(@Parameter(name = "userGrpId", description = "그룹 아이디")
+    public AnsApiResponse<UserGroupDTO> find(@Parameter(name = "userGrpId", description = "그룹 아이디")
                                           @PathVariable("userGrpId") Long userGrpId) {
 
         UserGroupDTO userGroupDTO = userGroupService.find(userGrpId);
@@ -52,26 +52,26 @@ public class UserGroupController {
             throw new ResourceNotFoundException("UserGroupId not found. userGroupId" + userGrpId);
         }
 
-        return new ApiResponse<>(userGroupDTO);
+        return new AnsApiResponse<>(userGroupDTO);
     }
 
     @Operation(summary = "사용자 그룹 등록", description = "사용자 그룹 등록")
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<UserGroupDTO> create(
+    public AnsApiResponse<UserGroupDTO> create(
             @Parameter(description = "필수값<br> ", required = true) @RequestBody @Valid UserGroupCreateDTO userGroupCreateDTO
     ) {
 
         UserGroupDTO userGroupDTO = userGroupService.create(userGroupCreateDTO);
 
-        return new ApiResponse<UserGroupDTO>(userGroupDTO);
+        return new AnsApiResponse<UserGroupDTO>(userGroupDTO);
     }
 
     @Operation(summary = "사용자 그룹 정보 수정", description = "사용자 그룹 정보 수정")
     @PutMapping(path = "/{userGrpId}")
-    public ApiResponse<UserGroupDTO> update(@Parameter(name = "userDto", required = true, description = "필수값<br>")
+    public AnsApiResponse<UserGroupDTO> update(@Parameter(name = "userDto", required = true, description = "필수값<br>")
                                             @Valid @RequestBody UserGroupUpdateDTO userGroupUpdateDTO,
-                                            @Parameter(name = "userGrpId", required = true) @PathVariable("userGrpId") Long userGrpId) {
+                                               @Parameter(name = "userGrpId", required = true) @PathVariable("userGrpId") Long userGrpId) {
 
         UserGroupDTO userGroupIdCheck = userGroupService.find(userGrpId);
         if (ObjectUtils.isEmpty(userGroupIdCheck)) {
@@ -82,13 +82,13 @@ public class UserGroupController {
 
         UserGroupDTO userGroupDTO = userGroupService.find(userGrpId);
 
-        return new ApiResponse<>(userGroupDTO);
+        return new AnsApiResponse<>(userGroupDTO);
     }
 
     @Operation(summary = "사용자 삭제", description = "사용자 삭제")
     @DeleteMapping(path = "/{userGrpId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResponse<?> delete(
+    public AnsApiResponse<?> delete(
             @Parameter(name = "userGrpId", description = "사용자 아이디") @PathVariable("userGrpId") Long userGrpId) {
 
         UserGroupDTO userGroupIdCheck = userGroupService.find(userGrpId);
@@ -98,7 +98,7 @@ public class UserGroupController {
 
         userGroupService.delete(userGrpId);
 
-        return ApiResponse.noContent();
+        return AnsApiResponse.noContent();
 
     }
 

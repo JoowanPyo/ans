@@ -4,7 +4,7 @@ package com.gemiso.zodiac.app.auth;
 import com.gemiso.zodiac.app.auth.dto.AuthDTO;
 import com.gemiso.zodiac.app.auth.dto.AuthRequestDTO;
 import com.gemiso.zodiac.app.auth.dto.JwtDTO;
-import com.gemiso.zodiac.core.response.ApiResponse;
+import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,44 +28,44 @@ public class AuthController {
     @Operation(summary = "사용자 로그인", description = "사용자 로그인")
     @PostMapping(path = "/login")//login
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<JwtDTO> login(@Parameter(name = "loginDTO", required = true, description = "필수값<br> userId , password")
+    public AnsApiResponse<JwtDTO> login(@Parameter(name = "loginDTO", required = true, description = "필수값<br> userId , password")
                                      @Valid @RequestBody AuthRequestDTO authRequestDTO
     ) throws Exception {
 
         JwtDTO jwtDTO = authService.login(authRequestDTO);
 
-        return new ApiResponse<>(jwtDTO);
+        return new AnsApiResponse<>(jwtDTO);
     }
 
     @Operation(summary = "Access Token 재발급", description = "Access Token 재발급")
     @PostMapping(path = "/againlogin")//againlogin
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<JwtDTO> reissuance(@Parameter(name = "authorization", description = "엑세스토큰")
+    public AnsApiResponse<JwtDTO> reissuance(@Parameter(name = "authorization", description = "엑세스토큰")
                                           @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {
 
         JwtDTO jwtDTO = authService.reissuance(authorization);
 
-        return new ApiResponse<>(jwtDTO);
+        return new AnsApiResponse<>(jwtDTO);
     }
 
     @Operation(summary = "로그아웃", description = "로그아웃")
     @PostMapping(path = "/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResponse<?> logout(@Parameter(name = "authorization", description = "엑세스토큰")
+    public AnsApiResponse<?> logout(@Parameter(name = "authorization", description = "엑세스토큰")
                                  @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {
 
         authService.logout(authorization);
 
-        return ApiResponse.noContent();
+        return AnsApiResponse.noContent();
     }
 
     @Operation(summary = "사용자 로그인 정보 조회", description = "사용자 로그인 정보 조회")
     @GetMapping(path = "/me")
-    public ApiResponse<AuthDTO> find(@Parameter(name = "authorization", description = "엑세스토큰", in = ParameterIn.PATH)
+    public AnsApiResponse<AuthDTO> find(@Parameter(name = "authorization", description = "엑세스토큰", in = ParameterIn.PATH)
                                       @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {
 
         AuthDTO authDTO = authService.find(authorization);
 
-        return new ApiResponse<>(authDTO);
+        return new AnsApiResponse<>(authDTO);
     }
 }

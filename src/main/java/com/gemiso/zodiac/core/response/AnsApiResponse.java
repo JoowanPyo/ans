@@ -18,29 +18,29 @@ import org.springframework.http.HttpStatus;
  * }
  */
 @Data
-public class ApiResponse<T> /*extends BaseApiResponse*/ {
+public class AnsApiResponse<T> /*extends BaseApiResponse*/ {
     private final HttpStatus status;
     private final boolean success;
     private final T data;
 
 
-    public ApiResponse(T data) {
+    public AnsApiResponse(T data) {
         this.data = data;
         this.status = HttpStatus.OK;
         this.success = true;
     }
 
-    public ApiResponse(T data, HttpStatus status) {
+    public AnsApiResponse(T data, HttpStatus status) {
         this.data = data;
         this.status = status;
         this.success = true;
     }
 
-    public static ApiResponse ok() {
-        return new ApiResponse(null, HttpStatus.OK);
+    public static AnsApiResponse ok() {
+        return new AnsApiResponse(null, HttpStatus.OK);
     }
-    public static ApiResponse noContent() {
-        return new ApiResponse(null, HttpStatus.NO_CONTENT);
+    public static AnsApiResponse noContent() {
+        return new AnsApiResponse(null, HttpStatus.NO_CONTENT);
     }
 
 }

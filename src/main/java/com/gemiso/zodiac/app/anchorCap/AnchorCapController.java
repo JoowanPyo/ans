@@ -3,8 +3,7 @@ package com.gemiso.zodiac.app.anchorCap;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapCreateDTO;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapDTO;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapUpdateDTO;
-import com.gemiso.zodiac.app.articleCap.dto.ArticleCapCreateDTO;
-import com.gemiso.zodiac.core.response.ApiResponse;
+import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,28 +26,28 @@ public class AnchorCapController {
 
     @Operation(summary = "앵커자막 목록조회", description = "앵커자막 목록조회")
     @GetMapping(path = "")
-    public ApiResponse<List<AnchorCapDTO>> findAll(@Parameter(name = "anchorCapId", description = "앵커자막 아이디")
+    public AnsApiResponse<List<AnchorCapDTO>> findAll(@Parameter(name = "anchorCapId", description = "앵커자막 아이디")
                                                    @RequestParam(value = "anchorCapId", required = false) Long anchorCapId) {
 
         List<AnchorCapDTO> anchorCapDTOList = anchorCapService.findAll(anchorCapId);
 
-        return new ApiResponse<>(anchorCapDTOList);
+        return new AnsApiResponse<>(anchorCapDTOList);
     }
 
     @Operation(summary = "앵커자막 상세조회", description = "앵커자막 상세조회")
     @GetMapping(path = "/{anchorCapId}")
-    public ApiResponse<AnchorCapDTO> find(@Parameter(name = "anchorCapId", required = true, description = "앵커자막 아이디")
+    public AnsApiResponse<AnchorCapDTO> find(@Parameter(name = "anchorCapId", required = true, description = "앵커자막 아이디")
                                           @PathVariable("anchorCapId") Long anchorCapId) {
 
         AnchorCapDTO anchorCapDTO = anchorCapService.find(anchorCapId);
 
-        return new ApiResponse<>(anchorCapDTO);
+        return new AnsApiResponse<>(anchorCapDTO);
     }
 
     @Operation(summary = "앵커자막 등록", description = "앵커자막 등록")
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<AnchorCapDTO> create(@Parameter(description = "필수값<br>, ", required = true)
+    public AnsApiResponse<AnchorCapDTO> create(@Parameter(description = "필수값<br>, ", required = true)
                                             @RequestBody AnchorCapCreateDTO anchorCapCreateDTO) {
 
         Long anchorCapId = anchorCapService.create(anchorCapCreateDTO);
@@ -57,14 +56,14 @@ public class AnchorCapController {
         AnchorCapDTO anchorCapDTO = new AnchorCapDTO();
         anchorCapDTO.setAnchorCapId(anchorCapId);
 
-        return new ApiResponse<>(anchorCapDTO);
+        return new AnsApiResponse<>(anchorCapDTO);
     }
 
     @Operation(summary = "앵커자막 수정", description = "앵커자막 수정")
     @PutMapping(path = "/{anchorCapId}")
-    public ApiResponse<AnchorCapDTO> update(@Parameter(description = "필수값<br>, ", required = true)
+    public AnsApiResponse<AnchorCapDTO> update(@Parameter(description = "필수값<br>, ", required = true)
                                             @RequestBody AnchorCapUpdateDTO anchorCapUpdateDTO,
-                                            @Parameter(name = "anchorCapId", required = true, description = "앵커자막 아이디")
+                                               @Parameter(name = "anchorCapId", required = true, description = "앵커자막 아이디")
                                             @PathVariable("anchorCapId") Long anchorCapId) {
 
         anchorCapService.update(anchorCapUpdateDTO, anchorCapId);
@@ -73,19 +72,19 @@ public class AnchorCapController {
         AnchorCapDTO anchorCapDTO = new AnchorCapDTO();
         anchorCapDTO.setAnchorCapId(anchorCapId);
 
-        return new ApiResponse<>(anchorCapDTO);
+        return new AnsApiResponse<>(anchorCapDTO);
 
     }
 
     @Operation(summary = "앵커자막 삭제", description = "앵커자막 삭제")
     @DeleteMapping(path = "/{anchorCapId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResponse<?> delete(@Parameter(name = "anchorCapId", required = true, description = "앵커자막 아이디")
+    public AnsApiResponse<?> delete(@Parameter(name = "anchorCapId", required = true, description = "앵커자막 아이디")
                                  @PathVariable("anchorCapId") Long anchorCapId) {
 
         anchorCapService.delete(anchorCapId);
 
-        return ApiResponse.noContent();
+        return AnsApiResponse.noContent();
     }
 
 }

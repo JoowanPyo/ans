@@ -6,7 +6,9 @@ import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateUpdateDTO;
 import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateCreateMapper;
 import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateMapper;
 import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateUpdateMapper;
+import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrp;
 import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrpService;
+import com.gemiso.zodiac.app.capTemplateGrp.dto.CapTemplateGrpDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -64,9 +66,18 @@ public class CapTemplateService {
 
     }
 
-    public Long create(CapTemplateCreateDTO capTemplateCreateDTO){
+    public Long create(CapTemplateCreateDTO capTemplateCreateDTO, Long tmpltGrpId){
 
-        CapTemplate capTemplate = new CapTemplate();
+        CapTemplate capTemplate = new CapTemplate(); //return Object
+
+        // 템플릿 그룹 유무 확인.
+        CapTemplateGrp capTemplateGrp = capTemplateGrpService.templateFindOrFail(tmpltGrpId);
+
+        //자막템플릿에 넣어줄 자막템플릿그룹 아이디 빌드
+        CapTemplateGrpDTO capTemplateGrpDTO = CapTemplateGrpDTO.builder().tmpltGrpId(tmpltGrpId).build();
+
+        //자막템플릿에 자막템플릿그룹 아이디 set
+        capTemplateCreateDTO.setCapTemplateGrp(capTemplateGrpDTO);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
@@ -199,9 +210,9 @@ public class CapTemplateService {
 
         QCapTemplate qCap = QCapTemplate.capTemplate;
 
-        if(!ObjectUtils.isEmpty(brdc_pgm_id)){
+        /*if(!ObjectUtils.isEmpty(brdc_pgm_id)){
             booleanBuilder.and(qCap.brdcPgmId.eq(brdc_pgm_id));
-        }
+        }*/
         if(!StringUtils.isEmpty(cap_class_cd)){
             booleanBuilder.and(qCap.capClassCd.eq(cap_class_cd));
         }

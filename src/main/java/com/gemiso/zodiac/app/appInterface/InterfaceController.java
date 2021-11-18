@@ -1,13 +1,9 @@
 package com.gemiso.zodiac.app.appInterface;
 
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueSheetDataDTO;
 import com.gemiso.zodiac.app.appInterface.programDTO.ParentProgramDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
-import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.page.PageResultDTO;
-import com.gemiso.zodiac.core.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,7 +14,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.List;
 
 @Api(description = "연계 인터페이스 API")
 @RestController
@@ -61,19 +56,19 @@ public class InterfaceController {
 
     /*@Operation(summary = "큐시트 상세조회[Taker]", description = "큐시트 상세조회[Taker]")
     @GetMapping(path = "/cuesheet/{cueId}")
-    public ApiResponse<CueSheetDTO> cueFind(@Parameter(name = "cueId", description = "큐시트 아이디")
+    public AnsApiResponse<CueSheetDTO> cueFind(@Parameter(name = "cueId", description = "큐시트 아이디")
                                             @PathVariable("cueId") Long cueId,
                                             @RequestHeader(value = "securityKey") String securityKey) {
 
 
         CueSheetDTO cueSheetDTO = interfaceService.cueFind(cueId);
 
-        return new ApiResponse<>(cueSheetDTO);
+        return new AnsApiResponse<>(cueSheetDTO);
     }
 
     @Operation(summary = "큐시트 아이템 목록조회[Taker]", description = "큐시트 아이템 목록조회[Taker]")
     @GetMapping(path = "/cuesheet/{cueId}/cuesheetitems")
-    public ApiResponse<List<CueSheetItemDTO>> cueItemFindAll(@Parameter(name = "artlcId", description = "기사 아이디")
+    public AnsApiResponse<List<CueSheetItemDTO>> cueItemFindAll(@Parameter(name = "artlcId", description = "기사 아이디")
                                                              @RequestParam(value = "artlcId", required = false) Long artlcId,
                                                              @Parameter(name = "cueId", description = "큐시트 아이디")
                                                              @PathVariable("cueId") Long cueId,
@@ -81,7 +76,7 @@ public class InterfaceController {
 
         List<CueSheetItemDTO> cueSheetItemDTOList = interfaceService.cueItemFindAll(artlcId, cueId);
 
-        return new ApiResponse<>(cueSheetItemDTOList);
+        return new AnsApiResponse<>(cueSheetItemDTOList);
     }*/
 
     @Operation(summary = "큐시트 목록조회[Taker]", description = "큐시트 목록조회[Taker]")

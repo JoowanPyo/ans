@@ -1,7 +1,7 @@
 package com.gemiso.zodiac.app.home;
 
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
-import com.gemiso.zodiac.core.response.ApiResponse;
+import com.gemiso.zodiac.core.response.AnsApiResponse;
 import com.querydsl.core.types.Order;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,16 +25,16 @@ public class HomeController {
     //작성자 기준?? 기자아이디(rptr_id)기준?
     @Operation(summary = "홈화면 내기사 목록", description = "홈화면 내기사 목록")
     @GetMapping(path = "/myarticle")
-    public ApiResponse<List<ArticleDTO>> findMyArticle(){
+    public AnsApiResponse<List<ArticleDTO>> findMyArticle(){
 
         List<ArticleDTO> articleDTOList = homeService.findAll();
 
-        return new ApiResponse<>(articleDTOList);
+        return new AnsApiResponse<>(articleDTOList);
     }
 
     @Operation(summary = "홈화면 내기사 목록", description = "홈화면 내기사 목록")
     @GetMapping(path = "/myorder")
-    public ApiResponse<List<Order>> findMyOrder(){
+    public AnsApiResponse<List<Order>> findMyOrder(){
 
         return null;
     }

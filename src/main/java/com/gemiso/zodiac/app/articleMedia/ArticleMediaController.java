@@ -5,7 +5,7 @@ import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaCreateDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
-import com.gemiso.zodiac.core.response.ApiResponse;
+import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,12 +33,12 @@ public class ArticleMediaController {
 
     @Operation(summary = "기사 미디어 목록조회", description = "기사 미디어 목록조회")
     @GetMapping(path = "")
-    public ApiResponse<List<ArticleMediaDTO>> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
-                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
-                                                      @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
-                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                      @Parameter(name = "trnsfFileNm", description = "전송 파일 명")
-                                                      @RequestParam(value = "trnsfFileNm", required = false) String trnsfFileNm) throws Exception {
+    public AnsApiResponse<List<ArticleMediaDTO>> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                         @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                         @Parameter(name = "trnsfFileNm", description = "전송 파일 명")
+                                                         @RequestParam(value = "trnsfFileNm", required = false) String trnsfFileNm) throws Exception {
 
         List<ArticleMediaDTO> articleMediaDTOList = new ArrayList<>();
 
@@ -48,27 +48,27 @@ public class ArticleMediaController {
 
             articleMediaDTOList = articleMediaService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), trnsfFileNm);
 
-        }else {
+        } else {
             articleMediaDTOList = articleMediaService.findAll(null, null, trnsfFileNm);
         }
-        return new ApiResponse<>(articleMediaDTOList);
+        return new AnsApiResponse<>(articleMediaDTOList);
     }
 
     @Operation(summary = "기사 미디어 상세조회", description = "기사 미디어 상세조회")
     @GetMapping(path = "/{artclMediaId}")
-    public ApiResponse<ArticleMediaDTO> find(@Parameter(name = "artclMediaId", description = "기사미디어 아이디")
-                                             @PathVariable("artclMediaId") Long artclMediaId) {
+    public AnsApiResponse<ArticleMediaDTO> find(@Parameter(name = "artclMediaId", description = "기사미디어 아이디")
+                                                @PathVariable("artclMediaId") Long artclMediaId) {
 
         ArticleMediaDTO articleMediaDTO = articleMediaService.find(artclMediaId);
 
-        return new ApiResponse<>(articleMediaDTO);
+        return new AnsApiResponse<>(articleMediaDTO);
     }
 
     @Operation(summary = "기사 미디어 등록", description = "기사 미디어 등록")
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<ArticleMediaDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                               @RequestBody @Valid ArticleMediaCreateDTO articleMediaCreateDTO) {
+    public AnsApiResponse<ArticleMediaDTO> create(@Parameter(description = "필수값<br> ", required = true)
+                                                  @RequestBody @Valid ArticleMediaCreateDTO articleMediaCreateDTO) {
 
         Long artclMediaId = articleMediaService.create(articleMediaCreateDTO);
 
@@ -76,15 +76,15 @@ public class ArticleMediaController {
         ArticleMediaDTO articleMediaDTO = new ArticleMediaDTO();
         articleMediaDTO.setArtclMediaId(artclMediaId);
 
-        return new ApiResponse<>(articleMediaDTO);
+        return new AnsApiResponse<>(articleMediaDTO);
     }
 
     @Operation(summary = "기사 미디어 수정", description = "기사 미디어 수정")
     @PutMapping(path = "/{artclMediaId}")
-    public ApiResponse<ArticleMediaDTO> update(@Parameter(description = "필수값<br> ", required = true)
-                                               @RequestBody @Valid ArticleMediaUpdateDTO articleMediaUpdateDTO,
-                                               @Parameter(name = "artclMediaId", description = "기사미디어 아이디")
-                                               @PathVariable("artclMediaId") Long artclMediaId) {
+    public AnsApiResponse<ArticleMediaDTO> update(@Parameter(description = "필수값<br> ", required = true)
+                                                  @RequestBody @Valid ArticleMediaUpdateDTO articleMediaUpdateDTO,
+                                                  @Parameter(name = "artclMediaId", description = "기사미디어 아이디")
+                                                  @PathVariable("artclMediaId") Long artclMediaId) {
 
         articleMediaService.update(articleMediaUpdateDTO, artclMediaId);
 
@@ -92,19 +92,19 @@ public class ArticleMediaController {
         ArticleMediaDTO articleMediaDTO = new ArticleMediaDTO();
         articleMediaDTO.setArtclMediaId(artclMediaId);
 
-        return new ApiResponse<>(articleMediaDTO);
+        return new AnsApiResponse<>(articleMediaDTO);
 
     }
 
     @Operation(summary = "기사 미디어 삭제", description = "기사 미디어 삭제")
     @DeleteMapping(path = "/{artclMediaId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResponse<?> delete(@Parameter(name = "artclMediaId", description = "기사미디어 아이디")
-                                 @PathVariable("artclMediaId") Long artclMediaId) {
+    public AnsApiResponse<?> delete(@Parameter(name = "artclMediaId", description = "기사미디어 아이디")
+                                    @PathVariable("artclMediaId") Long artclMediaId) {
 
         articleMediaService.delete(artclMediaId);
 
-        return ApiResponse.noContent();
+        return AnsApiResponse.noContent();
     }
 
 }

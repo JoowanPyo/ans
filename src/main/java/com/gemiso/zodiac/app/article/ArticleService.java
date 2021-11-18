@@ -6,6 +6,10 @@ import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapCreateDTO;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.anchorCap.mapper.AnchorCapCreateMapper;
 import com.gemiso.zodiac.app.anchorCap.mapper.AnchorCapSimpleMapper;
+import com.gemiso.zodiac.app.anchorCapHist.AnchorCapHist;
+import com.gemiso.zodiac.app.anchorCapHist.AnchorCapHistRepository;
+import com.gemiso.zodiac.app.anchorCapHist.dto.AnchorCapHistCreateDTO;
+import com.gemiso.zodiac.app.anchorCapHist.mapper.AnchorCapHistCreateMapper;
 import com.gemiso.zodiac.app.article.dto.ArticleCreateDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleLockDTO;
@@ -21,8 +25,13 @@ import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapCreateMapper;
 import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapMapper;
 import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapSimpleMapper;
+import com.gemiso.zodiac.app.articleCapHist.ArticleCapHist;
+import com.gemiso.zodiac.app.articleCapHist.ArticleCapHistRepository;
+import com.gemiso.zodiac.app.articleCapHist.dto.ArticleCapHistCreateDTO;
+import com.gemiso.zodiac.app.articleCapHist.mapper.ArticleCapHistCreateMapper;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.articleHist.ArticleHistRepository;
+import com.gemiso.zodiac.app.articleHist.dto.ArticleHistSimpleDTO;
 import com.gemiso.zodiac.app.articleHist.mapper.ArticleHistSimpleMapper;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
@@ -81,13 +90,12 @@ public class ArticleService {
     private final UserGroupUserRepository userGroupUserRepository;
     private final UserGroupAuthRepository userGroupAuthRepository;
     private final AnchorCapRepository anchorCapRepository;
-    private final IssueRepositoy issueRepositoy;
+    private final ArticleCapHistRepository articleCapHistRepository;
+    private final AnchorCapHistRepository anchorCapHistRepository;
 
     private final ArticleMapper articleMapper;
     private final ArticleCreateMapper articleCreateMapper;
-    private final ArticleCapMapper articleCapMapper;
     private final ArticleCapSimpleMapper articleCapSimpleMapper;
-    private final ArticleHistSimpleMapper articleHistSimpleMapper;
     private final ArticleMediaSimpleMapper articleMediaSimpleMapper;
     private final ArticleOrderSimpleMapper articleOrderSimpleMapper;
     private final ArticleUpdateMapper articleUpdateMapper;
@@ -95,6 +103,8 @@ public class ArticleService {
     private final AnchorCapSimpleMapper anchorCapSimpleMapper;
     private final ArticleCapCreateMapper articleCapCreateMapper;
     private final AnchorCapCreateMapper anchorCapCreateMapper;
+    private final ArticleCapHistCreateMapper articleCapHistCreateMapper;
+    private final AnchorCapHistCreateMapper anchorCapHistCreateMapper;
 
     private final UserAuthService userAuthService;
     private final UserService userService;
@@ -264,23 +274,23 @@ public class ArticleService {
         Article article = articleCreateMapper.toEntity(articleCreateDTO);
         articleRepository.save(article);
 
-        ArticleDTO articleDTO = articleMapper.toDto(article);
+        //기사 이력 create
+        Long articleHistId = createArticleHist(article);
 
-        Long articleId = articleDTO.getArtclId();
+        Long articleId = article.getArtclId();//기사 자막등록 및 리턴시켜줄 기사아이디
 
         //기사 자막 create
         List<ArticleCapCreateDTO> articleCapDTOS = articleCreateDTO.getArticleCap();
         List<AnchorCapCreateDTO> anchorCapDTOS = articleCreateDTO.getAnchorCap();
-        createArticleCap(articleCapDTOS, articleId);//기사자막 create
-        createAnchorCap(anchorCapDTOS, articleId);//앵커자막 create.
+        createArticleCap(articleCapDTOS, articleId, articleHistId);//기사자막 create
+        createAnchorCap(anchorCapDTOS, articleId, articleHistId);//앵커자막 create.
 
-        //기사 이력 create
-        createArticleHist(article);
 
-        return article.getArtclId();
+        return articleId;
     }
 
-    public void createAnchorCap(List<AnchorCapCreateDTO> anchorCapDTOS, Long articleId){ //앵커자막 create.
+    //앵커자막 등록
+    public void createAnchorCap(List<AnchorCapCreateDTO> anchorCapDTOS, Long articleId, Long articleHistId){ //앵커자막 create.
 
         if (ObjectUtils.isEmpty(anchorCapDTOS) == false){
             for (AnchorCapCreateDTO anchorCapCreateDTO : anchorCapDTOS){ //앵커자막 리스트 단건씩 저장.
@@ -303,12 +313,15 @@ public class ArticleService {
                 anchorCap.setArticle(article);//기사아이디 엔티티set.
 
                 anchorCapRepository.save(anchorCap);//저장.
+
+                createAnchorCapHist(anchorCap, articleHistId); //앵커자막 이력 등록
             }
         }
 
     }
 
-    public void createArticleCap(List<ArticleCapCreateDTO> articleCapDTOS, Long articleId){//기사자막 create.
+    //기사자막 등록
+    public void createArticleCap(List<ArticleCapCreateDTO> articleCapDTOS, Long articleId, Long articleHistId){//기사자막 create.
 
         if (ObjectUtils.isEmpty(articleCapDTOS) == false) {
             for (ArticleCapCreateDTO articleCapDTO : articleCapDTOS) { //기사자막 리스트 단건씩 저장.
@@ -332,8 +345,77 @@ public class ArticleService {
                 articleCap.setArticle(article); //기사아이디 엔티티set.
 
                 articleCapRepository.save(articleCap); //저장.
+
+                createArticleCapHist(articleCap, articleHistId); //기사자막 이력 저장.
             }
         }
+    }
+
+    //기사자막 이력 등록
+    public void createArticleCapHist(ArticleCap articleCap, Long articleHistId){
+
+        //기사자막이력에 등록할 기사이력 아이디 빌드
+        ArticleHistSimpleDTO articleHistSimpleDTO = ArticleHistSimpleDTO.builder().artclHistId(articleHistId).build();
+
+        Long capTmpltId = null;
+        CapTemplate capTemplate = articleCap.getCapTemplate();
+        if (ObjectUtils.isEmpty(capTemplate) == false){
+            capTmpltId = capTemplate.getCapTmpltId();
+        }
+        String symbolId = "";
+        Symbol symbol = articleCap.getSymbol();
+        if (ObjectUtils.isEmpty(symbol) == false){
+            symbolId = symbol.getSymbolId();
+        }
+        
+        //기사자막 이력 등록DTO 빌드
+        ArticleCapHistCreateDTO articleCapHistCreateDTO = ArticleCapHistCreateDTO.builder()
+                .articleHist(articleHistSimpleDTO)
+                .lnNo(articleCap.getLnNo())
+                .capTmpltId(capTmpltId)
+                .capCtt(articleCap.getCapCtt())
+                .capRmk(articleCap.getCapRmk())
+                .symbolId(symbolId)
+                .capDivCd(articleCap.getCapDivCd())
+                .build();
+
+        //디비에 등록하기위해 엔티티 변환
+        ArticleCapHist articleCapHist = articleCapHistCreateMapper.toEntity(articleCapHistCreateDTO);
+
+        articleCapHistRepository.save(articleCapHist);
+    }
+
+    //앵커자막 이력 등록
+    public void createAnchorCapHist(AnchorCap anchorCap, Long articleHistId){
+
+        //기사자막이력에 등록할 기사이력 아이디 빌드
+        ArticleHistSimpleDTO articleHistSimpleDTO = ArticleHistSimpleDTO.builder().artclHistId(articleHistId).build();
+
+        Long capTmpltId = null;
+        CapTemplate capTemplate = anchorCap.getCapTemplate();
+        if (ObjectUtils.isEmpty(capTemplate) == false){
+            capTmpltId = capTemplate.getCapTmpltId();
+        }
+        String symbolId = "";
+        Symbol symbol = anchorCap.getSymbol();
+        if (ObjectUtils.isEmpty(symbol) == false){
+            symbolId = symbol.getSymbolId();
+        }
+
+        //앵커자막 이력 등록DTO 빌드
+        AnchorCapHistCreateDTO anchorCapHistCreateDTO = AnchorCapHistCreateDTO.builder()
+                .articleHist(articleHistSimpleDTO)
+                .lnNo(anchorCap.getLnNo())
+                .capTmpltId(capTmpltId)
+                .capCtt(anchorCap.getCapCtt())
+                .capRmk(anchorCap.getCapRmk())
+                .symbolId(symbolId)
+                .capDivCd(anchorCap.getCapDivCd())
+                .build();
+        //디비에 등록하기위해 엔티티 변환
+        AnchorCapHist anchorCapHist = anchorCapHistCreateMapper.toEntity(anchorCapHistCreateDTO);
+
+        anchorCapHistRepository.save(anchorCapHist); //등록
     }
 
     public void update(ArticleUpdateDTO articleUpdateDTO, Long artclId) {
@@ -345,10 +427,6 @@ public class ArticleService {
             article.setIssue(null);
         }
 
-        //기사 자막 Update
-        articleCapUpdate(article, articleUpdateDTO);
-        anchorCapupdate(article, articleUpdateDTO);
-
         String userId = userAuthService.authUser.getUserId();
         articleUpdateDTO.setUpdtrId(userId);
 
@@ -357,7 +435,11 @@ public class ArticleService {
         articleRepository.save(article);
 
         //기사이력 등록.
-        updateArticleHist(article);
+        Long articleHistId = updateArticleHist(article);
+
+        //기사 자막 Update
+        articleCapUpdate(article, articleUpdateDTO, articleHistId);
+        anchorCapupdate(article, articleUpdateDTO, articleHistId);
 
     }
 
@@ -393,7 +475,7 @@ public class ArticleService {
 
     }
 
-    private void articleCapUpdate(Article article, ArticleUpdateDTO articleUpdateDTO) { //기사자막 수정.
+    private void articleCapUpdate(Article article, ArticleUpdateDTO articleUpdateDTO, Long articleHistId) { //기사자막 수정.
 
         Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
         List<ArticleCap> articleCapList = article.getArticleCap(); //원본기사 자막 get
@@ -405,12 +487,12 @@ public class ArticleService {
             }
         }
         List<ArticleCapCreateDTO> capSimpleDTOList = articleUpdateDTO.getArticleCap(); //update로 들어온 기사 등록
-        createArticleCap(capSimpleDTOList, articleId); //기사자막 등록
+        createArticleCap(capSimpleDTOList, articleId, articleHistId); //기사자막 등록
 
 
     }
 
-    private void anchorCapupdate(Article article, ArticleUpdateDTO articleUpdateDTO){//앵커자막 수정.
+    private void anchorCapupdate(Article article, ArticleUpdateDTO articleUpdateDTO, Long articleHistId){//앵커자막 수정.
 
         Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
 
@@ -423,7 +505,7 @@ public class ArticleService {
         }
 
         List<AnchorCapCreateDTO> anchorCapCreateDTOList = articleUpdateDTO.getAnchorCap();
-        createAnchorCap(anchorCapCreateDTOList, articleId);//앵커자막 등록
+        createAnchorCap(anchorCapCreateDTOList, articleId, articleHistId);//앵커자막 등록
 
     }
 
@@ -431,10 +513,16 @@ public class ArticleService {
 
         Article article = articleFindOrFail(artclId);
 
+        String lockYn = article.getLckYn();//잠금여부값 get
+        String userId = userAuthService.authUser.getUserId();
+
+        if (lockYn.equals("Y")){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN); // 잠금 사용자가 다르다.
+        }
+
         if (articleLockDTO.getLckYn().equals("Y")) {
             articleLockDTO.setLckDtm(new Date());
             // 토큰 인증된 사용자 아이디를 입력자로 등록
-            String userId = userAuthService.authUser.getUserId();
             articleLockDTO.setLckrId(userId);
         } else {
             article.setLckDtm(null);
@@ -450,7 +538,7 @@ public class ArticleService {
 
     public void articleUnlock(Long artclId, ArticleLockDTO articleLockDTO) {//기사 잠금 해제
 
-        Article article = articleFindOrFail(artclId);
+        Article article = articleFindOrFail(artclId); //기사아이디로 기사정보조회 및 기사유무 확인.
 
         if (articleLockDTO.getLckYn().equals("N")) {
             article.setLckDtm(null);
@@ -561,7 +649,7 @@ public class ArticleService {
         return booleanBuilder;
     }
 
-    public void createArticleHist(Article article) {
+    public Long createArticleHist(Article article) {
 
         ArticleHist articleHist = ArticleHist.builder()
                 .article(article)
@@ -577,10 +665,12 @@ public class ArticleService {
                 .build();
 
         articleHistRepository.save(articleHist);
+
+        return articleHist.getArtclHistId();
     }
 
 
-    public void updateArticleHist(Article article) {
+    public Long updateArticleHist(Article article) {
 
         ArticleHist articleHist = ArticleHist.builder()
                 .article(article)
@@ -597,6 +687,7 @@ public class ArticleService {
 
         articleHistRepository.save(articleHist);
 
+        return articleHist.getArtclHistId();
     }
 
 

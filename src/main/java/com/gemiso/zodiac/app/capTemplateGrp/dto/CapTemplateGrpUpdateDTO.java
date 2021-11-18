@@ -19,7 +19,7 @@ public class CapTemplateGrpUpdateDTO {
     private String chDivCd;
     //private String chDivCdNm;
     private String tmpltGrpNm;
-    private String brdcPgmId;
+   /* private String brdcPgmId;*/
     //private String inputrId;
     //private String inputrNm;
     private String updtrId;

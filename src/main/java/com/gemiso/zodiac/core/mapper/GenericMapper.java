@@ -11,7 +11,6 @@ import java.util.List;
  * @param <D>
  * @param <E>
  */
-
 public interface GenericMapper<D, E, UD> {
 
     D toDto(E e);

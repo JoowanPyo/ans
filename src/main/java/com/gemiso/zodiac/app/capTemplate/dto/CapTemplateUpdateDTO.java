@@ -29,8 +29,8 @@ public class CapTemplateUpdateDTO {
     private int varCnt;
     private String varNm;
     private int takeCount;
-    private Long brdcPgmId;
-    private String brdcPgmNm;
+    /*private Long brdcPgmId;
+    private String brdcPgmNm;*///맵핑테이블로대처.
     private String prvwYn;
     private String useYn;
     //private Date delDtm;

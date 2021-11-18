@@ -32,7 +32,7 @@ import java.util.List;
 public class Symbol extends BaseEntity {
 
     @Id
-    @Column(name = "symbol_id", nullable = false, length = 50)
+    @Column(name = "symbol_id", nullable = false, length = 21)
     private String symbolId;
 
     @Column(name = "symbol_nm", length = 50)

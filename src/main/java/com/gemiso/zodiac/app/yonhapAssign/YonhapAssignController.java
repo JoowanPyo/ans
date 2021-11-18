@@ -5,7 +5,7 @@ import com.gemiso.zodiac.app.yonhapAssign.dto.YonhapAssignDTO;
 import com.gemiso.zodiac.app.yonhapAssign.dto.YonhapAssignResponseDTO;
 import com.gemiso.zodiac.app.yonhapAssign.dto.YonhapAssignUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
-import com.gemiso.zodiac.core.response.ApiResponse;
+import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,17 +32,17 @@ public class YonhapAssignController {
 
     @Operation(summary = "연합담당자지정 목록조회", description = "연합담당자지정 목록조회")
     @GetMapping(path = "")
-    public ApiResponse<List<YonhapAssignDTO>> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
+    public AnsApiResponse<List<YonhapAssignDTO>> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
-                                                      @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
+                                                         @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                      @Parameter(name = "yonhapId", description = "연합기사 아이디")
+                                                         @Parameter(name = "yonhapId", description = "연합기사 아이디")
                                                       @RequestParam(value = "yonhapId", required = false) Long yonhapId,
-                                                      @Parameter(name = "wireId", description = "연합외신기사 아이디")
+                                                         @Parameter(name = "wireId", description = "연합외신기사 아이디")
                                                       @RequestParam(value = "wireId", required = false) Long wireId,
-                                                      @Parameter(name = "designatorId", description = "지정자 아이디")
+                                                         @Parameter(name = "designatorId", description = "지정자 아이디")
                                                       @RequestParam(value = "designatorId", required = false) String designatorId,
-                                                      @Parameter(name = "assignerId", description = "담당자 아이디")
+                                                         @Parameter(name = "assignerId", description = "담당자 아이디")
                                                       @RequestParam(value = "assignerId", required = false) String assignerId) throws Exception {
 
         List<YonhapAssignDTO> yonhapAssignDTOList = new ArrayList<>();
@@ -57,24 +57,24 @@ public class YonhapAssignController {
 
             yonhapAssignDTOList = yonhapAssignService.findAll(null, null, yonhapId, wireId, designatorId, assignerId);
         }
-        return new ApiResponse<>(yonhapAssignDTOList);
+        return new AnsApiResponse<>(yonhapAssignDTOList);
     }
 
     @Operation(summary = "연합담당자지정 상세조회", description = "연합담당자지정 상세조회")
     @GetMapping(path = "/{assignId}")
-    public ApiResponse<YonhapAssignDTO> find(@Parameter(name = "assignId", description = "연합담당자지정 아이디")
+    public AnsApiResponse<YonhapAssignDTO> find(@Parameter(name = "assignId", description = "연합담당자지정 아이디")
                                              @PathVariable("assignId") Long assignId) {
 
         YonhapAssignDTO yonhapAssignDTO = yonhapAssignService.find(assignId);
 
-        return new ApiResponse<>(yonhapAssignDTO);
+        return new AnsApiResponse<>(yonhapAssignDTO);
     }
 
 
     @Operation(summary = "연합담당자지정  등록", description = "연합담당자지정 등록")
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<YonhapAssignResponseDTO> create(@Parameter(description = "필수값<br> ", required = true)
+    public AnsApiResponse<YonhapAssignResponseDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                                  @RequestBody YonhapAssignCreateDTO yonhapAssignCreateDTO) {
 
         YonhapAssignResponseDTO returnId = new YonhapAssignResponseDTO();
@@ -82,14 +82,14 @@ public class YonhapAssignController {
         Long assignId = yonhapAssignService.create(yonhapAssignCreateDTO);
         returnId.setAssignId(assignId);
 
-        return new ApiResponse<>(returnId);
+        return new AnsApiResponse<>(returnId);
     }
 
     @Operation(summary = "연합담당자지정  수정", description = "연합담당자지정 수정")
     @PutMapping(path = "/{assignId}")
-    public ApiResponse<YonhapAssignResponseDTO> update(@Parameter(name = "assignId", description = "연합담당자지정 아이디")
+    public AnsApiResponse<YonhapAssignResponseDTO> update(@Parameter(name = "assignId", description = "연합담당자지정 아이디")
                                                  @PathVariable("assignId") Long assignId,
-                                                       @Parameter(description = "필수값<br> ", required = true)
+                                                          @Parameter(description = "필수값<br> ", required = true)
                                                  @RequestBody YonhapAssignUpdateDTO yonhapAssignUpdateDTO) {
 
         YonhapAssignResponseDTO returnId = new YonhapAssignResponseDTO();
@@ -98,16 +98,16 @@ public class YonhapAssignController {
 
         returnId.setAssignId(assignId);
 
-        return new ApiResponse<>(returnId);
+        return new AnsApiResponse<>(returnId);
     }
 
     @Operation(summary = "연합담당자지정  삭제", description = "연합담당자지정 삭제")
     @DeleteMapping(path = "/{assignId}")
-    public ApiResponse<?> delete(@Parameter(name = "assignId", description = "연합담당자지정 아이디")
+    public AnsApiResponse<?> delete(@Parameter(name = "assignId", description = "연합담당자지정 아이디")
                                  @PathVariable("assignId") Long assignId) {
 
         yonhapAssignService.delete(assignId);
 
-        return ApiResponse.noContent();
+        return AnsApiResponse.noContent();
     }
 }

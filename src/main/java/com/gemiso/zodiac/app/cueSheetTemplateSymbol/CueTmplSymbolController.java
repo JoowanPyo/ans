@@ -2,7 +2,7 @@ package com.gemiso.zodiac.app.cueSheetTemplateSymbol;
 
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolCreateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolDTO;
-import com.gemiso.zodiac.core.response.ApiResponse;
+import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,9 +27,9 @@ public class CueTmplSymbolController {
     @Operation(summary = "큐시트 템플릿 방송아이콘 등록", description = "큐시트 템플릿 방송아이콘 등록")
     @PostMapping(path = "/{cueTmpltId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<CueTmplSymbolDTO> create(@Parameter(name = "cueTmpltId", required = true, description = "큐시트 템플릿 아이디")
+    public AnsApiResponse<CueTmplSymbolDTO> create(@Parameter(name = "cueTmpltId", required = true, description = "큐시트 템플릿 아이디")
                                                          @PathVariable("cueTmpltId") Long cueTmpltId,
-                                                @Parameter(description = "필수값<br> ", required = true)
+                                                   @Parameter(description = "필수값<br> ", required = true)
                                                          @RequestBody @Valid List<CueTmplSymbolCreateDTO> cueTmplSymbolCreateDTO) {
 
         cueTmplSymbolService.create(cueTmpltId, cueTmplSymbolCreateDTO);

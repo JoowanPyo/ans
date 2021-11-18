@@ -2,7 +2,7 @@ package com.gemiso.zodiac.app.file;
 
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.dto.StatusCodeFileDTO;
-import com.gemiso.zodiac.core.response.ApiResponse;
+import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,11 +32,11 @@ public class AttachFileController {
     @Operation(summary = "파일 업로드", description = "파일 업로드")
     @PostMapping(path = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<StatusCodeFileDTO> create(@RequestPart MultipartFile file, @RequestParam String fileDivCd) {
+    public AnsApiResponse<StatusCodeFileDTO> create(@RequestPart MultipartFile file, @RequestParam String fileDivCd) {
 
         StatusCodeFileDTO statusCodeFileDTO = attachFileService.create(file, fileDivCd);
 
-        return new ApiResponse<>(statusCodeFileDTO);
+        return new AnsApiResponse<>(statusCodeFileDTO);
     }
 
 

@@ -36,8 +36,9 @@ public class CapTemplateGrp extends BaseEntity {
     @Column(name = "tmplt_grp_nm", length = 150, nullable = false)
     private String tmpltGrpNm;
 
-    @Column(name = "brdc_pgm_id", length = 21)
-    private String brdcPgmId;
+    //맵핑테이블로 대처.
+    /*@Column(name = "brdc_pgm_id", length = 21)
+    private String brdcPgmId;*/
 
     @Column(name = "inputr_id", length = 50)
     private String inputrId;

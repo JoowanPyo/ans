@@ -1,7 +1,7 @@
 package com.gemiso.zodiac.app.articleOrder;
 
 import com.gemiso.zodiac.app.articleOrder.dto.*;
-import com.gemiso.zodiac.core.response.ApiResponse;
+import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,30 +25,30 @@ public class ArticleOrderFileController {
 
     @Operation(summary = "기사의뢰 첨부파일 목록조회", description = "기사의뢰 첨부파일 목록조회")
     @GetMapping(path = "")
-    public ApiResponse<List<ArticleOrderFileDTO>> findAll(@Parameter(name = "orderId", description = "의뢰 아이디")
+    public AnsApiResponse<List<ArticleOrderFileDTO>> findAll(@Parameter(name = "orderId", description = "의뢰 아이디")
                                                           @RequestParam(value = "orderId", required = false) Long orderId) {
 
         List<ArticleOrderFileDTO> articleOrderFileDTOList = articleOrderFileService.findAll(orderId);
 
-        return new ApiResponse<>(articleOrderFileDTOList);
+        return new AnsApiResponse<>(articleOrderFileDTOList);
     }
 
     @Operation(summary = "기사의뢰 첨부파일 상세조회", description = "기사의뢰 첨부파일 상세조회")
     @GetMapping(path = "/{id}")
-    public ApiResponse<ArticleOrderFileDTO> find(@Parameter(name = "id", required = true, description = "의뢰 첨부파일 아이디")
+    public AnsApiResponse<ArticleOrderFileDTO> find(@Parameter(name = "id", required = true, description = "의뢰 첨부파일 아이디")
                                                  @PathVariable("id") long id) {
 
         ArticleOrderFileDTO articleOrderFileDTO = articleOrderFileService.find(id);
 
-        return new ApiResponse<>(articleOrderFileDTO);
+        return new AnsApiResponse<>(articleOrderFileDTO);
     }
 
     @Operation(summary = "기사의뢰 첨부파일 등록", description = "기사의뢰 첨부파일 등록")
     @PostMapping(path = "/{orderId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<List<ArticleOrderFileDTO>> create(@Parameter(name = "orderId", required = true, description = "의뢰 첨부파일 아이디")
+    public AnsApiResponse<List<ArticleOrderFileDTO>> create(@Parameter(name = "orderId", required = true, description = "의뢰 첨부파일 아이디")
                                                            @PathVariable("orderId") long orderId,
-                                                           @Parameter(description = "필수값<br>", required = true)
+                                                            @Parameter(description = "필수값<br>", required = true)
                                                            @RequestBody @Valid List<ArticleOrderFileCreateDTO> articleOrderFileCreateDTOList) {
 
         //오더 파일등록하고 오더아이디로 등록된 파일리스트 조회 하기위해 오더아이디 response
@@ -58,14 +58,14 @@ public class ArticleOrderFileController {
 
         List<ArticleOrderFileDTO> articleOrderFileDTOList = articleOrderFileService.findAll(orderId);
 
-        return new ApiResponse<>(articleOrderFileDTOList);
+        return new AnsApiResponse<>(articleOrderFileDTOList);
     }
 
     @Operation(summary = "기사의뢰 첨부파일 수정", description = "기사의뢰 첨부파일 수정")
     @PutMapping(path = "/{orderId}")
-    public ApiResponse<List<ArticleOrderFileDTO>> update(@Parameter(name = "orderId", required = true, description = "의뢰 첨부파일 아이디")
+    public AnsApiResponse<List<ArticleOrderFileDTO>> update(@Parameter(name = "orderId", required = true, description = "의뢰 첨부파일 아이디")
                                                            @PathVariable("orderId") long orderId,
-                                                           @Parameter(description = "필수값<br>", required = true)
+                                                            @Parameter(description = "필수값<br>", required = true)
                                                            @RequestBody @Valid List<ArticleOrderFileCreateDTO> articleOrderFileCreateDTOList) {
 
         //오더 파일등록하고 오더아이디로 등록된 파일리스트 조회 하기위해 오더아이디 response
@@ -75,17 +75,17 @@ public class ArticleOrderFileController {
 
         List<ArticleOrderFileDTO> articleOrderFileDTOList = articleOrderFileService.findAll(orderId);
 
-        return new ApiResponse<>(articleOrderFileDTOList);
+        return new AnsApiResponse<>(articleOrderFileDTOList);
     }
 
     @Operation(summary = "기사의뢰 첨부파일 삭제", description = "기사의뢰 첨부파일 삭제")
     @DeleteMapping(path = "/{orderFileId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResponse<?> delete(@Parameter(name = "orderFileId", required = true, description = "의뢰 첨부파일 아이디")
+    public AnsApiResponse<?> delete(@Parameter(name = "orderFileId", required = true, description = "의뢰 첨부파일 아이디")
                                  @PathVariable("orderFileId") long orderFileId) {
 
         articleOrderFileService.delete(orderFileId);
 
-        return ApiResponse.noContent();
+        return AnsApiResponse.noContent();
     }
 }

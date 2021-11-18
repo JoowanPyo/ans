@@ -1,16 +1,17 @@
 package com.gemiso.zodiac.app.article;
 
-import com.gemiso.zodiac.app.appAuth.dto.AppAuthDTO;
 import com.gemiso.zodiac.app.article.dto.*;
 import com.gemiso.zodiac.core.enumeration.AuthEnum;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.page.PageResultDTO;
+import com.gemiso.zodiac.core.response.AnsApiResponse;
 import com.gemiso.zodiac.core.response.ApiCollectionResponse;
-import com.gemiso.zodiac.core.response.ApiResponse;
 import com.gemiso.zodiac.core.service.UserAuthChkService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -55,7 +56,7 @@ public class ArticleController {
 
         //기사읽기 권한이 없는 사용자 error.forbidden
         //List<String> userAuth = userAuthService.authChk(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth());
-        if (userAuthService.authChk(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth())) { //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
+        if (userAuthService.authChks(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth())) { //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -80,38 +81,38 @@ public class ArticleController {
 
     @Operation(summary = "기사 목록조회[큐시트]", description = "기사 목록조회[큐시트]")
     @GetMapping(path = "/cuesheet")
-    public ApiResponse<List<ArticleDTO>> findCue(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = true)
-                                                 @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
-                                                 @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = true)
-                                                 @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                 @Parameter(name = "searchWord", description = "검색키워드")
-                                                 @RequestParam(value = "searchWord", required = false) String searchWord,
-                                                 @Parameter(name = "cueId", description = "검색키워드", required = true)
-                                                 @RequestParam(value = "cueId") Long cueId) throws Exception {
+    public AnsApiResponse<List<ArticleDTO>> findCue(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = true)
+                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                    @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = true)
+                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                    @Parameter(name = "searchWord", description = "검색키워드")
+                                                    @RequestParam(value = "searchWord", required = false) String searchWord,
+                                                    @Parameter(name = "cueId", description = "검색키워드", required = true)
+                                                    @RequestParam(value = "cueId") Long cueId) throws Exception {
 
         SearchDate searchDate = new SearchDate(sdate, edate);
 
         List<ArticleDTO> articleDTOList = articleService.findCue(searchDate.getStartDate(), searchDate.getEndDate(), searchWord, cueId);
 
-        return new ApiResponse<>(articleDTOList);
+        return new AnsApiResponse<>(articleDTOList);
 
     }
 
     @Operation(summary = "기사 상세조회", description = "기사 상세조회")
     @GetMapping(path = "/{artclId}")
-    public ApiResponse<ArticleDTO> find(@Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                        @PathVariable("artclId") long artclId) {
+    public AnsApiResponse<ArticleDTO> find(@Parameter(name = "artclId", required = true, description = "기사 아이디")
+                                           @PathVariable("artclId") Long artclId) {
 
         ArticleDTO articleDTO = articleService.find(artclId);
 
-        return new ApiResponse<>(articleDTO);
+        return new AnsApiResponse<>(articleDTO);
     }
 
     @Operation(summary = "기사 등록", description = "기사 등록")
     @PostMapping(name = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<ArticleSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                @RequestBody @Valid ArticleCreateDTO articleCreateDTO) {
+    public AnsApiResponse<ArticleSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
+                                                   @RequestBody @Valid ArticleCreateDTO articleCreateDTO) {
 
         Long artclId = articleService.create(articleCreateDTO);
 
@@ -120,15 +121,15 @@ public class ArticleController {
         articleDTO.setArtclId(artclId);
 
 
-        return new ApiResponse<>(articleDTO);
+        return new AnsApiResponse<>(articleDTO);
     }
 
     @Operation(summary = "기사 수정", description = "기사 수정")
     @PutMapping(path = "/{artclId}")
-    public ApiResponse<ArticleSimpleDTO> update(@Parameter(description = "필수값<br> ", required = true)
-                                                @RequestBody @Valid ArticleUpdateDTO articleUpdateDTO,
-                                                @Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                                @PathVariable("artclId") long artclId) {
+    public AnsApiResponse<ArticleSimpleDTO> update(@Parameter(description = "필수값<br> ", required = true)
+                                                   @RequestBody @Valid ArticleUpdateDTO articleUpdateDTO,
+                                                   @Parameter(name = "artclId", required = true, description = "기사 아이디")
+                                                   @PathVariable("artclId") Long artclId) {
 
         //수정. 잠금사용자확인
         if (articleService.chkOrderLock(artclId)) {
@@ -142,74 +143,83 @@ public class ArticleController {
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
         articleDTO.setArtclId(artclId);
 
-        return new ApiResponse<>(articleDTO);
+        return new AnsApiResponse<>(articleDTO);
 
     }
 
     @Operation(summary = "기사 삭제", description = "기사 삭제")
     @DeleteMapping(path = "/{artclId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResponse<?> delete(@Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                 @PathVariable("artclId") long artclId) {
+    public AnsApiResponse<?> delete(@Parameter(name = "artclId", required = true, description = "기사 아이디")
+                                    @PathVariable("artclId") Long artclId) {
 
         articleService.delete(artclId);
 
-        return ApiResponse.noContent();
+        return AnsApiResponse.noContent();
 
     }
 
     @Operation(summary = "기사 잠금", description = "기사 잠금")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN(사용자 권한이 없다.)"),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN(잠금사용자가 다르다)")})
     @PutMapping(path = "/{artclId}/lock")
-    public ApiResponse<ArticleDTO> articleLock(@Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                               @PathVariable("artclId") long artclId,
-                                               @Parameter(description = "필수값<br> lckYn ", required = true)
-                                               @RequestBody @Valid ArticleLockDTO articleLockDTO) {
+    public AnsApiResponse<ArticleDTO> articleLock(@Parameter(name = "artclId", required = true, description = "기사 아이디")
+                                                  @PathVariable("artclId") Long artclId,
+                                                  @Parameter(description = "필수값<br> lckYn ", required = true)
+                                                  @RequestBody @Valid ArticleLockDTO articleLockDTO) {
+
+        if (userAuthService.authChk(AuthEnum.ArticleWrite.getAuth())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
 
         articleService.articleLock(artclId, articleLockDTO);
 
         ArticleDTO articleDTO = articleService.find(artclId);
 
-        return new ApiResponse<>(articleDTO);
+        return new AnsApiResponse<>(articleDTO);
     }
 
     @Operation(summary = "기사 잠금해제", description = "기사 잠금해제")
     @PutMapping(path = "/{artclId}/unlock")
-    public ApiResponse<ArticleDTO> articleUnlock(@Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                                 @PathVariable("artclId") long artclId,
-                                                 @Parameter(description = "필수값<br> lckYn ", required = true)
-                                                 @RequestBody @Valid ArticleLockDTO articleLockDTO) {
+    public AnsApiResponse<ArticleDTO> articleUnlock(@Parameter(name = "artclId", required = true, description = "기사 아이디")
+                                                    @PathVariable("artclId") Long artclId,
+                                                    @Parameter(description = "필수값<br> lckYn ", required = true)
+                                                    @RequestBody @Valid ArticleLockDTO articleLockDTO) {
+
+        //권한, 작성자 확인
 
         articleService.articleUnlock(artclId, articleLockDTO);
 
         ArticleDTO articleDTO = articleService.find(artclId);
 
-        return new ApiResponse<>(articleDTO);
+        return new AnsApiResponse<>(articleDTO);
     }
 
 
     @Operation(summary = "기사 픽스", description = "기사 픽스")
     @PutMapping(path = "/{artclId}/fix")
-    public ApiResponse<ArticleDTO> fix(@Parameter(name = "artclId", description = "기사 아이디")
-                                       @PathVariable("artclId") Long artclId,
-                                       @Parameter(name = "apprvDivCd", description = "픽스 상태 코드(none[픽스가 없는상태]" +
-                                               ", articlefix[기자 픽스], editorfix[에디터 픽스], anchorfix[앵커 픽스], deskfix[데스크 픽스])")
-                                       @RequestParam(value = "apprvDivCd", required = true) String apprvDivCd) {
+    public AnsApiResponse<ArticleDTO> fix(@Parameter(name = "artclId", description = "기사 아이디")
+                                          @PathVariable("artclId") Long artclId,
+                                          @Parameter(name = "apprvDivCd", description = "픽스 상태 코드(none[픽스가 없는상태]" +
+                                                  ", articlefix[기자 픽스], editorfix[에디터 픽스], anchorfix[앵커 픽스], deskfix[데스크 픽스])")
+                                          @RequestParam(value = "apprvDivCd", required = true) String apprvDivCd) {
 
 
         articleService.vaildFixStaus(artclId, apprvDivCd);
 
         ArticleDTO articleDTO = articleService.find(artclId);
 
-        return new ApiResponse<>(articleDTO);
+        return new AnsApiResponse<>(articleDTO);
     }
 
     @Operation(summary = "기사 삭제자 확인", description = "기사 삭제자 확인")
     @PutMapping(path = "/confirmuser")
-    public ApiResponse<?> confirmUser(@Parameter(name = "password", description = "사용자 비밀번호")
-                                      @RequestParam(value = "password", required = false) String password) {
+    public AnsApiResponse<?> confirmUser(@Parameter(name = "password", description = "사용자 비밀번호")
+                                         @RequestParam(value = "password", required = false) String password) {
 
         articleService.confirmUser(password);
 
-        return ApiResponse.ok();
+        return AnsApiResponse.ok();
     }
 }

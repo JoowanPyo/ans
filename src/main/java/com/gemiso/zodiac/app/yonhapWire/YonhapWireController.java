@@ -3,7 +3,7 @@ package com.gemiso.zodiac.app.yonhapWire;
 import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireCreateDTO;
 import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
-import com.gemiso.zodiac.core.response.ApiResponse;
+import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,15 +33,15 @@ public class YonhapWireController {
 
     @Operation(summary = "연합외신 목록조회", description = "연합외신 목록조회")
     @GetMapping(path = "")
-    public ApiResponse<List<YonhapWireDTO>> findAll(@Parameter(name = "sdate", description = "검색시작일[yyyy-MM-dd]", required = false)
+    public AnsApiResponse<List<YonhapWireDTO>> findAll(@Parameter(name = "sdate", description = "검색시작일[yyyy-MM-dd]", required = false)
                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
-                                                    @Parameter(name = "edate", description = "검색종료일[yyyy-MM-dd]", required = false)
+                                                       @Parameter(name = "edate", description = "검색종료일[yyyy-MM-dd]", required = false)
                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                    @Parameter(name = "agcyCd", description = "통신사코드")
+                                                       @Parameter(name = "agcyCd", description = "통신사코드")
                                                     @RequestParam(value = "agcyCd", required = false) String agcyCd,
-                                                    @Parameter(name = "searchWord", description = "검색어")
+                                                       @Parameter(name = "searchWord", description = "검색어")
                                                     @RequestParam(value = "searchWord", required = false) String searchWord,
-                                                    @Parameter(name = "imprt", description = "중요도 List<String>", required = false)
+                                                       @Parameter(name = "imprt", description = "중요도 List<String>", required = false)
                                                     @RequestParam(value = "imprt", required = false) List<String> imprtList) throws Exception {
 
         List<YonhapWireDTO> yonhapWireDTOList = new ArrayList<>();
@@ -56,7 +56,7 @@ public class YonhapWireController {
 
             yonhapWireDTOList = yonhapWireService.findAll(null, null, agcyCd, searchWord, imprtList);
         }
-        return new ApiResponse<>(yonhapWireDTOList);
+        return new AnsApiResponse<>(yonhapWireDTOList);
     }
 
     @Operation(summary = "연합외신 등록", description = "연합외신 등록")
