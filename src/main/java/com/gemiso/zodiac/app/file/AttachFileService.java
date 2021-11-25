@@ -171,7 +171,7 @@ public class AttachFileService {
             e.printStackTrace();
         }
 
-        //return new StatusCodeFileDTO(code, msg, file_id, org_file_nm);
+        //return new StatusCodeFileDTO(codeDTO, msg, file_id, org_file_nm);
         return new StatusCodeFileDTO(code, msg, fileId, orgFileNm);
     }
 

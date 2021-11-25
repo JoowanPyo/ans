@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.tag;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.user.User;
 import lombok.*;
@@ -16,7 +17,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString
+@ToString(exclude = "article")
 @Setter
 @DynamicUpdate
 public class ArticleTag {

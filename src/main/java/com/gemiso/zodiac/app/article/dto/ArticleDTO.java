@@ -149,6 +149,8 @@ public class ArticleDTO {
     private Integer videoTime;
     @Schema(description = "부서 코드")
     private String deptCd;
+    @Schema(description = "부서 명")
+    private String deptNm;
     @Schema(description = "")
     private String deviceCd;
     @Schema(description = "")

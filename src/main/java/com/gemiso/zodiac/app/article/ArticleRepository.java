@@ -16,6 +16,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Queryds
     @Query("select a from Article a " +
             "left outer join Issue f on f.issuId = a.issue.issuId " +
             "left outer join ArticleCap  c on c.article.artclId = a.artclId " +
+            "left outer join AnchorCap h on h.article.artclId = a.artclId " +
             "left outer join ArticleMedia d on d.article.artclId = a.artclId " +
             "left outer join ArticleOrder e on e.article.artclId = a.artclId " +
             "left outer join ArticleTag b on b.article.artclId = a.artclId " +

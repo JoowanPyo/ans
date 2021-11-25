@@ -225,6 +225,9 @@ public class Article extends BaseEntity {
     @Column(name = "dept_cd", length = 50, nullable = false)
     private String deptCd;
 
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = dept_cd)")
+    private String deptNm;
+
     @Column(name = "device_cd", length = 50, nullable = false)
     private String deviceCd;
 

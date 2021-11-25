@@ -74,7 +74,7 @@ public class CueSheetItemController {
                                                   @Parameter(name = "cueId", description = "큐시트아이디")
                                                @PathVariable("cueId") Long cueId,
                                                   @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
-                                               @PathVariable("cueItemId") Long cueItemId) {
+                                               @PathVariable("cueItemId") Long cueItemId) throws Exception {
 
         if (cueItemDivCd == null || "".equals(cueItemDivCd)) {
             throw new ResourceNotFoundException("큐시트 아이템 구분 코드가 잘못 되었습니다. 구분코드 : " + cueItemDivCd);

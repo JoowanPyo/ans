@@ -31,16 +31,15 @@ import java.util.List;
 public class IssueController {
 
     private final IssueService issueService;
-    private final UserAuthService userAuthService;
 
     @Operation(summary = "이슈 목록 조회", description = "조회조건으로 이슈 목록 조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<IssueDTO>> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
-                                               @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                  @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                   @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
-                                               @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                  @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                   @Parameter(name = "issuDelYn", description = "삭제여부 (N , Y)")
-                                               @RequestParam(value = "issuDelYn", required = false) String issuDelYn) throws Exception {
+                                                  @RequestParam(value = "issuDelYn", required = false) String issuDelYn) throws Exception {
 
         List<IssueDTO> issueList = new ArrayList<>();
 
@@ -60,7 +59,7 @@ public class IssueController {
     @Operation(summary = "이슈 상세정보 조회", description = "이슈아이디로 이슈상세 정보 조회")
     @GetMapping(path = "/{issuId}")
     public AnsApiResponse<IssueDTO> find(@Parameter(name = "issuId", required = true, description = "이슈아이디", in = ParameterIn.PATH)
-                                      @PathVariable("issuId") long issuId) {
+                                         @PathVariable("issuId") Long issuId) {
 
         IssueDTO issu = issueService.find(issuId);
 
@@ -121,9 +120,10 @@ public class IssueController {
 
     @Operation(summary = "이슈 순서 변경", description = "이슈 순서 변경")
     @PutMapping("/{issuId}/changeOrder")
-    public AnsApiResponse<List<IssueDTO>> changeOrder(@Parameter(name = "issuId", required = true, description = "이슈아이디") @PathVariable("issuId") Long issuId,
+    public AnsApiResponse<List<IssueDTO>> changeOrder(@Parameter(name = "issuId", required = true, description = "이슈아이디")
+                                                      @PathVariable("issuId") Long issuId,
                                                       @Parameter(name = "issuOrd", required = true, description = "이슈 순번")
-                                                   @RequestParam(value = "issuOrd") Integer issuOrd) throws Exception {
+                                                      @RequestParam(value = "issuOrd") Integer issuOrd) throws Exception {
 
         List<IssueDTO> issueDTOList = issueService.changeOrder(issuId, issuOrd);
 
@@ -133,7 +133,7 @@ public class IssueController {
     @Operation(summary = "삭제 이슈 복구", description = "삭제 이슈 복구")
     @PutMapping(path = "/{issuId}/restore")
     public AnsApiResponse<IssueDTO> restoreIssue(@Parameter(name = "issuId", required = true, description = "이슈아이디")
-                                              @PathVariable("issuId") Long issuId) {
+                                                 @PathVariable("issuId") Long issuId) {
 
         issueService.restoreIssue(issuId);
 

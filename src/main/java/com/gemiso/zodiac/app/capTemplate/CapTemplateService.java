@@ -210,6 +210,7 @@ public class CapTemplateService {
 
         QCapTemplate qCap = QCapTemplate.capTemplate;
 
+        booleanBuilder.and(qCap.delYn.eq("N"));
         /*if(!ObjectUtils.isEmpty(brdc_pgm_id)){
             booleanBuilder.and(qCap.brdcPgmId.eq(brdc_pgm_id));
         }*/

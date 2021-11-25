@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -25,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -59,7 +61,7 @@ public class JwtFilter implements Filter {
                 + ",/swagger-ui/favicon-32x32.png,/swagger-ui/favicon-16x16.png,/swagger-resources/configuration/ui"
                 + ",/swagger-resources/configuration/security,/swagger-resources,/swagger-ui/swagger-ui-standalone-preset.js"
                 + ",/swagger-ui/favicon-32x32.png,/swagger-resources/configuration/ui,/v3/api-docs,/swagger-ui/swagger-ui.css,/error"
-                + ",/auth/createToken,/yonhapInternational,/yonhap,/interface/cuesheet,/interface/cuesheetitem,/interface"
+                + ",/auth/createToken,/yonhapInternational,/yonhap,/interface/cuesheet,/interface/code,/interface/dailypgm,/interface"
                 + ",/swagger-ui/index.html/swagger-resources,/swagger-ui/index.html/swagger-resources/configuration/ui"
                 + ",/swagger-ui/index.html/swagger-resources/configuration/security,/auth/login,/auth/againlogin,/auth/logout";
         excludedUrls = Arrays.asList(excludePattern.split(","));
@@ -88,7 +90,7 @@ public class JwtFilter implements Filter {
                     String jwtToken = null;
 
 
-                    if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
+                   /* if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {*/
 
                         //헤더에 있는 Bearer Substring => 토큰값을 빼기 위함.
                         jwtToken = requestTokenHeader.substring(6);
@@ -121,10 +123,10 @@ public class JwtFilter implements Filter {
 
                         logMessage.append(" [TOKEN USER ID:").append(user.getUserId().toString()).append("]");
 
-                    } else {
+                   /* } else {
                         httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-
-                    }
+                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+                    }*/
 
                     logMessage.append(" [RESPONSE STATUS:").append(httpServletResponse.getStatus()).append("]"); //코드를 넘겨줌
 
@@ -145,8 +147,8 @@ public class JwtFilter implements Filter {
                     PrintWriter out = httpServletResponse.getWriter();
                     out.println(mapper.writeValueAsString(apiErrorResponse));
                     out.flush();
+                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
 
-                    return;
                     /*resolver.resolveException(httpServletRequest, httpServletResponse, null, ex);//filter error handling방법*/
                 } catch (Throwable a) {
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -154,6 +156,8 @@ public class JwtFilter implements Filter {
                     a.printStackTrace(pinrtStream);
                     log.error(out.toString());
                     httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "EXPIRED_ACCESSTOKEN");
+
+                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
                 }
             }
         }

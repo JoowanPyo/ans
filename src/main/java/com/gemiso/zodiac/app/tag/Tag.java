@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.tag;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -16,6 +17,7 @@ import javax.persistence.*;
 @ToString
 @Setter
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) //json 파싱때 필드가 없는 클래스를 Serialize문제 설정
 public class Tag {
 
     @Id

@@ -81,20 +81,28 @@ public class ArticleController {
 
     @Operation(summary = "기사 목록조회[큐시트]", description = "기사 목록조회[큐시트]")
     @GetMapping(path = "/cuesheet")
-    public AnsApiResponse<List<ArticleDTO>> findCue(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = true)
+    public AnsApiResponse<PageResultDTO<ArticleDTO, Article>> findCue(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = true)
                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                     @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = true)
                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                     @Parameter(name = "searchWord", description = "검색키워드")
                                                     @RequestParam(value = "searchWord", required = false) String searchWord,
                                                     @Parameter(name = "cueId", description = "검색키워드", required = true)
-                                                    @RequestParam(value = "cueId") Long cueId) throws Exception {
+                                                    @RequestParam(value = "cueId") Long cueId,
+                                                    @Parameter(name = "page", description = "시작페이지")
+                                                    @RequestParam(value = "page", required = false) Integer page,
+                                                    @Parameter(name = "limit", description = "한 페이지에 데이터 수")
+                                                    @RequestParam(value = "limit", required = false) Integer limit) throws Exception {
+
 
         SearchDate searchDate = new SearchDate(sdate, edate);
 
-        List<ArticleDTO> articleDTOList = articleService.findCue(searchDate.getStartDate(), searchDate.getEndDate(), searchWord, cueId);
+        PageResultDTO<ArticleDTO, Article> pageList = articleService.findCue(searchDate.getStartDate(), searchDate.getEndDate(),
+                searchWord, cueId, page, limit);
 
-        return new AnsApiResponse<>(articleDTOList);
+        pageList = articleService.confirmArticleList(pageList, cueId);
+
+        return new AnsApiResponse<>(pageList);
 
     }
 
@@ -112,7 +120,7 @@ public class ArticleController {
     @PostMapping(name = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<ArticleSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                   @RequestBody @Valid ArticleCreateDTO articleCreateDTO) {
+                                                   @RequestBody @Valid ArticleCreateDTO articleCreateDTO) throws Exception {
 
         Long artclId = articleService.create(articleCreateDTO);
 
@@ -129,7 +137,7 @@ public class ArticleController {
     public AnsApiResponse<ArticleSimpleDTO> update(@Parameter(description = "필수값<br> ", required = true)
                                                    @RequestBody @Valid ArticleUpdateDTO articleUpdateDTO,
                                                    @Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                                   @PathVariable("artclId") Long artclId) {
+                                                   @PathVariable("artclId") Long artclId) throws Exception {
 
         //수정. 잠금사용자확인
         if (articleService.chkOrderLock(artclId)) {
@@ -151,7 +159,7 @@ public class ArticleController {
     @DeleteMapping(path = "/{artclId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                    @PathVariable("artclId") Long artclId) {
+                                    @PathVariable("artclId") Long artclId) throws Exception {
 
         articleService.delete(artclId);
 
@@ -203,7 +211,7 @@ public class ArticleController {
                                           @PathVariable("artclId") Long artclId,
                                           @Parameter(name = "apprvDivCd", description = "픽스 상태 코드(none[픽스가 없는상태]" +
                                                   ", articlefix[기자 픽스], editorfix[에디터 픽스], anchorfix[앵커 픽스], deskfix[데스크 픽스])")
-                                          @RequestParam(value = "apprvDivCd", required = true) String apprvDivCd) {
+                                          @RequestParam(value = "apprvDivCd", required = true) String apprvDivCd) throws Exception {
 
 
         articleService.vaildFixStaus(artclId, apprvDivCd);

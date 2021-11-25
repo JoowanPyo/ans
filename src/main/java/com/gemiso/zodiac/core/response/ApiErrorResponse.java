@@ -21,7 +21,7 @@ import java.util.*;
  *   "status": 422,
  *   "success": false,
  *   "error": {
- *     "code": "validation_exception",
+ *     "codeDTO": "validation_exception",
  *     "message": "입력값이 유효하지 않습니다.",
  *     "errors": {
  *       "search": ["search 필드는 필수입니다."]

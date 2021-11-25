@@ -1,22 +1,14 @@
 package com.gemiso.zodiac.app.dictionary;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import org.json.simple.JSONObject;
-import springfox.documentation.spring.web.json.Json;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Entity
 @Table(name = "tb_dic")
@@ -27,7 +19,7 @@ import java.util.Map;
 @Setter
 @ToString
 @DynamicUpdate
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+/*@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)*/
 public class Dictionary extends BaseEntity {
 
     @Id

@@ -31,7 +31,7 @@ public class IssueCreateDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
     //private Date updtDtm;
-    //private Long issuOrgId;
+    private Long issuOrgId;
     private String inputrId;
     //private String updtrId;
     //private String delrId;

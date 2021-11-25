@@ -1,6 +1,9 @@
 package com.gemiso.zodiac.app.appInterface;
 
+import com.gemiso.zodiac.app.appInterface.codeDTO.TakerCodeDTO;
+import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueSheetDTO;
 import com.gemiso.zodiac.app.appInterface.programDTO.ParentProgramDTO;
+import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.page.PageResultDTO;
@@ -14,6 +17,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Api(description = "연계 인터페이스 API")
 @RestController
@@ -28,10 +32,10 @@ public class InterfaceController {
     @Operation(summary = "일일편성 목록조회[Taker]", description = "일일편성 목록조회[Taker]")
     @GetMapping(path = "/dailypgm")
     public String dailyPgmFindAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
-                                                          @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
-                                                          @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
-                                                          @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                          @RequestHeader(value = "securityKey") String securityKey) throws Exception {
+                                  @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                  @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
+                                  @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                  @RequestHeader(value = "securityKey") String securityKey) throws Exception {
 
         PageResultDTO<ParentProgramDTO, CueSheet> pageResultDTO = null;
         String takerCueSheetDTO = "";
@@ -39,13 +43,13 @@ public class InterfaceController {
         //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
             SearchDate searchDate = new SearchDate(sdate, edate);
-            pageResultDTO = interfaceService.cueFindAll(searchDate.getStartDate(), searchDate.getEndDate());
+            pageResultDTO = interfaceService.dailyPgmFindAll(searchDate.getStartDate(), searchDate.getEndDate());
 
-            takerCueSheetDTO = interfaceService.toXml(pageResultDTO);
+            takerCueSheetDTO = interfaceService.takerPgmToXml(pageResultDTO);
         } else {
-            pageResultDTO = interfaceService.cueFindAll(null, null);
+            pageResultDTO = interfaceService.dailyPgmFindAll(null, null);
 
-            takerCueSheetDTO = interfaceService.toXml(pageResultDTO);
+            takerCueSheetDTO = interfaceService.takerPgmToXml(pageResultDTO);
         }
 
         System.out.println("controller xml :" + takerCueSheetDTO);
@@ -81,21 +85,73 @@ public class InterfaceController {
 
     @Operation(summary = "큐시트 목록조회[Taker]", description = "큐시트 목록조회[Taker]")
     @GetMapping(path = "/cuesheet")
-    public String cueFindAll(){
+    public String cueFindAll(@Parameter(name = "rd_id", description = "프로그램 아이디")
+                             @RequestParam(value = "rd_id", required = false) String rd_id,
+                             @Parameter(name = "play_seq", description = "플레이 시퀀스??")
+                             @RequestParam(value = "play_seq", required = false) String play_seq,
+                             @Parameter(name = "cued_seq", description = "큐시트 시퀀스???")
+                             @RequestParam(value = "cued_seq", required = false) String cued_seq,
+                             @Parameter(name = "vplay_seq", description = "v플레이 시퀀스???")
+                             @RequestParam(value = "vplay_seq", required = false) String vplay_seq,
+                             @Parameter(name = "vcued_seq", description = "v큐시트 시퀀스???")
+                             @RequestParam(value = "vcued_seq", required = false) String vcued_seq,
+                             @Parameter(name = "del_yn", description = "삭제여부")
+                             @RequestParam(value = "del_yn", required = false) String del_yn,
+                             @Parameter(name = "ch_div_cd", description = "채널 구분 코드")
+                             @RequestParam(value = "ch_div_cd", required = false) String ch_div_cd,
+                             @Parameter(name = "usr_id", description = "사용자 아이디")
+                             @RequestParam(value = "usr_id", required = false) String usr_id,
+                             @Parameter(name = "token", description = "토큰???(빈값 하드코딩)")
+                             @RequestParam(value = "token", required = false) String token,
+                             @Parameter(name = "usr_ip", description = "사용자 아이피")
+                             @RequestParam(value = "usr_ip", required = false) String usr_ip,
+                             @Parameter(name = "format", description = "포맷 타입 XML")
+                             @RequestParam(value = "format", required = false) String format,
+                             @Parameter(name = "lang", description = "랭퀴지 타입 KO")
+                             @RequestParam(value = "lang", required = false) String lang,
+                             @Parameter(name = "os_type", description = "os타입 SCU")
+                             @RequestParam(value = "os_type", required = false) String os_type,
+                             @RequestHeader(value = "securityKey") String securityKey) {
 
-        return null;
+
+        List<TakerCueSheetDTO> takerCueSheetDTOList = interfaceService.cuefindAll(rd_id, play_seq, cued_seq, vplay_seq, vcued_seq, del_yn,
+                ch_div_cd, usr_id, token, usr_ip, format, lang, os_type);
+
+        String takerCue = interfaceService.takerCueToXml(takerCueSheetDTOList);
+
+        return takerCue;
     }
 
     @Operation(summary = "방송구분코드 조회[Taker]", description = "방송구분코드 조회[Taker]")
     @GetMapping(path = "/code")
-    public String codeFindAll(){
+    public String codeFindAll(@Parameter(name = "key", description = "키 ??")
+                              @RequestParam(value = "key", required = false) String key,
+                              @Parameter(name = "ch_div_cd", description = "채널 구분 코드")
+                              @RequestParam(value = "ch_div_cd", required = false) String ch_div_cd,
+                              @Parameter(name = "usr_id", description = "사용자 아이디")
+                              @RequestParam(value = "usr_id", required = false) String usr_id,
+                              @Parameter(name = "token", description = "토큰???")
+                              @RequestParam(value = "token", required = false) String token,
+                              @Parameter(name = "usr_ip", description = "사용자 아이피")
+                              @RequestParam(value = "usr_ip", required = false) String usr_ip,
+                              @Parameter(name = "format", description = "포맷 타입 XML")
+                              @RequestParam(value = "format", required = false) String format,
+                              @Parameter(name = "lang", description = "랭퀴지 타입 KO")
+                              @RequestParam(value = "lang", required = false) String lang,
+                              @Parameter(name = "os_type", description = "os타입 SCU")
+                              @RequestParam(value = "os_type", required = false) String os_type,
+                              @RequestHeader(value = "securityKey") String securityKey) {
 
-        return null;
+        TakerCodeDTO takerCodeDTO = interfaceService.codeFindAll(key, ch_div_cd, usr_id, token, usr_ip, format, lang, os_type);
+
+        String takerCode = interfaceService.codeToTakerCodeXml(takerCodeDTO);
+
+        return takerCode;
     }
 
     @Operation(summary = "영상전송상태 조회[Taker]", description = "영상전송상태 조회[Taker]")
     @GetMapping(path = "/mediatransrate")
-    public String mediaTransRateFindAll(){
+    public String mediaTransRateFindAll() {
 
         return null;
     }

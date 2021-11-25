@@ -89,7 +89,7 @@ public class ArticleCreateDTO {
     private Long parentArtlcId;
 
     //private List<ArticleMediaDTO> articleMedia;
-    private List<ArticleCapCreateDTO> articleCap = new ArrayList<>();;
+    private List<ArticleCapCreateDTO> articleCap = new ArrayList<>();
     private List<AnchorCapCreateDTO> anchorCap = new ArrayList<>();
     //private List<ArticleOrderDTO> articleOrder;
     //private List<ArticleHistDTO> articleHist;

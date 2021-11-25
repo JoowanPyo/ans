@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class TakerProgramResultDTO {
 
     @XmlAttribute
-    private String xuccess;
+    private String success;
 
     @XmlAttribute
     private String msg;

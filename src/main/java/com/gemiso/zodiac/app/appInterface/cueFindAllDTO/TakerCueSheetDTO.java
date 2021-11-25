@@ -1,8 +1,5 @@
 package com.gemiso.zodiac.app.appInterface.cueFindAllDTO;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
-import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,9 +9,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Data
 @Builder
@@ -25,7 +20,7 @@ import java.util.List;
 public class TakerCueSheetDTO {
 
     @XmlElement(name="rd_id")
-    private Long cueId;
+    private Long brdcPgmId;
     @XmlElement(name="rd_seq")
     private int rdSeq;
     @XmlElement(name="ch_div_cd")
@@ -67,7 +62,7 @@ public class TakerCueSheetDTO {
     @XmlElement(name = "dept_nm")
     private String deptNm;
     @XmlElement(name = "artcl_reqd_sec")
-    private int artcl_reqd_sec;
+    private int artclReqdSec;
     @XmlElement(name = "artcl_smry_ctt")
     private int artclSmryCtt;
     @XmlElement(name = "artcl_div_cd")

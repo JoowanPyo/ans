@@ -1,7 +1,5 @@
 package com.gemiso.zodiac.app.issue;
 
-import com.gemiso.zodiac.app.code.Code;
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueCopyDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueCreateDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
@@ -9,8 +7,6 @@ import com.gemiso.zodiac.app.issue.dto.IssueUpdateDTO;
 import com.gemiso.zodiac.app.issue.mapper.IssueCreateMapper;
 import com.gemiso.zodiac.app.issue.mapper.IssueMapper;
 import com.gemiso.zodiac.app.issue.mapper.IssueUpdateMapper;
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import com.gemiso.zodiac.core.service.CodeUpdateService;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -21,7 +17,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -89,6 +84,7 @@ public class IssueService {
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
         issueCreateDTO.setInputrId(userId);
+        /*issueCreateDTO.setInputDtm(new Date());*/
 
         Issue issue = issueCreateMapper.toEntity(issueCreateDTO);
         issueRepositoy.save(issue);
@@ -104,7 +100,7 @@ public class IssueService {
   /*      Code orgChDivCd = issue.getChDivCd();
         CodeSimpleDTO newChDivCd = issueUpdateDTO.getChDivCd();
         //update code값이 새로 들어오면 entity 값 null set
-        //code PK값을 foreign키로 갖고있기때문에 PK값을 삭제 후 재등록.
+        //codeDTO PK값을 foreign키로 갖고있기때문에 PK값을 삭제 후 재등록.
         if (codeUpdateService.codeUpdateCheck(orgChDivCd, newChDivCd)){
             issue.setChDivCd(null);
         }
@@ -119,6 +115,7 @@ public class IssueService {
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
         issueUpdateDTO.setUpdtrId(userId);
+       /* issueUpdateDTO.setUpdtDtm(new Date());*/
 
 
         issueUpdateMapper.updateFromDto(issueUpdateDTO, issue);
@@ -186,25 +183,25 @@ public class IssueService {
                 Long issueId = issueCopyDto.getIssuId();
                 IssueDTO issueDTO = find(issueId);
 
-                IssueDTO issueDTOCopy = new IssueDTO();
+                IssueCreateDTO issueDTOCopy = new IssueCreateDTO();
 
-                Integer issuOrd = targetOrd(targetDate);
+                /*Integer issuOrd = targetOrd(targetDate);*/
+                Integer issuOrd = getOrd();
 
                 issueDTOCopy.setChDivCd(issueDTO.getChDivCd());
-                issueDTOCopy.setIssuDtm(issueDTO.getIssuDtm());
+                issueDTOCopy.setIssuDtm(targetDate);
                 issueDTOCopy.setIssuOrd(issuOrd + 1);
                 issueDTOCopy.setIssuKwd(issueDTO.getIssuKwd());
                 issueDTOCopy.setIssuCtt(issueDTO.getIssuCtt());
                 issueDTOCopy.setIssuFnshYn(issueDTO.getIssuFnshYn());
-                issueDTOCopy.setIssuDelYn(issueDTO.getIssuDelYn());
+                //issueDTOCopy.setIssuDelYn(issueDTO.getIssuDelYn());
                 issueDTOCopy.setIssuFnshDtm(issueDTO.getIssuFnshDtm());
                 issueDTOCopy.setIssuOrgId(issueDTO.getIssuOrgId());
-                issueDTOCopy.setUpdtrId(issueDTO.getUpdtrId());
-                issueDTOCopy.setUpdtDtm(issueDTO.getUpdtDtm());
-                issueDTOCopy.setInputDtm(targetDate);
+                //issueDTOCopy.setUpdtrId(issueDTO.getUpdtrId());
+                //issueDTOCopy.setUpdtDtm(issueDTO.getUpdtDtm());
                 issueDTOCopy.setInputrId(userId);
 
-                Issue issueEntity = issueMapper.toEntity(issueDTOCopy);
+                Issue issueEntity = issueCreateMapper.toEntity(issueDTOCopy);
                 issueRepositoy.save(issueEntity);
             }
         }

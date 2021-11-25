@@ -30,15 +30,15 @@ public class CueSheetController {
     @Operation(summary = "큐시트 목록조회", description = "큐시트 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<CueSheetFindAllDTO> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
-                                                   @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                       @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
-                                                   @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                       @Parameter(name = "brdcPgmId", description = "프로그램구분코드")
-                                                   @RequestParam(value = "brdcPgmId", required = false) Long brdcPgmId,
+                                                      @RequestParam(value = "brdcPgmId", required = false) Long brdcPgmId,
                                                       @Parameter(name = "brdcPgmNm", description = "프로그램구분코드")
-                                                   @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
+                                                      @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
                                                       @Parameter(name = "searchWord", description = "프로그램구분코드")
-                                                   @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
+                                                      @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
 
         CueSheetFindAllDTO cueSheetDTOList = new CueSheetFindAllDTO();
 
@@ -60,7 +60,7 @@ public class CueSheetController {
     @Operation(summary = "큐시트 상세조회", description = "큐시트 상세조회")
     @GetMapping(path = "/{cueId}")
     public AnsApiResponse<CueSheetDTO> find(@Parameter(name = "cueId", description = "큐시트 아이디")
-                                         @PathVariable("cueId") Long cueId) {
+                                            @PathVariable("cueId") Long cueId) {
 
 
         CueSheetDTO cueSheetDTO = cueSheetService.find(cueId);
@@ -73,14 +73,14 @@ public class CueSheetController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<CueSheetDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                           @RequestBody @Valid CueSheetCreateDTO cueSheetCreateDTO,
+                                              @RequestBody @Valid CueSheetCreateDTO cueSheetCreateDTO,
                                               @Parameter(name = "cueTmpltId", description = "큐시트템플릿아이디", in = ParameterIn.QUERY)
-                                           @RequestParam(value = "cueTmpltId", required = false) Long cueTmpltId) {
+                                              @RequestParam(value = "cueTmpltId", required = false) Long cueTmpltId) {
 
         Long cueId = cueSheetService.create(cueSheetCreateDTO);
 
         //수정! 큐시트아이템복사.???
-        
+
         //큐시트 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         CueSheetDTO cueSheetDTO = new CueSheetDTO();
         cueSheetDTO.setCueId(cueId);
@@ -91,9 +91,9 @@ public class CueSheetController {
     @Operation(summary = "큐시트 수정", description = "큐시트 수정")
     @PutMapping(path = "/{cueId}")
     public AnsApiResponse<CueSheetDTO> update(@Parameter(name = "cueSheetUpdateDTO", required = true, description = "필수값<br>")
-                                           @Valid @RequestBody CueSheetUpdateDTO cueSheetUpdateDTO,
+                                              @Valid @RequestBody CueSheetUpdateDTO cueSheetUpdateDTO,
                                               @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                           @PathVariable("cueId") Long cueId) {
+                                              @PathVariable("cueId") Long cueId) {
 
         cueSheetService.update(cueSheetUpdateDTO, cueId);
 
@@ -109,7 +109,7 @@ public class CueSheetController {
     @DeleteMapping(path = "/{cueId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                 @PathVariable("cueId") Long cueId) {
+                                    @PathVariable("cueId") Long cueId) {
 
         cueSheetService.delete(cueId);
 
@@ -119,9 +119,9 @@ public class CueSheetController {
     @Operation(summary = "큐시트 오더락", description = "큐시트 오더락")
     @PutMapping(path = "/{cueId}/orderLock")
     public AnsApiResponse<CueSheetDTO> cueSheetOrderLock(@Parameter(name = "cueSheetUpdateDTO", required = true, description = "필수값<br>")
-                                                      @Valid @RequestBody CueSheetOrderLockDTO cueSheetOrderLockDTO,
+                                                         @Valid @RequestBody CueSheetOrderLockDTO cueSheetOrderLockDTO,
                                                          @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                                      @PathVariable("cueId") Long cueId) {
+                                                         @PathVariable("cueId") Long cueId) {
 
         cueSheetService.cueSheetOrderLock(cueSheetOrderLockDTO, cueId);
 
@@ -136,7 +136,7 @@ public class CueSheetController {
     @Operation(summary = "큐시트 잠금해제", description = "큐시트 잠금해제")
     @PutMapping(path = "/{cueId}/unLock")
     public AnsApiResponse<CueSheetDTO> cueSheetUnLock(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                                   @PathVariable("cueId") Long cueId) {
+                                                      @PathVariable("cueId") Long cueId) {
 
         cueSheetService.cueSheetUnLock(cueId);
 
@@ -150,7 +150,7 @@ public class CueSheetController {
     @Operation(summary = "큐시트 복사", description = "큐시트 복사")
     @PostMapping(path = "/{cueId}/cuesheetcopy")
     public AnsApiResponse<CueSheetSimpleDTO> cueSheetCopy(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                                 @PathVariable("cueId") Long cueId) {
+                                                          @PathVariable("cueId") Long cueId) {
 
         CueSheetSimpleDTO cueSheetSimpleDTO = new CueSheetSimpleDTO();
 

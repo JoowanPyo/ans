@@ -1,7 +1,5 @@
 package com.gemiso.zodiac.app.issue;
 
-import com.gemiso.zodiac.app.code.Code;
-import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -33,6 +31,7 @@ public class Issue extends BaseEntity {
     @Column(name = "ch_div_cd", length = 50)
     private String chDivCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = ch_div_cd)")
     private String chDivCdNm;
 
@@ -60,7 +59,7 @@ public class Issue extends BaseEntity {
     @Column(name = "issu_fnsh_dtm")
     private Date  issuFnshDtm;
 
-/*    @Column( name = "input_dtm", updatable = false)
+    /*@Column( name = "input_dtm", updatable = false)
     private Date inputDtm;
 
     @Column(name = "updt_dtm")

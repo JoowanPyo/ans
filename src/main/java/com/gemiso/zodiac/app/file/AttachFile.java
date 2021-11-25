@@ -1,18 +1,11 @@
 package com.gemiso.zodiac.app.file;
 
-import com.gemiso.zodiac.app.code.Code;
-import com.gemiso.zodiac.app.symbol.Symbol;
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.yonhap.YonhapAttchFile;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "tb_strg_file")

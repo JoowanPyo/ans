@@ -29,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -247,7 +249,9 @@ public class CueSheetService {
         booleanBuilder.and(qCueSheet.delYn.eq("N"));
 
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
-            booleanBuilder.and(qCueSheet.inputDtm.between(sdate, edate));
+            String StringSdate = dateToString(sdate);
+            String stringEdate = dateToString(edate);
+            booleanBuilder.and(qCueSheet.brdcDt.between(StringSdate, stringEdate));
         }
         if(ObjectUtils.isEmpty(brdcPgmId) == false){
             booleanBuilder.and(qCueSheet.program.brdcPgmId.eq(brdcPgmId));
@@ -261,6 +265,15 @@ public class CueSheetService {
         }
 
         return booleanBuilder;
+    }
+
+    public String dateToString(Date date){
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        String returnDate = dateFormat.format(date);
+
+        return returnDate;
     }
 
     public void cueSheetOrderLock(CueSheetOrderLockDTO cueSheetOrderLockDTO, Long cueId){

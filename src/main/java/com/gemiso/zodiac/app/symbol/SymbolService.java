@@ -48,7 +48,7 @@ public class SymbolService {
 
         BooleanBuilder booleanBuilder = getSearch(useYn, symbolNm);
 
-        List<Symbol> symbolList = (List<Symbol>) symbolRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "symbolId"));
+        List<Symbol> symbolList = (List<Symbol>) symbolRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "symbolOrd"));
 
         List<SymbolDTO> symbolDTOS = symbolMapper.toDtoList(symbolList);
 
