@@ -27,7 +27,7 @@ public class ProgramController {
     @Operation(summary = "프로그램 목록조회", description = "프로그램 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<ProgramDTO>> findAll(@Parameter(name = "brdcPgmNm", description = "방송프로그램 명")
-                                  @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm) throws Exception {
+                                                    @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm) throws Exception {
 
 
         List<ProgramDTO> programDTOList = programService.findAll(brdcPgmNm);
@@ -39,7 +39,7 @@ public class ProgramController {
     @Operation(summary = "프로그램 상세조회", description = "프로그램 상세조회")
     @GetMapping(path = "/{brdcPgmId}")
     public AnsApiResponse<ProgramDTO> find(@Parameter(name = "brdcPgmId", description = "방송 프로그램 아이디", required = true)
-                               @PathVariable("brdcPgmId") Long brdcPgmId) throws Exception {
+                                           @PathVariable("brdcPgmId") Long brdcPgmId) throws Exception {
 
         ProgramDTO programDTO = programService.find(brdcPgmId);
 
@@ -51,7 +51,7 @@ public class ProgramController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<ProgramDTO> create(@Parameter(name = "programCreateDTO", required = true, description = "필수값<br>  , ")
-                                 @Valid @RequestBody ProgramCreateDTO programCreateDTO) throws Exception {
+                                             @Valid @RequestBody ProgramCreateDTO programCreateDTO) throws Exception {
 
         Long programId = programService.create(programCreateDTO);
 
@@ -64,7 +64,7 @@ public class ProgramController {
     @Operation(summary = "프로그램 수정", description = "프로그램 수정")
     @PutMapping(path = "/{brdcPgmId}")
     public AnsApiResponse<ProgramDTO> update(@Parameter(name = "programUpdateDTO", required = true, description = "필수값<br>")
-                                 @Valid @RequestBody ProgramUpdateDTO programUpdateDTO,
+                                             @Valid @RequestBody ProgramUpdateDTO programUpdateDTO,
                                              @Parameter(name = "brdcPgmId", required = true) @PathVariable("brdcPgmId") Long brdcPgmId) throws Exception {
 
         programService.update(programUpdateDTO, brdcPgmId);
@@ -78,7 +78,7 @@ public class ProgramController {
     @DeleteMapping(path = "/{brdcPgmId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "brdcPgmId", description = "방송프로그램 아이디")
-                                 @PathVariable("brdcPgmId") Long brdcPgmId) throws Exception {
+                                    @PathVariable("brdcPgmId") Long brdcPgmId) throws Exception {
 
         programService.delete(brdcPgmId);
 

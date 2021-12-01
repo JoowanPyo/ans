@@ -1,16 +1,10 @@
-package com.gemiso.zodiac.app.cueSheetItem;
+package com.gemiso.zodiac.app.spareCueSheetItem;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.article.Article;
-import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
-import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.user.UserGroupUser;
-import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
@@ -21,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_cue_item")
+@Table(name = "tb_spare_cue_item")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,12 +23,12 @@ import java.util.List;
 @Setter
 @ToString(exclude = {"article","cueSheetItemSymbol","cueId"})
 @DynamicUpdate
-public class CueSheetItem extends BaseEntity {
+public class SpareCueSheetItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cue_item_id", nullable = false)
-    private Long cueItemId;
+    @Column(name = "spare_cue_item_id", nullable = false)
+    private Long spareCueItemId;
 
     @Column(name = "cue_item_titl", length = 300)
     private String cueItemTitl;
@@ -200,19 +194,9 @@ public class CueSheetItem extends BaseEntity {
     @JsonBackReference
     private Article article;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "cue_tmplt_id")
-    private CueSheetTemplate cueSheetTemplate;
-
     @OneToMany(mappedBy = "cueSheetItem")
     @JsonManagedReference
     private List<CueSheetMedia> cueSheetMedia = new ArrayList<>();
-      /*@Column(name = "artcl_id", length = 21)
-    private String artclId;*/
-
-   /* @OneToMany(mappedBy = "cueSheetItem")
-    @JsonManagedReference
-    private List<CueSheetItemSymbol> cueSheetItemSymbol = new ArrayList<>();*/
 
 
     @PrePersist

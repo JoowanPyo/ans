@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface CueSheetRepository extends JpaRepository<CueSheet, Long>, QuerydslPredicateExecutor<CueSheet> {
 
     @Query("select a from CueSheet a left outer join CueSheetItem b on b.cueSheet.cueId = a.cueId " +
-            "where a.cueId =:cueId and a.delYn ='N' ")
+            "where a.cueId =:cueId and a.delYn ='N'")
     Optional<CueSheet> findByCue(@Param("cueId")Long cueId);
 
     @Query("select a from CueSheet a where a.cueId =:cueId and a.delYn =:del_yn ")

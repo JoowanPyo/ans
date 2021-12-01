@@ -31,15 +31,15 @@ public class YonhapController {
     @Operation(summary = "연합 목록조회", description = "연합 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<YonhapDTO>> findAll(@Parameter(name = "sdate", description = "검색시작일[yyyy-MM-dd]", required = false)
-                                                @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                   @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                    @Parameter(name = "edate", description = "검색종료일[yyyy-MM-dd]", required = false)
-                                                @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                   @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                    @Parameter(name = "artclCateCds", description = "분류코드")
-                                                @RequestParam(value = "artclCateCds", required = false) List<String> artclCateCds,
+                                                   @RequestParam(value = "artclCateCds", required = false) List<String> artclCateCds,
                                                    @Parameter(name = "regionCds", description = "통신사코드")
-                                                @RequestParam(value = "regionCds", required = false) List<String> regionCds,
+                                                   @RequestParam(value = "regionCds", required = false) List<String> regionCds,
                                                    @Parameter(name = "searchWord", description = "통신사코드")
-                                                @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
+                                                   @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
 
         List<YonhapDTO> yonhapDTOList = new ArrayList<>();
 
@@ -49,7 +49,7 @@ public class YonhapController {
 
             yonhapDTOList = yonhapService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), artclCateCds, regionCds, searchWord);
 
-        }else {
+        } else {
             yonhapDTOList = yonhapService.findAll(null, null, artclCateCds, regionCds, searchWord);
 
         }
@@ -69,7 +69,7 @@ public class YonhapController {
 
             yonhapDTO = yonhapService.find(yonhapId);
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             log.error("yonhap : " + e.getMessage());
             return new ResponseEntity<YonhapDTO>(yonhapDTO, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.core.helper;
 
-import io.swagger.models.auth.In;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

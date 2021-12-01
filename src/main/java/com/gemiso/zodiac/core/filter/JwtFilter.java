@@ -136,7 +136,7 @@ public class JwtFilter implements Filter {
                 } catch (ExpiredJwtException ex) {
                     log.error(ex.toString());
 
-                    //에러리스폰스 작성.
+                   /* //에러리스폰스 작성.
                     ApiErrorResponse.Error error =
                             new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.EXPIRED_ACCESSTOKEN, ex.getLocalizedMessage());
                     ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
@@ -146,7 +146,8 @@ public class JwtFilter implements Filter {
 
                     PrintWriter out = httpServletResponse.getWriter();
                     out.println(mapper.writeValueAsString(apiErrorResponse));
-                    out.flush();
+                    out.flush();*/
+                    httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "EXPIRED_ACCESSTOKEN");
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
 
                     /*resolver.resolveException(httpServletRequest, httpServletResponse, null, ex);//filter error handling방법*/

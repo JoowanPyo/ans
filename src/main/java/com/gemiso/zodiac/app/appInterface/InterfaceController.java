@@ -31,10 +31,32 @@ public class InterfaceController {
 
     @Operation(summary = "일일편성 목록조회[Taker]", description = "일일편성 목록조회[Taker]")
     @GetMapping(path = "/dailypgm")
-    public String dailyPgmFindAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
+    public String dailyPgmFindAll(@Parameter(name = "brdc_pgm_id", description = "프로그램 아이디")
+                                  @RequestParam(value = "brdc_pgm_id", required = false) String brdc_pgm_id,
+                                  @Parameter(name = "pgm_nm", description = "프로그램 명")
+                                  @RequestParam(value = "pgm_nm", required = false) String pgm_nm,
+                                  @Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
                                   @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                   @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
                                   @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                  @Parameter(name = "brdc_pgm_div_cd", description = "프로그램 구분 코드")
+                                  @RequestParam(value = "brdc_pgm_div_cd", required = false) String brdc_pgm_div_cd,
+                                  @Parameter(name = "del_yn", description = "삭제여부")
+                                  @RequestParam(value = "del_yn", required = false) String del_yn,
+                                  @Parameter(name = "ch_div_cd", description = "채널구분 코드")
+                                  @RequestParam(value = "ch_div_cd", required = false) String ch_div_cd,
+                                  @Parameter(name = "usr_id", description = "사용자 아이디")
+                                  @RequestParam(value = "usr_id", required = false) String usr_id,
+                                  @Parameter(name = "token", description = "토큰???(빈값 하드코딩)")
+                                  @RequestParam(value = "token", required = false) String token,
+                                  @Parameter(name = "usr_ip", description = "사용자 아이피")
+                                  @RequestParam(value = "usr_ip", required = false) String usr_ip,
+                                  @Parameter(name = "format", description = "포맷 타입 XML")
+                                  @RequestParam(value = "format", required = false) String format,
+                                  @Parameter(name = "lang", description = "랭퀴지 타입 KO")
+                                  @RequestParam(value = "lang", required = false) String lang,
+                                  @Parameter(name = "os_type", description = "os타입 SCU")
+                                  @RequestParam(value = "os_type", required = false) String os_type,
                                   @RequestHeader(value = "securityKey") String securityKey) throws Exception {
 
         PageResultDTO<ParentProgramDTO, CueSheet> pageResultDTO = null;
@@ -151,7 +173,29 @@ public class InterfaceController {
 
     @Operation(summary = "영상전송상태 조회[Taker]", description = "영상전송상태 조회[Taker]")
     @GetMapping(path = "/mediatransrate")
-    public String mediaTransRateFindAll() {
+    public String mediaTransRateFindAll(@Parameter(name = "media_cd", description = "미디어 코드???")
+                                        @RequestParam(value = "media_cd", required = false) String media_cd,
+                                        @Parameter(name = "rd_id", description = "큐시트 아이디???")
+                                        @RequestParam(value = "rd_id", required = false) String rd_id,
+                                        @Parameter(name = "rd_seq", description = "시퀀스???")
+                                        @RequestParam(value = "rd_seq", required = false) String rd_seq,
+                                        @Parameter(name = "plyout_id", description = "페이로드 아이디???")
+                                        @RequestParam(value = "plyout_id", required = false) String plyout_id,
+                                        @Parameter(name = "ch_div_cd", description = "채널 구분 코드")
+                                        @RequestParam(value = "ch_div_cd", required = false) String ch_div_cd,
+                                        @Parameter(name = "usr_id", description = "사용자 아이디")
+                                        @RequestParam(value = "usr_id", required = false) String usr_id,
+                                        @Parameter(name = "token", description = "토큰???")
+                                        @RequestParam(value = "token", required = false) String token,
+                                        @Parameter(name = "usr_ip", description = "사용자 아이피")
+                                        @RequestParam(value = "usr_ip", required = false) String usr_ip,
+                                        @Parameter(name = "format", description = "포맷 타입 XML")
+                                        @RequestParam(value = "format", required = false) String format,
+                                        @Parameter(name = "lang", description = "랭퀴지 타입 KO")
+                                        @RequestParam(value = "lang", required = false) String lang,
+                                        @Parameter(name = "os_type", description = "os타입 SCU")
+                                        @RequestParam(value = "os_type", required = false) String os_type,
+                                        @RequestHeader(value = "securityKey") String securityKey) {
 
         return null;
     }

@@ -119,10 +119,10 @@ public class InterfaceService {
                                        String format, String lang, String os_type){
 
         //큐시트 아이티와 삭제여부값 예외 처리[아이디가 String 타입으로 들어오기 때문에 Long값으로 변환.]
-        Long cueId = null;
-        if (rd_id != null && rd_id.trim().isEmpty() ==false) {
+        Long cueId = 3L;
+        /*if (rd_id != null && rd_id.trim().isEmpty() ==false) {
             cueId = Long.parseLong(rd_id);
-        }
+        }*/
         //큐시트 아이티와 삭제여부값 예외 처리[여부값이 안들어 올시, N값 설정]
         if (del_yn == null || del_yn.trim().isEmpty()){
             del_yn = "N";
@@ -352,9 +352,9 @@ public class InterfaceService {
 
         booleanBuilder.and(qCueSheet.delYn.eq("N"));
 
-        if (!StringUtils.isEmpty(sdate) && !StringUtils.isEmpty(edate)){
+        /*if (!StringUtils.isEmpty(sdate) && !StringUtils.isEmpty(edate)){
             booleanBuilder.and(qCueSheet.inputDtm.between(sdate, edate));
-        }
+        }*/
      /*   if(!StringUtils.isEmpty(brdcPgmId)){
             booleanBuilder.and(qCueSheet.program.brdcPgmId.eq(brdcPgmId));
         }

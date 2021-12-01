@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheet;
 
+import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.*;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetCreateMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
@@ -11,6 +12,7 @@ import com.gemiso.zodiac.app.cueSheetHist.dto.CueSheetHistCreateDTO;
 import com.gemiso.zodiac.app.cueSheetHist.mapper.CueSheetHistCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
+import com.gemiso.zodiac.app.cueSheetItem.QCueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemCreateMapper;
@@ -31,10 +33,7 @@ import org.springframework.util.StringUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,11 +66,50 @@ public class CueSheetService {
 
         List<CueSheetDTO> cueSheetDTOList = cueSheetMapper.toDtoList(cueSheets);
 
-        CueSheetFindAllDTO cueSheetFindAllDTO = unionPgm(cueSheetDTOList); //큐시트 유니온 방송프로그램.
+        List<CueSheetDTO> newCueSheetDTOList = checkDelItem(cueSheetDTOList); //삭제된 기사아이템 제거.
+
+        CueSheetFindAllDTO cueSheetFindAllDTO = unionPgm(newCueSheetDTOList); //큐시트 유니온 방송프로그램.
 
         return cueSheetFindAllDTO;
 
 
+    }
+
+    //삭제된 기사아이템 제거.
+    public List<CueSheetDTO> checkDelItem(List<CueSheetDTO> cueSheetDTOList){
+
+        List<CueSheetDTO> newCueSheetDTOList = new ArrayList<>();
+
+        //삭제된 큐시트 아이템 제거.
+        for (CueSheetDTO cueSheetDTO : cueSheetDTOList){
+            List<CueSheetItemDTO> orgCueSheetItemDTOList = cueSheetDTO.getCueSheetItem();
+            List<CueSheetItemDTO> newCueSheetItemDTOList = new ArrayList<>();
+            for (Iterator<CueSheetItemDTO> itr = orgCueSheetItemDTOList.iterator(); itr.hasNext();){
+
+                CueSheetItemDTO cueSheetItemDTO = itr.next();
+
+                String delYn = cueSheetItemDTO.getDelYn();//큐시트 아이템의 삭제여부 값
+                ArticleCueItemDTO articleCueItemDTO = cueSheetItemDTO.getArticle();//큐시트 아이템의 기사의 삭제여부 값
+
+                if (ObjectUtils.isEmpty(articleCueItemDTO) == false){ //큐시트 아이템에 기사가 포함된 경우.
+                    String articleDelYn = articleCueItemDTO.getDelYn();//큐시트 아이템에 포함된 기사의 삭제 여부값
+                    if ("Y".equals(articleDelYn)){ //기사 삭제 값이 Y인경우 조회된 큐시트아이템 삭제
+                        continue;
+                    }
+                }
+                if ("Y".equals(delYn)){ //조회된 큐시트 아이템 삭제여부값이 Y인 경우/.
+                    continue;
+                }
+
+                newCueSheetItemDTOList.add(cueSheetItemDTO);
+
+            }
+
+            cueSheetDTO.setCueSheetItem(newCueSheetItemDTOList);
+            newCueSheetDTOList.add(cueSheetDTO);
+        }
+
+        return newCueSheetDTOList;
     }
 
     public CueSheetFindAllDTO unionPgm(List<CueSheetDTO> cueSheetDTOList){
@@ -112,6 +150,32 @@ public class CueSheetService {
         CueSheet cueSheet = cueSheetFindOrFail(cueId);
 
         CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
+
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetDTO.getCueSheetItem();
+
+        List<CueSheetItemDTO> newCueSheetItemDTOList = new ArrayList<>();
+        for (Iterator<CueSheetItemDTO> itr = cueSheetItemDTOList.iterator(); itr.hasNext();){
+
+            CueSheetItemDTO cueSheetItemDTO = itr.next();
+
+            String delYn = cueSheetItemDTO.getDelYn();//큐시트 아이템의 삭제여부 값
+            ArticleCueItemDTO articleCueItemDTO = cueSheetItemDTO.getArticle();//큐시트 아이템의 기사의 삭제여부 값
+
+            if (ObjectUtils.isEmpty(articleCueItemDTO) == false){ //큐시트 아이템에 기사가 포함된 경우.
+                String articleDelYn = articleCueItemDTO.getDelYn();//큐시트 아이템에 포함된 기사의 삭제 여부값
+                if ("Y".equals(articleDelYn)){ //기사 삭제 값이 Y인경우 조회된 큐시트아이템 삭제
+                    continue;
+                }
+            }
+            if ("Y".equals(delYn)){ //조회된 큐시트 아이템 삭제여부값이 Y인 경우/.
+                continue;
+            }
+
+            newCueSheetItemDTOList.add(cueSheetItemDTO);
+
+        }
+
+        cueSheetDTO.setCueSheetItem(newCueSheetItemDTOList);
 
         return cueSheetDTO;
 

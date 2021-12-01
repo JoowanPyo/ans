@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
+import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateSimpleDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,6 +55,8 @@ public class CueSheetItemDTO {
     private Date lckDtm;
     private String cueItemTypCd;
     private String cueItemTypCdNm;
+    private String mediaChCd;
+    private String mediaChCdNm;
     private Date cueItemBrdcDtm;
     private String capChgYn;
     private Date capChgDtm;
@@ -76,6 +79,7 @@ public class CueSheetItemDTO {
     private String artclRef;
     private CueSheetSimpleDTO cueSheet;
     private ArticleCueItemDTO article;
+    private CueSheetTemplateSimpleDTO cueSheetTemplate;
     private List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTO = new ArrayList<>();
 
 }
