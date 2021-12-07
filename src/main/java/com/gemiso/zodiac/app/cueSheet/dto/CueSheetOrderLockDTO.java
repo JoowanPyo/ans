@@ -24,7 +24,7 @@ public class CueSheetOrderLockDTO {
     private String brdcEndTime;
     private String brdcSchTime;
     private String brdcPgmNm;
-    private String cueStCd;
+    private String cueStCd; //상태추가.
     private String stdioId;
     private String subrmId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")*/
@@ -42,6 +42,7 @@ public class CueSheetOrderLockDTO {
     private UserSimpleDTO anc1;
     private UserSimpleDTO anc2;*/
     private String lckrId;
+    private String cueStCd;
     /*private UserSimpleDTO td1;
     private UserSimpleDTO td2;
     private String remark;

@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.article;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
@@ -12,6 +13,7 @@ import com.gemiso.zodiac.app.tag.ArticleTag;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
@@ -26,8 +28,9 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"cueSheetItem", "articleMedia", "articleOrder", "articleHist", "articleCap"})
+@ToString(exclude = {"issue","articleMedia","articleOrder","articleHist","articleCap","anchorCap","articleTag"})
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Article extends BaseEntity {
 
     @Id
@@ -241,9 +244,9 @@ public class Article extends BaseEntity {
     @JoinColumn(name = "issu_id")
     private Issue issue;
 
-    @OneToMany(mappedBy="article")
+    /*@OneToMany(mappedBy="article")
     @JsonManagedReference
-    private List<CueSheetItem> cueSheetItem = new ArrayList<>();
+    private List<CueSheetItem> cueSheetItem = new ArrayList<>();*/
 
     @OneToMany(mappedBy = "article")
     @JsonManagedReference

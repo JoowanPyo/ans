@@ -200,5 +200,31 @@ public class InterfaceController {
         return null;
     }
 
+    @Operation(summary = "getMstListService", description = "getMstListService")
+    @GetMapping(path = "/getMstListService")
+    public String getMstListService(@Parameter(name = "media_id", description = "미디어 아이디???")
+                                    @RequestParam(value = "media_id", required = false) String media_id,
+                                    @Parameter(name = "pro_id", description = "프로그램 아이디???")
+                                    @RequestParam(value = "pro_id", required = false) String pro_id,
+                                    @Parameter(name = "sdate", description = "검색 시작일자???")
+                                    @RequestParam(value = "sdate", required = false) String sdate,
+                                    @Parameter(name = "fdate", description = "검색 종료일자???")
+                                    @RequestParam(value = "fdate", required = false) String fdate,
+                                    @Parameter(name = "usr_id", description = "사용자 아이디???")
+                                    @RequestParam(value = "usr_id", required = false) String usr_id) {
 
+        return null;
+    }
+
+    @Operation(summary = "getCuesheetService", description = "getCuesheetService")
+    @GetMapping(path = "/getCuesheetService")
+    public String getCuesheetService(@Parameter(name = "cs_id", description = "큐시트 아이디???")
+                                     @RequestParam(value = "cs_id", required = false) String cs_id,
+                                     @Parameter(name = "usr_id", description = "사용자 아이디???")
+                                     @RequestParam(value = "usr_id", required = false) String usr_id,
+                                     @Parameter(name = "user_ip", description = "사용자 아이피???")
+                                     @RequestParam(value = "user_ip", required = false) String user_ip) {
+
+        return null;
+    }
 }

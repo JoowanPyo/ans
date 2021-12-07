@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.symbol;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.file.AttachFile;
@@ -26,9 +27,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString(exclude = {"attachFile", "articleCap"})
+@ToString(exclude = {"attachFile"})
 @Setter
 @DynamicUpdate
+/*@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) //json 파싱때 필드가 없는 클래스를 Serialize문제 설정*/
 public class Symbol extends BaseEntity {
 
     @Id
@@ -90,12 +92,12 @@ public class Symbol extends BaseEntity {
     @Column(name = "symbol_ord")
     private int symbolOrd;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id")
     private AttachFile attachFile;
 
-    @OneToMany(mappedBy = "symbol")
-    private List<ArticleCap> articleCap;
+    /*@OneToMany(mappedBy = "symbol")
+    private List<ArticleCap> articleCap;*/
 
     @PrePersist
     public void prePersist() {

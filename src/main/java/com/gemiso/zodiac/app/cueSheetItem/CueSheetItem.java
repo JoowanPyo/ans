@@ -27,7 +27,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"article","cueSheetItemSymbol","cueId"})
+@ToString(exclude = {"cueSheet","article","cueSheetTemplate","cueSheetMedia"})
 @DynamicUpdate
 public class CueSheetItem extends BaseEntity {
 

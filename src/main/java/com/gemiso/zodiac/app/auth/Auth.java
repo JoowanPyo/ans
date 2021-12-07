@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.auth;
 
-import com.gemiso.zodiac.app.code.Code;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;

@@ -2,6 +2,7 @@ package com.gemiso.zodiac.core.response;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
+import com.gemiso.zodiac.exception.UserFailException;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -135,6 +136,12 @@ public class ApiErrorResponse extends BaseApiResponse {
         Error error = new Error(ErrorCodes.ResourceNotFound, exception.getLocalizedMessage(), null);
 
         return new ApiErrorResponse(error, HttpStatus.NOT_FOUND);
+    }
+
+    public static ApiErrorResponse makeUserFailResponse(UserFailException exception) {
+        Error error = new Error(ErrorCodes.InternalServerError, exception.getLocalizedMessage(), null);
+
+        return new ApiErrorResponse(error, HttpStatus.FORBIDDEN);
     }
 
     protected static HashMap<String, List<String>> getValidationErrors(List<FieldError> fieldErrors) {

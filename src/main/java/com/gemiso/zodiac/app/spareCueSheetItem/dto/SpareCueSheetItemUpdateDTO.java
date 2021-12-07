@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.spareCueSheetItem.dto;
 
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolDTO;
 import lombok.AllArgsConstructor;
@@ -70,6 +71,6 @@ public class SpareCueSheetItemUpdateDTO {
     private String headLn;
     private String artclRef;
     private CueSheetSimpleDTO cueSheet;
-    private ArticleSimpleDTO article;
+    private ArticleUpdateDTO article;
     private List<CueSheetItemSymbolDTO> cueSheetMedia = new ArrayList<>();
 }

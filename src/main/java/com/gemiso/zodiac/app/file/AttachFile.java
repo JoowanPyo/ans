@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.app.file;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
@@ -16,6 +18,7 @@ import java.util.Date;
 @Setter
 @ToString
 @DynamicUpdate
+/*@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) //json 파싱때 필드가 없는 클래스를 Serialize문제 설정*/
 public class AttachFile {
 
         @Id

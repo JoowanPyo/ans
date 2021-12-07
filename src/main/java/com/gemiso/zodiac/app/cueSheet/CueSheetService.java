@@ -200,6 +200,17 @@ public class CueSheetService {
 
     public void cueSheetHistCreate(Long cueId, CueSheet cueSheet, String userId){
 
+        List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //큐시트 아이템 엔티티 조회
+
+        //조회된 큐시트 아이템 엔티티 DTO변환[ 엔티티를 바로 써버리면 필요없는 데이터가 다 보여지기 때문.]
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
+        /*String cueSheetItem = String.valueOf(cueSheetItemList);*/
+
+        //큐시트 아이템 리스트를 String 으로 변환 리스트 정보를 text로 저장하기 위함.
+        String cueSheetItem = cueSheetItemDTOList.stream()
+                .map(n -> String.valueOf(n))
+                .collect(Collectors.joining());
+
         //큐시트 이력에 넣어줄 큐시트 아이디 빌드
         CueSheetSimpleDTO cueSheetSimpleDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
 
@@ -208,6 +219,7 @@ public class CueSheetService {
                 .cueAction(ActionEnum.CREATE.getAction(ActionEnum.CREATE))
                 .inputrId(userId)
                 .cueSheet(cueSheetSimpleDTO)
+                .cueItemData(cueSheetItem)
                 .build();
 
         CueSheetHist cueSheetHist = cueSheetHistCreateMapper.toEntity(cueSheetHistBuild);
@@ -290,6 +302,46 @@ public class CueSheetService {
 
         cueSheetRepository.save(cueSheet);
 
+        cueSheetHistDelete( cueId, cueSheet);
+
+    }
+
+    public void cueSheetHistDelete(Long cueId, CueSheet cueSheet){
+
+        List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //큐시트 아이템 엔티티 조회
+
+        //조회된 큐시트 아이템 엔티티 DTO변환[ 엔티티를 바로 써버리면 필요없는 데이터가 다 보여지기 때문.]
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
+        /*String cueSheetItem = String.valueOf(cueSheetItemList);*/
+
+        //큐시트 아이템 리스트를 String 으로 변환 리스트 정보를 text로 저장하기 위함.
+        String cueSheetItem = cueSheetItemDTOList.stream()
+                .map(n -> String.valueOf(n))
+                .collect(Collectors.joining());
+
+
+        String userId = userAuthService.authUser.getUserId();//수정자 아이디 get
+        //큐시트 이력에 넣어줄 큐시트 아이디 빌드
+        CueSheetSimpleDTO cueSheetSimpleDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
+
+        //큐시트아이템 이력 버전 카운트 조회
+        int getCueVer = cueSheetHistRepository.findCueVer(cueId);
+
+        //큐시트 아이템 이력 DTO 빌드
+        CueSheetHistCreateDTO cueSheetHistBuild = CueSheetHistCreateDTO.builder()
+                .cueVer(++getCueVer)
+                .cueAction(ActionEnum.DELETE.getAction(ActionEnum.DELETE))
+                .cueItemData(cueSheetItem)
+                .inputrId(userId)
+                .cueSheet(cueSheetSimpleDTO)
+                .build();
+
+        //빌드된 큐시트아이템 이력 DTO를 엔티티 변환
+        CueSheetHist cueSheetHist = cueSheetHistCreateMapper.toEntity(cueSheetHistBuild);
+
+        //큐시트 아이템 등록
+        cueSheetHistRepository.save(cueSheetHist);
+
     }
 
     public CueSheet cueSheetFindOrFail(Long cueId){
@@ -351,9 +403,12 @@ public class CueSheetService {
             cueSheetOrderLockDTO.setLckrId(userId);
             cueSheetOrderLockDTO.setLckDtm(new Date());
             cueSheetOrderLockDTO.setLckYn("Y");
+            cueSheetOrderLockDTO.setCueStCd("cuesheet_ready");
         } else {
             cueSheet.setLckrId(null);
             cueSheet.setLckDtm(null);
+            cueSheet.setDelYn("N");
+            cueSheet.setCueStCd(null);
             //cueSheetOrderLockDTO.setLckYn("N");
         }
 
@@ -371,6 +426,7 @@ public class CueSheetService {
         cueSheet.setLckrId(null);
         cueSheet.setLckDtm(null);
         cueSheet.setLckYn("N");
+        cueSheet.setCueStCd(null);
 
         cueSheetRepository.save(cueSheet);
 

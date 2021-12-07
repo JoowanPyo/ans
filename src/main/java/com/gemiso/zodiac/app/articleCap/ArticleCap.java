@@ -1,9 +1,9 @@
 package com.gemiso.zodiac.app.articleCap;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
-import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -12,10 +12,7 @@ import org.hibernate.annotations.Formula;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "tb_artcl_cap"/*,
-        uniqueConstraints = {
-                @UniqueConstraint(name = "file_fileId_unique", columnNames = "file_id")
-        }*/)
+@Table(name = "tb_artcl_cap")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,6 +20,7 @@ import javax.persistence.*;
 @Setter
 @ToString(exclude = {"article", "capTemplate", "symbol"})
 @DynamicUpdate
+/*@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) //json 파싱때 필드가 없는 클래스를 Serialize문제 설정*/
 public class ArticleCap {
 
     @Id

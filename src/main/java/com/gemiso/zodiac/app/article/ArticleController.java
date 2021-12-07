@@ -107,6 +107,9 @@ public class ArticleController {
     @Operation(summary = "기사 목록조회[이슈]", description = "기사 목록조회")
     @GetMapping(path = "/issue")
     public ApiCollectionResponse<?> findAllIssue(
+            @Parameter(name = "date", description = "이슈 검색 시작 데이터 날짜(yyyy-MM-dd)", required = true)
+            @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
+            @Parameter(name = "issuKwd", description = "이슈 키워드") @RequestParam(value = "artclDivCd", required = true) String issuKwd,
             @Parameter(name = "artclDivCd", description = "기사 구분 코드") @RequestParam(value = "artclDivCd", required = false) String artclDivCd,
             @Parameter(name = "artclTypCd", description = "기사 유형 코드") @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
             @Parameter(name = "artclTypDtlCd", description = "기상 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
@@ -121,15 +124,17 @@ public class ArticleController {
             @Parameter(name = "limit", description = "한 페이지에 데이터 수") @RequestParam(value = "limit", required = false) Integer limit) throws Exception {
 
 
-
         //기사읽기 권한이 없는 사용자 error.forbidden
         //List<String> userAuth = userAuthService.authChk(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth());
         if (userAuthService.authChks(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth())) { //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        PageResultDTO<ArticleDTO, Article> pageList = articleService.findAllIsuue(artclDivCd, artclTypCd,
-                artclTypDtlCd, artclCateCd, deptCd, inputrId, brdcPgmId, orgArtclId, delYn, searchword, page, limit);
+        SearchDate searchDate = new SearchDate(date, date);
+
+        PageResultDTO<ArticleDTO, Article> pageList = articleService.findAllIsuue(searchDate.getStartDate(),
+                searchDate.getEndDate(), issuKwd,artclDivCd, artclTypCd, artclTypDtlCd, artclCateCd, deptCd, inputrId,
+                brdcPgmId, orgArtclId, delYn, searchword, page, limit);
 
 
         return new ApiCollectionResponse<>(pageList);
@@ -198,17 +203,17 @@ public class ArticleController {
 
     @Operation(summary = "기사 수정권한 확인", description = "기사 수정권한 확인")
     @PutMapping(path = "/{artclId}/confirm")
-    public AnsApiResponse<?> articleConfirm(@Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                           @PathVariable("artclId") Long artclId) {
+    public AnsApiResponse<ArticleAuthConfirmDTO> articleConfirm(@Parameter(name = "artclId", required = true, description = "기사 아이디")
+                                                                @PathVariable("artclId") Long artclId) {
 
 
-        Article article = articleService.articleConfirm(artclId);
+        ArticleAuthConfirmDTO articleAuthConfirmDTO = articleService.articleConfirm(artclId);
 
-        if (ObjectUtils.isEmpty(article) == false){
+        /*if (ObjectUtils.isEmpty(article) == false){
             ArticleAuthConfirmDTO articleAuthConfirmDTO = articleService.errorArticleAuthConfirm(article);
             return new AnsApiResponse<>(articleAuthConfirmDTO);
-        }
-        return AnsApiResponse.ok();
+        }*/
+        return new AnsApiResponse<>(articleAuthConfirmDTO);
     }
 
     @Operation(summary = "기사 잠금", description = "기사 잠금")
@@ -266,11 +271,13 @@ public class ArticleController {
     }
 
     @Operation(summary = "기사 삭제자 확인", description = "기사 삭제자 확인")
-    @PutMapping(path = "/confirmuser")
-    public AnsApiResponse<?> confirmUser(@Parameter(name = "password", description = "사용자 비밀번호")
-                                         @RequestParam(value = "password", required = false) String password) {
+    @PutMapping(path = "/{artclId}/confirmuser")
+    public AnsApiResponse<?> confirmUser(@Parameter(description = "필수값<br> lckYn ", required = true)
+                                         @RequestBody @Valid ArticleDeleteConfirmDTO articleDeleteConfirmDTO,
+                                         @Parameter(name = "artclId", description = "기사 아이디")
+                                         @PathVariable("artclId") Long artclId) {
 
-        articleService.confirmUser(password);
+        articleService.confirmUser(articleDeleteConfirmDTO, artclId);
 
         return AnsApiResponse.ok();
     }

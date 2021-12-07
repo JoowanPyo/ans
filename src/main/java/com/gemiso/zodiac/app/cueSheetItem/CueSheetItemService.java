@@ -2,6 +2,8 @@ package com.gemiso.zodiac.app.cueSheetItem;
 
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.ArticleRepository;
+import com.gemiso.zodiac.app.article.ArticleService;
+import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
@@ -39,6 +41,8 @@ public class CueSheetItemService {
     //방송아이콘 url저장 주소
     @Value("${files.url-key}")
     private String fileUrl;
+
+    private final ArticleService articleService;
 
     private final CueSheetItemRepository cueSheetItemRepository;
     private final ArticleRepository articleRepository;
@@ -176,6 +180,27 @@ public class CueSheetItemService {
         cueSheetItemRepository.save(cueSheetItem);
     }
 
+    public void updateCueItemArticle(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId) throws Exception {
+
+        ArticleUpdateDTO articleUpdateDTO = cueSheetItemUpdateDTO.getArticle(); //큐시트 아이템의 수정기사를 불러온다
+        Long artclId = articleUpdateDTO.getArtclId(); //수정기사의 아이디를 불러온다.
+
+        articleService.update(articleUpdateDTO, artclId); //기사 수정.
+
+        CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
+
+        CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
+        cueSheetItemUpdateDTO.setCueSheet(cueSheetDTO);
+        cueSheetItemUpdateDTO.setCueItemId(cueItemId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        cueSheetItemUpdateDTO.setUpdtrId(userId);
+
+        cueSheetItemUpdateMapper.updateFromDto(cueSheetItemUpdateDTO, cueSheetItem);
+
+        cueSheetItemRepository.save(cueSheetItem);
+    }
+
     public void delete(Long cueId, Long cueItemId){
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
@@ -252,12 +277,12 @@ public class CueSheetItemService {
 
         booleanBuilder.and(qCueSheetItem.delYn.eq("N"));
         //쿼리 where 조건 추가.
-        if (StringUtils.isEmpty(artclId) == false){
+        if (ObjectUtils.isEmpty(artclId) == false){
             booleanBuilder.and(qCueSheetItem.article.artclId.eq(artclId));
         }
         //쿼리 where 조건 추가.
-        if (StringUtils.isEmpty(cueId) == false){
-            //booleanBuilder.and(qCueSheetItem.cueId.eq(cueId));
+        if (ObjectUtils.isEmpty(cueId) == false){
+            booleanBuilder.and(qCueSheetItem.cueSheet.cueId.eq(cueId));
         }
 
 
@@ -273,8 +298,8 @@ public class CueSheetItemService {
 
         booleanBuilder.and(qCueSheetItem.delYn.eq("N"));
         //쿼리 where 조건 추가.
-        if (StringUtils.isEmpty(cueId) == false){
-            //booleanBuilder.and(qCueSheetItem.cueId.eq(cueId));
+        if (ObjectUtils.isEmpty(cueId) == false){
+            booleanBuilder.and(qCueSheetItem.cueSheet.cueId.eq(cueId));
         }
 
         return booleanBuilder;

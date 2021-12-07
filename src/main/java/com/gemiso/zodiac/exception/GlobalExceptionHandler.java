@@ -71,6 +71,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         return new ResponseEntity<>(ApiErrorResponse.makeResourceNotFoundResponse(ex), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    @ExceptionHandler(value = UserFailException.class)
+    public ResponseEntity<Object> handleApiRequestException(UserFailException ex) {
+        return new ResponseEntity<>(ApiErrorResponse.makeUserFailResponse(ex), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
     @ExceptionHandler(value = { Exception.class })
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
         ApiErrorResponse.Error error =
@@ -81,14 +86,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
 
     @ExceptionHandler(value = { ExpiredJwtException.class })
     public ResponseEntity<Object> handleExpiredJwtException(ExpiredJwtException ex){
-        ApiErrorResponse.Error error =
-                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.EXPIRED_ACCESSTOKEN, ex.getLocalizedMessage());
-        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
-        return new ResponseEntity<>(apiErrorResponse, HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(value = { TokenFailedException.class })
-    public ResponseEntity<Object> handleTokenFailedException(TokenFailedException ex){
         ApiErrorResponse.Error error =
                 new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.EXPIRED_ACCESSTOKEN, ex.getLocalizedMessage());
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);

@@ -46,6 +46,7 @@ import com.gemiso.zodiac.app.userGroup.UserGroupAuth;
 import com.gemiso.zodiac.app.userGroup.UserGroupAuthRepository;
 import com.gemiso.zodiac.core.enumeration.ActionEnum;
 import com.gemiso.zodiac.core.enumeration.ActionMesg;
+import com.gemiso.zodiac.core.enumeration.FixAuth;
 import com.gemiso.zodiac.core.enumeration.FixEnum;
 import com.gemiso.zodiac.core.helper.PageHelper;
 import com.gemiso.zodiac.core.page.PageResultDTO;
@@ -54,6 +55,7 @@ import com.gemiso.zodiac.core.service.UserAuthChkService;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.PasswordFailedException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
+import com.gemiso.zodiac.exception.UserFailException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -106,7 +108,7 @@ public class ArticleService {
     private final AnchorCapHistCreateMapper anchorCapHistCreateMapper;
 
     private final UserAuthService userAuthService;
-    //private final UserAuthChkService userAuthChkService;
+    private final UserAuthChkService userAuthChkService;
     private final UserService userService;
 
     private final PasswordEncoder passwordEncoder;
@@ -150,7 +152,7 @@ public class ArticleService {
     }
 
     //기사 목록조회[이슈 기사]
-    public PageResultDTO<ArticleDTO, Article> findAllIsuue(String artclDivCd, String artclTypCd, String artclTypDtlCd,
+    public PageResultDTO<ArticleDTO, Article> findAllIsuue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd, String artclTypDtlCd,
                                                            String artclCateCd, String deptCd, String inputrId,
                                                            Long brdcPgmId, Long orgArtclId, String delYn,
                                                            String searchword, Integer page, Integer limit){
@@ -159,7 +161,7 @@ public class ArticleService {
         PageHelper pageHelper = new PageHelper(page, limit);
         Pageable pageable = pageHelper.getArticlePageInfo();
 
-        BooleanBuilder booleanBuilder = getSearchIssue(artclDivCd, artclTypCd,
+        BooleanBuilder booleanBuilder = getSearchIssue(sdate, edate, issuKwd, artclDivCd, artclTypCd,
                 artclTypDtlCd, artclCateCd, deptCd, inputrId, brdcPgmId, orgArtclId, delYn, searchword);
 
         //전체조회[page type]
@@ -238,10 +240,10 @@ public class ArticleService {
 
         //기사이력, 자막, 미디어, 의뢰 정보 set
         //articleDTO.setArticleHistDTO(articleHistDTOList);
-        articleDTO.setArticleCapDTO(setArticleCapDTOList);
+        articleDTO.setArticleCap(setArticleCapDTOList);
         articleDTO.setAnchorCap(setAnchorCapDTOList);
-        articleDTO.setArticleMediaDTO(articleMediaSimpleDTOList);
-        articleDTO.setArticleOrderDTO(articleOrderSimpleDTOList);
+        articleDTO.setArticleMedia(articleMediaSimpleDTOList);
+        articleDTO.setArticleOrder(articleOrderSimpleDTOList);
 
 
         return articleDTO;
@@ -346,7 +348,7 @@ public class ArticleService {
             articleActionLog = ArticleActionLog.builder()
                     .article(article)
                     .message(ActionMesg.articleTM.getActionMesg(ActionMesg.articleTM))
-                    .action(ActionEnum.CREATE.getAction(ActionEnum.UPDATE))
+                    .action(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
                     .inputrId(userId)
                     .artclInfo(entityToJson(article))//Json으로 기사내용저장
                     .build();
@@ -363,7 +365,7 @@ public class ArticleService {
             articleActionLog = ArticleActionLog.builder()
                     .article(article)
                     .message(ActionMesg.articleTEM.getActionMesg(ActionMesg.articleTEM))
-                    .action(ActionEnum.CREATE.getAction(ActionEnum.UPDATE))
+                    .action(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
                     .inputrId(userId)
                     .artclInfo(entityToJson(article))//Json으로 기사내용저장
                     .build();
@@ -380,7 +382,7 @@ public class ArticleService {
             articleActionLog = ArticleActionLog.builder()
                     .article(article)
                     .message(ActionMesg.articleCM.getActionMesg(ActionMesg.articleCM))
-                    .action(ActionEnum.CREATE.getAction(ActionEnum.UPDATE))
+                    .action(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
                     .inputrId(userId)
                     .artclInfo(entityToJson(article))//Json으로 기사내용저장
                     .build();
@@ -397,7 +399,7 @@ public class ArticleService {
             articleActionLog = ArticleActionLog.builder()
                     .article(article)
                     .message(ActionMesg.anchorMM.getActionMesg(ActionMesg.anchorMM))
-                    .action(ActionEnum.CREATE.getAction(ActionEnum.UPDATE))
+                    .action(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
                     .inputrId(userId)
                     .artclInfo(entityToJson(article))//Json으로 기사내용저장
                     .build();
@@ -412,7 +414,7 @@ public class ArticleService {
             articleActionLog = ArticleActionLog.builder()
                     .article(article)
                     .message(ActionMesg.articleU.getActionMesg(ActionMesg.articleU))
-                    .action(ActionEnum.CREATE.getAction(ActionEnum.UPDATE))
+                    .action(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
                     .inputrId(userId)
                     .artclInfo(entityToJson(article))//Json으로 기사내용저장
                     .build();
@@ -450,8 +452,8 @@ public class ArticleService {
         //기사로그 빌드
         ArticleActionLog articleActionLog = ArticleActionLog.builder()
                 .article(article)
-                .message(ActionMesg.articleC.getActionMesg(ActionMesg.articleD))
-                .action(ActionEnum.CREATE.getAction(ActionEnum.DELETE))
+                .message(ActionMesg.articleD.getActionMesg(ActionMesg.articleD))
+                .action(ActionEnum.DELETE.getAction(ActionEnum.DELETE))
                 .inputrId(userId)
                 .artclInfo(entityToJson(article))//Json으로 기사내용저장
                 .build();
@@ -747,7 +749,7 @@ public class ArticleService {
     }
 
     //기사 정보조회 존재여부 확인
-    public Article articleFindOrFail(Long artclId) { 
+    public Article articleFindOrFail(Long artclId) {
 
         Optional<Article> article = articleRepository.findArticle(artclId);
 
@@ -826,14 +828,22 @@ public class ArticleService {
     }
 
     //기사 목록조회 조회조건 빌드[이슈 기사]
-    public BooleanBuilder getSearchIssue(String artclDivCd, String artclTypCd, String artclTypDtlCd,
-                                         String artclCateCd, String deptCd, String inputrId,
+    public BooleanBuilder getSearchIssue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd,
+                                         String artclTypDtlCd, String artclCateCd, String deptCd, String inputrId,
                                          Long brdcPgmId, Long orgArtclId, String delYn, String searchword){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         QArticle qArticle = QArticle.article;
 
+        //이슈 검색일 조건
+        if (ObjectUtils.isEmpty(sdate) && ObjectUtils.isEmpty(edate)){
+            booleanBuilder.and(qArticle.issue.inputDtm.between(sdate, edate));
+        }
+        //이슈 키워드 검색
+        if (issuKwd != null && issuKwd.trim().isEmpty() == false){
+            booleanBuilder.and(qArticle.issue.issuKwd.eq(issuKwd));
+        }
         //기사 구분코드[이슈기사 검색이기때문에 무조건 article_issue 들어와야함함]
         if (artclDivCd != null && artclDivCd.trim().isEmpty() == false){
             booleanBuilder.and(qArticle.artclDivCd.eq(artclDivCd));
@@ -953,7 +963,7 @@ public class ArticleService {
         //기사 조회.
         Optional<Article> articleEntity = articleRepository.findArticle(artclId);
         if (articleEntity.isPresent() == false) {
-            throw new ResourceNotFoundException(String.format("기사를 찾을수 없습니다. 기사아이디 : {%ld}", artclId));
+            throw new ResourceNotFoundException("기사를 찾을수 없습니다. 기사아이디 :"+ artclId);
         }
 
         Article article = articleEntity.get();
@@ -1060,29 +1070,52 @@ public class ArticleService {
     }
 
     //사용자 확인
-    public void confirmUser(String password) {
+    public void confirmUser(ArticleDeleteConfirmDTO articleDeleteConfirmDTO, Long artclId) {
 
+        String pwd = articleDeleteConfirmDTO.getPassword();//파라미터로 들어온 비밀번호
         String userId = userAuthService.authUser.getUserId(); //토큰에서 유저 아이디를 가져온다.
-
         User userEntity = userService.userFindOrFail(userId); //사용자 아이디로 사용자 유무 확인 및 사용자 정보조회.
 
-        if (passwordEncoder.matches(password, userEntity.getPwd()) == false) { //현재 들어온 비밀번호와 등록되어 있는 비밀번호 확인
+        if (passwordEncoder.matches(pwd, userEntity.getPwd()) == false) { //현재 들어온 비밀번호와 등록되어 있는 비밀번호 확인
             throw new PasswordFailedException("Password failed.");
         }
 
+        Article article = articleFindOrFail(artclId);//기사조회 및 존재유무 확인.
+        String inputr = article.getInputrId();
+
+        if (inputr.equals(userId) ==false) { //기사입력자 확인, 본인기사만 삭제 가능.
+            if (userAuthChkService.authChk(FixAuth.ADMIN.name())) {
+                throw new UserFailException("기사를 입력한 사용자가 아닙니다. 기사 입력자 아이디 : "+ inputr);
+            }
+        }
+        if (userAuthChkService.authChk(FixAuth.ADMIN.name())) {//관리자 권한 확인. 본인기사가 아니더라도 관리자면 삭제가능
+            if (inputr.equals(userId) ==false) {
+                throw new UserFailException("관리자 권한 이거나 기사를 입력한 사용자만 기사 삭제가 가능 합니다.");
+            }
+        }
 
     }
 
     //기사 잠금여부 및 권한 확인.
-    public Article articleConfirm(Long artclId){
+    public ArticleAuthConfirmDTO articleConfirm(Long artclId) {
 
         Article article = articleFindOrFail(artclId); //기사아이디로 기사정보조회 및 기사유무 확인.
 
         String orgApprDivCd = article.getApprvDivCd(); //현재 기사의 픽스 값을 get
         String orgLckYn = article.getLckYn(); //잠금 여부값 확인
+        String inputr = article.getInputrId(); //기사 작성자 get
 
-        if ("Y".equals(orgLckYn)){ //이미 lckYn 값이 Y이면 잠긴상태이므로 리턴 true로 예외처리로 넘어간다.
-            return article;
+        if ("Y".equals(orgLckYn)) { //이미 lckYn 값이 Y이면 잠긴상태이므로 리턴 true로 예외처리로 넘어간다.
+            ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
+                    .artclId(article.getArtclId())
+                    .lckYn(article.getLckYn())
+                    .lckDtm(article.getLckDtm())
+                    .lckrId(article.getLckrId())
+                    .msg("다른 사용자가 수정중 입니다.")
+                    .httpStatus(HttpStatus.METHOD_NOT_ALLOWED)
+                    .build();
+
+            return articleAuthConfirmDTO;
         }
 
         // 사용자 정보
@@ -1096,62 +1129,101 @@ public class ArticleService {
         paf.setArticle(article);
 
 
+        if (FixEnum.FIX_NONE.getFixeum(FixEnum.FIX_NONE).equals(orgApprDivCd)) { //픽스 권한이 none일경우
 
-        if (FixEnum.FIX_NONE.equals(orgApprDivCd)){ //픽스 권한이 none일경우
+            if (inputr.equals(userId) == false) {
+
+                ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
+                        .artclId(article.getArtclId())
+                        .msg("기사 입력자와 일치하지 않습니다. 기사 입력자 아이디 : " + inputr)
+                        .httpStatus(HttpStatus.FORBIDDEN)
+                        .build();
+
+                return articleAuthConfirmDTO;//작상자만 기사를 수정가능
+            }
 
             //fix none 상태일 경우 article_fix할 권한이상이 있는경우만 수정가능.
             paf.setApproveCode(FixEnum.ARTICLE_FIX.getFixeum(FixEnum.ARTICLE_FIX));
 
             if (paf.getFixStatus(userId, fixAuthList) == false) { //권한 확인후 false이면 에러 403포비든.
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
+                        .artclId(article.getArtclId())
+                        .msg("기사 수정 권한이 없습니다.")
+                        .httpStatus(HttpStatus.FORBIDDEN)
+                        .build();
+
+                return articleAuthConfirmDTO;
             }
-
             return null;
-
         }
-        if (FixEnum.ARTICLE_FIX.equals(orgApprDivCd)){ //픽스 권한이 articlefix일 경우
+
+        if (FixEnum.ARTICLE_FIX.getFixeum(FixEnum.ARTICLE_FIX).equals(orgApprDivCd)) { //픽스 권한이 articlefix일 경우
             // article fix 상태일 경우 에디터 픽스 권한이상이 있는경우만 수정가능.
             paf.setApproveCode(FixEnum.EDITOR_FIX.getFixeum(FixEnum.EDITOR_FIX));
 
             if (paf.getFixStatus(userId, fixAuthList) == false) { //권한 확인후 false이면 에러 403포비든.
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
+                        .artclId(article.getArtclId())
+                        .msg("기자 픽스 상태입니다. 기사 수정 권한을 확인하십시오.")
+                        .httpStatus(HttpStatus.FORBIDDEN)
+                        .build();
+
+                return articleAuthConfirmDTO;
             }
-
             return null;
-
         }
-        if (FixEnum.EDITOR_FIX.equals(orgApprDivCd)){//픽스 권한이 editorfix 경우
+
+        if (FixEnum.EDITOR_FIX.getFixeum(FixEnum.EDITOR_FIX).equals(orgApprDivCd)) {//픽스 권한이 editorfix 경우
 
             // article fix 상태일 경우 할 ANCHOR_FIX 권한이상이 있는경우만 수정가능.
             paf.setApproveCode(FixEnum.ANCHOR_FIX.getFixeum(FixEnum.ANCHOR_FIX));
 
             if (paf.getFixStatus(userId, fixAuthList) == false) { //권한 확인후 false이면 에러 403포비든.
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
+                ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
+                        .artclId(article.getArtclId())
+                        .msg("애디터 픽스 상태입니다. 기사 수정 권한을 확인하십시오.")
+                        .httpStatus(HttpStatus.FORBIDDEN)
+                        .build();
 
+                return articleAuthConfirmDTO;
+            }
             return null;
         }
-        if (FixEnum.ANCHOR_FIX.equals(orgApprDivCd)){//픽스 권한이 anchorfix 경우
+
+        if (FixEnum.ANCHOR_FIX.getFixeum(FixEnum.ANCHOR_FIX).equals(orgApprDivCd)) {//픽스 권한이 anchorfix 경우
 
             // article fix 상태일 경우 할 DESK_FIX 권한이상이 있는경우만 수정가능.
             paf.setApproveCode(FixEnum.DESK_FIX.getFixeum(FixEnum.DESK_FIX));
 
             if (paf.getFixStatus(userId, fixAuthList) == false) { //권한 확인후 false이면 에러 403포비든.
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
+                        .artclId(article.getArtclId())
+                        .msg("앵커 픽스 상태입니다. 기사 수정 권한을 확인하십시오.")
+                        .httpStatus(HttpStatus.FORBIDDEN)
+                        .build();
+
+                return articleAuthConfirmDTO;
             }
-
             return null;
-
         }
-        if (FixEnum.DESK_FIX.equals(orgApprDivCd)){//픽스 권한이 deskfix 경우
 
-            //
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        if (FixEnum.DESK_FIX.getFixeum(FixEnum.DESK_FIX).equals(orgApprDivCd)) {//픽스 권한이 deskfix 경우
 
+            if (paf.getFixStatus(userId, fixAuthList) == false) { //권한 확인후 false이면 에러 403포비든.
+                ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
+                        .artclId(article.getArtclId())
+                        .msg("데스커 픽스 상태에서는 수정할 수 없습니다.")
+                        .httpStatus(HttpStatus.FORBIDDEN)
+                        .build();
+
+                return articleAuthConfirmDTO;
+                //throw new ResponseStatusException(HttpStatus.CONFLICT);
+
+            }
+            return null;
         }
 
         return null;
-
     }
 
     //기사 수정중 일시 수정중인 사용자 빌드후  리스폰스
@@ -1171,6 +1243,7 @@ public class ArticleService {
     }
 
 }
+
 
 // artcl_di_cd[기사구분코드가] 이슈로 들어왔을 경우 해당이슈로  작성된 기사들 출력.
 /*    public PageResultDTO<ArticleDTO, Article> findAllIssue(Long issuId){

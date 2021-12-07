@@ -159,15 +159,15 @@ public class ArticleDTO {
     private IssueDTO issue;
     @Schema(description = "복사된 기사 아이디")
     private Long parentArtlcId;
-    //private List<ArticleHistSimpleDTO> articleHistDTO = new ArrayList<>();
+    //private List<ArticleHistSimpleDTO> articleHist = new ArrayList<>();
     @Schema(description = "기사자막 리스트")
-    private List<ArticleCapSimpleDTO> articleCapDTO = new ArrayList<>();
+    private List<ArticleCapSimpleDTO> articleCap = new ArrayList<>();
     @Schema(description = "앵커자막 리스트")
     private List<AnchorCapSimpleDTO> anchorCap = new ArrayList<>();
     @Schema(description = "기사영상 리스트")
-    private List<ArticleMediaSimpleDTO> articleMediaDTO = new ArrayList<>();
+    private List<ArticleMediaSimpleDTO> articleMedia = new ArrayList<>();
     @Schema(description = "기사의회 리스트")
-    private List<ArticleOrderSimpleDTO> articleOrderDTO = new ArrayList<>();
+    private List<ArticleOrderSimpleDTO> articleOrder = new ArrayList<>();
     @Schema(description = "기사태그 리스트")
     private List<ArticleTagDTO> articleTag = new ArrayList<>();
 

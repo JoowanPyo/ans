@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.app.issue;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -7,6 +9,7 @@ import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.Date;
+
 
 @Entity
 @Table(name = "tb_issu"/*,
@@ -18,8 +21,9 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = "article")
+@ToString
 @DynamicUpdate
+/*@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)*/
 public class Issue extends BaseEntity {
 
     @Id
@@ -59,12 +63,6 @@ public class Issue extends BaseEntity {
     @Column(name = "issu_fnsh_dtm")
     private Date  issuFnshDtm;
 
-    /*@Column( name = "input_dtm", updatable = false)
-    private Date inputDtm;
-
-    @Column(name = "updt_dtm")
-    private Date updtDtm;*/
-
     @Column(name = "issu_org_id", length = 50)
     private Long issuOrgId;
 
@@ -88,10 +86,6 @@ public class Issue extends BaseEntity {
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
     private String delrNm;
-
-    /*@OneToMany(mappedBy="issue")
-    @JsonManagedReference
-    private List<Article> article;*/
 
     /**
      * insert 되기전 (persist 되기전) 실행된다.

@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.cueSheetItem;
 
-import com.gemiso.zodiac.app.article.ArticleService;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateListDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
@@ -26,7 +25,7 @@ import java.util.List;
 public class CueSheetItemController {
 
     private final CueSheetItemService cueSheetItemService;
-    private final ArticleService articleService;
+    /*private final ArticleService articleService;*/
 
     @Operation(summary = "큐시트 아이템 목록조회", description = "큐시트 아이템 목록조회")
     @GetMapping(path = "")
@@ -83,7 +82,8 @@ public class CueSheetItemController {
             cueSheetItemService.update(cueSheetItemUpdateDTO, cueId, cueItemId);
         } else if (cueItemDivCd.equals("cuearticle")) {
             //기사복사본 수정.
-            articleService.update(cueSheetItemUpdateDTO.getArticle(), cueSheetItemUpdateDTO.getArticle().getArtclId());
+            cueSheetItemService.updateCueItemArticle(cueSheetItemUpdateDTO, cueId, cueItemId);
+            /*articleService.update(cueSheetItemUpdateDTO.getArticle(), cueSheetItemUpdateDTO.getArticle().getArtclId());*/
         }
         CueSheetItemDTO cueSheetItemDTO = cueSheetItemService.find(cueItemId);
 
