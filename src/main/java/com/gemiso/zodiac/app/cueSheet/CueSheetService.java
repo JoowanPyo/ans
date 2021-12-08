@@ -1,6 +1,9 @@
 package com.gemiso.zodiac.app.cueSheet;
 
+import com.gemiso.zodiac.app.anchorCap.AnchorCap;
+import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
+import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.*;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetCreateMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
@@ -19,6 +22,7 @@ import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
 import com.gemiso.zodiac.app.program.ProgramService;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
+import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.core.enumeration.ActionEnum;
 import com.gemiso.zodiac.core.enumeration.FixEnum;
 import com.gemiso.zodiac.core.service.UserAuthService;
@@ -26,8 +30,10 @@ import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -41,6 +47,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class CueSheetService {
+
+    @Value("${files.url-key}")
+    private String fileUrl;
 
     private final CueSheetRepository cueSheetRepository;
     private final CueSheetItemRepository cueSheetItemRepository;
@@ -159,26 +168,93 @@ public class CueSheetService {
             CueSheetItemDTO cueSheetItemDTO = itr.next();
 
             String delYn = cueSheetItemDTO.getDelYn();//큐시트 아이템의 삭제여부 값
-            ArticleCueItemDTO articleCueItemDTO = cueSheetItemDTO.getArticle();//큐시트 아이템의 기사의 삭제여부 값
+            ArticleCueItemDTO articleCueItemDTO = cueSheetItemDTO.getArticle();//큐시트 아이템의 기사 정보 get
 
             if (ObjectUtils.isEmpty(articleCueItemDTO) == false){ //큐시트 아이템에 기사가 포함된 경우.
                 String articleDelYn = articleCueItemDTO.getDelYn();//큐시트 아이템에 포함된 기사의 삭제 여부값
                 if ("Y".equals(articleDelYn)){ //기사 삭제 값이 Y인경우 조회된 큐시트아이템 삭제
                     continue;
                 }
+                articleCueItemDTO = symbolUrlSet(articleCueItemDTO);//기사에 방송아이콘의 방송아이콘URL 추가.
+                cueSheetItemDTO.setArticle(articleCueItemDTO);//방송아이콘 추가한 기사 큐시트 아이템에 set
             }
-            if ("Y".equals(delYn)){ //조회된 큐시트 아이템 삭제여부값이 Y인 경우/.
+            if ("Y".equals(delYn)) { //조회된 큐시트 아이템 삭제여부값이 Y인 경우/.
                 continue;
             }
 
             newCueSheetItemDTOList.add(cueSheetItemDTO);
-
         }
-
         cueSheetDTO.setCueSheetItem(newCueSheetItemDTOList);
 
         return cueSheetDTO;
 
+    }
+
+    //조회된 큐시트아이템 기사형식의 방송아이콘 URL추가생성
+    public ArticleCueItemDTO symbolUrlSet(ArticleCueItemDTO articleCueItemDTO){
+
+        ArticleCueItemDTO returnArticleCueItemDTO = new ArticleCueItemDTO(); //리턴시킬 큐시트 아이템 생성
+
+        if (ObjectUtils.isEmpty(articleCueItemDTO) == false){ //큐시트 아이템 기사가 있는 경우.
+
+            //큐시트아이템 기사에 기사자막 리스트 get
+            List<ArticleCapSimpleDTO> articleCapSimpleDTOList = articleCueItemDTO.getArticleCapDTO();
+            //큐시트아이템 기사에 앵커자막 리스트 get
+            List<AnchorCapSimpleDTO> anchorCapSimpleDTOList = articleCueItemDTO.getAnchorCap();
+
+            //새로 생성하여 set해줄 기사자막 생성
+            List<ArticleCapSimpleDTO> returnArticleCapSimpleDTOList = new ArrayList<>();
+            //새로 생성하여 set해줄 앵커자막 생성
+            List<AnchorCapSimpleDTO> returnAnchorCapSimpleDTOList = new ArrayList<>();
+
+            if (CollectionUtils.isEmpty(articleCapSimpleDTOList) == false){ //큐시트아이템 기사에 기사자막 리스트가 있는경우
+                for (ArticleCapSimpleDTO articleCapSimpleDTO : articleCapSimpleDTOList){ //기사자막 리스트한껀식 Url set
+
+                    SymbolDTO symbolDTO = new SymbolDTO(); //새로 값을 받을 방송아이콘DTO생성
+
+                    symbolDTO = articleCapSimpleDTO.getSymbol();//기사자막에 방송아이콘get
+
+                    if (ObjectUtils.isEmpty(symbolDTO) == false){//기사자막에 방송아이콘이 있는경우
+                        //기사자막에 방송아이콘에 파일로그 get
+                        String fileLoc = articleCapSimpleDTO.getSymbol().getAttachFile().getFileLoc();
+                        //파일 Url+ 가져온 파일로그
+                        String url = fileUrl + fileLoc; //url + 파일로그
+                        //생성된 파일 url set
+                        symbolDTO.setUrl(url);
+
+                        articleCapSimpleDTO.setSymbol(symbolDTO); //기사자막에 파일url 셋팅된 방송아이콘  set
+
+                    }
+                    returnArticleCapSimpleDTOList.add(articleCapSimpleDTO);//새로 생성된 기사자막 리스트에 url추가된 기사자막 추가
+                }
+                returnArticleCueItemDTO.setArticleCapDTO(returnArticleCapSimpleDTOList); //새로 생성된 기사자막 리스트 기사에 set
+            }
+
+            if (CollectionUtils.isEmpty(anchorCapSimpleDTOList) == false){ //큐시트아이템 기사에 앵커자막 리스트가 있는경우
+                for (AnchorCapSimpleDTO anchorCapSimpleDTO : anchorCapSimpleDTOList){ //기사자막 리스트한껀식 Url set
+
+                    SymbolDTO symbolDTO = new SymbolDTO(); //새로 값을 받을 방송아이콘DTO생성
+
+                    symbolDTO = anchorCapSimpleDTO.getSymbol();//기사자막에 방송아이콘get
+
+                    if (ObjectUtils.isEmpty(symbolDTO) == false){//앵커자막에 방송아이콘이 있는경우
+                        //앵커자막에 방송아이콘에 파일로그 get
+                        String fileLoc = anchorCapSimpleDTO.getSymbol().getAttachFile().getFileLoc();
+                        //파일 Url+ 가져온 파일로그
+                        String url = fileUrl + fileLoc; //url + 파일로그
+                        //생성된 파일 url set
+                        symbolDTO.setUrl(url);
+
+                        anchorCapSimpleDTO.setSymbol(symbolDTO); //앵커자막에 파일url 셋팅된 방송아이콘  set
+
+                    }
+                    returnAnchorCapSimpleDTOList.add(anchorCapSimpleDTO);//새로 생성된 앵커자막 리스트에 url추가된 기사자막 추가
+                }
+                returnArticleCueItemDTO.setAnchorCap(returnAnchorCapSimpleDTOList); //새로 생성된 앵커자막 리스트 기사에 set
+            }
+
+        }
+        return returnArticleCueItemDTO;//방송아이콘URL추가된 기사 리턴
     }
 
     public Long create(CueSheetCreateDTO cueSheetCreateDTO){

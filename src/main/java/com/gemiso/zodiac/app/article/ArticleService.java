@@ -281,13 +281,20 @@ public class ArticleService {
     //기사 액션로그 등록
     public void articleActionLogCreate(Article article, String userId) throws Exception {
 
+        List<ArticleCap> articleCapList  = article.getArticleCap();
+        List<AnchorCap> anchorCapList = article.getAnchorCap();
+        article.setArticleCap(null);
+        article.setAnchorCap(null);
+
         //기사 액션로그 빌드
         ArticleActionLog articleActionLog = ArticleActionLog.builder()
                 .article(article)
                 .message(ActionMesg.articleC.getActionMesg(ActionMesg.articleC))
                 .action(ActionEnum.CREATE.getAction(ActionEnum.CREATE))
                 .inputrId(userId)
-                .artclInfo(entityToJson(article)) //Json으로 기사내용저장
+                .artclCapInfo(articleCapEntityToJson(articleCapList))
+                .anchorCapInfo(anchorCapEntityToJson(anchorCapList))
+                .artclInfo(articleEntityToJson(article)) //Json으로 기사내용저장
                 .build();
         //기사 액션로그 등록
         articleActionLogRepository.save(articleActionLog);
@@ -295,11 +302,35 @@ public class ArticleService {
     }
 
     //기사 액션로그 엔티티 Json변환
-    public String entityToJson(Article article) throws Exception {
+    public String articleEntityToJson(Article article) throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();
 
         String jsonInString = mapper.writeValueAsString(article);
+
+        System.out.println(jsonInString);
+
+        return jsonInString;
+    }
+
+    //기사자막 액션로그 엔티티 Json변환
+    public String articleCapEntityToJson(List<ArticleCap> articleCapList) throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String jsonInString = mapper.writeValueAsString(articleCapList);
+
+        System.out.println(jsonInString);
+
+        return jsonInString;
+    }
+
+    //앵커자막 액션로그 엔티티 Json변환
+    public String anchorCapEntityToJson(List<AnchorCap> anchorCapList) throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String jsonInString = mapper.writeValueAsString(anchorCapList);
 
         System.out.println(jsonInString);
 
@@ -343,6 +374,11 @@ public class ArticleService {
         String orgTitle = article.getArtclTitl(); //등록되어 있던 기사 제목
         String newTitle = articleUpdateDTO.getArtclTitl(); //신규 기사 제목
 
+        List<ArticleCap> articleCapList  = article.getArticleCap();//기사로그에 등록할 기사자막 리스트를 기사에서 가져온다.
+        List<AnchorCap> anchorCapList = article.getAnchorCap();//기사로그에 등록할 앵커자막 리스트를 기사에서 가져온다.
+        article.setArticleCap(null);//기사에서 기사자막삭제
+        article.setAnchorCap(null);//기사에서 앵커자막삭제
+
         if (Objects.equals(orgTitle, newTitle) == false) { // 기사제목이 바뀌었을 경우 기사액션로그 등록
             //기사로그 빌드
             articleActionLog = ArticleActionLog.builder()
@@ -350,7 +386,9 @@ public class ArticleService {
                     .message(ActionMesg.articleTM.getActionMesg(ActionMesg.articleTM))
                     .action(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
                     .inputrId(userId)
-                    .artclInfo(entityToJson(article))//Json으로 기사내용저장
+                    .artclCapInfo(articleCapEntityToJson(articleCapList))
+                    .anchorCapInfo(anchorCapEntityToJson(anchorCapList))
+                    .artclInfo(articleEntityToJson(article)) //Json으로 기사내용저장
                     .build();
 
             //기사로그 저장
@@ -367,7 +405,9 @@ public class ArticleService {
                     .message(ActionMesg.articleTEM.getActionMesg(ActionMesg.articleTEM))
                     .action(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
                     .inputrId(userId)
-                    .artclInfo(entityToJson(article))//Json으로 기사내용저장
+                    .artclCapInfo(articleCapEntityToJson(articleCapList))
+                    .anchorCapInfo(anchorCapEntityToJson(anchorCapList))
+                    .artclInfo(articleEntityToJson(article)) //Json으로 기사내용저장
                     .build();
 
             //기사로그 저장
@@ -384,7 +424,9 @@ public class ArticleService {
                     .message(ActionMesg.articleCM.getActionMesg(ActionMesg.articleCM))
                     .action(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
                     .inputrId(userId)
-                    .artclInfo(entityToJson(article))//Json으로 기사내용저장
+                    .artclCapInfo(articleCapEntityToJson(articleCapList))
+                    .anchorCapInfo(anchorCapEntityToJson(anchorCapList))
+                    .artclInfo(articleEntityToJson(article)) //Json으로 기사내용저장
                     .build();
 
             //기사로그 저장
@@ -401,7 +443,9 @@ public class ArticleService {
                     .message(ActionMesg.anchorMM.getActionMesg(ActionMesg.anchorMM))
                     .action(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
                     .inputrId(userId)
-                    .artclInfo(entityToJson(article))//Json으로 기사내용저장
+                    .artclCapInfo(articleCapEntityToJson(articleCapList))
+                    .anchorCapInfo(anchorCapEntityToJson(anchorCapList))
+                    .artclInfo(articleEntityToJson(article)) //Json으로 기사내용저장
                     .build();
 
             //기사로그 저장
@@ -416,7 +460,9 @@ public class ArticleService {
                     .message(ActionMesg.articleU.getActionMesg(ActionMesg.articleU))
                     .action(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
                     .inputrId(userId)
-                    .artclInfo(entityToJson(article))//Json으로 기사내용저장
+                    .artclCapInfo(articleCapEntityToJson(articleCapList))
+                    .anchorCapInfo(anchorCapEntityToJson(anchorCapList))
+                    .artclInfo(articleEntityToJson(article)) //Json으로 기사내용저장
                     .build();
 
             //기사로그 저장
@@ -449,13 +495,20 @@ public class ArticleService {
     // 기사 삭제 액션로그 등록
     public void articleActionLogDelete(Article article, String userId) throws Exception {
 
+        List<ArticleCap> articleCapList  = article.getArticleCap();//기사로그에 등록할 기사자막 리스트를 기사에서 가져온다.
+        List<AnchorCap> anchorCapList = article.getAnchorCap();//기사로그에 등록할 앵커자막 리스트를 기사에서 가져온다.
+        article.setArticleCap(null);//기사에서 기사자막삭제
+        article.setAnchorCap(null);//기사에서 앵커자막삭제
+
         //기사로그 빌드
         ArticleActionLog articleActionLog = ArticleActionLog.builder()
                 .article(article)
                 .message(ActionMesg.articleD.getActionMesg(ActionMesg.articleD))
                 .action(ActionEnum.DELETE.getAction(ActionEnum.DELETE))
                 .inputrId(userId)
-                .artclInfo(entityToJson(article))//Json으로 기사내용저장
+                .artclCapInfo(articleCapEntityToJson(articleCapList))
+                .anchorCapInfo(anchorCapEntityToJson(anchorCapList))
+                .artclInfo(articleEntityToJson(article)) //Json으로 기사내용저장
                 .build();
 
         //기사로그 저장
@@ -1010,6 +1063,10 @@ public class ArticleService {
     //기사 액션 로그 등록
     public void articleActionLogfix(String apprvDivCd, String orgApprvDivcd, String userId, Article article) throws Exception {
 
+        List<ArticleCap> articleCapList  = article.getArticleCap();//기사로그에 등록할 기사자막 리스트를 기사에서 가져온다.
+        List<AnchorCap> anchorCapList = article.getAnchorCap();//기사로그에 등록할 앵커자막 리스트를 기사에서 가져온다.
+        article.setArticleCap(null);//기사에서 기사자막삭제
+        article.setAnchorCap(null);//기사에서 앵커자막삭제
 
         //기사 액션로그 빌드
         ArticleActionLog articleActionLog = ArticleActionLog.builder()
@@ -1017,7 +1074,9 @@ public class ArticleService {
                 .message(ActionMesg.fixM.getActionMesg(ActionMesg.fixM) + " " + "'" + orgApprvDivcd + "'" + " to " + "'" + apprvDivCd + "'")
                 .action(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
                 .inputrId(userId)
-                .artclInfo(entityToJson(article)) //Json으로 기사내용저장
+                .artclCapInfo(articleCapEntityToJson(articleCapList))
+                .anchorCapInfo(anchorCapEntityToJson(anchorCapList))
+                .artclInfo(articleEntityToJson(article)) //Json으로 기사내용저장
                 .build();
         //기사 액션로그 등록
         articleActionLogRepository.save(articleActionLog);
@@ -1112,6 +1171,7 @@ public class ArticleService {
                     .lckDtm(article.getLckDtm())
                     .lckrId(article.getLckrId())
                     .msg("다른 사용자가 수정중 입니다.")
+                    .authCode("Locked article")
                     .httpStatus(HttpStatus.METHOD_NOT_ALLOWED)
                     .build();
 
@@ -1136,6 +1196,7 @@ public class ArticleService {
                 ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
                         .artclId(article.getArtclId())
                         .msg("기사 입력자와 일치하지 않습니다. 기사 입력자 아이디 : " + inputr)
+                        .authCode("not_match_userId")
                         .httpStatus(HttpStatus.FORBIDDEN)
                         .build();
 
@@ -1149,6 +1210,7 @@ public class ArticleService {
                 ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
                         .artclId(article.getArtclId())
                         .msg("기사 수정 권한이 없습니다.")
+                        .authCode("incorrect_auth_articlefix")
                         .httpStatus(HttpStatus.FORBIDDEN)
                         .build();
 
@@ -1165,6 +1227,7 @@ public class ArticleService {
                 ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
                         .artclId(article.getArtclId())
                         .msg("기자 픽스 상태입니다. 기사 수정 권한을 확인하십시오.")
+                        .authCode("incorrect_auth_editorfix")
                         .httpStatus(HttpStatus.FORBIDDEN)
                         .build();
 
@@ -1182,6 +1245,7 @@ public class ArticleService {
                 ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
                         .artclId(article.getArtclId())
                         .msg("애디터 픽스 상태입니다. 기사 수정 권한을 확인하십시오.")
+                        .authCode("incorrect_auth_anchorfix")
                         .httpStatus(HttpStatus.FORBIDDEN)
                         .build();
 
@@ -1199,6 +1263,7 @@ public class ArticleService {
                 ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
                         .artclId(article.getArtclId())
                         .msg("앵커 픽스 상태입니다. 기사 수정 권한을 확인하십시오.")
+                        .authCode("incorrect_auth_deskfix")
                         .httpStatus(HttpStatus.FORBIDDEN)
                         .build();
 
@@ -1213,6 +1278,7 @@ public class ArticleService {
                 ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
                         .artclId(article.getArtclId())
                         .msg("데스커 픽스 상태에서는 수정할 수 없습니다.")
+                        .authCode("cannot_be_modified")
                         .httpStatus(HttpStatus.FORBIDDEN)
                         .build();
 

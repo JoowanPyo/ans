@@ -119,6 +119,7 @@ public class CueSheetItemService {
         List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTO = cueSheetItemSymbolMapper.toDtoList(cueSheetItemSymbol);
 
         CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
+
         cueSheetItemDTO.setCueSheetItemSymbolDTO(cueSheetItemSymbolDTO);
 
         return cueSheetItemDTO;
@@ -353,6 +354,7 @@ public class CueSheetItemService {
                     .cueSheet(cueSheet)
                     .cueItemOrd(cueItemOrd)
                     .inputrId(userId)
+                    .cueItemDivCd("cue_article")
                     .article(copyArtcl)
                     .build();
 

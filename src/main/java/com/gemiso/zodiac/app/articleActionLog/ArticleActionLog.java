@@ -32,7 +32,7 @@ public class ArticleActionLog {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "message", length = 50)
+    @Column(name = "message", length = 255)
     private String message;
 
     @Column(name = "action", length = 50)
@@ -42,7 +42,7 @@ public class ArticleActionLog {
     @Column(name = "input_dtm")
     private Date inputDtm;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50, nullable = false)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)

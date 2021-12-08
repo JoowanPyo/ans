@@ -1,7 +1,5 @@
 package com.gemiso.zodiac.app.issue;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
