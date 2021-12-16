@@ -104,7 +104,7 @@ public class AuthService {
 
         if (ObjectUtils.isEmpty(auth)) {
             //사용자 로그인 정보 신규 저장
-            AuthDTO authDTO = new AuthDTO();
+            AuthDTO authDTO = new AuthDTO(); //DTO생성
             authDTO.setToken(accessToken);
             authDTO.setUserNm(userDTO.getUserNm());
             authDTO.setDeptId(userDTO.getDeptId());
@@ -117,8 +117,14 @@ public class AuthService {
 
         } else {
             AuthDTO authDTO = authMapper.toDto(auth); //기존 로그인 정보가 있을경우 업데이트
+            //사용자 로그인 정보 업데이트
             authDTO.setToken(accessToken);
+            authDTO.setUserNm(userDTO.getUserNm());
+            authDTO.setDeptId(userDTO.getDeptId());
             authDTO.setLoginDtm(new Date());
+            authDTO.setStCd(userDTO.getUserStCd());
+            authDTO.setUserId(userDTO.getUserId());
+
             Auth authEntity = authMapper.toEntity(authDTO);
             authRepository.save(authEntity);
         }

@@ -28,7 +28,7 @@ public class CueCapTmpltController {
     @Operation(summary = "큐시트 자막 템플릿 목록조회", description = "큐시트 자막 템플릿 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<CueCapTmpltDTO>> findAll(@Parameter(name = "brdcPgmId", description = "방송프로그램 아이디")
-                                                        @RequestParam(value = "brdcPgmId", required = false) Long brdcPgmId) {
+                                                        @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId) {
 
         List<CueCapTmpltDTO> cueCapTmpltDTOList = cueCapTmpltService.findAll(brdcPgmId);
 
@@ -51,7 +51,7 @@ public class CueCapTmpltController {
     public AnsApiResponse<CueCapTmpltDTO> creata(@Parameter(name = "cueCapTmpltCreateDTO", required = true, description = "필수값<br>")
                                                  @Valid @RequestBody List<CueCapTmpltCreateDTO> cueCapTmpltCreateDTOList,
                                                  @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디")
-                                                 @PathVariable("brdcPgmId") Long brdcPgmId) {
+                                                 @PathVariable("brdcPgmId") String brdcPgmId) {
 
         CueCapTmpltDTO cueCapTmpltDTO = cueCapTmpltService.create(cueCapTmpltCreateDTOList, brdcPgmId);
 

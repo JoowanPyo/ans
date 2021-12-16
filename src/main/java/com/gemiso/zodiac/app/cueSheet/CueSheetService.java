@@ -1,9 +1,6 @@
 package com.gemiso.zodiac.app.cueSheet;
 
-import com.gemiso.zodiac.app.anchorCap.AnchorCap;
-import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
-import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.*;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetCreateMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
@@ -15,16 +12,13 @@ import com.gemiso.zodiac.app.cueSheetHist.dto.CueSheetHistCreateDTO;
 import com.gemiso.zodiac.app.cueSheetHist.mapper.CueSheetHistCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
-import com.gemiso.zodiac.app.cueSheetItem.QCueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
 import com.gemiso.zodiac.app.program.ProgramService;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
-import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.core.enumeration.ActionEnum;
-import com.gemiso.zodiac.core.enumeration.FixEnum;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -33,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -67,7 +60,7 @@ public class CueSheetService {
 
     private final ProgramService programService;
 
-    public CueSheetFindAllDTO findAll(Date sdate, Date edate, Long brdcPgmId, String brdcPgmNm, String searchWord){
+    public CueSheetFindAllDTO findAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord){
 
         BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm,  searchWord);
 
@@ -133,13 +126,13 @@ public class CueSheetService {
 
             if (getProgramDTO.isPresent()) {
                 ProgramDTO ProgramDTO = getProgramDTO.get();
-                Long getBrdcPgmId = ProgramDTO.getBrdcPgmId();
+                String getBrdcPgmId = ProgramDTO.getBrdcPgmId();
 
                 //ConcurrentModificationException에러가 나서 이터레이터로 수정.
                 Iterator<ProgramDTO> iter = programDTOList.listIterator();
                 while (iter.hasNext()) {
                     ProgramDTO programDTO = iter.next();
-                    Long orgBrdcPgmId = programDTO.getBrdcPgmId();
+                    String orgBrdcPgmId = programDTO.getBrdcPgmId();
                     if (getBrdcPgmId.equals(orgBrdcPgmId)) {
                         iter.remove();
                     }
@@ -175,8 +168,8 @@ public class CueSheetService {
                 if ("Y".equals(articleDelYn)){ //기사 삭제 값이 Y인경우 조회된 큐시트아이템 삭제
                     continue;
                 }
-                articleCueItemDTO = symbolUrlSet(articleCueItemDTO);//기사에 방송아이콘의 방송아이콘URL 추가.
-                cueSheetItemDTO.setArticle(articleCueItemDTO);//방송아이콘 추가한 기사 큐시트 아이템에 set
+                /*articleCueItemDTO = symbolUrlSet(articleCueItemDTO);//기사에 방송아이콘의 방송아이콘URL 추가.
+                cueSheetItemDTO.setArticle(articleCueItemDTO);//방송아이콘 추가한 기사 큐시트 아이템에 set*/
             }
             if ("Y".equals(delYn)) { //조회된 큐시트 아이템 삭제여부값이 Y인 경우/.
                 continue;
@@ -190,10 +183,10 @@ public class CueSheetService {
 
     }
 
-    //조회된 큐시트아이템 기사형식의 방송아이콘 URL추가생성
+    /*//조회된 큐시트아이템 기사형식의 방송아이콘 URL추가생성
     public ArticleCueItemDTO symbolUrlSet(ArticleCueItemDTO articleCueItemDTO){
 
-        ArticleCueItemDTO returnArticleCueItemDTO = new ArticleCueItemDTO(); //리턴시킬 큐시트 아이템 생성
+        //ArticleCueItemDTO returnArticleCueItemDTO = new ArticleCueItemDTO(); //리턴시킬 큐시트 아이템 생성
 
         if (ObjectUtils.isEmpty(articleCueItemDTO) == false){ //큐시트 아이템 기사가 있는 경우.
 
@@ -226,8 +219,9 @@ public class CueSheetService {
 
                     }
                     returnArticleCapSimpleDTOList.add(articleCapSimpleDTO);//새로 생성된 기사자막 리스트에 url추가된 기사자막 추가
+                    articleCueItemDTO.setArticleCapDTO(returnArticleCapSimpleDTOList);
                 }
-                returnArticleCueItemDTO.setArticleCapDTO(returnArticleCapSimpleDTOList); //새로 생성된 기사자막 리스트 기사에 set
+                //returnArticleCueItemDTO.setArticleCapDTO(returnArticleCapSimpleDTOList); //새로 생성된 기사자막 리스트 기사에 set
             }
 
             if (CollectionUtils.isEmpty(anchorCapSimpleDTOList) == false){ //큐시트아이템 기사에 앵커자막 리스트가 있는경우
@@ -249,13 +243,14 @@ public class CueSheetService {
 
                     }
                     returnAnchorCapSimpleDTOList.add(anchorCapSimpleDTO);//새로 생성된 앵커자막 리스트에 url추가된 기사자막 추가
+                    articleCueItemDTO.setAnchorCap(returnAnchorCapSimpleDTOList);
                 }
-                returnArticleCueItemDTO.setAnchorCap(returnAnchorCapSimpleDTOList); //새로 생성된 앵커자막 리스트 기사에 set
+                //returnArticleCueItemDTO.setAnchorCap(returnAnchorCapSimpleDTOList); //새로 생성된 앵커자막 리스트 기사에 set
             }
 
         }
-        return returnArticleCueItemDTO;//방송아이콘URL추가된 기사 리턴
-    }
+        return articleCueItemDTO;//방송아이콘URL추가된 기사 리턴
+    }*/
 
     public Long create(CueSheetCreateDTO cueSheetCreateDTO){
 
@@ -311,8 +306,6 @@ public class CueSheetService {
         CueSheet cueSheet = cueSheetFindOrFail(cueId);
 
         //cueSheet.setProgram(null);
-
-        cueSheetUpdateDTO.setCueId(cueId);
 
         cueSheetUpdateMapper.updateFromDto(cueSheetUpdateDTO, cueSheet);
 
@@ -432,7 +425,7 @@ public class CueSheetService {
 
     }
 
-    private BooleanBuilder getSearch(Date sdate, Date edate, Long brdcPgmId, String brdcPgmNm, String searchWord) {
+    private BooleanBuilder getSearch(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 

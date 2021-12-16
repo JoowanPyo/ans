@@ -142,9 +142,18 @@ public class AttachFileService {
                 //파일을 버퍼링을 이용하여 저장할 경로                                     YYYYMMDD+FI+seq
                 buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
             }
-            //파일 복사
-            buffStream.write(bytes);
-            buffStream.close();
+            try {
+                //파일 복사
+                buffStream.write(bytes);
+            }
+            catch (IOException e)
+            {
+                System.out.println("BufferedReader 파일복사 중 에러 발생");
+            }
+            finally {
+                buffStream.close();
+            }
+            /*buffStream.close();*/
             msg += "Uploaded (" + file.getOriginalFilename() + ")";
             code = 200;
 
@@ -165,10 +174,16 @@ public class AttachFileService {
 
             //return attachFileDTO;
 
+        } catch (IOException e) {
+            code = 500;
+            msg = "You failed to upload " + rname + ": " + e.getMessage() + "<br/>";
+            /*e.printStackTrace();*/
+            System.out.println("IOException Occured");
         } catch (Exception e) {
             code = 500;
             msg = "You failed to upload " + rname + ": " + e.getMessage() + "<br/>";
-            e.printStackTrace();
+            /*e.printStackTrace();*/
+            System.out.println("Exception Occured");
         }
 
         //return new StatusCodeFileDTO(codeDTO, msg, file_id, org_file_nm);
@@ -200,7 +215,7 @@ public class AttachFileService {
 
 
         //xml파일에서 파일구분코드로 파일경로추가
-        ub = xu.getUploadInfo("FileAttach.xml", "upload" + fileDivCd);
+        ub = xu.getUploadInfo("FileAttach.xml", fileDivCd);
         //dest(파일경로)/file_loc(divcd:04일 경우)jebo/2021/0415/file_name.확장자
         _rname=ub.getDest()+File.separator+attachFileDTO.getFileLoc()+File.separator+attachFileDTO.getFileNm();
 

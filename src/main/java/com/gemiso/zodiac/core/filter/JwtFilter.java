@@ -151,7 +151,7 @@ public class JwtFilter implements Filter {
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
 
                     /*resolver.resolveException(httpServletRequest, httpServletResponse, null, ex);//filter error handling방법*/
-                } catch (Throwable a) {
+                } /*catch (Throwable a) {
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     PrintStream pinrtStream = new PrintStream(out);
                     a.printStackTrace(pinrtStream);
@@ -159,7 +159,7 @@ public class JwtFilter implements Filter {
                     httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "EXPIRED_ACCESSTOKEN");
 
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-                }
+                }*/
             }
         }
         chain.doFilter(request, response);

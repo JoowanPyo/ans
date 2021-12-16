@@ -30,7 +30,7 @@ public class CueSheetTemplate extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cue_tmplt_id", nullable = false)
+    @Column(name = "cue_tmplt_id", length = 50, nullable = false)
     private Long cueTmpltId;
 
     @Column(name = "brdc_pgm_nm", length = 150)

@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface ProgramRepository extends JpaRepository<Program, Long> , QuerydslPredicateExecutor<Program> {
 
     @Query("select a from Program a where a.brdcPgmId = :brdcPgmId and a.delYn = 'N'")
-    Optional<Program> findByProgramId(@Param("brdcPgmId")Long brdcPgmId);
+    Optional<Program> findByProgramId(@Param("brdcPgmId")String brdcPgmId);
 }

@@ -33,9 +33,9 @@ public class CueSheetController {
                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                       @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                      @Parameter(name = "brdcPgmId", description = "프로그램구분코드")
-                                                      @RequestParam(value = "brdcPgmId", required = false) Long brdcPgmId,
-                                                      @Parameter(name = "brdcPgmNm", description = "프로그램구분코드")
+                                                      @Parameter(name = "brdcPgmId", description = "프로그램 아이디")
+                                                      @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
+                                                      @Parameter(name = "brdcPgmNm", description = "프로그램 명")
                                                       @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
                                                       @Parameter(name = "searchWord", description = "프로그램구분코드")
                                                       @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {

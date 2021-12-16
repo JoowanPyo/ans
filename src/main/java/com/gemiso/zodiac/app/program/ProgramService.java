@@ -45,7 +45,7 @@ public class ProgramService {
         return programDTOList;
     }
 
-    public ProgramDTO find(Long brdcPgmId) {
+    public ProgramDTO find(String brdcPgmId) {
 
         Program program = programFindOrFail(brdcPgmId);
 
@@ -55,7 +55,7 @@ public class ProgramService {
 
     }
 
-    public Long create(ProgramCreateDTO programCreateDTO) {
+    public String create(ProgramCreateDTO programCreateDTO) {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
@@ -69,7 +69,7 @@ public class ProgramService {
 
     }
 
-    public void update(ProgramUpdateDTO programUpdateDTO, Long brdcPgmId) {
+    public void update(ProgramUpdateDTO programUpdateDTO, String brdcPgmId) {
 
         Program program = programFindOrFail(brdcPgmId);
 
@@ -82,7 +82,7 @@ public class ProgramService {
 
     }
 
-    public void delete(Long brdcPgmId) {
+    public void delete(String brdcPgmId) {
 
         Program program = programFindOrFail(brdcPgmId);
 
@@ -101,7 +101,7 @@ public class ProgramService {
     }
 
 
-    public Program programFindOrFail(Long brdcPgmId) {
+    public Program programFindOrFail(String brdcPgmId) {
 
         Optional<Program> program = programRepository.findByProgramId(brdcPgmId);
 

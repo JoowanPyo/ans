@@ -16,12 +16,15 @@ import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jdom2.JDOMException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -249,96 +252,92 @@ public class YonhapService {
         PropertyUtil xu = new PropertyUtil();
         UploadFileBean ub = new UploadFileBean();
 
-        try {
-            //연합 첨부파일 저장 경로를 divcd값으로 불러온다.
-            ub = xu.getUploadInfo("FileAttach.xml", "upload" + divcd);
+        //연합 첨부파일 저장 경로를 divcd값으로 불러온다.
+        ub = xu.getUploadInfo("FileAttach.xml", "upload" + divcd);
 
-            // int uploadsize = Integer.parseInt(ub.getMaxsize().substring(0, ub.getMaxsize().indexOf("MB")));
-            SimpleDateFormat year = new SimpleDateFormat("yyyy", Locale.KOREA);
-            SimpleDateFormat day = new SimpleDateFormat("MMdd", Locale.KOREA);
+        // int uploadsize = Integer.parseInt(ub.getMaxsize().substring(0, ub.getMaxsize().indexOf("MB")));
+        SimpleDateFormat year = new SimpleDateFormat("yyyy", Locale.KOREA);
+        SimpleDateFormat day = new SimpleDateFormat("MMdd", Locale.KOREA);
 
-            String upDir = ub.getUpdir() + File.separator + year + File.separator + day;
+        String upDir = ub.getUpdir() + File.separator + year + File.separator + day;
 
-            // String realpath = ub.getDest() + File.separator + upDir;
+        // String realpath = ub.getDest() + File.separator + upDir;
 
-            if (yh_attc_file_vo_list != null && yh_attc_file_vo_list.size() > 0) {
+        if (yh_attc_file_vo_list != null && yh_attc_file_vo_list.size() > 0) {
 
-                for (YonhapAttachFileCreateDTO file : yh_attc_file_vo_list) {
-                    YonhapAttchFile yonhapAttchFile = yonhapAttchFileRepository.findFile(file.getFile_id());
-                    yonhapAttchFileRepository.deleteById(yonhapAttchFile.getId());
-                }
-
-                for (YonhapAttachFileCreateDTO file : yh_attc_file_vo_list) {
-
-
-                    //파일등록을 로컬에 안해준다?
-                    //MultipartFile multipartFile = new MockMultipartFile(file.getFile_titl(), new FileInputStream(new File(upDir)));
-
-                    // 업로드 파일 명
-                    String fileName = file.getFile_titl();
-
-                    // 파일 아이디 생성.
-                    //String file_id = attachFileDAO.getFileId();
-
-                    //확장자 파싱
-                    String ext = cutExtension(fileName);
-
-                    // 파일 리네임 [파일아이디.확장자]
-                    //String rname = file_id + "." + ext;
-                    // 파일 리네임 [파일아이디.확장자]
-
-                    //String rname = yonhapAttchFile.getId() + "." + ext;
-
-                    AttachFileDTO fb = new AttachFileDTO();
-
-                    //fb.setFile_id(file_id);
-                    /*fb.setOrg_file_nm(fileName);
-                    fb.setFile_nm(rname);
-                    fb.setFile_divcd(divcd);
-                    fb.setFile_loc(upDir);*/
-
-                    fb.setOrgFileNm(fileName);
-                    //fb.setFileNm(rname);
-                    fb.setFileDivCd(divcd);
-                    fb.setFileLoc(upDir);
-                    //fb.setFile_upldr_id("system");
-
-                    AttachFile attachFile = attachFileMapper.toEntity(fb);
-
-                    attachFileRepository.save(attachFile);
-
-                    // 파일 업로드 경로
-                    // String path = realpath + File.separator + rname;
-                    //file.setFile_id(file_id);
-                    file.setYh_artcl_id(yh_artcl_id);
-
-                    //YonhapAttchFile yonhapAttchFile = yonhapAttachFileMapper.toEntity(file);
-
-                    YonhapAttchFile yonhapAttchFile = YonhapAttchFile.builder()
-                            .attachFile(attachFile)
-                            .yonhap(yonhap)
-                            .fileOrd(file.getFile_ord())
-                            .fileTitl(file.getFile_titl())
-                            .mimeType(file.getMime_type())
-                            .cap(file.getCap())
-                            .yhUrl(file.getYh_url())
-                            .build();
-
-                    //일단 mars FileAttach.XML에 divcd = 07, Yonhap
-                    if (divcd.equals("07")) {
-                        yonhapAttchFileRepository.save(yonhapAttchFile);
-                    }
-
-                    String rname = yonhapAttchFile.getId() + "." + ext;
-                    attachFile.setFileNm(rname);
-                    attachFileRepository.save(attachFile);
-
-                }
+            for (YonhapAttachFileCreateDTO file : yh_attc_file_vo_list) {
+                YonhapAttchFile yonhapAttchFile = yonhapAttchFileRepository.findFile(file.getFile_id());
+                yonhapAttchFileRepository.deleteById(yonhapAttchFile.getId());
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            for (YonhapAttachFileCreateDTO file : yh_attc_file_vo_list) {
+
+
+                //파일등록을 로컬에 안해준다?
+                //MultipartFile multipartFile = new MockMultipartFile(file.getFile_titl(), new FileInputStream(new File(upDir)));
+
+                // 업로드 파일 명
+                String fileName = file.getFile_titl();
+
+                // 파일 아이디 생성.
+                //String file_id = attachFileDAO.getFileId();
+
+                //확장자 파싱
+                String ext = cutExtension(fileName);
+
+                // 파일 리네임 [파일아이디.확장자]
+                //String rname = file_id + "." + ext;
+                // 파일 리네임 [파일아이디.확장자]
+
+                //String rname = yonhapAttchFile.getId() + "." + ext;
+
+                AttachFileDTO fb = new AttachFileDTO();
+
+                //fb.setFile_id(file_id);
+                /*fb.setOrg_file_nm(fileName);
+                fb.setFile_nm(rname);
+                fb.setFile_divcd(divcd);
+                fb.setFile_loc(upDir);*/
+
+                fb.setOrgFileNm(fileName);
+                //fb.setFileNm(rname);
+                fb.setFileDivCd(divcd);
+                fb.setFileLoc(upDir);
+                //fb.setFile_upldr_id("system");
+
+                AttachFile attachFile = attachFileMapper.toEntity(fb);
+
+                attachFileRepository.save(attachFile);
+
+                // 파일 업로드 경로
+                // String path = realpath + File.separator + rname;
+                //file.setFile_id(file_id);
+                file.setYh_artcl_id(yh_artcl_id);
+
+                //YonhapAttchFile yonhapAttchFile = yonhapAttachFileMapper.toEntity(file);
+
+                YonhapAttchFile yonhapAttchFile = YonhapAttchFile.builder()
+                        .attachFile(attachFile)
+                        .yonhap(yonhap)
+                        .fileOrd(file.getFile_ord())
+                        .fileTitl(file.getFile_titl())
+                        .mimeType(file.getMime_type())
+                        .cap(file.getCap())
+                        .yhUrl(file.getYh_url())
+                        .build();
+
+                //일단 mars FileAttach.XML에 divcd = 07, Yonhap
+                if (divcd.equals("07")) {
+                    yonhapAttchFileRepository.save(yonhapAttchFile);
+                }
+
+                String rname = yonhapAttchFile.getId() + "." + ext;
+                attachFile.setFileNm(rname);
+                attachFileRepository.save(attachFile);
+
+            }
         }
+
     }
 
     //파일네임 확장자 파싱

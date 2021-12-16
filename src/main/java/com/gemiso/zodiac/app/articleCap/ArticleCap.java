@@ -20,7 +20,7 @@ import javax.persistence.*;
 @Setter
 @ToString(exclude = {"article", "capTemplate", "symbol"})
 @DynamicUpdate
-/*@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) //json 파싱때 필드가 없는 클래스를 Serialize문제 설정*/
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) //json 파싱때 필드가 없는 클래스를 Serialize문제 설정
 public class ArticleCap {
 
     @Id

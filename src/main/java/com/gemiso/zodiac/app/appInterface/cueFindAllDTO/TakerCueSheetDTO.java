@@ -20,7 +20,7 @@ import java.util.Date;
 public class TakerCueSheetDTO {
 
     @XmlElement(name="rd_id")
-    private Long brdcPgmId;
+    private String brdcPgmId;
     @XmlElement(name="rd_seq")
     private int rdSeq;
     @XmlElement(name="ch_div_cd")

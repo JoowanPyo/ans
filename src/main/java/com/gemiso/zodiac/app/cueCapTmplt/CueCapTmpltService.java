@@ -35,7 +35,7 @@ public class CueCapTmpltService {
     private final CueCapTmpltUpdateMapper cueCapTmpltUpdateMapper;
 
 
-    public List<CueCapTmpltDTO> findAll(Long brdcPgmId){ //큐시트 자막 템플릿 목록 조회
+    public List<CueCapTmpltDTO> findAll(String brdcPgmId){ //큐시트 자막 템플릿 목록 조회
 
         BooleanBuilder booleanBuilder = getSearch(brdcPgmId); //조회조건 빌드
 
@@ -58,7 +58,7 @@ public class CueCapTmpltService {
         return cueCapTmpltDTO;
     }
 
-    public CueCapTmpltDTO create(List<CueCapTmpltCreateDTO> cueCapTmpltCreateDTOList, Long brdcPgmId){
+    public CueCapTmpltDTO create(List<CueCapTmpltCreateDTO> cueCapTmpltCreateDTOList, String brdcPgmId){
 
         //기존에 등록되어 있던 큐시트 자막 템플릿을 List get
         List<CueCapTmplt> cueCapTmpltList = cueCapTmpltRepository.findCueCapTmpltList(brdcPgmId);
@@ -127,7 +127,7 @@ public class CueCapTmpltService {
         return cueCapTmplt.get(); //조회된 큐시트 자막 템플릿 리턴.
     }
 
-    public BooleanBuilder getSearch(Long brdcPgmId){ //조회조건 빌드
+    public BooleanBuilder getSearch(String brdcPgmId){ //조회조건 빌드
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 

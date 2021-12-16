@@ -25,9 +25,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -61,9 +63,9 @@ public class CueSheetItemService {
 
     private final UserAuthService userAuthService;
 
-    public List<CueSheetItemDTO> findAll(Long artclId, Long cueId){
+    public List<CueSheetItemDTO> findAll(Long artclId, Long cueId, String delYn){
 
-        BooleanBuilder booleanBuilder = getSearch(artclId, cueId);
+        BooleanBuilder booleanBuilder = getSearch(artclId, cueId, delYn);
 
         List<CueSheetItem> cueSheetItemList = (List<CueSheetItem>) cueSheetItemRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "cueItemOrd"));
 
@@ -118,12 +120,43 @@ public class CueSheetItemService {
 
         List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTO = cueSheetItemSymbolMapper.toDtoList(cueSheetItemSymbol);
 
+        cueSheetItemSymbolDTO = createUrl(cueSheetItemSymbolDTO);//방송아이콘 url 추가
+
         CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
 
         cueSheetItemDTO.setCueSheetItemSymbolDTO(cueSheetItemSymbolDTO);
 
         return cueSheetItemDTO;
 
+    }
+
+    //방송아이콘 url 추가
+    public List<CueSheetItemSymbolDTO> createUrl(List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTOList){
+
+        //큐시트 아이템 방송아이콘 리스트를 Url을 추가해서 리턴해줄 DTO 리스트 생성
+         List<CueSheetItemSymbolDTO> returnCueSheetItemSymbolDTOList = new ArrayList<>();
+
+        if (CollectionUtils.isEmpty(cueSheetItemSymbolDTOList) == false){
+
+            for (CueSheetItemSymbolDTO cueSheetItemSymbolDTO : cueSheetItemSymbolDTOList){
+
+                SymbolDTO symbolDTO = new SymbolDTO();
+
+                symbolDTO = cueSheetItemSymbolDTO.getSymbol();
+
+                if (ObjectUtils.isEmpty(symbolDTO) == false) {
+                    String fileLoc = symbolDTO.getAttachFile().getFileLoc(); //등록되어 있던 파일로그 get
+                    String url = fileUrl + fileLoc; //url + 파일로그
+
+                    symbolDTO.setUrl(url);//url주소 set
+                    cueSheetItemSymbolDTO.setSymbol(symbolDTO);//url주소 추가된 방송아이콘 큐시트아이템 방송아이콘에 set
+
+                    //새로 url추가한 방송아이콘 리스트를 리턴해줄 리스트 모델에 add
+                    returnCueSheetItemSymbolDTOList.add(cueSheetItemSymbolDTO);
+                }
+            }
+        }
+        return returnCueSheetItemSymbolDTOList;
     }
 
     public Long create(CueSheetItemCreateDTO cueSheetItemCreateDTO, Long cueId){
@@ -169,9 +202,9 @@ public class CueSheetItemService {
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
 
-        CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
+        /*CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
         cueSheetItemUpdateDTO.setCueSheet(cueSheetDTO);
-        cueSheetItemUpdateDTO.setCueItemId(cueItemId);
+        cueSheetItemUpdateDTO.setCueItemId(cueItemId);*/
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
         cueSheetItemUpdateDTO.setUpdtrId(userId);
@@ -184,9 +217,12 @@ public class CueSheetItemService {
     public void updateCueItemArticle(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId) throws Exception {
 
         ArticleUpdateDTO articleUpdateDTO = cueSheetItemUpdateDTO.getArticle(); //큐시트 아이템의 수정기사를 불러온다
-        Long artclId = articleUpdateDTO.getArtclId(); //수정기사의 아이디를 불러온다.
 
-        articleService.update(articleUpdateDTO, artclId); //기사 수정.
+        if (ObjectUtils.isEmpty(articleUpdateDTO) == false) {//기사내용 수정이 들어왔을경우.
+            Long artclId = articleUpdateDTO.getArtclId(); //수정기사의 아이디를 불러온다.
+
+            articleService.update(articleUpdateDTO, artclId); //기사 수정.
+        }
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
 
@@ -269,14 +305,18 @@ public class CueSheetItemService {
 
     }
 
-    public BooleanBuilder getSearch(Long artclId, Long cueId){
+    public BooleanBuilder getSearch(Long artclId, Long cueId, String delYn){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         //dsl q쿼리 생성
         QCueSheetItem qCueSheetItem = QCueSheetItem.cueSheetItem;
 
-        booleanBuilder.and(qCueSheetItem.delYn.eq("N"));
+        if (delYn != null && delYn.trim().isEmpty() == false){
+            booleanBuilder.and(qCueSheetItem.delYn.eq(delYn));
+        }else {
+            booleanBuilder.and(qCueSheetItem.delYn.eq("N"));
+        }
         //쿼리 where 조건 추가.
         if (ObjectUtils.isEmpty(artclId) == false){
             booleanBuilder.and(qCueSheetItem.article.artclId.eq(artclId));

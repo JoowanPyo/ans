@@ -1,10 +1,7 @@
 package com.gemiso.zodiac.app.program;
 
-import com.gemiso.zodiac.app.code.Code;
-import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgram;
-import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -25,10 +22,11 @@ import java.util.List;
 @DynamicUpdate
 public class Program extends BaseEntity {
 
+    /*@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)*/
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "brdc_pgm_id", nullable = false)
-    private Long brdcPgmId;
+    private String brdcPgmId;
 
     @Column(name = "brdc_pgm_nm", length = 450)
     private String brdcPgmNm;

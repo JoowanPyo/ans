@@ -42,11 +42,11 @@ public class JWTParser {
 
         } catch (ExpiredJwtException e) { // 토큰이 만료되었을 경우
             System.out.println(e);
-            e.printStackTrace();
+           /* e.printStackTrace();*/
 
         } catch (JwtException e) { // 그외 에러났을 경우
             System.out.println(e);
-            e.printStackTrace();
+            /*e.printStackTrace();*/
 
         }
         return return_expiration;

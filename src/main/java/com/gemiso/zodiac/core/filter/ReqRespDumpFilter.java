@@ -48,8 +48,9 @@ public class ReqRespDumpFilter implements Filter {
 
         } catch (Throwable a) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            PrintStream pinrtStream = new PrintStream(out);
-            a.printStackTrace(pinrtStream);
+            /*PrintStream pinrtStream = new PrintStream(out);
+            a.printStackTrace(pinrtStream);*/
+            System.out.println("Throwable Occured");
             log.error(out.toString());
         }
     }
@@ -98,16 +99,36 @@ public class ReqRespDumpFilter implements Filter {
         }
 
         String getRequestBody() throws IOException {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(this.getInputStream()));
-            String line = null;
+
+            BufferedReader reader = null;
             StringBuilder inputBuffer = new StringBuilder();
-            do {
-                line = reader.readLine();
-                if (null != line) {
-                    inputBuffer.append(line.trim());
+            try {
+                reader = new BufferedReader(new InputStreamReader(this.getInputStream()));
+                String line = null;
+                do {
+                    line = reader.readLine();
+                    if (null != line) {
+                        inputBuffer.append(line.trim());
+                    }
+                } while (line != null);
+            }
+            catch (IOException e)
+            {
+                System.out.println("reader : " + reader);
+            }
+            finally
+            {
+                try
+                {
+                    /* FIX : declare close method in finally */
+                    reader.close();
                 }
-            } while (line != null);
-            reader.close();
+                catch (IOException e)
+                {
+                    System.err.println("BufferedReader 종료 중 에러 발생");
+                }
+            }
+
             return inputBuffer.toString().trim();
         }
 

@@ -30,7 +30,7 @@ import java.util.List;
 @ToString(exclude = {"attachFile"})
 @Setter
 @DynamicUpdate
-/*@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) //json 파싱때 필드가 없는 클래스를 Serialize문제 설정*/
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) //json 파싱때 필드가 없는 클래스를 Serialize문제 설정
 public class Symbol extends BaseEntity {
 
     @Id

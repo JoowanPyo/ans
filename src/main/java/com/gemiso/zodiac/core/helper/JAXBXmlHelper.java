@@ -1,6 +1,8 @@
 package com.gemiso.zodiac.core.helper;
 
+import javax.naming.NamingException;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 
@@ -25,9 +27,10 @@ public class JAXBXmlHelper {
 
             rval = writer.toString();
 
-        }catch (Exception e) {
+        }catch (JAXBException e) {
             // TODO: handle exceptione
-            e.printStackTrace();
+            /*e.printStackTrace();*/
+            System.out.println("JAXBException Occured");
         }
         return rval;
     }

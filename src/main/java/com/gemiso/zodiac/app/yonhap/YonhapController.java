@@ -64,16 +64,16 @@ public class YonhapController {
 
         YonhapDTO yonhapDTO = new YonhapDTO();
 
-        try {
+        /*try {*/
             Long yonhapId = yonhapService.create(yonhapCreateDTO);
 
             yonhapDTO = yonhapService.find(yonhapId);
 
-        } catch (Exception e) {
+        /*} catch (Exception e) {
             e.printStackTrace();
             log.error("yonhap : " + e.getMessage());
             return new ResponseEntity<YonhapDTO>(yonhapDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        }*/
         return new ResponseEntity<YonhapDTO>(yonhapDTO, HttpStatus.CREATED);
 
     }

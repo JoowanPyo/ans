@@ -41,14 +41,24 @@ public class Configuration extends AbstractConfiguration
 
         try
         {
+            //시큐어코딩에 나온 심각사항. 파일경로 잘못들어가는거 방지.
+            if (this.configFileName != null && !"".equals(this.configFileName)){
+                this.configFileName = this.configFileName.replaceAll("/", ""); // "/" 필터링
+                this.configFileName = this.configFileName.replaceAll("\\\\", ""); // "\" 필터링
+                this.configFileName = this.configFileName.replaceAll("\\.\\.", ""); // ".." 필터링
+            }
+
             File configFile = new File(this.configFileName);
+
             log.info("configFile          :"+configFile);
             if (!configFile.canRead()) {
                 throw new ConfigurationException("Can't open configuration file: " + this.configFileName);
             }
             this.props = new Properties();
+
             //주어진 file 객체가 가리키는 파일을 바이트 스트림으로 읽기 위한 fileinputStream 객체를 생성
             FileInputStream fin = new FileInputStream(configFile);
+
             log.info("FileInputStream          :"+fin);
             this.props.load(new BufferedInputStream(fin));
             fin.close();

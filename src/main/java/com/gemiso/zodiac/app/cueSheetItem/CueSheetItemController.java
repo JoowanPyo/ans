@@ -32,9 +32,11 @@ public class CueSheetItemController {
     public AnsApiResponse<List<CueSheetItemDTO>> findAll(@Parameter(name = "artlcId", description = "기사 아이디")
                                                          @RequestParam(value = "artlcId", required = false) Long artlcId,
                                                          @Parameter(name = "cueId", description = "기사 아이디")
-                                                         @RequestParam(value = "cueId", required = false) Long cueId) {
+                                                         @RequestParam(value = "cueId", required = false) Long cueId,
+                                                         @Parameter(name = "delYn", description = "삭제여부 (디폴트 : N)")
+                                                         @RequestParam(value = "delYn", required = false) String delYn) {
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(artlcId, cueId);
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(artlcId, cueId, delYn);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
     }
@@ -77,13 +79,15 @@ public class CueSheetItemController {
 
         if (cueItemDivCd == null || "".equals(cueItemDivCd)) {
             throw new ResourceNotFoundException("큐시트 아이템 구분 코드가 잘못 되었습니다. 구분코드 : " + cueItemDivCd);
-        } else if (cueItemDivCd.equals("cueitem") || cueItemDivCd.equals("cuetemplate")) {
+        } else if (cueItemDivCd.equals("cue_item") || cueItemDivCd.equals("cue_template")) {
             //큐시트 템플릿 Update
             cueSheetItemService.update(cueSheetItemUpdateDTO, cueId, cueItemId);
-        } else if (cueItemDivCd.equals("cuearticle")) {
+        } else if (cueItemDivCd.equals("cue_article")) {
             //기사복사본 수정.
             cueSheetItemService.updateCueItemArticle(cueSheetItemUpdateDTO, cueId, cueItemId);
             /*articleService.update(cueSheetItemUpdateDTO.getArticle(), cueSheetItemUpdateDTO.getArticle().getArtclId());*/
+        } else {
+            throw new ResourceNotFoundException("큐시트 아이템 구분코드를 확인해 주세요. 큐시트 아이템 구분 코드 : " + cueItemDivCd);
         }
         CueSheetItemDTO cueSheetItemDTO = cueSheetItemService.find(cueItemId);
 
@@ -115,7 +119,7 @@ public class CueSheetItemController {
 
         cueSheetItemService.ordUpdate(cueId, cueItemId, cueItemOrd);
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId);
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
 
@@ -133,7 +137,7 @@ public class CueSheetItemController {
 
         cueSheetItemService.createCueItem(cueId, artclId, cueItemOrd);
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId);
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
 
@@ -149,7 +153,7 @@ public class CueSheetItemController {
 
         cueSheetItemService.createCueItemList(cueSheetItemCreateListDTO, cueId);
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId);
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
     }

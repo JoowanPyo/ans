@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.core.util.common;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Properties;
 
 public abstract class AbstractConfiguration implements Config{

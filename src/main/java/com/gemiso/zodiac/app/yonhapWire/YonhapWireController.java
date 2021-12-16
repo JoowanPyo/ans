@@ -64,12 +64,12 @@ public class YonhapWireController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> create(@Parameter(description = "필수값<br> ", required = true)
                                     @RequestBody YonhapWireCreateDTO yonhapWireCreateDTO, UriComponentsBuilder ucBuilder
-    ) {
+    ) throws Exception {
          HttpHeaders headers = null;
 
         YonhapWireDTO yonhapWireDTO = new YonhapWireDTO();
 
-        try {
+        /*try {*/
             Long wireId = yonhapWireService.create(yonhapWireCreateDTO);
 
             if (ObjectUtils.isEmpty(wireId) == false) {
@@ -80,11 +80,11 @@ public class YonhapWireController {
             }
 
 
-        } catch (Exception e) {
+        /*} catch (Exception e) {
             e.printStackTrace();
             log.error("yonhap : " + e.getMessage());
             return new ResponseEntity<YonhapWireDTO>(yonhapWireDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        }*/
         return new ResponseEntity<YonhapWireDTO>(yonhapWireDTO, headers, HttpStatus.CREATED);
     }
 

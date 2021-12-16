@@ -57,18 +57,21 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "cue_item_frm_cd", length = 50)
     private String cueItemFrmCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_frm_cd)")
     private String cueItemFrmCdNm;
 
     @Column(name = "cue_item_div_cd", length = 50)
     private String cueItemDivCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_div_cd)")
     private String cueItemDivCdNm;
 
     @Column(name = "brdc_st_cd", length = 50)
     private String brdcStCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = brdc_st_cd)")
     private String brdcStCdNm;
 
@@ -84,6 +87,7 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "artcl_cap_st_cd", length = 50)
     private String artclCapStCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_cap_st_cd)")
     private String artclCapStCdNm;
 
@@ -96,6 +100,7 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "cue_artcl_cap_st_cd", length = 50)
     private String cueArtclCapStCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_artcl_cap_st_cd)")
     private String cueArtclCapStCdNm;
 
@@ -117,12 +122,14 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "cue_item_typ_cd", length = 50)
     private String cueItemTypCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_typ_cd)")
     private String cueItemTypCdNm;
 
     @Column(name = "media_ch_cd", length = 50)
     private String mediaChCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = media_ch_cd)")
     private String mediaChCdNm;
 
@@ -138,12 +145,14 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "cap_st_cd", length = 50)
     private String capStCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cap_st_cd)")
     private String capStCdNm;
 
     @Column(name = "artcl_st_cd", length = 50)
     private String artclStCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_st_cd)")
     private String artclStCdNm;
 

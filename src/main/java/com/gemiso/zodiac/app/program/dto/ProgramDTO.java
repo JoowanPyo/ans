@@ -22,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ProgramDTO {
 
-    private Long brdcPgmId;
+    private String brdcPgmId;
     private String brdcPgmNm;
     private String chDivCd;
     private String chDivCdNm;

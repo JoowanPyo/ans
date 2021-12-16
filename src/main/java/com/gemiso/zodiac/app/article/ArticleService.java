@@ -1139,6 +1139,8 @@ public class ArticleService {
             throw new PasswordFailedException("Password failed.");
         }
 
+        /*String pssword = passwordEncoder.*/
+
         Article article = articleFindOrFail(artclId);//기사조회 및 존재유무 확인.
         String inputr = article.getInputrId();
 

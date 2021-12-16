@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.user;
 
-import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -8,7 +7,9 @@ import org.hibernate.annotations.Formula;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(
@@ -189,12 +190,5 @@ public class User extends BaseEntity {
         }
 
     }
-
-
-    //private Set<Role> roles = new HashSet<>();
-
-    //public void changePassword(String newPassword) {
-    //    password = newPassword;
-    //}
 
 }
