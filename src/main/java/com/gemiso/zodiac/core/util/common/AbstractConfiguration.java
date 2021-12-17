@@ -1,7 +1,5 @@
 package com.gemiso.zodiac.core.util.common;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Properties;
 
 public abstract class AbstractConfiguration implements Config{
@@ -28,7 +26,7 @@ public abstract class AbstractConfiguration implements Config{
         int value = 0;
         try {
             value = Integer.parseInt(this.props.getProperty(key));
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException("Illegal int key : " + key);
         }
         return value;
@@ -38,7 +36,7 @@ public abstract class AbstractConfiguration implements Config{
         double value = 0.0D;
         try {
             value = Double.valueOf(this.props.getProperty(key)).doubleValue();
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException("Illegal double key : " + key);
         }
         return value;
@@ -48,7 +46,7 @@ public abstract class AbstractConfiguration implements Config{
         boolean value = false;
         try {
             value = Boolean.valueOf(this.props.getProperty(key)).booleanValue();
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException("Illegal boolean key : " + key);
         }
         return value;

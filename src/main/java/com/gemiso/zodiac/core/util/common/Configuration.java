@@ -3,9 +3,7 @@ package com.gemiso.zodiac.core.util.common;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.naming.ConfigurationException;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.Properties;
 @Slf4j
@@ -41,29 +39,43 @@ public class Configuration extends AbstractConfiguration
 
         try
         {
+            String fileName = "";
             //시큐어코딩에 나온 심각사항. 파일경로 잘못들어가는거 방지.
             if (this.configFileName != null && !"".equals(this.configFileName)){
-                this.configFileName = this.configFileName.replaceAll("/", ""); // "/" 필터링
-                this.configFileName = this.configFileName.replaceAll("\\\\", ""); // "\" 필터링
-                this.configFileName = this.configFileName.replaceAll("\\.\\.", ""); // ".." 필터링
+                fileName = this.configFileName.replaceAll("/", ""); // "/" 필터링
+                fileName = this.configFileName.replaceAll("\\\\", ""); // "\" 필터링
+                fileName = this.configFileName.replaceAll("\\.\\.", ""); // ".." 필터링
             }
 
-            File configFile = new File(this.configFileName);
+            File configFile = new File(fileName);
 
             log.info("configFile          :"+configFile);
             if (!configFile.canRead()) {
-                throw new ConfigurationException("Can't open configuration file: " + this.configFileName);
+                throw new ConfigurationException("Can't open configuration file: " + fileName);
             }
             this.props = new Properties();
 
             //주어진 file 객체가 가리키는 파일을 바이트 스트림으로 읽기 위한 fileinputStream 객체를 생성
             FileInputStream fin = new FileInputStream(configFile);
-
             log.info("FileInputStream          :"+fin);
-            this.props.load(new BufferedInputStream(fin));
-            fin.close();
-        } catch (Exception ex) {
+            try{
+                this.props.load(new BufferedInputStream(fin));
+            }
+            catch (IOException e){
+                System.out.println("IOException Occured");
+            }
+            finally
+            {
+                try{
+                    fin.close();
+                }catch (IOException ex){
+                    System.out.println("BufferedReader 종료 중 에러 발생");
+                }
+            }
+        } catch (FileNotFoundException ex) {
             throw new ConfigurationException("Can't load configuration file: " + this.configFileName);
+        } catch (IOException e) {
+            System.out.println("IOException Occured");
         }
     }
 }

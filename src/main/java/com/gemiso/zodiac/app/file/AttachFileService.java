@@ -179,12 +179,12 @@ public class AttachFileService {
             msg = "You failed to upload " + rname + ": " + e.getMessage() + "<br/>";
             /*e.printStackTrace();*/
             System.out.println("IOException Occured");
-        } catch (Exception e) {
+        } /*catch (Exception e) {
             code = 500;
             msg = "You failed to upload " + rname + ": " + e.getMessage() + "<br/>";
-            /*e.printStackTrace();*/
+            *//*e.printStackTrace();*//*
             System.out.println("Exception Occured");
-        }
+        }*/
 
         //return new StatusCodeFileDTO(codeDTO, msg, file_id, org_file_nm);
         return new StatusCodeFileDTO(code, msg, fileId, orgFileNm);
@@ -305,7 +305,7 @@ public class AttachFileService {
 
     }
 
-    public boolean isMakeDir(String sdir) throws Exception
+    public boolean isMakeDir(String sdir)
     {
         try {
             java.io.File dir = new java.io.File(sdir);

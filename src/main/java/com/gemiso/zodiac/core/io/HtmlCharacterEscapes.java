@@ -23,6 +23,7 @@ public class HtmlCharacterEscapes extends CharacterEscapes {
 
     @Override
     public int[] getEscapeCodesForAscii() {
+
         return asciiEscapes;
     }
 

@@ -8,6 +8,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
+import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -56,14 +57,14 @@ public class PropertyUtil {
         return pb;
     }
 
-    public static String getConfigRoot() throws Exception {
+    public static String getConfigRoot(){
         String configpaths = "";
         try {
             Config conf = new Configuration();
             configpaths = conf.getString("configpath");
 
             log.info("configpaths : " + configpaths);
-        } catch (Exception localException) {
+        } catch (ConfigurationException localException) {
             System.out.println("SQLException Error!!");
         }
         return configpaths;
