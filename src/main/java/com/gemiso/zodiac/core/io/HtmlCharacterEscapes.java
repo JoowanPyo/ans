@@ -23,8 +23,21 @@ public class HtmlCharacterEscapes extends CharacterEscapes {
 
     @Override
     public int[] getEscapeCodesForAscii() {
+        //씨큐어코딩 [Private배열의 복제본을 만들고, 이를 반환하도록 작성합니다.]
+        int[] returnAsciiEscapes;
+        int asciiEscapesSize = this.asciiEscapes.length;
 
-        return asciiEscapes;
+        if (asciiEscapesSize > 0){
+            returnAsciiEscapes = new int[asciiEscapesSize];
+
+            for (int i = 0; i < asciiEscapesSize; i++){
+                returnAsciiEscapes[i] = this.asciiEscapes[i];
+            }
+            return returnAsciiEscapes;
+        }else {
+            return null;
+        }
+        /* return asciiEscapes;*/
     }
 
     @Override

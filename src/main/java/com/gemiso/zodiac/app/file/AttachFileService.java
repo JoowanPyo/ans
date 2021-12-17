@@ -307,23 +307,16 @@ public class AttachFileService {
 
     public boolean isMakeDir(String sdir)
     {
-        try {
-            java.io.File dir = new java.io.File(sdir);
-            if (!dir.exists()) {
-                if (!dir.mkdirs()) {
-                    if (log.isDebugEnabled()) {
-                        log.info("isMakeDir Fail: " + sdir);
-                    }
-                }
-                else if (log.isDebugEnabled()) {
-                    log.info("isMakeDir success: " + sdir);
+        File dir = new File(sdir);
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                if (log.isDebugEnabled()) {
+                    log.info("isMakeDir Fail: " + sdir);
                 }
             }
-
-        }
-        catch (Exception e)
-        {
-            return false;
+            else if (log.isDebugEnabled()) {
+                log.info("isMakeDir success: " + sdir);
+            }
         }
 
         return true;

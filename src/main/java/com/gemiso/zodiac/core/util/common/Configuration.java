@@ -18,6 +18,8 @@ public class Configuration extends AbstractConfiguration
     }
 
     private void initialize()throws ConfigurationException{
+
+        String configfileName = "";
         //Thread.currentThread().getContextClassLoader().getResource(name) 로 쓸수 있다
         //클레스 패스에서 resource를 찾는 방법이다.
         //null
@@ -29,29 +31,28 @@ public class Configuration extends AbstractConfiguration
             log.info("defaultFile       :" +defaultFile);
             //C:\\Users\\JOOWAN PYO\\npsnrcs\\config\\config.properties
             //System.getProperty key값이 실행되는 위치를 String으로 출력
-            this.configFileName = System.getProperty("app.config.file", defaultFile.getAbsolutePath());
-            log.info("configFileName    :" +configFileName);
+            configfileName = System.getProperty("app.config.file", defaultFile.getAbsolutePath());
+            log.info("configFileName    :" +configfileName);
         } else {
             File fileName = new File(configUrl.getFile());
             //파일경로를 가져온다
-            this.configFileName = fileName.getAbsolutePath();
+            configfileName = fileName.getAbsolutePath();
         }
 
         try
         {
-            String fileName = "";
             //시큐어코딩에 나온 심각사항. 파일경로 잘못들어가는거 방지.
-            if (this.configFileName != null && !"".equals(this.configFileName)){
-                fileName = this.configFileName.replaceAll("/", ""); // "/" 필터링
-                fileName = this.configFileName.replaceAll("\\\\", ""); // "\" 필터링
-                fileName = this.configFileName.replaceAll("\\.\\.", ""); // ".." 필터링
+            if (configfileName != null && !"".equals(configfileName)){
+                configfileName = this.configFileName.replaceAll("/", ""); // "/" 필터링
+                configfileName = this.configFileName.replaceAll("\\\\", ""); // "\" 필터링
+                configfileName = this.configFileName.replaceAll("\\.\\.", ""); // ".." 필터링
             }
 
-            File configFile = new File(fileName);
+            File configFile = new File(configfileName);
 
             log.info("configFile          :"+configFile);
             if (!configFile.canRead()) {
-                throw new ConfigurationException("Can't open configuration file: " + fileName);
+                throw new ConfigurationException("Can't open configuration file: " + configfileName);
             }
             this.props = new Properties();
 
