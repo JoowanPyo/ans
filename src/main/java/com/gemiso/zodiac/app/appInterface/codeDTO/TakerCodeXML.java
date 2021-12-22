@@ -1,7 +1,5 @@
 package com.gemiso.zodiac.app.appInterface.codeDTO;
 
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueSheetDataDTO;
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueSheetResultDTO;
 import lombok.Data;
 
 import javax.xml.bind.annotation.XmlAccessType;

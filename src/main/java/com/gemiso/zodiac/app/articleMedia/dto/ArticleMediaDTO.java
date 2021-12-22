@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.articleMedia.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
@@ -32,6 +33,7 @@ public class ArticleMediaDTO {
     private String trnsfFileNm;
     @Schema(description = "미디어 길이")
     private String mediaDurtn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "미디어 매칭 일시")
     private Date mediaMtchDtm;
     @Schema(description = "전송 상태 코드")
@@ -46,10 +48,13 @@ public class ArticleMediaDTO {
     private String videoEdtrNm;
     @Schema(description = "삭제 여부")
     private String delYn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "삭제 일시")
     private Date delDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "등록 일시")
     private Date inputDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "수정 일시")
     private Date updtDtm;
     @Schema(description = "등록자 아이디")

@@ -37,7 +37,7 @@ public class CueSheetController {
                                                       @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
                                                       @Parameter(name = "brdcPgmNm", description = "프로그램 명")
                                                       @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
-                                                      @Parameter(name = "searchWord", description = "프로그램구분코드")
+                                                      @Parameter(name = "searchWord", description = "검색키워드")
                                                       @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
 
         CueSheetFindAllDTO cueSheetDTOList = new CueSheetFindAllDTO();

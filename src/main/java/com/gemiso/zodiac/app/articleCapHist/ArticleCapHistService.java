@@ -6,6 +6,7 @@ import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -28,7 +29,7 @@ public class ArticleCapHistService {
 
         BooleanBuilder booleanBuilder = getSearch(artclHistId);
 
-        List<ArticleCapHist> articleCapHistList = (List<ArticleCapHist>) articleCapHistRepository.findAll(booleanBuilder);
+        List<ArticleCapHist> articleCapHistList = (List<ArticleCapHist>) articleCapHistRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "lnNo"));
 
         List<ArticleCapHistDTO> articleCapHistDTOList = articleCapHistMapper.toDtoList(articleCapHistList);
 

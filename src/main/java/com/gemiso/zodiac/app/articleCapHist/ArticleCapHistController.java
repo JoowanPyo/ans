@@ -33,7 +33,7 @@ public class ArticleCapHistController {
 
     @Operation(summary = "기사자막 이력 상세조회", description = "기사자막 이력 상세조회")
     @GetMapping(path = "/{ancCapHistId}")
-    public AnsApiResponse<ArticleCapHistDTO> find(@Parameter(name = "artclCapHistId", required = true, description = "앵커자막 이력 아이디")
+    public AnsApiResponse<ArticleCapHistDTO> find(@Parameter(name = "artclCapHistId", required = true, description = "기사자막 이력 아이디")
                                                   @PathVariable("artclCapHistId") Long artclCapHistId) {
 
         ArticleCapHistDTO articleCapHistDTO = articleCapHistService.find(artclCapHistId);

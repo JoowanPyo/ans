@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.appInterface.programDTO;
+package com.gemiso.zodiac.app.appInterface.takerProgramDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

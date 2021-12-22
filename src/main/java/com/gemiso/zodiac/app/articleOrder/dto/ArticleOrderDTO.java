@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.articleOrder.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
@@ -37,7 +38,9 @@ public class ArticleOrderDTO {
     private String workrNm;
     private String clientId;
     private String clientNm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date updtDtm;
     private ArticleSimpleDTO article;
     private List<ArticleOrderFileDTO> articleOrderFile = new ArrayList<>();

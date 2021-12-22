@@ -32,7 +32,7 @@ public class ArticleHistService {
 
         BooleanBuilder booleanBuilder = getSearch(artclId, orgArtclId, searchWord);
 
-        List<ArticleHist> articleHistList = (List<ArticleHist>) articleHistRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "artclOrd"));
+        List<ArticleHist> articleHistList = (List<ArticleHist>) articleHistRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "inputDtm"));
 
         List<ArticleHistDTO> articleHistDTOList = articleHistMapper.toDtoList(articleHistList);
 

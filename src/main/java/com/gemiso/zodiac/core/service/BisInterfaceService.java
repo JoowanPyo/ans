@@ -21,6 +21,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -187,6 +188,7 @@ public class BisInterfaceService {
 
         //bis에서 조회한 기본편성 정보를 불러온다.
         List<DsBasicScheduleListDTO> dsBasicScheduleListDTOList = bisBasicScheduleDTO.getDsBasicScheduleList();
+        List<DsBasicScheduleListDTO> addDsBasicScheduleListDTOList = new ArrayList<>();
 
         //ANS에 등록되어 있는 기본편성을 가져온다.
         List<BaseProgram> baseProgramList = baseProgramRepository.findAll();
@@ -200,16 +202,16 @@ public class BisInterfaceService {
                 String basicScheduleId = dsBasicScheduleDTO.getBasicScheduleId();//Bis에서 조회한 기본편성 아이디를 가져온다.
 
                 // 기본편성 아이디가 같다면, 이미 등록되어 있는 정보이므로 bis에서 조회한 기본편성 리스트 에서 삭제.
-                if (basePgmschId.equals(basicScheduleId)){
-                    dsBasicScheduleListDTOList.remove(dsBasicScheduleDTO);
+                if (basePgmschId.equals(basicScheduleId) == false){
+                    addDsBasicScheduleListDTOList.add(dsBasicScheduleDTO);
                 }
             }
         }
 
         //새로들어온 기본편성이 있으면 등록
-        if (CollectionUtils.isEmpty(dsBasicScheduleListDTOList) == false){
+        if (CollectionUtils.isEmpty(addDsBasicScheduleListDTOList) == false){
             //새로들어온 기본편성 등록
-            for (DsBasicScheduleListDTO dsBasicScheduleDTO : dsBasicScheduleListDTOList){
+            for (DsBasicScheduleListDTO dsBasicScheduleDTO : addDsBasicScheduleListDTOList){
 
                 String brdcPgmId = dsBasicScheduleDTO.getPgmCd();
                 ProgramSimpleDTO programSimpleDTO = ProgramSimpleDTO.builder().brdcPgmId(brdcPgmId).build();

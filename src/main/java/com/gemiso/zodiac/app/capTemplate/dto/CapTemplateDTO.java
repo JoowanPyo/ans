@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.capTemplate.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.capTemplateGrp.dto.CapTemplateGrpDTO;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
@@ -33,8 +34,11 @@ public class CapTemplateDTO {
     private String brdcPgmNm;*///맵핑테이블로대처.
     private String prvwYn;
     private String useYn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date delDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date updtDtm;
     private String delYn;
     private String inputrId;

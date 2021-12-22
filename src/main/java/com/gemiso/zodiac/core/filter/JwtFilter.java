@@ -90,7 +90,7 @@ public class JwtFilter implements Filter {
                     String jwtToken = null;
 
 
-                   /* if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {*/
+                    if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
 
                         //헤더에 있는 Bearer Substring => 토큰값을 빼기 위함.
                         jwtToken = requestTokenHeader.substring(6);
@@ -123,10 +123,10 @@ public class JwtFilter implements Filter {
 
                         logMessage.append(" [TOKEN USER ID:").append(user.getUserId().toString()).append("]");
 
-                   /* } else {
-                        httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                    } else {
+                        httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "토큰이 없거나 토큰정보가 정확하지 않습니다.");
                         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-                    }*/
+                    }
 
                     logMessage.append(" [RESPONSE STATUS:").append(httpServletResponse.getStatus()).append("]"); //코드를 넘겨줌
 

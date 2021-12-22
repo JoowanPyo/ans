@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.spareCueSheetItem.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolDTO;
@@ -37,20 +38,25 @@ public class SpareCueSheetItemDTO {
     private String artclCapStCd;
     private String artclCapStCdNm;
     private String cueArtclCapChgYn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date cueArtclCapChgDtm;
     private String cueArtclCapStCd;
     private String cueArtclCapStCdNm;
     private String rmk;
     private String lckYn;
     private String delYn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date delDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date lckDtm;
     private String cueItemTypCd;
     private String cueItemTypCdNm;
     private String mediaChCd;
     private String mediaChCdNm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date cueItemBrdcDtm;
     private String capChgYn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date capChgDtm;
     private String capStCd;
     private String capStCdNm;

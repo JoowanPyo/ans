@@ -276,8 +276,6 @@ public class CueSheetItemService {
             cueSheetItemList.remove(i);//신규 등록된 큐시트 아이템 리스트에서 삭제
         }
 
-
-
         cueSheetItemList.add(cueItemOrd, cueSheetItem); //신규등록하려는 큐시트 아이템 원하는 순번에 리스트 추가
 
         //조회된 큐시트 아이템 Ord 업데이트

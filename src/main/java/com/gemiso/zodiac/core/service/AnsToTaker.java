@@ -1,7 +1,7 @@
 package com.gemiso.zodiac.core.service;
 
-import com.gemiso.zodiac.app.appInterface.programDTO.ParentProgramDTO;
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueProgramDTO;
+import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
+import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueProgramDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.program.Program;
 

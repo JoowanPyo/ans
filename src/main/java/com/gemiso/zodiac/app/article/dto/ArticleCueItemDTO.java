@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.article.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
@@ -83,8 +84,10 @@ public class ArticleCueItemDTO {
     private Integer artclReqdSec;
     @Schema(description = "잠금 여부")
     private String lckYn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "잠금 일시")
     private Date lckDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "승인 일시")
     private Date apprvDtm;
     @Schema(description = "기사 순번")
@@ -99,10 +102,12 @@ public class ArticleCueItemDTO {
     private String frnotiYn;
     @Schema(description = "엠바고 여부")
     private String embgYn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "엠바고 일시")
     private Date embgDtm;
     @Schema(description = "입력자 명")
     private String inputrNm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "삭제 일시")
     private Date delDtm;
     @Schema(description = "삭제 여부")
@@ -113,10 +118,13 @@ public class ArticleCueItemDTO {
     private String regAppTyp;
     @Schema(description = "방송 프로그램 아이디")
     private Long brdcPgmId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "방송예정 일시")
     private Date brdcSchdDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "입력 일시")
     private Date inputDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "수정 일시")
     private Date updtDtm;
     @Schema(description = "입력자 아이디")

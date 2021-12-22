@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.dailyProgram.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
@@ -34,7 +35,9 @@ public class DailyProgramDTO {
     private String subrmId;
     private String pgmschYn;
     private String rmk;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date updtDtm;
     private String inputrId;
     private String inputrNm;

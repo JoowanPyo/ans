@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.breakingNews.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.breakingNewsDetail.BreakingNewsDtl;
 import com.gemiso.zodiac.app.breakingNewsDetail.dto.BreakingNewsDtlDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,11 +27,15 @@ public class BreakingNewsDTO {
     private String breakingNewsDivNm;
     private String lnTypCd;
     private String lnTypCdNm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date trnsfDtm;
     private String trnsfStCd;
     private String trnsfStCdNm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date updtDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date delDtm;
     private String delYn;
     private String inputrId;

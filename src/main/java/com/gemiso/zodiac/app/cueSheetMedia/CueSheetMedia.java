@@ -37,6 +37,7 @@ public class CueSheetMedia extends BaseEntity {
     @Column(name = "media_typ_cd", length = 50)
     private String mediaTypCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = media_typ_cd)")
     private String mediaTypCdNm;
 
@@ -58,12 +59,14 @@ public class CueSheetMedia extends BaseEntity {
     @Column(name = "trnsf_st_cd", length = 50)
     private String trnsfStCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = trnsf_st_cd)")
     private String trnsfStCdNm;
 
     @Column(name = "assn_st_cd", length = 50)
     private String assnStCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = assn_st_cd)")
     private String assnStCdNm;
 

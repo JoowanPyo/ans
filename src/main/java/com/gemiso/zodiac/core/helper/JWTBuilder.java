@@ -19,8 +19,9 @@ public class JWTBuilder {
 
         Map<String, Object> payloads = new HashMap<>();
         payloads.put("userId", userId);
-        Long expiredTime = 1000 * 60L * 60L * 2L;
-        //Long expiredTime = 1000 * 60L;
+        //Long expiredTime = 1000 * 60L * 60L * 2L; //2시간
+        //Long expiredTime = 1000 * 60L; //1분
+        Long expiredTime = 1000 * 60L * 5L; //5분
 
         //expiredTime, subject --cloud config로 처리??
         return createToken(payloads, expiredTime, "AccessToken");
@@ -32,8 +33,9 @@ public class JWTBuilder {
 
         Map<String, Object> payloads = new HashMap<>();
         payloads.put("", userId);
-        Long expirationIn =  1000 * 60L * 60L * 24L;
-        //Long expirationIn =  1000 * 60L;
+        //Long expirationIn =  1000 * 60L * 60L * 24L; //하루
+        //Long expirationIn =  1000 * 60L; //1분
+        Long expirationIn = 1000 * 60L * 30L; //30분
         return createToken(payloads, expirationIn, "RefreshToken");
     }
 

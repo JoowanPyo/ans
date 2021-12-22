@@ -29,8 +29,9 @@ public class Scheduling {
 
     }
 
-    /*//BIS기본편성 조회 및 등록
-    @Scheduled(cron = "0 * * * * *")
+    //BIS기본편성 조회 및 등록
+    /*@Scheduled(cron = "0 * * * * *")*/
+    @Scheduled(cron = "* * 3 * * ?")
     public void bisBasicScheduleCreate() throws Exception {
 
         //Bis에서 기본편성 조회
@@ -38,5 +39,5 @@ public class Scheduling {
 
         bisInterfaceService.matchBasicScheduleCreate(bisBasicScheduleDTO);
 
-    }*/
+    }
 }

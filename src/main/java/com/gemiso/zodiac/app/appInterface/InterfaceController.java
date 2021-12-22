@@ -1,9 +1,8 @@
 package com.gemiso.zodiac.app.appInterface;
 
 import com.gemiso.zodiac.app.appInterface.codeDTO.TakerCodeDTO;
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueSheetDTO;
-import com.gemiso.zodiac.app.appInterface.programDTO.ParentProgramDTO;
-import com.gemiso.zodiac.app.code.Code;
+import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.page.PageResultDTO;

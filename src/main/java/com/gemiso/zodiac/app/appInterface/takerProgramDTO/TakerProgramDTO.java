@@ -1,11 +1,8 @@
-package com.gemiso.zodiac.app.appInterface.programDTO;
+package com.gemiso.zodiac.app.appInterface.takerProgramDTO;
 
 import lombok.Data;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import javax.xml.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @XmlRootElement(name = "response")

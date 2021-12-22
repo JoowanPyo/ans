@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.yonhap.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,7 +38,9 @@ public class YonhapDTO {
     private String cmnt;
     private String relContId;
     private String refContInfo;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date embgDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
     private Date trnsfDtm;
     private String action;

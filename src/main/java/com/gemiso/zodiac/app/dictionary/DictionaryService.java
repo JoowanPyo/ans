@@ -202,7 +202,7 @@ public class DictionaryService {
 
         List<DictionaryDTO> dictionaryDTOList = new ArrayList<>();
 
-        if (searchWord == null || "".equals(searchWord)) //검색조건이 안들어와 왔을경우 entity to cueFindAllDTO 변환후 List 리턴
+        if (searchWord == null || "".equals(searchWord)) //검색조건이 안들어와 왔을경우 entity to takerCueFindAllDTO 변환후 List 리턴
         {
             for (Dictionary dictionary : dictionaryList) {
                 DictionaryDTO dictionaryDTO = DictionaryDTO.builder()

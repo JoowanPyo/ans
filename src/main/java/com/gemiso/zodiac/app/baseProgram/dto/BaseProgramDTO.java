@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.baseProgram.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
 import lombok.AllArgsConstructor;
@@ -27,8 +28,11 @@ public class BaseProgramDTO {
     private String brdcSubNm;
     private String endpgmDt;
     private String endpgmYn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date updtDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date delDtm;
     private String delYn;
     private String pd1Id;

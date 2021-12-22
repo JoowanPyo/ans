@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.articleHist.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,6 +34,7 @@ public class ArticleHistDTO {
     private int artclOrd;
     @Schema(description = "원본 기사 아이디")
     private Long orgArtclId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "입력 일시")
     private Date inputDtm;
     @Schema(description = "버전")

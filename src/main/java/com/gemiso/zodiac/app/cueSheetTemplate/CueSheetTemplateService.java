@@ -133,9 +133,9 @@ public class CueSheetTemplateService {
             booleanBuilder.and(qCueSheetTemplate.brdcPgmNm.contains(searchWord)
                     .or(qCueSheetTemplate.cueTmpltNm.contains(searchWord)));
         }
-        if (!StringUtils.isEmpty(pgmschTime)){
-            booleanBuilder.and(qCueSheetTemplate.pgmschTime.eq(pgmschTime));
-        }
+        /*if (!StringUtils.isEmpty(pgmschTime)){
+            booleanBuilder.and(qCueSheetTemplate.eq(pgmschTime));
+        }*/
 
         return booleanBuilder;
     }

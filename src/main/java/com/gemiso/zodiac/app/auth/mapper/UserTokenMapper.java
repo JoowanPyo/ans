@@ -7,5 +7,5 @@ import com.gemiso.zodiac.core.mapper.GenericMapper;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface UserTokenMapper extends GenericMapper<UserTokenDTO, UserToken, UserUpdateDTO> {
+public interface UserTokenMapper extends GenericMapper<UserTokenDTO, UserToken, UserTokenDTO> {
 }

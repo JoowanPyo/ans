@@ -115,7 +115,7 @@ public class ArticleService {
 
 
     //기사 목록조회
-    public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, Long brdcPgmId,
+    public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, Long brdcPgmId,
                                                       String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
                                                       Integer page, Integer limit/*, Long issuId*/) {
 
@@ -140,7 +140,7 @@ public class ArticleService {
         Pageable pageable = pageHelper.getArticlePageInfo();
 
         //검색조건생성 [where생성]
-        BooleanBuilder booleanBuilder = getSearch(sdate, edate, rcvDt, rptrId, brdcPgmId, artclDivCd, artclTypCd,
+        BooleanBuilder booleanBuilder = getSearch(sdate, edate, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd, artclTypCd,
                 searchDivCd, searchWord/*, issuId*/);
 
         //전체조회[page type]
@@ -815,7 +815,7 @@ public class ArticleService {
     }
 
     //기사 목록조회시 조건 빌드[일반 목록조회 ]
-    public BooleanBuilder getSearch(Date sdate, Date edate, Date rcvDt, String rptrId, Long brdcPgmId,
+    public BooleanBuilder getSearch(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, Long brdcPgmId,
                                     String artclDivCd, String artclTypCd, String searchDivCd, String searchWord /*Long issuId*/) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
@@ -827,13 +827,13 @@ public class ArticleService {
         booleanBuilder.and(qArticle.delYn.eq("N"));
 
         //등록날짜 기준으로 조회
-        if (!StringUtils.isEmpty(sdate) && !StringUtils.isEmpty(edate)) {
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
             booleanBuilder.and(qArticle.inputDtm.between(sdate, edate)
                     .or(qArticle.embgDtm.between(sdate, edate)
                             .or(qArticle.brdcSchdDtm.between(sdate, edate))));
         }
         //수신 일자 기준으로 조회
-        if (!StringUtils.isEmpty(rcvDt)) {
+        if (ObjectUtils.isEmpty(rcvDt) == false) {
 
             //rcvDt(수신일자)검색을 위해 +1 days
             Calendar calendar = Calendar.getInstance();
@@ -844,23 +844,27 @@ public class ArticleService {
             booleanBuilder.and(qArticle.inputDtm.between(rcvDt, rcvDtTomerrow));
         }
         //기자 아이디로 조회
-        if (!StringUtils.isEmpty(rptrId)) {
+        if (rptrId != null && rptrId.trim().isEmpty() == false) {
             booleanBuilder.and(qArticle.rptrId.eq(rptrId));
         }
+        //등록자 아이디로 조회
+        if (inputrId != null && inputrId.trim().isEmpty() == false){
+            booleanBuilder.and(qArticle.inputrId.eq(inputrId));
+        }
         //방송 프로그램 아이디로 조회
-        if (!StringUtils.isEmpty(brdcPgmId)) {
+        if (ObjectUtils.isEmpty(brdcPgmId) == false) {
             booleanBuilder.and(qArticle.brdcPgmId.eq(brdcPgmId));
         }
         //기사 구분 코드로 조회
-        if (!StringUtils.isEmpty(artclDivCd)) {
+        if (artclDivCd != null && artclDivCd.trim().isEmpty() == false) {
             booleanBuilder.and(qArticle.artclDivCd.eq(artclDivCd));
         }
         //기사 타입 코드로 조회
-        if (!StringUtils.isEmpty(artclTypCd)) {
+        if (artclTypCd != null && artclTypCd.trim().isEmpty() == false) {
             booleanBuilder.and(qArticle.artclTypCd.eq(artclTypCd));
         }
         //검색어로 조회
-        if (!StringUtils.isEmpty(searchWord)) {
+        if (searchWord != null && searchWord.trim().isEmpty() == false) {
             //검색구분코드 01 일때 기사 제목으로 검색
             if (searchDivCd.equals("01")) {
                 booleanBuilder.and(qArticle.artclTitl.contains(searchWord).or(qArticle.artclTitlEn.contains(searchWord)));

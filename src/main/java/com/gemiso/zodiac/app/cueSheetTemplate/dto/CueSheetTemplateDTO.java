@@ -1,13 +1,17 @@
 package com.gemiso.zodiac.app.cueSheetTemplate.dto;
 
-import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbol;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gemiso.zodiac.app.baseProgram.dto.BaseProgramSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,24 +27,14 @@ public class CueSheetTemplateDTO {
     private String cueTmpltNm;
     private String newsDivCd;
     private String newsDivCdNm;
-    private String brdcStartTime;
     private String rmk;
-    private String pgmschTime;
-    private String capHilClrRgb1;
-    private String capHilClrRgb2;
-    private String capHilClrRgb3;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date updtDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date delDtm;
     private String delYn;
-    private String pd1Id;
-    private String pd1Nm;
-    private String pd2Id;
-    private String pd2Nm;
-    private String anc1Id;
-    private String anc1Nm;
-    private String anc2Id;
-    private String anc2Nm;
     private String inputrId;
     private String inputrNm;
     private String updtrId;
@@ -48,5 +42,6 @@ public class CueSheetTemplateDTO {
     private String delrId;
     private String delrNm;
     private ProgramSimpleDTO program;
+    private BaseProgramSimpleDTO baseProgram;
     private List<CueTmplSymbolDTO> cueTmplSymbol = new ArrayList<>();
 }

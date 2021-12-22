@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.yonhapAssign.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.yonhap.Yonhap;
 import com.gemiso.zodiac.app.yonhapWire.YonhapWire;
 import lombok.AllArgsConstructor;
@@ -22,5 +23,6 @@ public class YonhapAssignDTO {
     private String designatorNm;
     private String assignerId;
     private String assignerNm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
 }

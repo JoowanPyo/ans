@@ -14,6 +14,7 @@ import com.gemiso.zodiac.app.user.mapper.UserMapper;
 import com.gemiso.zodiac.core.helper.JWTBuilder;
 import com.gemiso.zodiac.core.helper.JWTParser;
 import com.gemiso.zodiac.exception.PasswordFailedException;
+import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -88,9 +89,19 @@ public class AuthService {
         } else {
             //리플레시 토큰이 있으면, 리플레시토큰 시간이 만료되었는지 검증.
             String refreshToken = jwtParser.refreshTokenVerification(userTokenEntity.getRefreshToken());
-            if (StringUtils.isEmpty(refreshToken)) {
+            if (refreshToken == null || refreshToken.trim().isEmpty()) {
                 refreshToken = jwtBuilder.createRefreshToken(""); //만료된 토큰 재생성.
-                jwtDTO.setRefreshToken(refreshToken);
+
+                Date expirationDtm = jwtParser.refreshTokenParser(refreshToken); //생성한 리플레시 토큰 파싱하여 만료시간 저장.
+
+                UserTokenDTO userTokenDTO = userTokenMapper.toDto(userTokenEntity);
+                userTokenDTO.setUserId(userId);
+                userTokenDTO.setRefreshToken(refreshToken);
+                userTokenDTO.setExpirationDtm(expirationDtm);
+
+                userTokenMapper.updateFromDto(userTokenDTO, userTokenEntity);
+                userTokenRepository.save(userTokenEntity);
+
             }
             int returnExpirationDtm = jwtParser.verityJwt(refreshToken); //client로 만료시간 초단위(int)로 변환하여 보내준다
 
@@ -142,13 +153,14 @@ public class AuthService {
         UserToken userToken = userTokenRepository.findUserToken(userId);
 
         if (ObjectUtils.isEmpty(userToken)){ //토큰정보가 없을시 인증실패
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            throw new ResourceNotFoundException("인증할 수 있는 토큰 정보가 없습니다 토큰 정보를 확인해 주세요.");
+            //throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
         String refreshToken = jwtParser.refreshTokenVerification(userToken.getRefreshToken()); //리플레시 토큰이 만료되었는지 검증
         if (StringUtils.isEmpty(refreshToken)) { //만료되었으면 재생성
             //throw new TokenFailedException("리플레시 토큰 기간이 만료되었습니다 다시 로그인 해주세요" );
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         int returnExpirationDtm = jwtParser.verityJwt(refreshToken); //client로 만료시간 초단위(int)로 변환하여 보내준다
 

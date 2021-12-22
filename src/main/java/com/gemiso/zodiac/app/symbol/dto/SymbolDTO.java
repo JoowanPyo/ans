@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.symbol.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
@@ -24,8 +25,11 @@ public class SymbolDTO {
     private String delYn;
     private String useYn;
     private String cap_tmplt_yn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date updtDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date delDtm;
     private String inputrId;
     private String inputrNm;

@@ -31,7 +31,7 @@ public class CueSheetItemController {
     @GetMapping(path = "")
     public AnsApiResponse<List<CueSheetItemDTO>> findAll(@Parameter(name = "artlcId", description = "기사 아이디")
                                                          @RequestParam(value = "artlcId", required = false) Long artlcId,
-                                                         @Parameter(name = "cueId", description = "기사 아이디")
+                                                         @Parameter(name = "cueId", description = "큐시트 아이디")
                                                          @RequestParam(value = "cueId", required = false) Long cueId,
                                                          @Parameter(name = "delYn", description = "삭제여부 (디폴트 : N)")
                                                          @RequestParam(value = "delYn", required = false) String delYn) {

@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.appInterface.cueFindAllDTO;
+package com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

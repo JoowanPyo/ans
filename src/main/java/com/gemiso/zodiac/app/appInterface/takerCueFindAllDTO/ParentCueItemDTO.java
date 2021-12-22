@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.appInterface.cueFindAllDTO;
+package com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO;
 
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;

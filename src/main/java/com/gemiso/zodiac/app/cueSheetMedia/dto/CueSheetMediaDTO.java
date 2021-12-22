@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheetMedia.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
@@ -34,8 +35,11 @@ public class CueSheetMediaDTO {
     private String assnStCdNm;
     private String videoEdtrNm;
     private String delYn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date delDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date updtDtm;
     private String videoEdtrId;
     private String inputrId;

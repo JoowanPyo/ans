@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.appAuth.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,8 +36,10 @@ public class AppAuthDTO {
     private String useYn;
     @Schema(description = "등록 일시")
     private Date inputDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "수정 일시")
     private Date updtDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "삭제 일시")
     private Date delDtm;
     @Schema(description = "등록자 아이디")

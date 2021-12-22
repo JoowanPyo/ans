@@ -1,40 +1,36 @@
 package com.gemiso.zodiac.app.appInterface;
 
 import com.gemiso.zodiac.app.appInterface.codeDTO.*;
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueSheetDTO;
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueSheetDataDTO;
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueSheetResultDTO;
-import com.gemiso.zodiac.app.appInterface.cueFindAllDTO.TakerCueSheetXML;
-import com.gemiso.zodiac.app.appInterface.programDTO.ParentProgramDTO;
-import com.gemiso.zodiac.app.appInterface.programDTO.TakerProgramDTO;
-import com.gemiso.zodiac.app.appInterface.programDTO.TakerProgramDataDTO;
-import com.gemiso.zodiac.app.appInterface.programDTO.TakerProgramResultDTO;
+import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDataDTO;
+import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetResultDTO;
+import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetXML;
+import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
+import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDTO;
+import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDataDTO;
+import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramResultDTO;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.code.CodeRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.QCueSheet;
-import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
-import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
 import com.gemiso.zodiac.app.cueSheetItem.*;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolDTO;
-import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemSymbolMapper;
 import com.gemiso.zodiac.app.issue.Issue;
+import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
 import com.gemiso.zodiac.core.helper.PageHelper;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.service.AnsToTaker;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.QueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -151,9 +147,17 @@ public class InterfaceService {
             article = cueSheetItemList.get(i).getArticle(); //큐시트 아이템에 기사정보get
 
             if (ObjectUtils.isEmpty(article)){
+
+                //프로그램 아이디 get null에러 방지
+                Program program = cueSheet.getProgram();
+                String brdcPgmId = "";
+                if (ObjectUtils.isEmpty(program) == false){
+                    brdcPgmId = program.getBrdcPgmId();
+                }
+
                 //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
                 TakerCueSheetDTO takerCueSheetDTO = TakerCueSheetDTO.builder()
-                        .brdcPgmId(cueSheet.getProgram().getBrdcPgmId())
+                        .brdcPgmId(brdcPgmId)
                         .rdSeq(i)
                         .chDivCd(cueSheet.getChDivCd())
                         .cueDivCdNm(cueSheet.getCueDivCdNm())
@@ -176,10 +180,16 @@ public class InterfaceService {
                 if (ObjectUtils.isEmpty(issue) == false){
                     issueId = issue.getIssuId();
                 }
+                //프로그램 아이디 get null에러 방지
+                Program program = cueSheet.getProgram();
+                String brdcPgmId = "";
+                if (ObjectUtils.isEmpty(program) == false){
+                    brdcPgmId = program.getBrdcPgmId();
+                }
 
                 //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
                 TakerCueSheetDTO takerCueSheetDTO = TakerCueSheetDTO.builder()
-                        .brdcPgmId(cueSheet.getProgram().getBrdcPgmId())
+                        .brdcPgmId(brdcPgmId)
                         .rdSeq(i)
                         .chDivCd(cueSheet.getChDivCd())
                         .cueDivCdNm(cueSheet.getCueDivCdNm())

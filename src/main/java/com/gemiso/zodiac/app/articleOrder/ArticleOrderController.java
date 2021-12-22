@@ -34,17 +34,19 @@ public class ArticleOrderController {
     @Operation(summary = "기사의뢰 목록조회", description = "기사의뢰 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<ArticleOrderDTO>> findAll(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
-                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                          @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
-                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                          @Parameter(name = "orderDivCd", description = "의뢰 구분 코드(분류)")
-                                                      @RequestParam(value = "orderDivCd", required = false) String orderDivCd,
+                                                         @RequestParam(value = "orderDivCd", required = false) String orderDivCd,
                                                          @Parameter(name = "orderStatus", description = "의뢰 상태")
-                                                      @RequestParam(value = "orderStatus", required = false) String orderStatus,
+                                                         @RequestParam(value = "orderStatus", required = false) String orderStatus,
                                                          @Parameter(name = "workrId", description = "작업자 아이디")
-                                                      @RequestParam(value = "workrId", required = false) String workrId,
+                                                         @RequestParam(value = "workrId", required = false) String workrId,
+                                                         @Parameter(name = "inputrId", description = "등록자 아이디")
+                                                         @RequestParam(value = "inputrId", required = false) String inputrId,
                                                          @Parameter(name = "artclId", description = "기사 아이디")
-                                                      @RequestParam(value = "artclId", required = false) Long artclId) throws Exception {
+                                                         @RequestParam(value = "artclId", required = false) Long artclId) throws Exception {
 
         List<ArticleOrderDTO> articleOrderDTOList = new ArrayList<>();
 
@@ -54,11 +56,11 @@ public class ArticleOrderController {
             SearchDate searchDate = new SearchDate(sdate, edate);
 
             articleOrderDTOList = articleOrderService.findAll(searchDate.getStartDate(), searchDate.getEndDate(),
-                    orderDivCd, orderStatus, workrId, artclId);
+                    orderDivCd, orderStatus, workrId, inputrId, artclId);
         } else {
 
             articleOrderDTOList = articleOrderService.findAll(null, null,
-                    orderDivCd, orderStatus, workrId, artclId);
+                    orderDivCd, orderStatus, workrId, inputrId, artclId);
         }
 
         return new AnsApiResponse<>(articleOrderDTOList);
@@ -67,7 +69,7 @@ public class ArticleOrderController {
     @Operation(summary = "기사의뢰 상세조회", description = "기사의뢰 상세조회")
     @GetMapping(path = "/{orderId}")
     public AnsApiResponse<ArticleOrderDTO> find(@Parameter(name = "orderId", required = true, description = "의뢰 아이디")
-                                             @PathVariable("orderId") long orderId) {
+                                                @PathVariable("orderId") long orderId) {
 
         ArticleOrderDTO articleOrderDTO = articleOrderService.find(orderId);
 
@@ -78,7 +80,7 @@ public class ArticleOrderController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<ArticleOrderResponseDTO> create(@Parameter(description = "필수값<br>", required = true)
-                                               @RequestBody @Valid ArticleOrderCreateDTO articleOrderCreateDTO) {
+                                                          @RequestBody @Valid ArticleOrderCreateDTO articleOrderCreateDTO) {
 
         ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();
 
@@ -92,9 +94,9 @@ public class ArticleOrderController {
     @Operation(summary = "기사의뢰 수정", description = "기사의뢰 수정")
     @PutMapping(path = "/{orderId}")
     public AnsApiResponse<ArticleOrderResponseDTO> update(@Parameter(description = "필수값<br>", required = true)
-                                               @RequestBody @Valid ArticleOrderUpdateDTO articleOrderUpdateDTO,
+                                                          @RequestBody @Valid ArticleOrderUpdateDTO articleOrderUpdateDTO,
                                                           @Parameter(name = "orderId", required = true, description = "의뢰 아이디")
-                                               @PathVariable("orderId") long orderId) {
+                                                          @PathVariable("orderId") long orderId) {
 
         ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();
 
@@ -110,7 +112,7 @@ public class ArticleOrderController {
     @DeleteMapping(path = "/{orderId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "orderId", required = true, description = "의뢰 아이디")
-                                 @PathVariable("orderId") long orderId) {
+                                    @PathVariable("orderId") long orderId) {
 
         articleOrderService.delete(orderId);
 

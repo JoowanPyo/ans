@@ -1,15 +1,14 @@
-package com.gemiso.zodiac.app.appInterface.cueFindAllDTO;
+package com.gemiso.zodiac.app.appInterface.takerProgramDTO;
 
 import lombok.Data;
 
 import javax.xml.bind.annotation.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @XmlRootElement(name = "data")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TakerCueSheetDataDTO {
+public class TakerProgramDataDTO {
 
     @XmlAttribute
     private Long totalcount;
@@ -21,10 +20,5 @@ public class TakerCueSheetDataDTO {
     private int rowcount;
 
     @XmlElement(name = "record")
-    private List<TakerCueSheetDTO> takerCueSheetDTO = new ArrayList<>();
-
-   /* @XmlElement(name = "record")
-    private List<ParentProgramDTO> parentCueSheetDTOList;*/
-
-
+    private List<ParentProgramDTO> parentProgramDTOList;
 }

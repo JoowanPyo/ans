@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.userGroup.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,8 +24,11 @@ public class UserGroupDTO {
     private int ord;
     private String useYn;
     private String delYn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date updtDtm;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date delDtm;
     private String inputrId;
     private String inputrNm;

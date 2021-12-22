@@ -36,11 +36,12 @@ public class ArticleController {
 
     @Operation(summary = "기사 목록조회", description = "기사 목록조회")
     @GetMapping(path = "")
-    public ApiCollectionResponse<?> findAll(
+    public AnsApiResponse<?> findAll(
             @Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
             @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
             @Parameter(name = "rcvDt", description = "수신일자(yyyyMMdd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date rcvDt,
             @Parameter(name = "rptrId", description = "기자 아이디") @RequestParam(value = "rptrId", required = false) String rptrId,
+            @Parameter(name = "inputrId", description = "등록자 아이디") @RequestParam(value = "inputrId", required = false) String inputrId,
             @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디") @RequestParam(value = "brdcPgmId", required = false) Long brdcPgmId,
             @Parameter(name = "artclDivCd", description = "기사구분코드(01:일반, 02:전체, 03:이슈)") @RequestParam(value = "artclDivCd", required = false) String artclDivCd,
             @Parameter(name = "artclTypCd", description = "기사유형코드(01:스트레이트, 02:리포트, 03:C/T, 04:하단롤, 05:긴급자막)") @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
@@ -64,17 +65,17 @@ public class ArticleController {
 
             SearchDate searchDate = new SearchDate(sdate, edate);
 
-            pageList = articleService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), rcvDt, rptrId,
+            pageList = articleService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), rcvDt, rptrId, inputrId,
                     brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit/*, issuId*/);
             //검색조건 날짜형식이 안들어왔을경우
         } else {
 
-            pageList = articleService.findAll(null, null, rcvDt, rptrId, brdcPgmId, artclDivCd,
+            pageList = articleService.findAll(null, null, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd,
                     artclTypCd, searchDivCd, searchWord, page, limit/*, issuId*/);
 
         }
 
-        return new ApiCollectionResponse<>(pageList);
+        return new AnsApiResponse<>(pageList);
     }
 
     @Operation(summary = "기사 목록조회[큐시트]", description = "기사 목록조회[큐시트]")

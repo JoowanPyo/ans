@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.appInterface.cueFindAllDTO;
+package com.gemiso.zodiac.app.appInterface.takerProgramDTO;
 
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Data
 @XmlRootElement(name = "result")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TakerCueSheetResultDTO {
+public class TakerProgramResultDTO {
 
     @XmlAttribute
     private String success;
