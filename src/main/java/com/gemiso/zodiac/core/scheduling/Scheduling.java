@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.core.scheduling;
 
 import com.gemiso.zodiac.core.scheduling.dto.BisBasicScheduleDTO;
+import com.gemiso.zodiac.core.scheduling.dto.BisDailyScheduleDTO;
 import com.gemiso.zodiac.core.scheduling.dto.BisProgramDTO;
 import com.gemiso.zodiac.core.service.BisInterfaceService;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,17 @@ public class Scheduling {
         BisBasicScheduleDTO bisBasicScheduleDTO = bisInterfaceService.bisBasicSchedulefindAll();
 
         bisInterfaceService.matchBasicScheduleCreate(bisBasicScheduleDTO);
+
+    }
+
+    //Bis주간편성 조회 및 등록
+    /*@Scheduled(cron = "0 * * * * *")*/
+    @Scheduled(cron = "* * 3 * * ?")
+    public void bisDailyScheduleCreate() throws Exception {
+
+        BisDailyScheduleDTO bisDailyScheduleDTO = bisInterfaceService.bisDailyScheduleFindAll();
+
+        bisInterfaceService.bisDailyScheduleCreate(bisDailyScheduleDTO);
 
     }
 }

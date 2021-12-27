@@ -13,8 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BisBasicScheduleDTO {
+public class BisDailyScheduleDTO {
 
     private DmResultDTO dmResult;
-    private List<DsBasicScheduleListDTO> dsBasicScheduleList;
+    List<DschWeekDTO> dsSchWeek;
 }

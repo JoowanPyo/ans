@@ -22,7 +22,7 @@ import javax.persistence.*;
 @Setter
 @ToString(exclude = "program")
 @DynamicUpdate
-public class DailyProgram extends BaseEntity {
+public class DailyProgram{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +35,7 @@ public class DailyProgram extends BaseEntity {
     private String brdcDt;
 
     @Column(name = "brdc_seq", columnDefinition = "numeric(5)", nullable = false)
-    private String brdcSeq;
+    private int brdcSeq;
 
     @Column(name = "brdc_start_time", length = 8, nullable = false)
     private String brdcStartTime;
@@ -69,6 +69,12 @@ public class DailyProgram extends BaseEntity {
 
     @Column(name = "rmk", length = 500)
     private String rmk;
+
+    @Column(name = "input_dtm")
+    private String inputDtm;
+
+    @Column(name = "updt_dtm")
+    private String updtDtm;
 
     @Column(name = "inputr_id", length = 50)
     private String inputrId;

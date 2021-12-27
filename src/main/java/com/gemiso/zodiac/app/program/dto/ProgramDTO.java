@@ -35,10 +35,8 @@ public class ProgramDTO {
     private String prdDivCdNm;
     private String brdcStartTime;
     private String schTime;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private Date inputDtm;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private Date updtDtm;
+    private String inputDtm;
+    private String updtDtm;
     private String delYn;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date delDtm;
@@ -49,6 +47,6 @@ public class ProgramDTO {
     private String delrId;
     private String delrNm;
 
-    private List<CueSheetTemplateDTO> cueSheetTemplate;
-    private List<DailyProgramDTO> dailyProgram;
+    /*private List<CueSheetTemplateDTO> cueSheetTemplate;
+    private List<DailyProgramDTO> dailyProgram;*/
 }

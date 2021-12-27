@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO;
+package com.gemiso.zodiac.app.appInterface.prompterCue;
 
 import lombok.Data;
 
@@ -10,11 +10,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Data
 @XmlRootElement(name = "response")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TakerCueSheetXML {
+public class PrompterCueSheetXML {
 
     @XmlElement(name = "result")
-    private TakerCueSheetResultDTO result;
+    private PrompterCueSheetResultDTO result;
 
     @XmlElement(name = "data")
-    private TakerCueSheetDataDTO data;
+    private PrompterCueSheetDataDTO data;
 }

@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -35,7 +36,7 @@ public class BaseProgramService {
     private final UserAuthService userAuthService;
 
     //기본편성 목록조회
-    public List<BaseProgramDTO> findAll(String basPgmschId, String brdcStartDt,
+    public List<BaseProgramDTO> findAll(Long basPgmschId, String brdcStartDt,
                                         String brdcEndDt, String brdcStartClk, String brdcPgmId){
 
         BooleanBuilder booleanBuilder = getSearch(basPgmschId, brdcStartDt, brdcEndDt, brdcStartClk, brdcPgmId);
@@ -49,7 +50,7 @@ public class BaseProgramService {
     }
 
     //기본편성 상세조회
-    public BaseProgramDTO find(String basePgmschId){
+    public BaseProgramDTO find(Long basePgmschId){
 
         BaseProgram baseProgram = findBasepgm(basePgmschId);//기본편성 조회 및 존재유무 확인.
 
@@ -70,7 +71,7 @@ public class BaseProgramService {
         baseProgramRepository.save(baseProgram);//등록
 
         //기본편성 아이디를 불러온다
-        String basePgmschId = baseProgram.getBasePgmschId();
+        Long basePgmschId = baseProgram.getBasePgmschId();
         //기본편성 아이디를 담아 리턴할 DTO생성
         BaseProgramSimpleDTO baseProgramSimpleDTO = new BaseProgramSimpleDTO();
         //리턴할 DTO에 아이디 set
@@ -80,7 +81,7 @@ public class BaseProgramService {
     }
 
     //기본편성 업데이트
-    public BaseProgramSimpleDTO update(BaseProgramUpdateDTO baseProgramUpdateDTO, String basePgmschId){
+    public BaseProgramSimpleDTO update(BaseProgramUpdateDTO baseProgramUpdateDTO, Long basePgmschId){
 
         BaseProgram baseProgram = findBasepgm(basePgmschId);//기본편성 조회 및 존재유무 확인.
 
@@ -100,7 +101,7 @@ public class BaseProgramService {
     }
 
     //기본편성 삭제
-    public void delete(String basePgmschId){
+    public void delete(Long basePgmschId){
 
         BaseProgram baseProgram = findBasepgm(basePgmschId);//기본편성 조회 및 존재유무 확인.
 
@@ -117,7 +118,7 @@ public class BaseProgramService {
     }
 
     //기본편성 조회 및 존재유무 확인.
-    public BaseProgram findBasepgm(String basePgmschId){
+    public BaseProgram findBasepgm(Long basePgmschId){
 
         Optional<BaseProgram> baseProgram = baseProgramRepository.findBasePgm(basePgmschId);
 
@@ -129,7 +130,7 @@ public class BaseProgramService {
     }
 
     //기본편성 목록조회 조회조건 빌드
-    public BooleanBuilder getSearch(String basPgmschId, String brdcStartDt,
+    public BooleanBuilder getSearch(Long basPgmschId, String brdcStartDt,
                                     String brdcEndDt, String brdcStartClk, String brdcPgmId){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
@@ -137,7 +138,7 @@ public class BaseProgramService {
         QBaseProgram qBaseProgram = QBaseProgram.baseProgram;
 
         //기본편성 아이디로 조회
-        if (basPgmschId != null && basPgmschId.trim().isEmpty() == false){
+        if (ObjectUtils.isEmpty(basPgmschId) == false){
             booleanBuilder.and(qBaseProgram.basePgmschId.eq(basPgmschId));
         }
 

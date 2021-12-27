@@ -25,7 +25,7 @@ public class BaseProgramUpdateDTO {
     private String endpgmDt;
     private String endpgmYn;
     //private Date inputDtm;
-    //private Date updtDtm;
+    private String updtDtm;
     //private Date delDtm;
     //private String delYn;
     private String pd1Id;

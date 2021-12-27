@@ -18,11 +18,12 @@ import java.util.Date;
 @Setter
 @ToString
 @DynamicUpdate
-public class BaseProgram extends BaseEntity {
+public class BaseProgram {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="bas_pgmsch_id",length = 50, nullable = false )
-    private String basePgmschId;
+    private Long basePgmschId;
 
     @Column(name = "bas_dt", length = 8/*, nullable = false*/)
     private String basDt;
@@ -56,6 +57,12 @@ public class BaseProgram extends BaseEntity {
 
     @Column(name = "endpgm_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String endpgmYn;
+
+    @Column(name = "input_dtm")
+    private String inputDtm;
+
+    @Column(name = "updt_dtm")
+    private String updtDtm;
 
     @Column(name = "del_dtm")
     private Date delDtm;

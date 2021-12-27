@@ -31,7 +31,7 @@ public class ProgramUpdateDTO {
     private String brdcStartTime;
     private String schTime;
     //private Date inputDtm;
-    private Date updtDtm;
+    private String updtDtm;
     //private String delYn;
     //private Date delDtm;
     //private String inputrId;

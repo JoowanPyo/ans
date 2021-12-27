@@ -23,7 +23,7 @@ public class DailyProgramDTO {
 
     private Long dailyPgmId;
     private String brdcDt;
-    private String brdcSeq;
+    private int brdcSeq;
     private String brdcStartTime;
     private String brdcEndClk;
     private String brdcDivCd;
@@ -35,10 +35,8 @@ public class DailyProgramDTO {
     private String subrmId;
     private String pgmschYn;
     private String rmk;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private Date inputDtm;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private Date updtDtm;
+    private String inputDtm;
+    private String updtDtm;
     private String inputrId;
     private String inputrNm;
     private String updtrId;

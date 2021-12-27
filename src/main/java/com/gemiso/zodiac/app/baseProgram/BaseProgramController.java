@@ -28,7 +28,7 @@ public class BaseProgramController {
     @Operation(summary = "기본편성 목록조회", description = "기본편성 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<BaseProgramDTO>> findAll(@Parameter(name = "basPgmschId", description = "기본편성 아이디")
-                                                        @RequestParam(value = "basPgmschId", required = false) String basPgmschId,
+                                                        @RequestParam(value = "basPgmschId", required = false) Long basPgmschId,
                                                         @Parameter(name = "brdcStartDt", description = "방송시작일자")
                                                         @RequestParam(value = "brdcStartDt", required = false) String brdcStartDt,
                                                         @Parameter(name = "brdcEndDt", description = "방송종료일자")
@@ -47,7 +47,7 @@ public class BaseProgramController {
     @Operation(summary = "기본편성 상세조회", description = "기본편성 상세조회")
     @GetMapping(path = "/{basePgmschId}")
     public AnsApiResponse<BaseProgramDTO> find(@Parameter(name = "basePgmschId", required = true, description = "기본편성 아이디")
-                                               @PathVariable("basePgmschId") String basePgmschId) {
+                                               @PathVariable("basePgmschId") Long basePgmschId) {
 
         BaseProgramDTO baseProgramDTO = baseProgramService.find(basePgmschId);
 
@@ -70,7 +70,7 @@ public class BaseProgramController {
     public AnsApiResponse<BaseProgramSimpleDTO> update(@Parameter(description = "필수값<br> ", required = true)
                                                        @RequestBody @Valid BaseProgramUpdateDTO baseProgramUpdateDTO,
                                                        @Parameter(name = "basePgmschId", required = true, description = "기본편성 아이디")
-                                                       @PathVariable("basePgmschId") String basePgmschId) {
+                                                       @PathVariable("basePgmschId") Long basePgmschId) {
 
         BaseProgramSimpleDTO baseProgramSimpleDTO = baseProgramService.update(baseProgramUpdateDTO, basePgmschId);
 
@@ -81,7 +81,7 @@ public class BaseProgramController {
     @DeleteMapping(name = "/{basePgmschId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "basePgmschId", required = true, description = "기본편성 아이디")
-                                    @PathVariable("basePgmschId") String basePgmschId) {
+                                    @PathVariable("basePgmschId") Long basePgmschId) {
 
         baseProgramService.delete(basePgmschId);
 

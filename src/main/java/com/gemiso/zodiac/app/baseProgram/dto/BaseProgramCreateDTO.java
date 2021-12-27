@@ -24,8 +24,8 @@ public class BaseProgramCreateDTO {
     private String brdcSubNm;
     private String endpgmDt;
     private String endpgmYn;
-    //private Date inputDtm;
-    //private Date updtDtm;
+    private String inputDtm;
+    private String updtDtm;
     //private Date delDtm;
     //private String delYn;
     private String pd1Id;

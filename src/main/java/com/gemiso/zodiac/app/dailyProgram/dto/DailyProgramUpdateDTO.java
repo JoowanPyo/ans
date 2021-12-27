@@ -18,7 +18,7 @@ public class DailyProgramUpdateDTO {
 
     private Long dailyPgmId;
     private String brdcDt;
-    private String brdcSeq;
+    private int brdcSeq;
     private String brdcStartTime;
     private String brdcEndClk;
     private String brdcDivCd;
@@ -31,7 +31,7 @@ public class DailyProgramUpdateDTO {
     private String pgmschYn;
     private String rmk;
     //private Date inputDtm;
-    private Date updtDtm;
+    private String updtDtm;
     //private String inputrId;
     //private String inputrNm;
     private String updtrId;

@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BaseProgramSimpleDTO {
 
-    private String basePgmschId;
+    private Long basePgmschId;
 }

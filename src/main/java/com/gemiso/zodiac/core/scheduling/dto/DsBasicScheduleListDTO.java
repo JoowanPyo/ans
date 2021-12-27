@@ -19,4 +19,7 @@ public class DsBasicScheduleListDTO {
     private String broadHm; //방송시각 brdc_start_clk
     private String broadRun; //방송길이 brdc_end_clk
     private String pgmCd; //방송프로그램 코드 brdc_pgm_id
+    private String dayCd;
+    private String regDt; //입력일시
+    private String updDt; //수정일시
 }

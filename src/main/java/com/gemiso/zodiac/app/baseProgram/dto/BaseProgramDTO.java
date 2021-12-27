@@ -16,7 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class BaseProgramDTO {
 
-    private String basePgmschId;
+   /* private String basePgmschId;*/
     private String basDt;
     private String chDivCd;
     private String brdcDay;
@@ -28,10 +28,8 @@ public class BaseProgramDTO {
     private String brdcSubNm;
     private String endpgmDt;
     private String endpgmYn;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private Date inputDtm;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private Date updtDtm;
+    private String inputDtm;
+    private String updtDtm;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date delDtm;
     private String delYn;

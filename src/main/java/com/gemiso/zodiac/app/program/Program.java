@@ -1,15 +1,11 @@
 package com.gemiso.zodiac.app.program;
 
-import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
-import com.gemiso.zodiac.app.dailyProgram.DailyProgram;
-import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "tb_brdc_pgm")
@@ -18,9 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"cueSheetTemplate","dailyProgram"})
+@ToString
 @DynamicUpdate
-public class Program extends BaseEntity {
+public class Program {
 
     /*@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)*/
@@ -65,11 +61,11 @@ public class Program extends BaseEntity {
     @Column(name = "sch_time", length = 8)
     private String schTime;
 
-    //@Column(name = "input_dtm")
-    //private Date inputDtm;
+    @Column(name = "input_dtm")
+    private String inputDtm;
 
-    //@Column(name = "updt_dtm")
-    //private Date updtDtm;
+    @Column(name = "updt_dtm")
+    private String updtDtm;
 
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
@@ -98,11 +94,11 @@ public class Program extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
     private String delrNm;
 
-    @OneToMany(mappedBy = "program")
-    private List<CueSheetTemplate> cueSheetTemplate;
+   /* @OneToMany(mappedBy = "program")
+    private List<CueSheetTemplate> cueSheetTemplate;*/
 
-    @OneToMany(mappedBy = "program")
-    private List<DailyProgram> dailyProgram;
+    /*@OneToMany(mappedBy = "program")
+    private List<DailyProgram> dailyProgram;*/
 
     /*@OneToMany(mappedBy = "program")
     private List<CueSheet> cueSheet;*/

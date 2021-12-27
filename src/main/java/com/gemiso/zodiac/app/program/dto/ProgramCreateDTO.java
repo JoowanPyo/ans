@@ -30,7 +30,7 @@ public class ProgramCreateDTO {
     //private String prdDivCdNm;
     private String brdcStartTime;
     private String schTime;
-    private Date inputDtm;
+    private String inputDtm;
     //private Date updtDtm;
     //private String delYn;
     //private Date delDtm;
