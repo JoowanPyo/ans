@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -278,9 +279,12 @@ public class CueSheetService {
         /*String cueSheetItem = String.valueOf(cueSheetItemList);*/
 
         //큐시트 아이템 리스트를 String 으로 변환 리스트 정보를 text로 저장하기 위함.
-        String cueSheetItem = cueSheetItemDTOList.stream()
-                .map(n -> String.valueOf(n))
-                .collect(Collectors.joining());
+        String cueSheetItem = null;
+        if (CollectionUtils.isEmpty(cueSheetItemDTOList) == false) {
+            cueSheetItem = cueSheetItemDTOList.stream()
+                    .map(n -> String.valueOf(n))
+                    .collect(Collectors.joining());
+        }
 
         //큐시트 이력에 넣어줄 큐시트 아이디 빌드
         CueSheetSimpleDTO cueSheetSimpleDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();

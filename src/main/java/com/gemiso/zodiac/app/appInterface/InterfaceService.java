@@ -1,6 +1,11 @@
 package com.gemiso.zodiac.app.appInterface;
 
 import com.gemiso.zodiac.app.appInterface.codeDTO.*;
+import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramDTO;
+import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramDataDTO;
+import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramResultDTO;
+import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramXML;
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetResultDTO;
@@ -21,6 +26,10 @@ import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolDTO;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemSymbolMapper;
 import com.gemiso.zodiac.app.issue.Issue;
 import com.gemiso.zodiac.app.program.Program;
+import com.gemiso.zodiac.app.program.ProgramRepository;
+import com.gemiso.zodiac.app.program.QProgram;
+import com.gemiso.zodiac.app.program.dto.ProgramDTO;
+import com.gemiso.zodiac.app.program.mapper.ProgramMapper;
 import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
 import com.gemiso.zodiac.core.helper.PageHelper;
 import com.gemiso.zodiac.core.page.PageResultDTO;
@@ -53,8 +62,10 @@ public class InterfaceService {
     private final CueSheetRepository cueSheetRepository;
     private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
     private final CodeRepository codeRepository;
+    private final ProgramRepository programRepository;
 
     private final CueSheetItemSymbolMapper cueSheetItemSymbolMapper;
+    private final ProgramMapper programMapper;
 
 
 
@@ -379,7 +390,7 @@ public class InterfaceService {
         return booleanBuilder;
     }
 
-    public BooleanBuilder cueItemGetSearch(Long artclId, Long cueId){
+   /* public BooleanBuilder cueItemGetSearch(Long artclId, Long cueId){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -398,9 +409,9 @@ public class InterfaceService {
 
 
         return booleanBuilder;
-    }
+    }*/
 
-    public CueSheet cueSheetFindOrFail(Long cueId){
+   /* public CueSheet cueSheetFindOrFail(Long cueId){
 
         Optional<CueSheet> cueSheet = cueSheetRepository.findByCue(cueId);
 
@@ -410,9 +421,9 @@ public class InterfaceService {
 
         return cueSheet.get();
 
-    }
+    }*/
 
-    public List<CueSheetItemDTO> setSymbol(List<CueSheetItemDTO> cueSheetItemDTOList){
+   /* public List<CueSheetItemDTO> setSymbol(List<CueSheetItemDTO> cueSheetItemDTOList){
 
         for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList){ //조회된 아이템에 List
 
@@ -432,8 +443,135 @@ public class InterfaceService {
 
         return cueSheetItemDTOList;
 
+    }*/
+
+    //프롬프터 프로그램 목록조회
+    public List<PrompterProgramDTO> getMstListService(String pro_id, String sdate, String fdate){
+
+        BooleanBuilder booleanBuilder = getSearchProgram(pro_id, sdate, fdate);
+
+        List<Program> programList = (List<Program>) programRepository.findAll(booleanBuilder);
+
+        List<ProgramDTO> programDTOList = programMapper.toDtoList(programList);
+
+        List<PrompterProgramDTO> prompterProgramDTO = conversionProgram(programDTOList);//조회된 프로그램 엔티티 프롬프터DTO로 변환
+
+        return prompterProgramDTO;
+    }
+    
+    //조회된 프로그램 엔티티 프롬프터DTO로 변환
+    public List<PrompterProgramDTO> conversionProgram(List<ProgramDTO> programDTOList){
+
+        List<PrompterProgramDTO> prompterProgramDTOList = new ArrayList<>(); //리턴시켜줄 프롬프터 프로그램 리스트 생성
+
+        for (ProgramDTO programDTO : programDTOList){
+
+            PrompterProgramDTO prompterProgramDTO = PrompterProgramDTO.builder()
+                    .brdcPgmId(programDTO.getBrdcPgmId())
+                    .chDivCd(programDTO.getChDivCd())
+                    .chDivCdNm(programDTO.getChDivCdNm())
+                    .brdcPgmNm(programDTO.getBrdcPgmNm())
+                    .brdcPgmDivCd(programDTO.getBrdcPgmDivCd())
+                    .brdcPgmDivCdNm(programDTO.getBrdcPgmDivCdNm())
+                    .gneDivCd(programDTO.getGneDivCd())
+                    .gneDivCdNm(programDTO.getGneDivCdNm())
+                    .prdDivCd(programDTO.getPrdDivCd())
+                    .prdDivCdNm(programDTO.getPrdDivCdNm())
+                    .prdDeptCd(programDTO.getPrdDivCd())
+                    .prdDeptCdNm(programDTO.getPrdDivCdNm())
+                    .brdcStartDt(programDTO.getBrdcStartTime())
+                    .delYn(programDTO.getDelYn())
+                    .inputrId(programDTO.getInputrId())
+                    .inputrIdNm(programDTO.getInputrNm())
+                    .inputDtm(programDTO.getInputDtm())
+                    .updtrId(programDTO.getUpdtrId())
+                    .updtrIdNm(programDTO.getUpdtrNm())
+                    .updtDtm(programDTO.getUpdtDtm())
+                    .build();
+
+            prompterProgramDTOList.add(prompterProgramDTO);
+        }
+
+        return prompterProgramDTOList;
+        
     }
 
+    //프롬프터로 보내줄 프로그램 조회조건 빌드.
+    public BooleanBuilder getSearchProgram(String pro_id, String sdate, String fdate){
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        QProgram qProgram = QProgram.program;
+
+        //프로그램 아이디로 검색
+        if (pro_id != null && pro_id.trim().isEmpty() == false){
+            booleanBuilder.and(qProgram.brdcPgmId.eq(pro_id));
+        }
+        if (sdate != null && sdate.trim().isEmpty() ==false
+                && fdate != null && fdate.trim().isEmpty() == false){
+            booleanBuilder.and(qProgram.inputDtm.between(sdate, fdate));
+        }
+
+        return booleanBuilder;
+    }
+
+    //프로그램 프롬프터 Xml형식으로 변환
+    public String prompterProgramToXml(List<PrompterProgramDTO> prompterProgramDTOList){
+
+        //프롬프터 xml형식으로 변환할
+        PrompterProgramXML prompterProgramXML = new PrompterProgramXML();
+
+        //Lsit<prompterProgram>
+        PrompterProgramDataDTO prompterProgramDataDTO = new PrompterProgramDataDTO();
+
+        //success="true" msg="ok" 담는DTO
+        PrompterProgramResultDTO prompterProgramResultDTO = new PrompterProgramResultDTO();
+
+        //dataDTO set code데이터
+        prompterProgramDataDTO.setPrompterProgramDTO(prompterProgramDTOList);
+
+        //result 데이터 set
+        prompterProgramResultDTO.setMsg("ok");
+        prompterProgramResultDTO.setSuccess("true");
+
+        //XML 변환할 Code데이터 set
+        prompterProgramXML.setData(prompterProgramDataDTO);
+        prompterProgramXML.setResult(prompterProgramResultDTO);
+
+        //DTO TO XML 파싱
+        String xml = JAXBXmlHelper.marshal(prompterProgramXML, PrompterProgramXML.class);
+
+        System.out.println("xml : " + xml);
+        return xml;
+    }
+
+    public List<PrompterCueSheetDTO> getCuesheetService(Long cs_id){
+
+
+        Optional<CueSheet> cueSheet = cueSheetRepository.findByCue(cs_id);
+
+        if (cueSheet.isPresent() == false){
+            throw new ResourceNotFoundException("큐시트를 찾을 수 없습니다. 큐시트 아이디 : "+cs_id);
+        }
+
+        CueSheet cueSheetEntity = cueSheet.get();
+
+        List<CueSheetItem> cueSheetItemList = cueSheetEntity.getCueSheetItem();
+
+        for (CueSheetItem cueSheetItem : cueSheetItemList){
+
+            Article article = cueSheetItem.getArticle();
+
+            if (ObjectUtils.isEmpty(article)){
+                continue;
+            }
+
+
+
+        }
+
+        return null;
+
+    }
 
 }
 

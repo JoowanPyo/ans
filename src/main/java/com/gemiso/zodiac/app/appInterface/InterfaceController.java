@@ -1,9 +1,13 @@
 package com.gemiso.zodiac.app.appInterface;
 
 import com.gemiso.zodiac.app.appInterface.codeDTO.TakerCodeDTO;
+import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.app.program.Program;
+import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import io.swagger.annotations.Api;
@@ -199,7 +203,7 @@ public class InterfaceController {
         return null;
     }
 
-    @Operation(summary = "getMstListService", description = "getMstListService")
+    @Operation(summary = "프롬프터 프로그램 목록조회", description = "프롬프터 프로그램 목록조회")
     @GetMapping(path = "/getMstListService")
     public String getMstListService(@Parameter(name = "media_id", description = "미디어 아이디???")
                                     @RequestParam(value = "media_id", required = false) String media_id,
@@ -212,19 +216,23 @@ public class InterfaceController {
                                     @Parameter(name = "usr_id", description = "사용자 아이디???")
                                     @RequestParam(value = "usr_id", required = false) String usr_id) {
 
-        /*interfaceService.getMstListService(pro_id, sdate, fdate);*/
+        List<PrompterProgramDTO> prompterProgramDTOList = interfaceService.getMstListService(pro_id, sdate, fdate);
 
-        return null;
+        String prompterProgram = interfaceService.prompterProgramToXml(prompterProgramDTOList);
+
+        return prompterProgram;
     }
 
-    @Operation(summary = "getCuesheetService", description = "getCuesheetService")
+    @Operation(summary = "프롬프트 큐시트 상세조회", description = "프롬프트 큐시트 상세조회")
     @GetMapping(path = "/getCuesheetService")
     public String getCuesheetService(@Parameter(name = "cs_id", description = "큐시트 아이디???")
-                                     @RequestParam(value = "cs_id", required = false) String cs_id,
+                                     @RequestParam(value = "cs_id", required = false) Long cs_id,
                                      @Parameter(name = "usr_id", description = "사용자 아이디???")
                                      @RequestParam(value = "usr_id", required = false) String usr_id,
                                      @Parameter(name = "user_ip", description = "사용자 아이피???")
                                      @RequestParam(value = "user_ip", required = false) String user_ip) {
+
+        List<PrompterCueSheetDTO> prompterCueSheetDTOList = interfaceService.getCuesheetService(cs_id);
 
         return null;
     }

@@ -1,8 +1,5 @@
 package com.gemiso.zodiac.app.appInterface.prompterCue;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
-import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,9 +9,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Data
 @Builder
