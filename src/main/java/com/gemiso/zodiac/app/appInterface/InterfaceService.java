@@ -2,6 +2,9 @@ package com.gemiso.zodiac.app.appInterface;
 
 import com.gemiso.zodiac.app.appInterface.codeDTO.*;
 import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetDataDTO;
+import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetResultDTO;
+import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetXML;
 import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramDTO;
 import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramDataDTO;
 import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramResultDTO;
@@ -544,8 +547,98 @@ public class InterfaceService {
         return xml;
     }
 
+    //프롬프터 큐시트 상세 조회 -> PrompterCueSheetDTO리스트로 변환
     public List<PrompterCueSheetDTO> getCuesheetService(Long cs_id){
 
+
+        CueSheet cueSheet = findCueSheet(cs_id); //프롬프트로 보내줄 큐시트를 조회[단건 : 조건 큐시트 아이디]
+
+        List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //조회된 큐시트상세 정보에서 큐시트 아이템get
+
+        // 조회된 큐시트 정보를 List<PrompterCueSheetDTO>빌드 [기사정보가 있는 큐시트아이템 정보를 프롬프트DTO로 빌드 후 리턴]
+        List<PrompterCueSheetDTO> prompterCueSheetDTOList = cueToPrompterCue(cueSheetItemList);
+
+        return prompterCueSheetDTOList;
+
+    }
+
+    public String prompterCueSheetXml(List<PrompterCueSheetDTO> prompterCueSheetDTOList){
+
+        //프롬프터 큐시트 xml형식으로 변환할 DTO
+        PrompterCueSheetXML prompterCueSheetXML = new PrompterCueSheetXML();
+
+        //set Lsit<PrompterCueSheetDTO>
+        PrompterCueSheetDataDTO prompterCueSheetDataDTO = new PrompterCueSheetDataDTO();
+
+        //success="true" msg="ok" 담는DTO
+        PrompterCueSheetResultDTO prompterCueSheetResultDTO = new PrompterCueSheetResultDTO();
+
+        //dataDTO set code데이터
+        prompterCueSheetDataDTO.setCueSheetDTO(prompterCueSheetDTOList);
+
+        //result 데이터 set
+        prompterCueSheetResultDTO.setMsg("ok");
+        prompterCueSheetResultDTO.setSuccess("true");
+
+        //XML 변환할 데이터 set
+        prompterCueSheetXML.setData(prompterCueSheetDataDTO);
+        prompterCueSheetXML.setResult(prompterCueSheetResultDTO);
+
+        //DTO TO XML 파싱
+        String xml = JAXBXmlHelper.marshal(prompterCueSheetXML, PrompterCueSheetXML.class);
+
+        System.out.println("xml : " + xml);
+        return xml;
+    }
+
+    // 조회된 큐시트 정보를 List<PrompterCueSheetDTO>빌드 [기사정보가 있는 큐시트아이템 정보를 프롬프트DTO로 빌드 후 리턴]
+    public  List<PrompterCueSheetDTO> cueToPrompterCue(List<CueSheetItem> cueSheetItemList){
+
+        List<PrompterCueSheetDTO> prompterCueSheetDTOList = new ArrayList<>();
+
+        for (CueSheetItem cueSheetItem : cueSheetItemList){ //큐시트 아이템 PrompterCueSheetDTO리스트로 변환[기사(article)이 있는 아이템만 변환]
+
+            Article article = cueSheetItem.getArticle(); //큐시스트 아이템에서 기사 get
+            CueSheet cueSheet = cueSheetItem.getCueSheet();
+            Long cueId = cueSheet.getCueId();
+
+            if (ObjectUtils.isEmpty(article)){ //기사 정보가 없으면 contiue [프롬프트에서 기사정보만 쓰임]
+                continue;
+            }
+            //조회된 cueSheet정보의 기사정보로 PrompterCueSheetDTO생성
+            PrompterCueSheetDTO prompterCueSheetDTO = PrompterCueSheetDTO.builder()
+                    .cueId(cueId)
+                    .rdSeq("")
+                    .chDivCd(article.getChDivCd())
+                    .rdOrd(article.getArtclOrd())
+                    .prdDivCd(article.getPrdDivCd())
+                    .openYn("")
+                    .artclId(article.getArtclId())
+                    .artclFldCd(article.getArtclFldCd())
+                    .artclFldNm(article.getArtclFldCdNm())
+                    .artclFrmCd(article.getArtclFrmCd())
+                    .artclFrmNm(article.getArtclFrmCdNm())
+                    .artclTitl(article.getArtclTitl())
+                    .artclTitlEn(article.getArtclTitlEn())
+                    .artclCtt(article.getArtclCtt())
+                    .rptrId(article.getRptrId())
+                    .rptrNm(article.getRptrNm())
+                    .deptCd(article.getDeptCd())
+                    .artclReqdSec(article.getArtclReqdSec())
+                    .ancReqdSec(article.getAncMentCttTime())
+                    .build();
+
+            //빌드된 PrompterCueSheetDTO를 PrompterCueSheetDTO List에 add
+            prompterCueSheetDTOList.add(prompterCueSheetDTO);
+
+        }
+
+        //PrompterCueSheetDTO List return
+        return prompterCueSheetDTOList;
+    }
+
+    //프롬프트로 보내줄 큐시트를 조회[단건 : 조건 큐시트 아이디]
+    public CueSheet findCueSheet(Long cs_id){
 
         Optional<CueSheet> cueSheet = cueSheetRepository.findByCue(cs_id);
 
@@ -553,26 +646,8 @@ public class InterfaceService {
             throw new ResourceNotFoundException("큐시트를 찾을 수 없습니다. 큐시트 아이디 : "+cs_id);
         }
 
-        CueSheet cueSheetEntity = cueSheet.get();
-
-        List<CueSheetItem> cueSheetItemList = cueSheetEntity.getCueSheetItem();
-
-        for (CueSheetItem cueSheetItem : cueSheetItemList){
-
-            Article article = cueSheetItem.getArticle();
-
-            if (ObjectUtils.isEmpty(article)){
-                continue;
-            }
-
-
-
-        }
-
-        return null;
-
+        return cueSheet.get();
     }
-
 }
 
     /*public BooleanBuilder getSearchCue(String rd_id, String play_seq, String cued_seq, String vplay_seq, String vcued_seq,

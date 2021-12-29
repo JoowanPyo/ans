@@ -24,7 +24,8 @@ public class InterfaceFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        String excludePattern = "/interface/cuesheet,/interface/cuesheetitem,/interface";
+        String excludePattern = "/interface/dailypgm,/interface/cuesheet,/interface/code,/interface/mediatransrate," +
+                "/interface/getMstListService,/interface/getCuesheetService,/interface";
         excludedUrls = Arrays.asList(excludePattern.split(","));
     }
 
@@ -41,7 +42,7 @@ public class InterfaceFilter implements Filter {
 
             final String requestTokenHeader = httpServletRequest.getHeader("securityKey");
 
-                if (secretKey.equals(requestTokenHeader) == false) {
+                if (secretKey.equals(requestTokenHeader) == false || requestTokenHeader == null || requestTokenHeader.trim().isEmpty()) {
                     log.error("헤더에 Security key 값이 값이 잘못 되었습니다." + requestTokenHeader);
                     httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                 }

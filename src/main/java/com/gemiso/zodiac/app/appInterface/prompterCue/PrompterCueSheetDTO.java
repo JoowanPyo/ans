@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class PrompterCueSheetDTO {
 
     @XmlElement(name="rd_id")
-    private String cueId;
+    private Long cueId;
 
     @XmlElement(name = "rd_seq")
     private String rdSeq; //???
@@ -28,7 +28,7 @@ public class PrompterCueSheetDTO {
     private String chDivCd;
 
     @XmlElement(name = "rd_ord")
-    private Integer rd_ord;
+    private Integer rdOrd;
 
     @XmlElement(name = "prd_div_cd")
     private String prdDivCd;

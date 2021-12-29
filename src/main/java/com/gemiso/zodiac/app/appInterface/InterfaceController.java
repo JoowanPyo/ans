@@ -214,7 +214,8 @@ public class InterfaceController {
                                     @Parameter(name = "fdate", description = "검색 종료일자???")
                                     @RequestParam(value = "fdate", required = false) String fdate,
                                     @Parameter(name = "usr_id", description = "사용자 아이디???")
-                                    @RequestParam(value = "usr_id", required = false) String usr_id) {
+                                    @RequestParam(value = "usr_id", required = false) String usr_id,
+                                    @RequestHeader(value = "securityKey") String securityKey) {
 
         List<PrompterProgramDTO> prompterProgramDTOList = interfaceService.getMstListService(pro_id, sdate, fdate);
 
@@ -230,10 +231,13 @@ public class InterfaceController {
                                      @Parameter(name = "usr_id", description = "사용자 아이디???")
                                      @RequestParam(value = "usr_id", required = false) String usr_id,
                                      @Parameter(name = "user_ip", description = "사용자 아이피???")
-                                     @RequestParam(value = "user_ip", required = false) String user_ip) {
+                                     @RequestParam(value = "user_ip", required = false) String user_ip,
+                                     @RequestHeader(value = "securityKey") String securityKey) {
 
         List<PrompterCueSheetDTO> prompterCueSheetDTOList = interfaceService.getCuesheetService(cs_id);
 
-        return null;
+        String prompterCueSheetXml = interfaceService.prompterCueSheetXml(prompterCueSheetDTOList);
+
+        return prompterCueSheetXml;
     }
 }

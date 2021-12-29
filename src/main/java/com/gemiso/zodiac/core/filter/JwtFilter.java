@@ -61,7 +61,8 @@ public class JwtFilter implements Filter {
                 + ",/swagger-ui/favicon-32x32.png,/swagger-ui/favicon-16x16.png,/swagger-resources/configuration/ui"
                 + ",/swagger-resources/configuration/security,/swagger-resources,/swagger-ui/swagger-ui-standalone-preset.js"
                 + ",/swagger-ui/favicon-32x32.png,/swagger-resources/configuration/ui,/v3/api-docs,/swagger-ui/swagger-ui.css,/error"
-                + ",/auth/createToken,/yonhapInternational,/yonhap,/interface/cuesheet,/interface/code,/interface/dailypgm,/interface"
+                + ",/auth/createToken,/yonhapInternational,/yonhap,/interface/dailypgm,/interface/cuesheet,/interface/code"
+                + ",/interface/mediatransrate,/interface/getMstListService,/interface/getCuesheetService,/interface"
                 + ",/swagger-ui/index.html/swagger-resources,/swagger-ui/index.html/swagger-resources/configuration/ui"
                 + ",/swagger-ui/index.html/swagger-resources/configuration/security,/auth/login,/auth/againlogin,/auth/logout";
         excludedUrls = Arrays.asList(excludePattern.split(","));
