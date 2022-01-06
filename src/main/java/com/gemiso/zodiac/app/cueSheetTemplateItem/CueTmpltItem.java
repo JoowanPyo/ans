@@ -1,13 +1,18 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItem;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
+import com.gemiso.zodiac.app.cueSheetTemplateItemCap.CueTmpltItemCap;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(
@@ -20,7 +25,7 @@ import java.util.Date;
 @ToString(exclude = {"cueSheetTemplate"})
 @Setter
 @DynamicUpdate
-public class CueTmplItem extends BaseEntity {
+public class CueTmpltItem extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -108,6 +113,10 @@ public class CueTmplItem extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "cue_tmplt_id")
     private CueSheetTemplate cueSheetTemplate;
+
+    @OneToMany(mappedBy = "cueTmpltItem")
+    @JsonManagedReference
+    private List<CueTmpltItemCap> cueTmpltItemCap = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {

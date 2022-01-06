@@ -170,7 +170,7 @@ public class CueSheet {
     public void prePersist() {
 
         if (this.lckYn == null || this.lckYn == ""){
-            this.lckYn = "Y";
+            this.lckYn = "N";
         }
         if (this.delYn == null || this.delYn == ""){
             this.delYn = "N";

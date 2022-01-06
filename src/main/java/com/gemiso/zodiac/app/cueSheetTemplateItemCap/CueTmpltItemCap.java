@@ -1,45 +1,38 @@
-package com.gemiso.zodiac.app.cueSheetItemCap;
+package com.gemiso.zodiac.app.cueSheetTemplateItemCap;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
-import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrp;
-import com.gemiso.zodiac.app.code.Code;
-import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
-import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
-import com.gemiso.zodiac.app.user.User;
+import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
+import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
-@Table(name = "tb_cue_item_cap")
+@Table(
+        name = "tb_cue_tmplt_item_cap"
+)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@ToString(exclude = {"capTemplate","cueTmpltItem"})
 @Setter
-@ToString
 @DynamicUpdate
-public class CueSheetItemCap {
+public class CueTmpltItemCap extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cue_item_cap_id", nullable = false)
     private Long cueItemCapId;
 
-/*    @Column(name = "cue_item_id", length = 21, nullable = false)
-    private Long cueItemId;*/
-
-    @Column(name = "cue_item_cap_div_cd")
+    @Column(name = "cue_item_cap_div_cd", length = 50)
     private String cueItemCapDivCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_cap_div_cd)")
     private String cueItemCapDivCdNm;
 
@@ -55,9 +48,10 @@ public class CueSheetItemCap {
     @Column(name = "cap_prvw_id", length = 100)
     private String capPrvwId;
 
-    @Column(name = "cap_class_cd")
+    @Column(name = "cap_class_cd", length = 50)
     private String capClassCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cap_class_cd)")
     private String capClassCdNm;
 
@@ -70,55 +64,49 @@ public class CueSheetItemCap {
     @Column(name = "cap_rmk", length = 2000)
     private String capRmk;
 
-    @Column(name = "org_cue_item_cap_id", length = 21)
-    private String orgCueItemCapId;
-
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'")
     private String delYn;
 
     @Column(name = "del_dtm")
     private Date delDtm;
 
-    /*@Column(name = "cap_tmplt_id", nullable = false)
-    private Long capTmpltId;*/
-
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
 
-    @Column(name = "delr_id")
+    @Column(name = "delr_id", length = 50)
     private String delrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
     private String delrNm;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "cap_tmplt_id")
     private CapTemplate capTemplate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cue_item_id")
+    @ManyToOne
+    @JoinColumn(name = "cue_tmplt_item_id")
     @JsonBackReference
-    private CueSheetItem cueSheetItem;
-    
+    private CueTmpltItem cueTmpltItem;
 
     @PrePersist
     public void prePersist() {
 
-        if (this.delYn == null || this.delYn == "") {
+        if (this.delYn == null || this.delYn == ""){
             this.delYn = "N";
         }
+
     }
 
 }

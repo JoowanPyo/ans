@@ -23,16 +23,15 @@ import com.gemiso.zodiac.app.code.CodeRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.QCueSheet;
-import com.gemiso.zodiac.app.cueSheetItem.*;
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolDTO;
-import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemSymbolMapper;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
+import com.gemiso.zodiac.app.dailyProgram.DailyProgram;
+import com.gemiso.zodiac.app.dailyProgram.DailyProgramRepository;
+import com.gemiso.zodiac.app.dailyProgram.QDailyProgram;
+import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
+import com.gemiso.zodiac.app.dailyProgram.mapper.DailyProgramMapper;
 import com.gemiso.zodiac.app.issue.Issue;
 import com.gemiso.zodiac.app.program.Program;
-import com.gemiso.zodiac.app.program.ProgramRepository;
-import com.gemiso.zodiac.app.program.QProgram;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
-import com.gemiso.zodiac.app.program.mapper.ProgramMapper;
 import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
 import com.gemiso.zodiac.core.helper.PageHelper;
 import com.gemiso.zodiac.core.page.PageResultDTO;
@@ -43,10 +42,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -63,12 +62,14 @@ import java.util.function.Function;
 public class InterfaceService {
 
     private final CueSheetRepository cueSheetRepository;
-    private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
     private final CodeRepository codeRepository;
-    private final ProgramRepository programRepository;
+    private final DailyProgramRepository dailyProgramRepository;
+    //private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
+    //private final ProgramRepository programRepository;
 
-    private final CueSheetItemSymbolMapper cueSheetItemSymbolMapper;
-    private final ProgramMapper programMapper;
+    private final DailyProgramMapper dailyProgramMapper;
+    //private final CueSheetItemSymbolMapper cueSheetItemSymbolMapper;
+    //private final ProgramMapper programMapper;
 
 
 
@@ -453,24 +454,49 @@ public class InterfaceService {
 
         BooleanBuilder booleanBuilder = getSearchProgram(pro_id, sdate, fdate);
 
-        List<Program> programList = (List<Program>) programRepository.findAll(booleanBuilder);
+        List<DailyProgram> dailyProgramList = (List<DailyProgram>) dailyProgramRepository.findAll(
+                booleanBuilder,Sort.by(Sort.Direction.ASC, "brdcDt","dailyPgmId"));
 
-        List<ProgramDTO> programDTOList = programMapper.toDtoList(programList);
+        List<DailyProgramDTO> dailyProgramDTOList = dailyProgramMapper.toDtoList(dailyProgramList);
+        
+        List<PrompterProgramDTO> prompterProgramDTOList = conversionDailyPgm(dailyProgramDTOList);
 
-        List<PrompterProgramDTO> prompterProgramDTO = conversionProgram(programDTOList);//조회된 프로그램 엔티티 프롬프터DTO로 변환
-
-        return prompterProgramDTO;
+        return prompterProgramDTOList;
     }
     
-    //조회된 프로그램 엔티티 프롬프터DTO로 변환
-    public List<PrompterProgramDTO> conversionProgram(List<ProgramDTO> programDTOList){
+    //조회된 일일편성 엔티티 프롬프터DTO로 변환
+    public List<PrompterProgramDTO> conversionDailyPgm(List<DailyProgramDTO> dailyProgramDTOList){
 
         List<PrompterProgramDTO> prompterProgramDTOList = new ArrayList<>(); //리턴시켜줄 프롬프터 프로그램 리스트 생성
 
-        for (ProgramDTO programDTO : programDTOList){
+        for (DailyProgramDTO dailyProgramDTO : dailyProgramDTOList){
 
-            PrompterProgramDTO prompterProgramDTO = PrompterProgramDTO.builder()
+            ProgramDTO programDTO = dailyProgramDTO.getProgram();
+            String brdcPgmId = "";
+
+            if (ObjectUtils.isEmpty(programDTO) == false){
+                brdcPgmId = programDTO.getBrdcPgmId();
+            }
+
+            PrompterProgramDTO program = PrompterProgramDTO.builder()
+                    .brdcPgmId(brdcPgmId)
+                    .proNm(dailyProgramDTO.getBrdcPgmNm())
+                    .onAirDate(dailyProgramDTO.getBrdcDt())
+                    .startTime(dailyProgramDTO.getBrdcStartTime())
+                    .endTime(dailyProgramDTO.getBrdcEndClk())
+                    .displaySeq(null)
+                    .csId("")
+                    .csSpendTime("")
+                    .nodstatusNm("")
+                    .build();
+
+            prompterProgramDTOList.add(program);
+
+            /*PrompterProgramDTO prompterProgramDTO = PrompterProgramDTO.builder()
                     .brdcPgmId(programDTO.getBrdcPgmId())
+                    .proNm(programDTO.getBrdcPgmNm())
+                    .onAirDate(programDTO.)*/
+                    /*.brdcPgmId(programDTO.getBrdcPgmId())
                     .chDivCd(programDTO.getChDivCd())
                     .chDivCdNm(programDTO.getChDivCdNm())
                     .brdcPgmNm(programDTO.getBrdcPgmNm())
@@ -490,9 +516,9 @@ public class InterfaceService {
                     .updtrId(programDTO.getUpdtrId())
                     .updtrIdNm(programDTO.getUpdtrNm())
                     .updtDtm(programDTO.getUpdtDtm())
-                    .build();
+                    .build();*/
 
-            prompterProgramDTOList.add(prompterProgramDTO);
+           // prompterProgramDTOList.add(prompterProgramDTO);
         }
 
         return prompterProgramDTOList;
@@ -503,15 +529,15 @@ public class InterfaceService {
     public BooleanBuilder getSearchProgram(String pro_id, String sdate, String fdate){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        QProgram qProgram = QProgram.program;
+        QDailyProgram qDailyProgram = QDailyProgram.dailyProgram;
 
         //프로그램 아이디로 검색
         if (pro_id != null && pro_id.trim().isEmpty() == false){
-            booleanBuilder.and(qProgram.brdcPgmId.eq(pro_id));
+            booleanBuilder.and(qDailyProgram.program.brdcPgmId.eq(pro_id));
         }
         if (sdate != null && sdate.trim().isEmpty() ==false
                 && fdate != null && fdate.trim().isEmpty() == false){
-            booleanBuilder.and(qProgram.inputDtm.between(sdate, fdate));
+            booleanBuilder.and(qDailyProgram.brdcDt.between(sdate, fdate));
         }
 
         return booleanBuilder;

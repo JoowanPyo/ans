@@ -133,9 +133,11 @@ public class CueSheetItemController {
                                                                @Parameter(name = "artclId", description = "기사 아이디")
                                                                @PathVariable("artclId") Long artclId,
                                                                @Parameter(name = "cueItemOrd", description = "기사아이디")
-                                                               @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd) {
+                                                               @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd,
+                                                               @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드")
+                                                               @RequestParam(value = "cueItemDivCd", required = false) String cueItemDivCd) {
 
-        cueSheetItemService.createCueItem(cueId, artclId, cueItemOrd);
+        cueSheetItemService.createCueItem(cueId, artclId, cueItemOrd, cueItemDivCd);
 
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null);
 

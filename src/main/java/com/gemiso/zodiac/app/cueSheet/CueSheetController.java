@@ -150,11 +150,15 @@ public class CueSheetController {
     @Operation(summary = "큐시트 복사", description = "큐시트 복사")
     @PostMapping(path = "/{cueId}/cuesheetcopy")
     public AnsApiResponse<CueSheetSimpleDTO> cueSheetCopy(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                                          @PathVariable("cueId") Long cueId) {
+                                                          @PathVariable("cueId") Long cueId,
+                                                          @Parameter(name = "brdcPgmId", description = "프로그램 아이디")
+                                                          @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
+                                                          @Parameter(name = "brdcDt", description = "방송일자")
+                                                          @RequestParam(value = "brdcDt", required = false) String brdcDt) {
 
         CueSheetSimpleDTO cueSheetSimpleDTO = new CueSheetSimpleDTO();
 
-        Long cueSheetId = cueSheetService.copy(cueId);
+        Long cueSheetId = cueSheetService.copy(cueId, brdcPgmId, brdcDt);
 
         cueSheetSimpleDTO.setCueId(cueSheetId);
 

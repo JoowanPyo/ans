@@ -14,4 +14,5 @@ public class CueSheetItemCreateListDTO {
     //private Long cueId;
     private Long artclId;
     private int cueItemOrd;
+    private String cueItemDivCd;
 }

@@ -1,21 +1,25 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItem.dto;
 
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateSimpleDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateItemCap.CueTmpltItemCap;
+import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CueTmplItemSimpleDTO {
+public class CueTmpltItemDTO {
 
     private Long cueTmpltItemId;
-/*    private String cueItemTitl;
+    private String cueItemTitl;
     private String cueItemTitlEn;
     private String cueItemCtt;
     private int cueItemOrd;
@@ -41,5 +45,6 @@ public class CueTmplItemSimpleDTO {
     private String delrNm;
     private String lckrId;
     private String lckrNm;
-    private CueSheetTemplateSimpleDTO cueSheetTemplate;*/
+    private CueSheetTemplateSimpleDTO cueSheetTemplate;
+    private List<CueTmpltItemCapSimpleDTO> cueTmpltItemCap;
 }

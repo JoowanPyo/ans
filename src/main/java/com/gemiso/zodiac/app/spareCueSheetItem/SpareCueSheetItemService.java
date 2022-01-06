@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.spareCueSheetItem;
 
 import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
@@ -153,27 +154,35 @@ public class SpareCueSheetItemService {
 
     public void createSpareCueItem(Long cueId, Long artclId, int cueItemOrd){
 
-        Article copyArtcl = cueSheetItemService.copyArticle(artclId);
+        //Article copyArtcl = cueSheetItemService.copyArticle(artclId);
+        ArticleSimpleDTO articleSimpleDTO = ArticleSimpleDTO.builder().artclId(artclId).build();
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
         String userId = userAuthService.authUser.getUserId();
 
         //큐시트아이디 큐시트엔티티로 빌드 :: 예비 큐시트아이템에 큐시트 아이디set해주기 위해
-        CueSheet cueSheet = CueSheet.builder().cueId(cueId).build();
+        CueSheetSimpleDTO cueSheet = CueSheetSimpleDTO.builder().cueId(cueId).build();
         //예비 큐시트아이템create 빌드
-        SpareCueSheetItem spareCueSheetItem = SpareCueSheetItem.builder()
+        SpareCueSheetItemCreateDTO spareCueSheetItem = SpareCueSheetItemCreateDTO.builder()
                 .cueSheet(cueSheet)
                 .cueItemOrd(cueItemOrd)
                 .inputrId(userId)
-                .article(copyArtcl)
+                .article(articleSimpleDTO)
                 .build();
 
+        /*spareCueSheetItem.setCueSheet(cueSheet);
+        spareCueSheetItem.setCueItemOrd(cueItemOrd);
+        spareCueSheetItem.setInputrId(userId);
+        spareCueSheetItem.setArticle(articleSimpleDTO);*/
+
+        SpareCueSheetItem spareCueSheetItemEntity = spareCueSheetItemCreateMapper.toEntity(spareCueSheetItem);
+
         //빌드된 예비 큐시트아이템 등록
-        spareCueSheetItemRepository.save(spareCueSheetItem);
+        spareCueSheetItemRepository.save(spareCueSheetItemEntity);
 
-        Long spareCueItemId = spareCueSheetItem.getSpareCueItemId(); //생성된 예비 큐시트아이템 아이디 get
+        Long spareCueItemId = spareCueSheetItemEntity.getSpareCueItemId(); //생성된 예비 큐시트아이템 아이디 get
 
-        ordUpdateDrop(spareCueSheetItem, cueId, cueItemOrd);
+        ordUpdateDrop(spareCueSheetItemEntity, cueId, cueItemOrd);
     }
 
     public void ordUpdateDrop(SpareCueSheetItem spareCueSheetItem, Long cueId, int cueItemOrd){

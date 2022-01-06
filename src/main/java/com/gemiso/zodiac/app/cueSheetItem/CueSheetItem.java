@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.app.cueSheetItemCap.CueSheetItemCap;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
 import com.gemiso.zodiac.app.user.User;
@@ -216,6 +217,11 @@ public class CueSheetItem extends BaseEntity {
     @OneToMany(mappedBy = "cueSheetItem")
     @JsonManagedReference
     private List<CueSheetMedia> cueSheetMedia = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cueSheetItem")
+    @JsonManagedReference
+    private List<CueSheetItemCap> cueSheetItemCap = new ArrayList<>();
+
       /*@Column(name = "artcl_id", length = 21)
     private String artclId;*/
 

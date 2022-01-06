@@ -12,10 +12,10 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CueTmplItemDTO {
+public class CueTmpltItemSimpleDTO {
 
     private Long cueTmpltItemId;
-    private String cueItemTitl;
+/*    private String cueItemTitl;
     private String cueItemTitlEn;
     private String cueItemCtt;
     private int cueItemOrd;
@@ -41,5 +41,5 @@ public class CueTmplItemDTO {
     private String delrNm;
     private String lckrId;
     private String lckrNm;
-    private CueSheetTemplateSimpleDTO cueSheetTemplate;
+    private CueSheetTemplateSimpleDTO cueSheetTemplate;*/
 }

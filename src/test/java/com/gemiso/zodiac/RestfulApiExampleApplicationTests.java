@@ -8,6 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.text.ParseException;
+
 @SpringBootTest
 class RestfulApiExampleApplicationTests {
 
@@ -55,6 +57,12 @@ class RestfulApiExampleApplicationTests {
 
         System.out.println("boolean : " + isMatch);
 
+    }
+
+    @Test //Bis 방송길이 와 방송시작시작으로 방송종료시간 구하기
+    void getEndTime() throws ParseException {
+        String endtime = bisInterfaceService.getEndTime("130","1230");
+        System.out.println("endtimeendtimeendtimeendtimeendtimeendtimeendtimeendtimeendtime : " +endtime);
     }
 
 

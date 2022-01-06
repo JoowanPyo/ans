@@ -59,10 +59,10 @@ public class DailyProgram{
     private String srcDivCdNm;
 
     @Column(name = "stdio_id", length = 10)
-    private String stdioId;
+    private Long stdioId;
 
     @Column(name = "subrm_id", length = 10)
-    private String subrmId;
+    private Long subrmId;
 
     @Column(name = "pgmsch_yn", columnDefinition = "bpchar(1) default 'N'")
     private String pgmschYn;

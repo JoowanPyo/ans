@@ -9,7 +9,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
 
 @Data
 @Builder
@@ -19,7 +18,34 @@ import java.util.Date;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PrompterProgramDTO {
 
-    @XmlElement(name="brdc_pgm_id")
+    @XmlElement(name="PRO_ID")
+    private String brdcPgmId; //프로그램 아이디
+
+    @XmlElement(name="PRO_NM")
+    private String proNm; //프로그램 명
+
+    @XmlElement(name="ON_AIR_DATE")
+    private String onAirDate; // 방송일자
+
+    @XmlElement(name="START_TIME")
+    private String startTime; // 시작시간
+
+    @XmlElement(name="END_TIME")
+    private String endTime; // 종료시간
+
+    @XmlElement(name="DISPLAY_SEQ")
+    private String displaySeq; // 기사 건수
+
+    @XmlElement(name="CS_ID")
+    private String csId; // 방송 상태값
+
+    @XmlElement(name="CS_SPEND_TIME")
+    private String csSpendTime;
+
+    @XmlElement(name="NODSTATUS_NM")
+    private String nodstatusNm;
+
+    /*@XmlElement(name="brdc_pgm_id")
     private String brdcPgmId;
 
     @XmlElement(name = "ch_div_cd")
@@ -77,5 +103,5 @@ public class PrompterProgramDTO {
     private String updtrIdNm;
 
     @XmlElement(name = "updt_dtm")
-    private String updtDtm;
+    private String updtDtm;*/
 }

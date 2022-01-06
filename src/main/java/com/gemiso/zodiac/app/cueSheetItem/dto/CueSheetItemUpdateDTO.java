@@ -5,6 +5,7 @@ import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
+import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapCreateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateSimpleDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -24,7 +27,7 @@ public class CueSheetItemUpdateDTO {
     private String cueItemTitl;
     private String cueItemTitlEn;
     private String cueItemCtt;
-    private int cueItemOrd;
+    //private int cueItemOrd;
     private String cueItemOrdCd;
     //private String cueItemOrdCdNm;
     private int cueItemTime;
@@ -75,4 +78,5 @@ public class CueSheetItemUpdateDTO {
     private CueSheetSimpleDTO cueSheet;
     private ArticleUpdateDTO article;
     private CueSheetTemplateSimpleDTO cueSheetTemplate;
+    private List<CueSheetItemCapCreateDTO> cueSheetItemCap = new ArrayList<>();
 }

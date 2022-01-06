@@ -15,6 +15,10 @@ import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemSymbolMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemUpdateMapper;
+import com.gemiso.zodiac.app.cueSheetItemCap.CueSheetItemCap;
+import com.gemiso.zodiac.app.cueSheetItemCap.CueSheetItemCapRepotitory;
+import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapCreateDTO;
+import com.gemiso.zodiac.app.cueSheetItemCap.mapper.CueSheetItemCapCreateMapper;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -27,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,6 +54,7 @@ public class CueSheetItemService {
     private final ArticleCapRepository articleCapRepository;
     private final ArticleMediaRepository articleMediaRepository;
     private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
+    private final CueSheetItemCapRepotitory cueSheetItemCapRepotitory;
     //private final UserGroupUserRepository userGroupUserRepository;
     //private final UserGroupAuthRepository userGroupAuthRepository;
     //private final CueSheetRepository cueSheetRepository;
@@ -60,6 +64,7 @@ public class CueSheetItemService {
     private final CueSheetItemUpdateMapper cueSheetItemUpdateMapper;
     private final CueSheetItemSymbolMapper cueSheetItemSymbolMapper;
     //private final ArticleMapper articleMapper;
+    private final CueSheetItemCapCreateMapper cueSheetItemCapCreateMapper;
 
     private final UserAuthService userAuthService;
 
@@ -159,6 +164,7 @@ public class CueSheetItemService {
         return returnCueSheetItemSymbolDTOList;
     }
 
+    //큐시트 아이템 등록
     public Long create(CueSheetItemCreateDTO cueSheetItemCreateDTO, Long cueId){
 
 
@@ -172,30 +178,34 @@ public class CueSheetItemService {
         CueSheetItem cueSheetItem = cueSheetItemCreateMapper.toEntity(cueSheetItemCreateDTO);
         cueSheetItemRepository.save(cueSheetItem); //큐시트아이템 등록
 
-        /*//큐시트 아이템 순번 재등록
         Long cueItemId = cueSheetItem.getCueItemId();
-        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
 
-        for (int i = 0; i < cueSheetItemList.size(); i++){
-            if (cueItemId.equals(cueSheetItemList.get(i).getCueItemId())){
-                cueSheetItemList.remove(i);//신규 등록된 큐시트 아이템 리스트에서 삭제
-            }
+        //큐시트 아이템 자막 리스트 get
+        List<CueSheetItemCapCreateDTO> cueSheetItemCapDTOList = cueSheetItemCreateDTO.getCueSheetItemCap();
+        //큐시트 아이템 자막 리스트가 있으면 등록
+        if (CollectionUtils.isEmpty(cueSheetItemCapDTOList) == false){
+            createCap(cueSheetItemCapDTOList, cueItemId, userId);//큐시트 아이템 자막 리스트 등록
         }
 
-        cueSheetItemList.add(cueSheetItemCreateDTO.getCueItemOrd(), cueSheetItem); //신규등록하려는 큐시트 아이템 원하는 순번에 리스트 추가
+        return cueItemId;//return 큐시트 아이템 아이디
+    }
 
-        //조회된 큐시트 아이템 Ord 업데이트
-        int index = 0;
-        for (CueSheetItem cueSheetItems : cueSheetItemList){
+    //큐시트 아이템 자막 등록
+    public void createCap(List<CueSheetItemCapCreateDTO> cueSheetItemCapDTOList, Long cueItemId, String userId){
 
-            CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItems);
-            cueSheetItemDTO.setCueItemOrd(index);
-            CueSheetItem setCueSheetItem = cueSheetItemMapper.toEntity(cueSheetItemDTO);
-            cueSheetItemRepository.save(setCueSheetItem);
-            index++;
-        }*/
+        //큐시트 아이템 아이디 빌드
+        CueSheetItemSimpleDTO cueSheetItem = CueSheetItemSimpleDTO.builder().cueItemId(cueItemId).build();
 
-        return cueSheetItem.getCueItemId();
+        //큐시트 아이템 자막 리스트 등록
+        for (CueSheetItemCapCreateDTO capCreateDTO : cueSheetItemCapDTOList){
+
+            capCreateDTO.setCueSheetItem(cueSheetItem); //큐시트 아이템 아이디 set
+            capCreateDTO.setInputrId(userId);//등록자 set
+
+            CueSheetItemCap cueSheetItemCap = cueSheetItemCapCreateMapper.toEntity(capCreateDTO);
+
+            cueSheetItemCapRepotitory.save(cueSheetItemCap);//등록
+        }
     }
 
     public void update(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId){
@@ -212,6 +222,31 @@ public class CueSheetItemService {
         cueSheetItemUpdateMapper.updateFromDto(cueSheetItemUpdateDTO, cueSheetItem);
 
         cueSheetItemRepository.save(cueSheetItem);
+
+        //큐시트 아이템 자막 리스트 get
+        List<CueSheetItemCapCreateDTO> cueSheetItemCapDTOList = cueSheetItemUpdateDTO.getCueSheetItemCap();
+        //큐시트 아이템 자막 리스트가 있으면 등록
+        if (CollectionUtils.isEmpty(cueSheetItemCapDTOList) == false){
+            updateCap(cueSheetItemCapDTOList, cueItemId, userId);//큐시트 아이템 자막 리스트 등록
+        }
+    }
+
+    //업데이트 큐시트 아이템 자막
+    public void updateCap(List<CueSheetItemCapCreateDTO> cueSheetItemCapDTOList, Long cueItemId, String userId){
+
+        //큐시트아이템 자막 리스트 조회 [조회조건 큐시트 아이템 아이디]
+        List<CueSheetItemCap> cueSheetItemCapList = cueSheetItemCapRepotitory.findCueSheetItemCapList(cueItemId);
+
+        //조회된 큐시트아이템 자막 리스트 삭제처리.
+        for (CueSheetItemCap cueSheetItemCap : cueSheetItemCapList){
+
+            Long cueItemCapId = cueSheetItemCap.getCueItemCapId();
+
+            cueSheetItemCapRepotitory.deleteById(cueItemCapId);
+        }
+
+        //큐시트 아이템 자막 재등록
+        createCap(cueSheetItemCapDTOList, cueItemId, userId);
     }
 
     public void updateCueItemArticle(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId) throws Exception {
@@ -283,10 +318,10 @@ public class CueSheetItemService {
         for (CueSheetItem cueSheetItems : cueSheetItemList){
 
             CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItems);
-            cueSheetItemDTO.setCueItemOrd(index);
+            cueSheetItemDTO.setCueItemOrd(index);//순번 재등록
             CueSheetItem setCueSheetItem = cueSheetItemMapper.toEntity(cueSheetItemDTO);
-            cueSheetItemRepository.save(setCueSheetItem);
-            index++;
+            cueSheetItemRepository.save(setCueSheetItem);//순번 업데이트
+            index++;//순번 + 1
         }
 
     }
@@ -344,7 +379,7 @@ public class CueSheetItemService {
         return booleanBuilder;
     }
 
-    public void createCueItem(Long cueId, Long artclId, int cueItemOrd){
+    public void createCueItem(Long cueId, Long artclId, int cueItemOrd, String cueItemDivCd){
 
         //기사 복사[복사된 기사 Id get]
         Article copyArtcl = copyArticle(artclId);
@@ -357,6 +392,7 @@ public class CueSheetItemService {
         CueSheetItem cueSheetItem = CueSheetItem.builder()
                 .cueSheet(cueSheet)
                 .cueItemOrd(cueItemOrd)
+                .cueItemDivCd(cueItemDivCd)
                 .inputrId(userId)
                 .article(copyArtcl)
                 .build();
@@ -378,6 +414,7 @@ public class CueSheetItemService {
         for (CueSheetItemCreateListDTO createListDTO : cueSheetItemCreateListDTO){
             Long artclId = createListDTO.getArtclId();
             int cueItemOrd = createListDTO.getCueItemOrd();
+            String cueItemDivCd = createListDTO.getCueItemDivCd();
 
             //기사 복사[복사된 기사 Id get]
             Article copyArtcl = copyArticle(artclId);
@@ -392,7 +429,7 @@ public class CueSheetItemService {
                     .cueSheet(cueSheet)
                     .cueItemOrd(cueItemOrd)
                     .inputrId(userId)
-                    .cueItemDivCd("cue_article")
+                    .cueItemDivCd(cueItemDivCd)
                     .article(copyArtcl)
                     .build();
 

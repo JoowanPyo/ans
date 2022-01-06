@@ -6,11 +6,18 @@ import com.gemiso.zodiac.app.dailyProgram.mapper.DailyProgramCreateMapper;
 import com.gemiso.zodiac.app.dailyProgram.mapper.DailyProgramMapper;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
+import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,15 +34,29 @@ public class DailyProgramService {
     private final UserAuthService userAuthService;
 
 
+    public List<DailyProgramDTO> findAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String brdcDivCd, Long stdioId,
+                                         Long subrmId, String searchWord){
+
+        BooleanBuilder booleanBuilder = getSearch(sdate, edate, brdcPgmId, brdcPgmNm, brdcDivCd, stdioId, subrmId, searchWord);
+
+        List<DailyProgram> dailyProgramList = (List<DailyProgram>) dailyProgramRepository.findAll(
+                booleanBuilder, Sort.by(Sort.Direction.ASC, "brdcDt","dailyPgmId"));
+
+        List<DailyProgramDTO> dailyProgramDTOList = dailyProgramMapper.toDtoList(dailyProgramList);
+
+        return dailyProgramDTOList;
+    }
+
+    //일일편성 상세조회
     public DailyProgramDTO find(Long id){
 
-        DailyProgram dailyProgram = dailyProgramFindOrFail(id);
+        DailyProgram dailyProgram = dailyProgramFindOrFail(id); //일일편성 조횐 및 존재여부 확인
 
         DailyProgramDTO dailyProgramDTO = dailyProgramMapper.toDto(dailyProgram);
 
         return dailyProgramDTO;
     }
-
+    //일일편성 등록
     public Long create(DailyProgramCreateDTO dailyProgramCreateDTO){
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
@@ -50,6 +71,7 @@ public class DailyProgramService {
 
     }
 
+    //일일편성 조횐 및 존재여부 확인
     public DailyProgram dailyProgramFindOrFail(Long id){
 
         Optional<DailyProgram> dailyProgram = dailyProgramRepository.findById(id);
@@ -60,5 +82,54 @@ public class DailyProgramService {
 
         return dailyProgram.get();
 
+    }
+
+    // 일일편성 목록조회 조회조건 빌드
+    public BooleanBuilder getSearch(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String brdcDivCd,
+                                    Long stdioId, Long subrmId, String searchWord){
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        QDailyProgram qDailyProgram = QDailyProgram.dailyProgram;
+
+        //날짜조회시 방송일자 조회
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
+            String StringSdate = dateToString(sdate);
+            String stringEdate = dateToString(edate);
+            booleanBuilder.and(qDailyProgram.brdcDt.between(StringSdate, stringEdate));
+        }
+        //조회조건이 방송구분 코드로 들어온 경우
+        if (brdcDivCd != null && brdcDivCd.trim().isEmpty() == false){
+            booleanBuilder.and(qDailyProgram.brdcDivCd.eq(brdcDivCd));
+        }
+        if(brdcPgmId != null && brdcPgmId.trim().isEmpty() == false){
+            booleanBuilder.and(qDailyProgram.program.brdcPgmId.eq(brdcPgmId));
+        }
+        if(brdcPgmNm != null && brdcPgmNm.trim().isEmpty() == false){
+            booleanBuilder.and(qDailyProgram.brdcPgmNm.contains(brdcPgmNm));
+        }
+        //스튜디어 아이디가 조회조건으로 들어온경우
+        if (ObjectUtils.isEmpty(stdioId) == false){
+            booleanBuilder.and(qDailyProgram.stdioId.eq(stdioId));
+        }
+        //부조 아이디가 조회조건으로 들어온 경우
+        if (ObjectUtils.isEmpty(subrmId) == false){
+            booleanBuilder.and(qDailyProgram.subrmId.eq(subrmId));
+        }
+        //방송프로그램명이 조회조건으로 들어온 경우
+        if (searchWord != null && searchWord.trim().isEmpty() == false){
+            booleanBuilder.and(qDailyProgram.brdcPgmNm.contains(searchWord));
+        }
+
+        return booleanBuilder;
+    }
+
+    //Date to String
+    public String dateToString(Date date){
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+
+        String returnDate = dateFormat.format(date);
+
+        return returnDate;
     }
 }
