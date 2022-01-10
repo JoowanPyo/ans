@@ -26,8 +26,6 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.InputMismatchException;
-import java.util.jar.JarException;
 
 @Service
 @Slf4j
@@ -130,21 +128,13 @@ public class AttachFileService {
                 log.debug("attach file insert ok: " + fileId);
             }
 
-            //오리지널 파일네임 여부
+            /*//오리지널 파일네임 여부
             if (ub.getRname_yn().equals("N")) {
                 try {
                     //파일을 버퍼링을 이용하여 저장할 경로
                     buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
                 }catch (IOException e){
                     log.error(e.getMessage());
-                }finally {
-                    try {
-                        buffStream.write(bytes);
-                        buffStream.close();
-                    }catch (IOException e){
-                        log.error("BufferedOutputStream close or writer error");
-                        log.error(e.getMessage());
-                    }
                 }
 
             } else {
@@ -155,21 +145,23 @@ public class AttachFileService {
 
                 log.info("file name: " + rname);
                 //파일을 버퍼링을 이용하여 저장할 경로                                     YYYYMMDD+FI+seq
-                try {
-                    buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
-                }catch (IOException e){
-                    log.error(e.getMessage());
-                }finally {
-                    try {
-                        buffStream.write(bytes);
-                        buffStream.close();
-                    }catch (IOException e){
-                        log.error("BufferedOutputStream close or writer error");
-                        log.error(e.getMessage());
-                    }
-                }
+                buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
+
+            }*/
+
+            //오리지널 파일네임 여부
+            if (ub.getRname_yn().equals("N") == false) {
+                //확장자 파싱
+                ext = cutExtension(rname);
+
+                rname = fileId + "." + ext;
             }
-            /*try {
+
+            try {
+
+                //파일을 버퍼링을 이용하여 저장할 경로                                     YYYYMMDD+FI+seq
+                buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
+
                 //파일 복사
                 buffStream.write(bytes);
             }
@@ -179,8 +171,13 @@ public class AttachFileService {
                 log.error(e.getMessage());
             }
             finally {
-                buffStream.close();
-            }*/
+                try {
+                    buffStream.close();
+                }catch (IOException e){
+                    log.error(e.getMessage());
+                }
+
+            }
             /*buffStream.close();*/
             msg += "Uploaded (" + file.getOriginalFilename() + ")";
             code = 200;
