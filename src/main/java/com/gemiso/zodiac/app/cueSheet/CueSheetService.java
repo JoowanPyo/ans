@@ -18,6 +18,9 @@ import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgramService;
 import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
+import com.gemiso.zodiac.app.program.Program;
+import com.gemiso.zodiac.app.program.ProgramRepository;
+import com.gemiso.zodiac.app.program.ProgramService;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
 import com.gemiso.zodiac.core.enumeration.ActionEnum;
@@ -60,6 +63,7 @@ public class CueSheetService {
     private final CueSheetItemMapper cueSheetItemMapper;
     private final CueSheetHistCreateMapper cueSheetHistCreateMapper;
 
+    private final ProgramService programService;
     private final UserAuthService userAuthService;
 
     private final DailyProgramService dailyProgramService;
@@ -570,6 +574,8 @@ public class CueSheetService {
 
         CueSheet getCueSheet = cueSheetFindOrFail(cueId);//원본 큐시트 get
 
+
+
         CueSheetCreateDTO cueSheetCreateDTO = cueSheetCreateMapper.toDto(getCueSheet);//원본 큐시트의 데이터를 createDTO에set
 
         String userId = userAuthService.authUser.getUserId(); // 로그인 Id로 입력자 set
@@ -583,6 +589,10 @@ public class CueSheetService {
             ProgramSimpleDTO programSimpleDTO = ProgramSimpleDTO.builder()
                     .brdcPgmId(brdcPgmId).build(); //프로그램 아이디 빌드
             cueSheetCreateDTO.setProgram(programSimpleDTO);//프로그램 set
+
+            ProgramDTO programDTO = programService.find(brdcPgmId);//방송프로그램 명 바꿔주기 위해 프로그램 get
+
+            cueSheetCreateDTO.setBrdcPgmNm(programDTO.getBrdcPgmNm());//방송프로그램이 바뀔시 큐시트에 입력된 방송프로그램 명도 바꿔준다.
         }
 
         CueSheet cueSheet = cueSheetCreateMapper.toEntity(cueSheetCreateDTO);

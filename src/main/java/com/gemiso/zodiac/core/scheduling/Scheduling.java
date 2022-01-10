@@ -19,7 +19,7 @@ public class Scheduling {
     private final BisInterfaceService bisInterfaceService;
 
     //BIS프로그램 조회 및 등록
-    @Scheduled(cron = "* * 3 * * ?")
+    @Scheduled(cron = "* * 3 * * ?")//3시간에 한번씩
     public void bisProgramCreate() throws Exception {
 
         //bis에서 프로그램 정보를 가져온다.
@@ -32,7 +32,7 @@ public class Scheduling {
 
     //BIS기본편성 조회 및 등록
     /*@Scheduled(cron = "0 * * * * *")*/
-    @Scheduled(cron = "* * 3 * * ?")
+    @Scheduled(cron = "* * 3 * * ?") //3시간에 한번씩
     public void bisBasicScheduleCreate() throws Exception {
 
         //Bis에서 기본편성 조회
@@ -43,8 +43,8 @@ public class Scheduling {
     }
 
     //Bis주간편성 조회 및 등록
-    @Scheduled(cron = "0 * * * * *")
-    /*@Scheduled(cron = "* * 3 * * ?")*/
+    /*@Scheduled(cron = "0 * * * * *")*/
+    @Scheduled(cron = "* * 3 * * ?")//3시간에 한번씩
     public void bisDailyScheduleCreate() throws Exception {
 
         BisDailyScheduleDTO bisDailyScheduleDTO = bisInterfaceService.bisDailyScheduleFindAll();

@@ -639,6 +639,7 @@ public class InterfaceService {
         prompterProgramDataDTO.setPrompterProgramDTO(prompterProgramDTOList);
 
         //result 데이터 set
+        prompterProgramDataDTO.setTotalcount(prompterProgramDTOList.stream().count());
         prompterProgramResultDTO.setMsg("ok");
         prompterProgramResultDTO.setSuccess("true");
 
@@ -682,6 +683,7 @@ public class InterfaceService {
         prompterCueSheetDataDTO.setCueSheetDTO(prompterCueSheetDTOList);
 
         //result 데이터 set
+        prompterCueSheetDataDTO.setTotalcount(prompterCueSheetDTOList.stream().count());
         prompterCueSheetResultDTO.setMsg("ok");
         prompterCueSheetResultDTO.setSuccess("true");
 
@@ -714,7 +716,7 @@ public class InterfaceService {
                     .cueId(cueId)
                     .rdSeq("")
                     .chDivCd(article.getChDivCd())
-                    .rdOrd(article.getArtclOrd())
+                    .rdOrd(article.getArtclOrd()) //순번
                     .prdDivCd(article.getPrdDivCd())
                     .openYn("")
                     .artclId(article.getArtclId())
@@ -722,14 +724,14 @@ public class InterfaceService {
                     .artclFldNm(article.getArtclFldCdNm())
                     .artclFrmCd(article.getArtclFrmCd())
                     .artclFrmNm(article.getArtclFrmCdNm())
-                    .artclTitl(article.getArtclTitl())
-                    .artclTitlEn(article.getArtclTitlEn())
+                    .artclTitl(article.getArtclTitl()) //국문제목
+                    .artclTitlEn(article.getArtclTitlEn()) // 영문제목
                     .artclCtt(article.getArtclCtt())
-                    .rptrId(article.getRptrId())
-                    .rptrNm(article.getRptrNm())
+                    .rptrId(article.getRptrId()) //기자 아이디
+                    .rptrNm(article.getRptrNm()) //기자 명
                     .deptCd(article.getDeptCd())
-                    .artclReqdSec(article.getArtclReqdSec())
-                    .ancReqdSec(article.getAncMentCttTime())
+                    .artclReqdSec(article.getArtclReqdSec()) //기사 누적시간
+                    .ancReqdSec(article.getAncMentCttTime()) //앵커기사 누적시간
                     .build();
 
             //빌드된 PrompterCueSheetDTO를 PrompterCueSheetDTO List에 add
