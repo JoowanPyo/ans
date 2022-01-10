@@ -17,14 +17,11 @@ public class JAXBXmlHelper {
         Marshaller jaxbMarshaller = null;
         //StringWriter writer = new StringWriter();
         StringWriter writer = null;
+
+
+
         try {
             writer = new StringWriter();
-        }catch (Exception e){
-            log.error(e.getMessage());
-        }
-
-
-        try {
             jaxbContext = JAXBContext.newInstance(instanceClass);
             jaxbMarshaller = jaxbContext.createMarshaller();
             jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
@@ -41,6 +38,13 @@ public class JAXBXmlHelper {
             /*e.printStackTrace();*/
             //System.out.println("JAXBException Occured");
             log.error("JAXBException Occured" + e.getMessage());
+        }finally {
+            try {
+                writer.close();
+            } catch (IOException e) {
+                log.error("Writer close error");
+                log.error(e.getMessage());
+            }
         }
         return rval;
     }

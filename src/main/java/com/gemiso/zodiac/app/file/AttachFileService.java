@@ -137,6 +137,13 @@ public class AttachFileService {
                     buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
                 }catch (IOException e){
                     log.error(e.getMessage());
+                }finally {
+                    try {
+                        buffStream.close();
+                    }catch (IOException e){
+                        log.error("BufferedOutputStream close error");
+                        log.error(e.getMessage());
+                    }
                 }
 
             } else {
@@ -151,6 +158,13 @@ public class AttachFileService {
                     buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
                 }catch (IOException e){
                     log.error(e.getMessage());
+                }finally {
+                    try {
+                        buffStream.close();
+                    }catch (IOException e){
+                        log.error("BufferedOutputStream close error");
+                        log.error(e.getMessage());
+                    }
                 }
             }
             try {
@@ -309,15 +323,27 @@ public class AttachFileService {
         ResponseBuilder res = Response.ok(file);*/
 
         ResponseBuilder res = null;
+        InputStream inputStream = null;
         try {
-            InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+            inputStream = new BufferedInputStream(new FileInputStream(file));
 
             FileCopyUtils.copy(inputStream, response.getOutputStream());
             //response객체 생성
             //응답내용 file응답 내용을 넣어서 초기화
             res = Response.ok(file);
-        }catch(IOException ie){//import 해줘야 사용 가능
+        }catch(FileNotFoundException ie) {//import 해줘야 사용 가능
+            log.error("파일을 찾지 못했습니다.");
             log.error(ie.getMessage());
+        }catch (IOException e){
+            log.error("파일을 찾았으나 읽지 못했습니다.");
+            log.error(e.getMessage());
+        }finally {
+            try {
+                inputStream.close();
+            }catch (IOException e){
+                log.error(" 파일을 찾았은 읽지 못하여 fileStream을 닫으려고 했으나 닫지 못했습니다.");
+                log.error(e.getMessage());
+            }
         }
 
         //response객체  return
