@@ -162,8 +162,6 @@ public class AttachFileService {
                 //파일을 버퍼링을 이용하여 저장할 경로                                     YYYYMMDD+FI+seq
                 buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
 
-                //파일 복사
-                buffStream.write(bytes);
             }
             catch (IOException e)
             {
@@ -172,6 +170,9 @@ public class AttachFileService {
             }
             finally {
                 try {
+                    //파일 복사
+                    buffStream.write(bytes);
+
                     buffStream.close();
                 }catch (IOException e){
                     log.error(e.getMessage());
@@ -326,10 +327,6 @@ public class AttachFileService {
         try {
             inputStream = new BufferedInputStream(new FileInputStream(file));
 
-            FileCopyUtils.copy(inputStream, response.getOutputStream());
-            //response객체 생성
-            //응답내용 file응답 내용을 넣어서 초기화
-            res = Response.ok(file);
         }catch(FileNotFoundException ie) {//import 해줘야 사용 가능
             log.error("파일을 찾지 못했습니다.");
             log.error(ie.getMessage());
@@ -338,6 +335,11 @@ public class AttachFileService {
             log.error(e.getMessage());
         }finally {
             try {
+                FileCopyUtils.copy(inputStream, response.getOutputStream());
+                //response객체 생성
+                //응답내용 file응답 내용을 넣어서 초기화
+                res = Response.ok(file);
+
                 inputStream.close();
             }catch (IOException e){
                 log.error(" 파일을 찾았은 읽지 못하여 fileStream을 닫으려고 했으나 닫지 못했습니다.");
