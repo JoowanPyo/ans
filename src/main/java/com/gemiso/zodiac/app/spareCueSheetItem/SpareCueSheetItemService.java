@@ -267,7 +267,7 @@ public class SpareCueSheetItemService {
         booleanBuilder.and(qSpareCueSheetItem.delYn.eq("N"));
 
         //예비 큐시트 아이템 조회조건 큐시트 아이디
-        if (ObjectUtils.isEmpty(cueId)){
+        if (ObjectUtils.isEmpty(cueId) == false){
             booleanBuilder.and(qSpareCueSheetItem.cueSheet.cueId.eq(cueId));
         }
 

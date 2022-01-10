@@ -308,8 +308,6 @@ public class ArticleService {
 
         String jsonInString = mapper.writeValueAsString(article);
 
-        System.out.println(jsonInString);
-
         return jsonInString;
     }
 
@@ -320,7 +318,6 @@ public class ArticleService {
 
         String jsonInString = mapper.writeValueAsString(articleCapList);
 
-        System.out.println(jsonInString);
 
         return jsonInString;
     }
@@ -332,7 +329,6 @@ public class ArticleService {
 
         String jsonInString = mapper.writeValueAsString(anchorCapList);
 
-        System.out.println(jsonInString);
 
         return jsonInString;
     }
@@ -1050,7 +1046,7 @@ public class ArticleService {
 
        /* long finish = System.currentTimeMillis();
         long timeElapsed = finish - start;
-        System.out.print(timeElapsed);*/
+        ;*/
 
         ArticleDTO articleDTO = articleMapper.toDto(article);
         articleDTO.setApprvDivCd(apprvDivCd); //픽스 구분코드 변경.

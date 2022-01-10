@@ -29,11 +29,11 @@ public class CueSheetTemplateController {
     @GetMapping(path = "")
     public AnsApiResponse<List<CueSheetTemplateDTO>> findAll(@Parameter(name = "searchWord", description = "검색키워드")
                                                           @RequestParam(value = "searchWord", required = false) String searchWord,
-                                                             @Parameter(name = "pgmschTime", description = "검색키워드")
-                                                          @RequestParam(value = "pgmschTime", required = false) String pgmschTime
+                                                             @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디")
+                                                          @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId
     ) {
 
-        List<CueSheetTemplateDTO> cueSheetTemplateDTOList = cueSheetTemplateService.findAll(searchWord, pgmschTime);
+        List<CueSheetTemplateDTO> cueSheetTemplateDTOList = cueSheetTemplateService.findAll(searchWord, brdcPgmId);
 
         return new AnsApiResponse<>(cueSheetTemplateDTOList);
 

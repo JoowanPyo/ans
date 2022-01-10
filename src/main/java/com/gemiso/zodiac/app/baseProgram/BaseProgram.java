@@ -25,13 +25,13 @@ public class BaseProgram {
     @Column(name="bas_pgmsch_id",length = 50, nullable = false )
     private Long basePgmschId;
 
-    @Column(name = "bas_dt", length = 8/*, nullable = false*/)
+    @Column(name = "bas_dt", length = 10/*, nullable = false*/)
     private String basDt;
 
     @Column(name = "ch_div_cd", length = 50/*, nullable = false*/)
     private String chDivCd;
 
-    @Column(name = "brdc_day", length = 8/*, nullable = false*/)
+    @Column(name = "brdc_day", length = 10/*, nullable = false*/)
     private String brdcDay;
 
     @Column(name = "brdc_div_cd", length = 50)
@@ -43,16 +43,16 @@ public class BaseProgram {
     @Column(name = "brdc_end_clk", length = 8)
     private String brdcEndClk;
 
-    @Column(name = "brdc_start_dt", length = 8)
+    @Column(name = "brdc_start_dt", length = 10)
     private String brdcStartDt;
 
-    @Column(name = "brdc_end_dt", length = 8/*, nullable = false*/)
+    @Column(name = "brdc_end_dt", length = 10/*, nullable = false*/)
     private String brdcEndDt;
 
     @Column(name = "brdc_sub_nm", length = 450)
     private String brdcSubNm;
 
-    @Column(name = "endpgm_dt", length = 8)
+    @Column(name = "endpgm_dt", length = 10)
     private String endpgmDt;
 
     @Column(name = "endpgm_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)

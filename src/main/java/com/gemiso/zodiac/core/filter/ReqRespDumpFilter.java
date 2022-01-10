@@ -50,7 +50,6 @@ public class ReqRespDumpFilter implements Filter {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             /*PrintStream pinrtStream = new PrintStream(out);
             a.printStackTrace(pinrtStream);*/
-            System.out.println("Throwable Occured");
             log.error(out.toString());
         }
     }
@@ -114,7 +113,7 @@ public class ReqRespDumpFilter implements Filter {
             }
             catch (IOException e)
             {
-                System.out.println("reader : " + reader);
+                log.error("reader : " + reader);
             }
             finally
             {
@@ -125,7 +124,7 @@ public class ReqRespDumpFilter implements Filter {
                 }
                 catch (IOException e)
                 {
-                    System.err.println("BufferedReader 종료 중 에러 발생");
+                    log.error("BufferedReader 종료 중 에러 발생");
                 }
             }
 

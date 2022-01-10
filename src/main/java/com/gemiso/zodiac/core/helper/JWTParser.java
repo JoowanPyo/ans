@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -16,6 +17,7 @@ import java.util.Date;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class JWTParser {
 
     @Value("${jwt.auth.secret-key:secret}")
@@ -41,12 +43,14 @@ public class JWTParser {
             return_expiration = return_expiration / 1000;
 
         } catch (ExpiredJwtException e) { // 토큰이 만료되었을 경우
-            System.out.println(e);
+            //System.out.println(e);
            /* e.printStackTrace();*/
+            log.error(e.getMessage());
 
         } catch (JwtException e) { // 그외 에러났을 경우
-            System.out.println(e);
+            //System.out.println(e);
             /*e.printStackTrace();*/
+            log.error(e.getMessage());
 
         }
         return return_expiration;

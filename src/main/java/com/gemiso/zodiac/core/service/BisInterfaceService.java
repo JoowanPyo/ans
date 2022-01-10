@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.core.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gemiso.zodiac.app.baseProgram.BaseProgram;
 import com.gemiso.zodiac.app.baseProgram.BaseProgramRepository;
@@ -70,11 +69,8 @@ public class BisInterfaceService {
         //Object Mapper를 통한 Json바인딩
         Map<String, Object> map = new HashMap<>();
         map.put("data", data);
-        System.out.println("map : "+map);
         ObjectMapper objectMapper = new ObjectMapper();
         String params = objectMapper.writeValueAsString(map);
-
-        System.out.println("params : "+params);
 
         //httpEntity에 헤더 및 params 설정
         HttpEntity entity = new HttpEntity(params, httpHeaders);
@@ -84,17 +80,10 @@ public class BisInterfaceService {
                 restTemplate.exchange("http://121.134.111.62:8060/api/v1/bis/listProgramV3.do", HttpMethod.POST,
                         entity, String.class);
 
-
-
-        System.out.println(responseEntity.getStatusCode());
-        System.out.println(responseEntity.getBody());
-
         String results = responseEntity.getBody();
 
         BisProgramDTO bisProgramDTO = new BisProgramDTO();
         bisProgramDTO = objectMapper.readValue(results, BisProgramDTO.class);
-
-        System.out.println(bisProgramDTO);
 
         return bisProgramDTO;
     }
@@ -159,7 +148,7 @@ public class BisInterfaceService {
         //Object Mapper를 통한 Json바인딩할 dmParam생성
         Map<String, Object> dmParam = new HashMap<>();
         dmParam.put("chanId", "CH_K");
-        dmParam.put("broadYmd", "20211101");
+        dmParam.put("broadYmd", "20211201");
 
         //Object Mapper를 통한 Json바인딩할 data생성
         Map<String, Object> data = new HashMap<>();
@@ -168,7 +157,6 @@ public class BisInterfaceService {
         //Object Mapper를 통한 Json바인딩
         Map<String, Object> map = new HashMap<>();
         map.put("data", data);
-        System.out.println("map : "+map);
         ObjectMapper objectMapper = new ObjectMapper();
         String params = objectMapper.writeValueAsString(map);
 
@@ -180,15 +168,12 @@ public class BisInterfaceService {
                 restTemplate.exchange("http://121.134.111.62:8060/api/v1/bis/listBasicScheduleV3.do", HttpMethod.POST,
                         entity, String.class);
 
-        System.out.println(responseEntity.getStatusCode());
-        System.out.println(responseEntity.getBody());
 
         String results = responseEntity.getBody();
 
         BisBasicScheduleDTO bisBasicScheduleDTO = new BisBasicScheduleDTO();
         bisBasicScheduleDTO = objectMapper.readValue(results, BisBasicScheduleDTO.class);
 
-        System.out.println(bisBasicScheduleDTO);
 
         return bisBasicScheduleDTO;
     }
@@ -214,7 +199,6 @@ public class BisInterfaceService {
         //Object Mapper를 통한 Json바인딩
         Map<String, Object> map = new HashMap<>();
         map.put("data", data);
-        System.out.println("map : "+map);
         ObjectMapper objectMapper = new ObjectMapper();
         String params = objectMapper.writeValueAsString(map);
 
@@ -246,9 +230,15 @@ public class BisInterfaceService {
         //기존에 등록되어 있던 일일편성 데이터를 모두 가져온다.
         List<DailyProgram> dailyProgramList = dailyProgramRepository.findAll();
 
-        int dschWeekDTOListSize = dschWeekDTOList.size();//BIS 에서 조회된 리스트 사이즈를 가져온다.
-        int dailyProgramListSize = dailyProgramList.size();//ANS에 등록되어있는 리스트 사이즈를 가져온다.
+        //Ans등록되어 있는 일일편성이 없을 경우
+        if (CollectionUtils.isEmpty(dailyProgramList)){
+            if (CollectionUtils.isEmpty(dschWeekDTOList) == false){ //ANS에 등록되어있는 일일편성이 없고, Bis에서 조회된 일일편성이 있을 경우
+                createDailyProgram(dschWeekDTOList);
+            }
+        }
 
+        int dschWeekDTOListSize = dschWeekDTOList.size();//BIS 에서 조회된 리스트 사이즈를 가져온다.
+        int dailyProgramListSize = dailyProgramList.size();//ANS에 등록되어있는 리스트 사이즈를 가져온다.\
         //BIS와 ANS리스트 사이즈가 다르면 기존데이터 삭재후 BIS에서 조회한 데이터 재등록.
         if (dschWeekDTOListSize != dailyProgramListSize){
 
@@ -283,6 +273,38 @@ public class BisInterfaceService {
         }
     }
 
+    //일일편성 신규등록
+    public void createDailyProgram(List<DschWeekDTO> dschWeekDTOList) throws ParseException {
+
+        for (DschWeekDTO dschWeekDTO : dschWeekDTOList){
+
+            String brdcPgmId = dschWeekDTO.getPgmCd(); //프로그램 아이디
+
+            String boroadYmd = formatYmd(dschWeekDTO.getBroadYmd());
+
+            //시간 HHmm -> HH:mm:ss변환[시작시간, 종료시간(시작시간+방송길이)]
+            String broadRun = dschWeekDTO.getBroadRun(); //방송길이
+            String broadHm = dschWeekDTO.getBroadHm(); //방송시각
+            String formatBoradHm =  broadHm.substring(0,2)+":"+broadHm.substring(2,4)+":00";
+
+            String endTime = getEndTime(broadRun, formatBoradHm);
+
+            Program program = Program.builder().brdcPgmId(brdcPgmId).build();
+
+            DailyProgram dailyProgram = DailyProgram.builder()
+                    .brdcDt(boroadYmd) //방송일자
+                    .brdcStartTime(formatBoradHm) // 방송시각
+                    .brdcEndClk(endTime) //방송종료 시각
+                    .inputDtm(dschWeekDTO.getRegDt()) //입력일시
+                    .updtDtm(dschWeekDTO.getUpdDt()) //수정일시
+                    .program(program) //프로그램 아이디
+                    .build();
+
+            dailyProgramRepository.save(dailyProgram);
+        }
+
+    }
+
     //Ans 일일편성 재등록.
     public void regenerateDailyProgram(List<DailyProgram> dailyProgramList, List<DschWeekDTO> dschWeekDTOList) throws ParseException {
 
@@ -295,17 +317,22 @@ public class BisInterfaceService {
         for (DschWeekDTO dschWeekDTO : dschWeekDTOList){
 
             String brdcPgmId = dschWeekDTO.getPgmCd(); //프로그램 아이디
-            String getBroadRun = dschWeekDTO.getBroadRun(); //방송길이
-            String getBroadHm = dschWeekDTO.getBroadHm(); //방송시각
 
-            String broadRun = getEndTime(getBroadRun, getBroadHm);
+            String boroadYmd = formatYmd(dschWeekDTO.getBroadYmd());
+
+            //시간 HHmm -> HH:mm:ss변환[시작시간, 종료시간(시작시간+방송길이)]
+            String broadRun = dschWeekDTO.getBroadRun(); //방송길이
+            String broadHm = dschWeekDTO.getBroadHm(); //방송시각
+            String formatBoradHm =  broadHm.substring(0,2)+":"+broadHm.substring(2,4)+":00";
+
+            String endTime = getEndTime(broadRun, formatBoradHm);
 
             Program program = Program.builder().brdcPgmId(brdcPgmId).build();
 
             DailyProgram dailyProgram = DailyProgram.builder()
-                    .brdcDt(dschWeekDTO.getBroadYmd()) //방송일자
-                    .brdcStartTime(dschWeekDTO.getBroadHm()) // 방송시각
-                    .brdcEndClk(broadRun) //방송종료 시각
+                    .brdcDt(boroadYmd) //방송일자
+                    .brdcStartTime(formatBoradHm) // 방송시각
+                    .brdcEndClk(endTime) //방송종료 시각
                     .inputDtm(dschWeekDTO.getRegDt()) //입력일시
                     .updtDtm(dschWeekDTO.getUpdDt()) //수정일시
                     .program(program) //프로그램 아이디
@@ -320,7 +347,8 @@ public class BisInterfaceService {
 
         String broadRun = ""; // 리턴값.
         //방송시작시간에 "00000000"[년월일]+방송시작시간[시분]+"00"[초]
-         String formatBroadHm = "0000-00-00"+" "+getBroadHm.substring(0,2)+":"+getBroadHm.substring(2,4)+":00";
+        String formatBroadHm = "0000-00-00"+" "+getBroadHm; // 0000-00-00 00:00:00변환
+        //String formatBroadHm = "0000-00-00"+" "+getBroadHm.substring(0,2)+":"+getBroadHm.substring(2,4)+":00";
 
         //방송길이와, 방송시각이 비어있지 않을 경우. 방송시각에 방송길이를 더해 방송 종료시간 계산.
         if (getBroadRun != null && getBroadRun.trim().isEmpty() ==false &&
@@ -338,40 +366,37 @@ public class BisInterfaceService {
                 if (ObjectUtils.isEmpty(getHour) == false&& ObjectUtils.isEmpty(minute)) {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Date dateBroadHm = simpleDateFormat.parse(formatBroadHm);//방송시작시간 date로 변환
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(dateBroadHm);
-                    cal.add(Calendar.HOUR, getHour);
-                    String StringBroadHm = simpleDateFormat.format(cal.getTime());
+                    Calendar cal = Calendar.getInstance(); //시간을 더하기 위해 캘린더 생성
+                    cal.setTime(dateBroadHm);//캘린더에 시작시간 셋팅
+                    cal.add(Calendar.HOUR, getHour);//시작시에에 방송길이로 들어온 시간 더하기 ->종료시간
+                    String StringBroadHm = simpleDateFormat.format(cal.getTime());//스트링으로 변환하여 저장
 
                     String endTime = StringBroadHm.substring(11,15);
-                    System.out.println(endTime);
                     broadRun = endTime;
                 }
                 // 시,분 둘다 있을경우,
                 if (ObjectUtils.isEmpty(getHour) == false && ObjectUtils.isEmpty(minute) ==false) {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Date dateBroadHm = simpleDateFormat.parse(formatBroadHm);//방송시작시간 date로 변환
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(dateBroadHm);
-                    cal.add(Calendar.HOUR, getHour);
-                    cal.add(Calendar.MINUTE, minute);
-                    String StringBroadHm = simpleDateFormat.format(cal.getTime());
+                    Calendar cal = Calendar.getInstance(); //시간을 더하기 위해 캘린더 생성
+                    cal.setTime(dateBroadHm); //캘린더에 시작시간 셋팅
+                    cal.add(Calendar.HOUR, getHour); //시작시에에 방송길이로 들어온 시간 더하기 ->종료시간
+                    cal.add(Calendar.MINUTE, minute); //시작시간에 방송길이로 들어온 분 더하기 ->종료 분
+                    String StringBroadHm = simpleDateFormat.format(cal.getTime()); //스트링으로 변환하여 저장
 
                     String endTime = StringBroadHm.substring(11,19);
-                    System.out.println(endTime);
                     broadRun = endTime;
                 }
 
             } else {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Date dateBroadHm = simpleDateFormat.parse(formatBroadHm);//방송시작시간 date로 변환
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(dateBroadHm);
-                cal.add(Calendar.MINUTE, chkMinute);
-                String StringBroadHm = simpleDateFormat.format(cal.getTime());
+                Calendar cal = Calendar.getInstance(); //시간을 더하기 위해 캘린더 생성
+                cal.setTime(dateBroadHm);//캘린더에 시작시간 셋팅
+                cal.add(Calendar.MINUTE, chkMinute);//시작시간에 방송길이로 들어온 분 더하기 ->종료 분
+                String StringBroadHm = simpleDateFormat.format(cal.getTime());//스트링으로 변환하여 저장
 
                 String endTime = StringBroadHm.substring(11,19);
-                System.out.println(endTime);
                 broadRun = endTime;
             }
         }
@@ -386,38 +411,42 @@ public class BisInterfaceService {
         List<DsBasicScheduleListDTO> dsBasicScheduleListDTOList = bisBasicScheduleDTO.getDsBasicScheduleList();
 
         //ANS에 등록되어 있는 기본편성을 가져온다.
-        Optional<List<BaseProgram>> getBaseProgramList = Optional.of(baseProgramRepository.findAll());
+        List<BaseProgram> baseProgramList = baseProgramRepository.findAll();
 
-        if (getBaseProgramList.isPresent() ==false){
-            createBaseProgram(dsBasicScheduleListDTOList);
+        if (CollectionUtils.isEmpty(baseProgramList)){ //ANS에 등록된 기본편성이 없을경우
+            // ANS에 등록된 기본편성이 없고, BIS에서 들오온 기본편성 데이터가 있을경우 등록
+            if (CollectionUtils.isEmpty(dsBasicScheduleListDTOList) == false) {
+                createBaseProgram(dsBasicScheduleListDTOList); //기본편성 신규등록
+                return;
+            }
         }
 
-        List<BaseProgram> baseProgramList = getBaseProgramList.get();
+        //List<BaseProgram> baseProgramList = getBaseProgramList.get();// Optional로 조회한 기본편성 get
 
+        //조회한 ANS기본편성과 조회한BIS기본편성 데이터 사이즈가 다를 경우 재등록.
         int bisBasicScheduleSize = dsBasicScheduleListDTOList.size();
         int ansBaseProgramSize = baseProgramList.size();
-
-
         if (bisBasicScheduleSize != ansBaseProgramSize){
             regenerateBaseProgram(baseProgramList, dsBasicScheduleListDTOList);//기본편성 삭재후 재등록
             return;
         }
 
-        for (BaseProgram baseProgram : baseProgramList){
+        //프로그램아이디, 요일, 수정날짜 비교후 다르면 재등록.
+        for (BaseProgram baseProgram : baseProgramList){ //ANS기본편성 List
 
             String basePgmschId = baseProgram.getProgram().getBrdcPgmId(); //프로그램아이디를 가져온다.
-            String basDt = baseProgram.getBasDt();
-            String updtDtm = baseProgram.getUpdtDtm();
+            //String basDt = baseProgram.getBasDt(); // 요일
+            String basDt = formatDayCd(baseProgram.getBasDt());//Bis조회 dayCd 요일변환[1 월, 2 화, 3 수 , 4 목, 5 금, 6 토, 7 일]
+            String updtDtm = baseProgram.getUpdtDtm(); //수정날자
 
-            for (DsBasicScheduleListDTO dsBasicScheduleDTO : dsBasicScheduleListDTOList){
+            for (DsBasicScheduleListDTO dsBasicScheduleDTO : dsBasicScheduleListDTOList){ //BIS기본편성 리스트
 
                 String pgmCd = dsBasicScheduleDTO.getPgmCd();//Bis에서 조회한 기본편성 아이디를 가져온다.
-                String dayCd = dsBasicScheduleDTO.getDayCd();
-                String updDt = dsBasicScheduleDTO.getUpdDt();
+                String dayCd = dsBasicScheduleDTO.getDayCd();//요일
+                String updDt = dsBasicScheduleDTO.getUpdDt();//수정날자
 
                 // 기본편성 아이디가 같다면, 이미 등록되어 있는 정보이므로 bis에서 조회한 기본편성 리스트 에서 삭제.
                 if (basePgmschId.equals(pgmCd) && basDt.equals(dayCd)){ //프로그램 아이디가 와 방송일자가 일치하면  true
-
                     if (updDt != null && updDt.trim().isEmpty() == false){
                         if (updDt.equals(updtDtm) == false){
                             //기본편성 삭재후 재등록
@@ -455,24 +484,42 @@ public class BisInterfaceService {
     }
 
     //기본편성표 생성
-    public void createBaseProgram(List<DsBasicScheduleListDTO> dsBasicScheduleListDTOList){
+    public void createBaseProgram(List<DsBasicScheduleListDTO> dsBasicScheduleListDTOList) throws ParseException {
         //새로들어온 기본편성이 있으면 등록
         if (CollectionUtils.isEmpty(dsBasicScheduleListDTOList) == false){
             //새로들어온 기본편성 등록
             for (DsBasicScheduleListDTO dsBasicScheduleDTO : dsBasicScheduleListDTOList){
 
+                //날짜 yyyyMMdd -> yyyy-MM-dd 변환한 데이터 저장 [시작날짜, 종료날짜]
+                //시작일시, 종료일시 Bis에서 조회한 정보 yyyyMMdd -> yyyy-MM-dd 변환한 데이터 저장
+                String startDt = formatYmd(dsBasicScheduleDTO.getBroadBeginYmd()); //Bis 기본편성 시작시간
+                String endDt = formatYmd(dsBasicScheduleDTO.getBroadEndYmd()); //Bis 기본편성 종료시간
+
+                //시간 HHmm -> HH:mm:ss변환[시작시간, 종료시간(시작시간+방송길이)]
+                String broadHm = dsBasicScheduleDTO.getBroadHm(); //방송시작시간
+                String formatBroadHm = broadHm.substring(0,2)+":"+broadHm.substring(2,4)+":00";
+                /*String formatBroadHm = broadHm.substring(0,4)+"-"+broadHm.substring(4,6)+"-"+broadHm.substring(6,8);*/
+                String broadRun = dsBasicScheduleDTO.getBroadRun(); //방송길이
+                String endTime = getEndTime(broadRun, formatBroadHm); //방송종료시간 가져오기[방송길이 + 방송시작시간]
+
+                //요일 변환[1 월, 2 화, 3 수 , 4 목, 5 금, 6 토, 7 일]
+                String dayCd = dsBasicScheduleDTO.getDayCd();
+                String formatDayCd = formatDayCd(dayCd);
+
+               //방송프로그램 아이디 방송프로그램DTO로 빌드후  set
                 String brdcPgmId = dsBasicScheduleDTO.getPgmCd();
                 ProgramSimpleDTO programSimpleDTO = ProgramSimpleDTO.builder().brdcPgmId(brdcPgmId).build();
 
                 BaseProgramDTO baseProgramDTO = BaseProgramDTO.builder()
                         //.basePgmschId("")
-                        .brdcStartDt(dsBasicScheduleDTO.getBroadBeginYmd())
-                        .brdcEndDt(dsBasicScheduleDTO.getBroadEndYmd())
-                        .brdcStartClk(dsBasicScheduleDTO.getBroadHm())
-                        .basDt(dsBasicScheduleDTO.getDayCd())
-                        .inputDtm(dsBasicScheduleDTO.getRegDt())
-                        .updtDtm(dsBasicScheduleDTO.getUpdDt())
-                        .program(programSimpleDTO)
+                        .brdcStartDt(startDt) //yyyy-MM-dd 변환한 데이터 저장
+                        .brdcEndDt(endDt) //yyyy-MM-dd 변환한 데이터 저장
+                        .brdcStartClk(formatBroadHm)// 00:00:00 형식으로 변환한값 저장
+                        .brdcEndClk(endTime) //시작시간 + 방송길이로 종료시간 계산 00:00:00타입으로 저장.
+                        .basDt(formatDayCd) //요일 코드
+                        .inputDtm(dsBasicScheduleDTO.getRegDt()) //입력일시
+                        .updtDtm(dsBasicScheduleDTO.getUpdDt()) //수정일시
+                        .program(programSimpleDTO) //방송프로그램
                         .build();
 
                 BaseProgram baseProgram = baseProgramMapper.toEntity(baseProgramDTO);
@@ -481,6 +528,46 @@ public class BisInterfaceService {
             }
 
         }
+
+    }
+
+    //DayCD 요일 계산 //요일 변환[1 월, 2 화, 3 수 , 4 목, 5 금, 6 토, 7 일]
+    public String formatDayCd(String dayCd){
+
+        String returnDay = "";
+
+        switch (dayCd){
+            case "1":
+                returnDay = "월";
+                break;
+            case "2":
+                returnDay = "화";
+                break;
+            case "3":
+                returnDay = "수";
+                break;
+            case "4":
+                returnDay = "목";
+                break;
+            case "5":
+                returnDay = "금";
+                break;
+            case "6":
+                returnDay = "토";
+                break;
+            case "7":
+                returnDay = "일";
+                break;
+        }
+
+        return returnDay;
+    }
+
+    //날짜 변환 yyyyMMdd -> yyyy-MM-dd 변환한 데이터 저장 [시작날짜, 종료날짜]
+    public String formatYmd(String ymd){
+
+        //yyyy-MM-dd
+        return ymd.substring(0,4)+"-"+ymd.substring(4,6)+"-"+ymd.substring(6,8);
 
     }
 
@@ -498,9 +585,21 @@ public class BisInterfaceService {
             //새로들어온 기본편성 등록
             for (DsBasicScheduleListDTO dsBasicScheduleDTO : dsBasicScheduleListDTOList){
 
+                //날짜 yyyyMMdd -> yyyy-MM-dd 변환한 데이터 저장 [시작날짜, 종료날짜]
+                //시작일시, 종료일시 Bis에서 조회한 정보 yyyyMMdd -> yyyy-MM-dd 변환한 데이터 저장
+                String startDt = formatYmd(dsBasicScheduleDTO.getBroadBeginYmd()); //Bis 기본편성 시작시간
+                String endDt = formatYmd(dsBasicScheduleDTO.getBroadEndYmd()); //Bis 기본편성 종료시간
+
+                //시간 HHmm -> HH:mm:ss변환[시작시간, 종료시간(시작시간+방송길이)]
                 String broadHm = dsBasicScheduleDTO.getBroadHm(); //방송시작시간
+                String formatBroadHm = broadHm.substring(0,2)+":"+broadHm.substring(2,4)+":00";
+                /*String formatBroadHm = broadHm.substring(0,4)+"-"+broadHm.substring(4,6)+"-"+broadHm.substring(6,8);*/
                 String broadRun = dsBasicScheduleDTO.getBroadRun(); //방송길이
-                String endTime = getEndTime(broadRun, broadHm); //방송종료시간 가져오기[방송길이 + 방송시작시간]
+                String endTime = getEndTime(broadRun, formatBroadHm); //방송종료시간 가져오기[방송길이 + 방송시작시간]
+
+                //요일 변환[1 월, 2 화, 3 수 , 4 목, 5 금, 6 토, 7 일]
+                String dayCd = dsBasicScheduleDTO.getDayCd();
+                String formatDayCd = formatDayCd(dayCd);
 
                 //방송프로그램 아이디 방송프로그램DTO로 빌드후  set
                 String brdcPgmId = dsBasicScheduleDTO.getPgmCd();
@@ -508,14 +607,14 @@ public class BisInterfaceService {
 
                 BaseProgramDTO baseProgramDTO = BaseProgramDTO.builder()
                         //.basePgmschId("")
-                        .brdcStartDt(dsBasicScheduleDTO.getBroadBeginYmd())
-                        .brdcEndDt(dsBasicScheduleDTO.getBroadEndYmd())
-                        .brdcStartClk(dsBasicScheduleDTO.getBroadHm())
-                        .brdcEndClk(endTime)
-                        .basDt(dsBasicScheduleDTO.getDayCd())
-                        .inputDtm(dsBasicScheduleDTO.getRegDt())
-                        .updtDtm(dsBasicScheduleDTO.getUpdDt())
-                        .program(programSimpleDTO)
+                        .brdcStartDt(startDt) //yyyy-MM-dd 변환한 데이터 저장
+                        .brdcEndDt(endDt) //yyyy-MM-dd 변환한 데이터 저장
+                        .brdcStartClk(formatBroadHm)// 00:00:00 형식으로 변환한값 저장
+                        .brdcEndClk(endTime) //시작시간 + 방송길이로 종료시간 계산 00:00:00타입으로 저장.
+                        .basDt(formatDayCd) //요일 코드
+                        .inputDtm(dsBasicScheduleDTO.getRegDt()) //입력일시
+                        .updtDtm(dsBasicScheduleDTO.getUpdDt()) //수정일시
+                        .program(programSimpleDTO) //방송프로그램
                         .build();
 
                 BaseProgram baseProgram = baseProgramMapper.toEntity(baseProgramDTO);

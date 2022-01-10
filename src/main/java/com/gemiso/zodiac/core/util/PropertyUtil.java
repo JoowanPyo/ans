@@ -48,11 +48,11 @@ public class PropertyUtil {
             pb.setDirtype(dirtype.getValue());
             pb.setRname_yn(rname_yn.getValue());
         } catch (IOException e) {
-            System.out.println("IOException Occured");
+            log.error("IOException Occured" + e.getMessage());
         } catch (JDOMException e) {
-            System.out.println("JDOMException Occured");
+            log.error("JDOMException Occured" + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Exception Occured");
+            log.error("Exception Occured" + e.getMessage());
         }
         return pb;
     }
@@ -65,7 +65,7 @@ public class PropertyUtil {
 
             log.info("configpaths : " + configpaths);
         } catch (ConfigurationException localException) {
-            System.out.println("SQLException Error!!");
+            log.error("SQLException Error!!" + localException.getMessage());
         }
         return configpaths;
     }

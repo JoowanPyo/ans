@@ -18,12 +18,18 @@ import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramResultDTO;
 import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.code.CodeRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
+import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.QCueSheet;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetFindAllDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
+import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgram;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgramRepository;
 import com.gemiso.zodiac.app.dailyProgram.QDailyProgram;
@@ -48,6 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,6 +78,7 @@ public class InterfaceService {
     //private final CueSheetItemSymbolMapper cueSheetItemSymbolMapper;
     //private final ProgramMapper programMapper;
 
+    private final CueSheetService cueSheetService;
 
 
     public PageResultDTO<ParentProgramDTO, CueSheet> dailyPgmFindAll(Date sdate, Date edate) {
@@ -84,9 +92,6 @@ public class InterfaceService {
         Page<CueSheet> result = cueSheetRepository.findAll(booleanBuilder,pageable);
 
         AnsToTaker taker = new AnsToTaker();
-        /*taker.SetCuesheet(cueSheets);
-        List<ParentProgramDTO> cueSheetDTOList = taker.ToSTringXML();
-        System.out.println(" xml : " + cueSheetDTOList );*/
 
         Function<CueSheet, ParentProgramDTO> fn = (entity -> taker.ToStringXML(entity));
 
@@ -120,7 +125,7 @@ public class InterfaceService {
         //DTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(takerProgramDTO, TakerProgramDTO.class);
 
-        System.out.println("xml : " + xml);
+       // name.out.println("xml : " + xml);
         return xml;
     }
 
@@ -291,7 +296,6 @@ public class InterfaceService {
         //DTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(takerCueSheetXML, TakerCueSheetXML.class);
 
-        System.out.println("xml : " + xml);
         return xml;
 
     }
@@ -364,7 +368,6 @@ public class InterfaceService {
         //DTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(takerCodeXML, TakerCodeXML.class);
 
-        System.out.println("xml : " + xml);
         return xml;
 
     }
@@ -449,98 +452,175 @@ public class InterfaceService {
 
     }*/
 
-    //프롬프터 프로그램 목록조회
-    public List<PrompterProgramDTO> getMstListService(String pro_id, String sdate, String fdate){
+    //프롬프터 일일편성 목록조회
+    public List<PrompterProgramDTO> getMstListService(String pro_id, String sdate, String fdate) throws ParseException {
 
-        BooleanBuilder booleanBuilder = getSearchProgram(pro_id, sdate, fdate);
+        Date formatSdate = stringToDate(sdate);
+        Date formatEdate = stringToDate(fdate);
 
-        List<DailyProgram> dailyProgramList = (List<DailyProgram>) dailyProgramRepository.findAll(
-                booleanBuilder,Sort.by(Sort.Direction.ASC, "brdcDt","dailyPgmId"));
+        CueSheetFindAllDTO cueSheetFindAllDTO = cueSheetService.findAll(formatSdate, formatEdate, pro_id, "","");
 
-        List<DailyProgramDTO> dailyProgramDTOList = dailyProgramMapper.toDtoList(dailyProgramList);
-        
-        List<PrompterProgramDTO> prompterProgramDTOList = conversionDailyPgm(dailyProgramDTOList);
+        List<PrompterProgramDTO> prompterProgramDTOList = toPrompterDailyPgm(cueSheetFindAllDTO);
 
         return prompterProgramDTOList;
     }
     
-    //조회된 일일편성 엔티티 프롬프터DTO로 변환
-    public List<PrompterProgramDTO> conversionDailyPgm(List<DailyProgramDTO> dailyProgramDTOList){
+    //String형식의 데이터를 Date타입으로 변환.
+    public Date stringToDate(String date) throws ParseException {
+
+        Date formatDate = null;
+
+        if (date != null && date.trim().isEmpty() == false) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            formatDate = simpleDateFormat.parse(date);
+        }
+
+        return formatDate;
+    }
+
+    //일일편성 큐시트목록 유니온 목록조회 목록을 프롬프터 형식의 데이터로 변환
+    public List<PrompterProgramDTO> toPrompterDailyPgm(CueSheetFindAllDTO cueSheetFindAllDTO){
 
         List<PrompterProgramDTO> prompterProgramDTOList = new ArrayList<>(); //리턴시켜줄 프롬프터 프로그램 리스트 생성
 
-        for (DailyProgramDTO dailyProgramDTO : dailyProgramDTOList){
+        List<CueSheetDTO> cueSheetDTOList = cueSheetFindAllDTO.getCueSheetDTO(); //큐시트목록 조회 리스트
+        List<DailyProgramDTO> dailyProgramDTOList = cueSheetFindAllDTO.getDailyProgramDTO(); //알알편성목록 조회 리스트
 
-            ProgramDTO programDTO = dailyProgramDTO.getProgram();
-            String brdcPgmId = "";
+        for (CueSheetDTO cueSheet : cueSheetDTOList){
 
-            if (ObjectUtils.isEmpty(programDTO) == false){
-                brdcPgmId = programDTO.getBrdcPgmId();
+            String date = cueSheet.getBrdcDt(); //방송일자
+            int cueBrdcDt = 0;
+            if (date != null && date.trim().isEmpty() == false) { //방송일자 데이터가 있을경우
+                //int변환을 위해 -빼기[yyyy-MM-dd -> yyyyMMdd]
+                //String getTime = date.substring(0, 4) + date.substring(5, 7) + date.substring(8, 10);
+                //큐시트 방송일시 비교를 위해 int로 변환
+                cueBrdcDt = dateToint(date);
             }
 
-            PrompterProgramDTO program = PrompterProgramDTO.builder()
-                    .brdcPgmId(brdcPgmId)
-                    .proNm(dailyProgramDTO.getBrdcPgmNm())
-                    .onAirDate(dailyProgramDTO.getBrdcDt())
-                    .startTime(dailyProgramDTO.getBrdcStartTime())
-                    .endTime(dailyProgramDTO.getBrdcEndClk())
-                    .displaySeq(null)
-                    .csId("")
-                    .csSpendTime("")
-                    .nodstatusNm("")
-                    .build();
+            String time = cueSheet.getBrdcStartTime();
+            int cueStartTime = 0;
+            if ( time != null && time.trim().isEmpty() == false) { //방송시작시간이 있을경우
 
-            prompterProgramDTOList.add(program);
+                //방송시작시작 Int변환을 위해 00:00:00 -> 000000으로 변환
+                //String getCueStime = time.substring(0,2)+time.substring(3,5)+time.substring(6,8);
+                //큐시트 방송시작시간 비교를 위해 int로 변환
+                cueStartTime = timeToInt(time);
+            }
+            for (DailyProgramDTO dailyProgram : dailyProgramDTOList){
 
-            /*PrompterProgramDTO prompterProgramDTO = PrompterProgramDTO.builder()
-                    .brdcPgmId(programDTO.getBrdcPgmId())
-                    .proNm(programDTO.getBrdcPgmNm())
-                    .onAirDate(programDTO.)*/
-                    /*.brdcPgmId(programDTO.getBrdcPgmId())
-                    .chDivCd(programDTO.getChDivCd())
-                    .chDivCdNm(programDTO.getChDivCdNm())
-                    .brdcPgmNm(programDTO.getBrdcPgmNm())
-                    .brdcPgmDivCd(programDTO.getBrdcPgmDivCd())
-                    .brdcPgmDivCdNm(programDTO.getBrdcPgmDivCdNm())
-                    .gneDivCd(programDTO.getGneDivCd())
-                    .gneDivCdNm(programDTO.getGneDivCdNm())
-                    .prdDivCd(programDTO.getPrdDivCd())
-                    .prdDivCdNm(programDTO.getPrdDivCdNm())
-                    .prdDeptCd(programDTO.getPrdDivCd())
-                    .prdDeptCdNm(programDTO.getPrdDivCdNm())
-                    .brdcStartDt(programDTO.getBrdcStartTime())
-                    .delYn(programDTO.getDelYn())
-                    .inputrId(programDTO.getInputrId())
-                    .inputrIdNm(programDTO.getInputrNm())
-                    .inputDtm(programDTO.getInputDtm())
-                    .updtrId(programDTO.getUpdtrId())
-                    .updtrIdNm(programDTO.getUpdtrNm())
-                    .updtDtm(programDTO.getUpdtDtm())
-                    .build();*/
+                //일일편성 방송일시 비교를 위해 int로 변환
+                int dailyBrdcDt = dateToint(dailyProgram.getBrdcDt());
 
-           // prompterProgramDTOList.add(prompterProgramDTO);
+                //일일편성 방송시작시간 비교를 위해 int로 변환
+                int dailyStartTime = timeToInt(dailyProgram.getBrdcStartTime());
+
+              /*  //큐시트 방송일시가 일일편성 방송일시보다 크면.
+                if (cueBrdcDt > dailyBrdcDt){
+
+                }*/
+                //일일편성 방송일시가 큐시트 방송일시보다 크면.
+                if (cueBrdcDt < dailyBrdcDt){
+
+                }
+                //큐시트 방송일시와 일일편성 방송일시와 같으면
+                if (cueBrdcDt != 0 && dailyBrdcDt != 0 && cueBrdcDt == dailyBrdcDt){
+                        if (cueStartTime > dailyStartTime){//큐시트 시작시간이 크면 일일편성출력
+                            //프롬프터 큐시트목록 xml변환[ 일일편성 ]
+                            prompterProgramDTOList.add(dailyToPrompter(dailyProgram));
+                        }
+                        /*if (cueStartTime < dailyStartTime){//일일편성 시작시간이 크면 큐시트출력
+                            
+                        }*/
+                        if (cueStartTime == dailyStartTime){//같으면 큐시트,일일편성 둘다 출력하되 큐시트 먼저
+                            //프롬프터 큐시트목록 xml변환[ 일일편성 ]
+                            prompterProgramDTOList.add(dailyToPrompter(dailyProgram));
+                        }
+                    
+                }
+
+            }
+            //프롬프터 큐시트목록 xml변환[ 일일편성 ]
+            prompterProgramDTOList.add(cueToPrompter(cueSheet));
+
+        }
+        return prompterProgramDTOList;
+    }
+    //프롬프터 큐시트목록 xml변환[ 일일편성 ]
+    public PrompterProgramDTO dailyToPrompter(DailyProgramDTO dailyProgram){
+
+        ProgramDTO programDTO = dailyProgram.getProgram();//프로그램 get
+        String brdcPgmId = "";//set해줄 프로그램 아이디
+        if (ObjectUtils.isEmpty(programDTO) == false){ //프로그램이 있으면 프로그램아이디 출력하여 set
+            brdcPgmId = programDTO.getBrdcPgmId();
+        }
+        PrompterProgramDTO program = PrompterProgramDTO.builder()
+                .brdcPgmId(brdcPgmId)
+                .proNm(dailyProgram.getBrdcPgmNm())
+                .onAirDate(dailyProgram.getBrdcDt())
+                .startTime(dailyProgram.getBrdcStartTime())
+                .endTime(dailyProgram.getBrdcEndClk())
+                .aricleCount(0)
+                .brdcStCd("")
+                .build();
+        return program;
+    }
+    //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+    public PrompterProgramDTO cueToPrompter(CueSheetDTO cueSheet){
+
+        ProgramDTO programDTO = cueSheet.getProgram();//프로그램 get
+        String brdcPgmId = "";//set해줄 프로그램 아이디
+        if (ObjectUtils.isEmpty(programDTO) == false){ //프로그램이 있으면 프로그램아이디 출력하여 set
+            brdcPgmId = programDTO.getBrdcPgmId();
         }
 
-        return prompterProgramDTOList;
-        
+        //기사수 get
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheet.getCueSheetItem();
+        int articleCount = 0;
+        for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList){
+            ArticleCueItemDTO article = cueSheetItemDTO.getArticle();
+            if (ObjectUtils.isEmpty(article)){//기사가 포함되지 않았으면 contiue;
+                continue;
+            }
+            ++articleCount; //기사가 포함되어있으면 +1
+        }
+
+        PrompterProgramDTO program = PrompterProgramDTO.builder()
+                .brdcPgmId(brdcPgmId)
+                .proNm(cueSheet.getBrdcPgmNm())
+                .onAirDate(cueSheet.getBrdcDt())
+                .startTime(cueSheet.getBrdcStartTime())
+                .endTime(cueSheet.getBrdcEndTime())
+                .aricleCount(articleCount)
+                .brdcStCd(cueSheet.getCueStCd())
+                .build();
+        return program;
     }
 
-    //프롬프터로 보내줄 프로그램 조회조건 빌드.
-    public BooleanBuilder getSearchProgram(String pro_id, String sdate, String fdate){
+    //time to int
+    public int timeToInt(String time) {
 
-        BooleanBuilder booleanBuilder = new BooleanBuilder();
-        QDailyProgram qDailyProgram = QDailyProgram.dailyProgram;
+        String formatTime = time.substring(0,2)+time.substring(3,5)+time.substring(6,8);
 
-        //프로그램 아이디로 검색
-        if (pro_id != null && pro_id.trim().isEmpty() == false){
-            booleanBuilder.and(qDailyProgram.program.brdcPgmId.eq(pro_id));
-        }
-        if (sdate != null && sdate.trim().isEmpty() ==false
-                && fdate != null && fdate.trim().isEmpty() == false){
-            booleanBuilder.and(qDailyProgram.brdcDt.between(sdate, fdate));
+        int formatDailyStartTime = 0;
+        if (formatTime != null & formatTime.trim().isEmpty() == false) {
+            formatDailyStartTime = Integer.parseInt(formatTime);
         }
 
-        return booleanBuilder;
+        return formatDailyStartTime;
+    }
+
+    //date to int
+    public int dateToint(String date){
+
+        String formatDate = date.substring(0, 4) + date.substring(5, 7) + date.substring(8, 10);
+
+        int returnInt = 0;
+        if (formatDate != null & formatDate.trim().isEmpty() == false) {
+            returnInt = Integer.parseInt(formatDate);
+        }
+
+        return returnInt;
     }
 
     //프로그램 프롬프터 Xml형식으로 변환
@@ -569,7 +649,6 @@ public class InterfaceService {
         //DTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(prompterProgramXML, PrompterProgramXML.class);
 
-        System.out.println("xml : " + xml);
         return xml;
     }
 
@@ -613,7 +692,6 @@ public class InterfaceService {
         //DTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(prompterCueSheetXML, PrompterCueSheetXML.class);
 
-        System.out.println("xml : " + xml);
         return xml;
     }
 
@@ -726,3 +804,36 @@ public class InterfaceService {
         System.out.println(" xml : " + xml );
 
         return xml;*/
+/*
+        //조회된 일일편성 엔티티 프롬프터DTO로 변환
+        public List<PrompterProgramDTO> conversionDailyPgm(List<DailyProgramDTO> dailyProgramDTOList){
+
+            List<PrompterProgramDTO> prompterProgramDTOList = new ArrayList<>(); //리턴시켜줄 프롬프터 프로그램 리스트 생성
+
+            for (DailyProgramDTO dailyProgramDTO : dailyProgramDTOList){
+
+                ProgramDTO programDTO = dailyProgramDTO.getProgram();
+                String brdcPgmId = "";
+
+                if (ObjectUtils.isEmpty(programDTO) == false){
+                    brdcPgmId = programDTO.getBrdcPgmId();
+                }
+
+                PrompterProgramDTO program = PrompterProgramDTO.builder()
+                        .brdcPgmId(brdcPgmId)
+                        .proNm(dailyProgramDTO.getBrdcPgmNm())
+                        .onAirDate(dailyProgramDTO.getBrdcDt())
+                        .startTime(dailyProgramDTO.getBrdcStartTime())
+                        .endTime(dailyProgramDTO.getBrdcEndClk())
+                        .displaySeq(null)
+                        .csId("")
+                        .csSpendTime("")
+                        .nodstatusNm("")
+                        .build();
+
+                prompterProgramDTOList.add(program);
+            }
+
+            return prompterProgramDTOList;
+
+        }*/

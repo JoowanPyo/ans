@@ -16,6 +16,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -39,8 +40,15 @@ public class DailyProgramService {
 
         BooleanBuilder booleanBuilder = getSearch(sdate, edate, brdcPgmId, brdcPgmNm, brdcDivCd, stdioId, subrmId, searchWord);
 
+        //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
+        List<Sort.Order> orders = new ArrayList<>();
+        Sort.Order order1 = new Sort.Order(Sort.Direction.DESC, "brdcDt");
+        orders.add(order1);
+        Sort.Order order2 = new Sort.Order(Sort.Direction.ASC, "brdcStartTime");
+        orders.add(order2);
+
         List<DailyProgram> dailyProgramList = (List<DailyProgram>) dailyProgramRepository.findAll(
-                booleanBuilder, Sort.by(Sort.Direction.ASC, "brdcDt","dailyPgmId"));
+                booleanBuilder, Sort.by(orders));
 
         List<DailyProgramDTO> dailyProgramDTOList = dailyProgramMapper.toDtoList(dailyProgramList);
 

@@ -31,7 +31,7 @@ public class DailyProgram{
 
     /*@Column(name = "brdc_pgm_id")*/
 
-    @Column(name = "brdc_dt", length = 8, nullable = false)
+    @Column(name = "brdc_dt", length = 10, nullable = false)
     private String brdcDt;
 
     @Column(name = "brdc_seq", columnDefinition = "numeric(5)", nullable = false)
@@ -40,7 +40,7 @@ public class DailyProgram{
     @Column(name = "brdc_start_time", length = 8, nullable = false)
     private String brdcStartTime;
 
-    @Column(name = "brdc_end_clk", columnDefinition = "bpchar(6)", nullable = false)
+    @Column(name = "brdc_end_clk", length = 8, nullable = false)
     private String brdcEndClk;
 
     @Column(name = "brdc_div_cd", length = 50)

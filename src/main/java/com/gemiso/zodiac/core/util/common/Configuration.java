@@ -63,20 +63,22 @@ public class Configuration extends AbstractConfiguration
                 this.props.load(new BufferedInputStream(fin));
             }
             catch (IOException e){
-                System.out.println("IOException Occured");
+                log.error("IOException Occured "+e.getMessage());
             }
             finally
             {
                 try{
                     fin.close();
                 }catch (IOException ex){
-                    System.out.println("BufferedReader 종료 중 에러 발생");
+                    //System.out.println("BufferedReader 종료 중 에러 발생");
+                    log.error("BufferedReader 종료 중 에러 발생 "+ex.getMessage());
                 }
             }
         } catch (FileNotFoundException ex) {
             throw new ConfigurationException("Can't load configuration file: " + this.configFileName);
         } catch (IOException e) {
-            System.out.println("IOException Occured");
+            //System.out.println("IOException Occured");
+            log.error("IOException Occured " + e.getMessage());
         }
     }
 }

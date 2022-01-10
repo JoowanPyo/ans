@@ -1,5 +1,6 @@
 package com.gemiso.zodiac;
 
+import com.gemiso.zodiac.core.scheduling.Scheduling;
 import com.gemiso.zodiac.core.service.BisInterfaceService;
 import com.mysema.commons.lang.Assert;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,6 @@ class RestfulApiExampleApplicationTests {
         longArr[3] = 1234L;
 
 
-        System.out.println( longArr.toString());
 
        // boolean ret = ProcessArticleFix.articleFix( FixEnum.ANCHOR_FIX, FixEnum.FIX_NONE , "gemiso", "joowan");
 
@@ -34,11 +34,7 @@ class RestfulApiExampleApplicationTests {
 
     @Test
     void bisMapTest() throws Exception {
-        System.out.println("----------test start-----------");
-        /*BisInterfaceService bisInterfaceService = new BisInterfaceService();*/
-        /*bisInterfaceService.restTemplateTest();*/
         bisInterfaceService.bisProgramfindAll();
-        System.out.println("----------test end-----------");
 
     }
 
@@ -55,15 +51,12 @@ class RestfulApiExampleApplicationTests {
         boolean isMatch = encoder.matches("1234", "$2a$10$AmMoftfjRv/VFgO3Qs8ZBOqAsOc3Q5JXgf.E0sF42HJrDQL8gloXi");
         Assert.isTrue(isMatch, "error");
 
-        System.out.println("boolean : " + isMatch);
 
     }
 
     @Test //Bis 방송길이 와 방송시작시작으로 방송종료시간 구하기
     void getEndTime() throws ParseException {
         String endtime = bisInterfaceService.getEndTime("130","1230");
-        System.out.println("endtimeendtimeendtimeendtimeendtimeendtimeendtimeendtimeendtime : " +endtime);
     }
-
 
 }

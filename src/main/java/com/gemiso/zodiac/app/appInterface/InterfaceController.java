@@ -19,6 +19,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -76,8 +77,6 @@ public class InterfaceController {
 
             takerCueSheetDTO = interfaceService.takerPgmToXml(pageResultDTO);
         }
-
-        System.out.println("controller xml :" + takerCueSheetDTO);
 
         return takerCueSheetDTO;
 
@@ -215,7 +214,7 @@ public class InterfaceController {
                                     @RequestParam(value = "fdate", required = false) String fdate,
                                     @Parameter(name = "usr_id", description = "사용자 아이디???")
                                     @RequestParam(value = "usr_id", required = false) String usr_id,
-                                    @RequestHeader(value = "securityKey") String securityKey) {
+                                    @RequestHeader(value = "securityKey") String securityKey) throws ParseException {
 
         List<PrompterProgramDTO> prompterProgramDTOList = interfaceService.getMstListService(pro_id, sdate, fdate);
 

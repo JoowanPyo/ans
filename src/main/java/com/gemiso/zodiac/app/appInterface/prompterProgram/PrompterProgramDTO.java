@@ -33,17 +33,17 @@ public class PrompterProgramDTO {
     @XmlElement(name="END_TIME")
     private String endTime; // 종료시간
 
-    @XmlElement(name="DISPLAY_SEQ")
-    private String displaySeq; // 기사 건수
+    @XmlElement(name="ARTICLE_COUNT")
+    private Integer aricleCount; // 기사 건수
 
-    @XmlElement(name="CS_ID")
-    private String csId; // 방송 상태값
+    @XmlElement(name="BRDC_ST_CD")
+    private String brdcStCd; // 방송 상태값
 
-    @XmlElement(name="CS_SPEND_TIME")
+    /*@XmlElement(name="CS_SPEND_TIME")
     private String csSpendTime;
 
     @XmlElement(name="NODSTATUS_NM")
-    private String nodstatusNm;
+    private String nodstatusNm;*/
 
     /*@XmlElement(name="brdc_pgm_id")
     private String brdcPgmId;

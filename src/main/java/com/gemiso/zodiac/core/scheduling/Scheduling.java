@@ -43,8 +43,8 @@ public class Scheduling {
     }
 
     //Bis주간편성 조회 및 등록
-    /*@Scheduled(cron = "0 * * * * *")*/
-    @Scheduled(cron = "* * 3 * * ?")
+    @Scheduled(cron = "0 * * * * *")
+    /*@Scheduled(cron = "* * 3 * * ?")*/
     public void bisDailyScheduleCreate() throws Exception {
 
         BisDailyScheduleDTO bisDailyScheduleDTO = bisInterfaceService.bisDailyScheduleFindAll();

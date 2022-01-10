@@ -1,6 +1,8 @@
 package com.gemiso.zodiac.app.spareCueSheetItem.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolDTO;
@@ -76,6 +78,6 @@ public class SpareCueSheetItemDTO {
     private String headLn;
     private String artclRef;
     private CueSheetSimpleDTO cueSheet;
-    private ArticleSimpleDTO article;
+    private ArticleCueItemDTO article;
     private List<CueSheetItemSymbolDTO> cueSheetMedia = new ArrayList<>();
 }

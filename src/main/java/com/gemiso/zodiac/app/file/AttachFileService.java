@@ -26,6 +26,8 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.InputMismatchException;
+import java.util.jar.JarException;
 
 @Service
 @Slf4j
@@ -130,8 +132,13 @@ public class AttachFileService {
 
             //오리지널 파일네임 여부
             if (ub.getRname_yn().equals("N")) {
-                //파일을 버퍼링을 이용하여 저장할 경로
-                buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
+                try {
+                    //파일을 버퍼링을 이용하여 저장할 경로
+                    buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
+                }catch (IOException e){
+                    log.error(e.getMessage());
+                }
+
             } else {
                 //확장자 파싱
                 ext = cutExtension(rname);
@@ -140,7 +147,11 @@ public class AttachFileService {
 
                 log.info("file name: " + rname);
                 //파일을 버퍼링을 이용하여 저장할 경로                                     YYYYMMDD+FI+seq
-                buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
+                try {
+                    buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
+                }catch (IOException e){
+                    log.error(e.getMessage());
+                }
             }
             try {
                 //파일 복사
@@ -148,7 +159,8 @@ public class AttachFileService {
             }
             catch (IOException e)
             {
-                System.out.println("BufferedReader 파일복사 중 에러 발생");
+                //System.out.println("BufferedReader 파일복사 중 에러 발생");
+                log.error(e.getMessage());
             }
             finally {
                 buffStream.close();
@@ -178,14 +190,8 @@ public class AttachFileService {
             code = 500;
             msg = "You failed to upload " + rname + ": " + e.getMessage() + "<br/>";
             /*e.printStackTrace();*/
-            System.out.println("IOException Occured");
-        } /*catch (Exception e) {
-            code = 500;
-            msg = "You failed to upload " + rname + ": " + e.getMessage() + "<br/>";
-            *//*e.printStackTrace();*//*
-            System.out.println("Exception Occured");
-        }*/
-
+            log.error("IOException Occured "+e.getMessage());
+        }
         //return new StatusCodeFileDTO(codeDTO, msg, file_id, org_file_nm);
         return new StatusCodeFileDTO(code, msg, fileId, orgFileNm);
     }
@@ -293,13 +299,27 @@ public class AttachFileService {
         //File(_rname).length
         response.setContentLength((int) file.length());
 
-        //다운로드파일
+
+       /* //다운로드파일
         InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
 
         FileCopyUtils.copy(inputStream, response.getOutputStream());
         //response객체 생성
         //응답내용 file응답 내용을 넣어서 초기화
-        ResponseBuilder res = Response.ok(file);
+        ResponseBuilder res = Response.ok(file);*/
+
+        ResponseBuilder res = null;
+        try {
+            InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+
+            FileCopyUtils.copy(inputStream, response.getOutputStream());
+            //response객체 생성
+            //응답내용 file응답 내용을 넣어서 초기화
+            res = Response.ok(file);
+        }catch(IOException ie){//import 해줘야 사용 가능
+            log.error(ie.getMessage());
+        }
+
         //response객체  return
         return  res.build();
 

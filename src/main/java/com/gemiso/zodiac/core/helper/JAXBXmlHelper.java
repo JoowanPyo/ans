@@ -1,20 +1,29 @@
 package com.gemiso.zodiac.core.helper;
 
-import javax.naming.NamingException;
+import lombok.extern.slf4j.Slf4j;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import java.io.IOException;
 import java.io.StringWriter;
 
+@Slf4j
 public class JAXBXmlHelper {
 
     public static String marshal(Object obj, Class<?> instanceClass) {
         String rval = null;
         JAXBContext jaxbContext = null;
         Marshaller jaxbMarshaller = null;
-        StringWriter writer = new StringWriter();
+        //StringWriter writer = new StringWriter();
+        StringWriter writer = null;
+        try {
+            writer = new StringWriter();
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
 
-        System.out.println("obj :" + obj);
+
         try {
             jaxbContext = JAXBContext.newInstance(instanceClass);
             jaxbMarshaller = jaxbContext.createMarshaller();
@@ -30,7 +39,8 @@ public class JAXBXmlHelper {
         }catch (JAXBException e) {
             // TODO: handle exceptione
             /*e.printStackTrace();*/
-            System.out.println("JAXBException Occured");
+            //System.out.println("JAXBException Occured");
+            log.error("JAXBException Occured" + e.getMessage());
         }
         return rval;
     }
