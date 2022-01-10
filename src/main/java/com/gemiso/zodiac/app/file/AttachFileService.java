@@ -139,9 +139,10 @@ public class AttachFileService {
                     log.error(e.getMessage());
                 }finally {
                     try {
+                        buffStream.write(bytes);
                         buffStream.close();
                     }catch (IOException e){
-                        log.error("BufferedOutputStream close error");
+                        log.error("BufferedOutputStream close or writer error");
                         log.error(e.getMessage());
                     }
                 }
@@ -160,14 +161,15 @@ public class AttachFileService {
                     log.error(e.getMessage());
                 }finally {
                     try {
+                        buffStream.write(bytes);
                         buffStream.close();
                     }catch (IOException e){
-                        log.error("BufferedOutputStream close error");
+                        log.error("BufferedOutputStream close or writer error");
                         log.error(e.getMessage());
                     }
                 }
             }
-            try {
+            /*try {
                 //파일 복사
                 buffStream.write(bytes);
             }
@@ -178,7 +180,7 @@ public class AttachFileService {
             }
             finally {
                 buffStream.close();
-            }
+            }*/
             /*buffStream.close();*/
             msg += "Uploaded (" + file.getOriginalFilename() + ")";
             code = 200;

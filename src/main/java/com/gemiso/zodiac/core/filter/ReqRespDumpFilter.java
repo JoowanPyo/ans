@@ -22,9 +22,9 @@ public class ReqRespDumpFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        try {
+       /* try {*/
             HttpServletRequest httpServletRequest = (HttpServletRequest) request;
             HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
@@ -46,12 +46,16 @@ public class ReqRespDumpFilter implements Filter {
 
             log.info(String.valueOf(logMessage));
 
-        } catch (Throwable a) {
+        /*} catch (Throwable a) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            /*PrintStream pinrtStream = new PrintStream(out);
-            a.printStackTrace(pinrtStream);*/
+            *//*PrintStream pinrtStream = new PrintStream(out);
+            a.printStackTrace(pinrtStream);*//*
             log.error(out.toString());
-        }
+        }catch (ServletException e){
+            log.error(e.getMessage());
+        }catch (IOException e){
+
+        }*/
     }
 
 
