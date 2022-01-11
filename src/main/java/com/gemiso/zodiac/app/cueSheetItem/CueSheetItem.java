@@ -200,6 +200,9 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "artcl_ref", columnDefinition = "bpchar(1) default 'N'")
     private String artclRef;
 
+    @Column(name = "spare_yn", columnDefinition = "bpchar(1) default 'N'")
+    private String spareYn;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cue_id", nullable = false)
     @JsonBackReference
@@ -256,6 +259,9 @@ public class CueSheetItem extends BaseEntity {
         }
         if (this.artclRef == null || this.artclRef == "") {
             this.artclRef = "N";
+        }
+        if (this.spareYn == null || this.spareYn == "") {
+            this.spareYn = "N";
         }
     }
 

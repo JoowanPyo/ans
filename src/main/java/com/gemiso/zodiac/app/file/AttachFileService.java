@@ -82,9 +82,6 @@ public class AttachFileService {
                 throw new IOException();
             }
 
-            //BufferedOutputStream을 이용하여 파일 복사
-            BufferedOutputStream buffStream = null;
-
             rname = file.getOriginalFilename();
 
             log.info("original name: " + rname);
@@ -128,27 +125,6 @@ public class AttachFileService {
                 log.debug("attach file insert ok: " + fileId);
             }
 
-            /*//오리지널 파일네임 여부
-            if (ub.getRname_yn().equals("N")) {
-                try {
-                    //파일을 버퍼링을 이용하여 저장할 경로
-                    buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
-                }catch (IOException e){
-                    log.error(e.getMessage());
-                }
-
-            } else {
-                //확장자 파싱
-                ext = cutExtension(rname);
-
-                rname = fileId + "." + ext;
-
-                log.info("file name: " + rname);
-                //파일을 버퍼링을 이용하여 저장할 경로                                     YYYYMMDD+FI+seq
-                buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
-
-            }*/
-
             //오리지널 파일네임 여부
             if (ub.getRname_yn().equals("N") == false) {
                 //확장자 파싱
@@ -157,10 +133,15 @@ public class AttachFileService {
                 rname = fileId + "." + ext;
             }
 
+            //BufferedOutputStream을 이용하여 파일 복사
+            BufferedOutputStream buffStream = null;
+            FileOutputStream fileOutputStream = null;
             try {
 
-                //파일을 버퍼링을 이용하여 저장할 경로                                     YYYYMMDD+FI+seq
-                buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
+                //파일을 버퍼링을 이용하여 저장할 경로
+                // YYYYMMDD+FI+seq 요런식으로 들어감...
+                fileOutputStream = new FileOutputStream(new File(realpath + File.separator + rname));
+                buffStream = new BufferedOutputStream(fileOutputStream);
 
                 //파일 복사
                 buffStream.write(bytes);
@@ -172,6 +153,7 @@ public class AttachFileService {
             }
             finally {
                 try {
+                    fileOutputStream.close();
                     buffStream.close();
                 }catch (IOException e){
                     log.error(e.getMessage());
@@ -323,8 +305,10 @@ public class AttachFileService {
 
         ResponseBuilder res = null;
         InputStream inputStream = null;
+        FileInputStream fileInputStream = null;
         try {
-            inputStream = new BufferedInputStream(new FileInputStream(file));
+            fileInputStream = new FileInputStream(file);
+            inputStream = new BufferedInputStream(fileInputStream);
 
             FileCopyUtils.copy(inputStream, response.getOutputStream());
             //response객체 생성
@@ -339,7 +323,7 @@ public class AttachFileService {
             log.error(e.getMessage());
         }finally {
             try {
-
+                fileInputStream.close();
                 inputStream.close();
 
             }catch (IOException e){
