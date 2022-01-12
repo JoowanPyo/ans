@@ -11,12 +11,14 @@ import com.gemiso.zodiac.app.user.UserRepository;
 import com.gemiso.zodiac.app.user.UserService;
 import com.gemiso.zodiac.app.user.dto.UserDTO;
 import com.gemiso.zodiac.app.user.mapper.UserMapper;
+import com.gemiso.zodiac.core.helper.EncodingHelper;
 import com.gemiso.zodiac.core.helper.JWTBuilder;
 import com.gemiso.zodiac.core.helper.JWTParser;
 import com.gemiso.zodiac.exception.PasswordFailedException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,9 @@ import java.util.Date;
 @RequiredArgsConstructor
 @Transactional
 public class AuthService {
+
+    @Value("${password.salt-key:saltKey}")
+    private String saltKey;
 
     private final UserService userService;
 
@@ -60,7 +65,11 @@ public class AuthService {
 
         UserDTO userDTO = userMapper.toDto(userEntity); //tb_user_login 테이블에 정보를 저장하기위한 DTO생성
 
-        if (!passwordEncoder.matches(password, userEntity.getPwd())) {
+        //아리랑 pwd sha256해싱 [ pwd + salt ]
+        EncodingHelper encodingHelper = new EncodingHelper(password);
+        String hexPwd = encodingHelper.getHex();
+
+        if (!passwordEncoder.matches(hexPwd, userEntity.getPwd())) {
             throw new PasswordFailedException("Password failed.");
         }
 

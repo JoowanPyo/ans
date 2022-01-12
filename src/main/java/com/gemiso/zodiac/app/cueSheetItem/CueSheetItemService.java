@@ -68,9 +68,9 @@ public class CueSheetItemService {
 
     private final UserAuthService userAuthService;
 
-    public List<CueSheetItemDTO> findAll(Long artclId, Long cueId, String delYn){
+    public List<CueSheetItemDTO> findAll(Long artclId, Long cueId, String delYn, String spareYn){
 
-        BooleanBuilder booleanBuilder = getSearch(artclId, cueId, delYn);
+        BooleanBuilder booleanBuilder = getSearch(artclId, cueId, delYn, spareYn);
 
         List<CueSheetItem> cueSheetItemList = (List<CueSheetItem>) cueSheetItemRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "cueItemOrd"));
 
@@ -338,7 +338,7 @@ public class CueSheetItemService {
 
     }
 
-    public BooleanBuilder getSearch(Long artclId, Long cueId, String delYn){
+    public BooleanBuilder getSearch(Long artclId, Long cueId, String delYn, String spareYn){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -357,6 +357,11 @@ public class CueSheetItemService {
         //쿼리 where 조건 추가.
         if (ObjectUtils.isEmpty(cueId) == false){
             booleanBuilder.and(qCueSheetItem.cueSheet.cueId.eq(cueId));
+        }
+
+        //스페어 여부
+        if (spareYn != null && spareYn.trim().isEmpty() == false){
+            booleanBuilder.and(qCueSheetItem.spareYn.eq(spareYn));
         }
 
 

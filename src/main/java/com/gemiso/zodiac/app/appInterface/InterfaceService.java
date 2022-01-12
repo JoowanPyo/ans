@@ -19,36 +19,25 @@ import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramResultDTO;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
-import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.code.CodeRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
-import com.gemiso.zodiac.app.cueSheet.QCueSheet;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
-import com.gemiso.zodiac.app.cueSheet.dto.CueSheetFindAllDTO;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetInterfaceDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
-import com.gemiso.zodiac.app.dailyProgram.DailyProgram;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgramRepository;
-import com.gemiso.zodiac.app.dailyProgram.QDailyProgram;
 import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
 import com.gemiso.zodiac.app.dailyProgram.mapper.DailyProgramMapper;
 import com.gemiso.zodiac.app.issue.Issue;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
-import com.gemiso.zodiac.core.helper.PageHelper;
-import com.gemiso.zodiac.core.page.PageResultDTO;
-import com.gemiso.zodiac.core.service.AnsToTaker;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
-import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -56,11 +45,7 @@ import org.springframework.util.ObjectUtils;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -81,25 +66,201 @@ public class InterfaceService {
     private final CueSheetService cueSheetService;
 
 
-    public PageResultDTO<ParentProgramDTO, CueSheet> dailyPgmFindAll(Date sdate, Date edate) {
+    public List<ParentProgramDTO> dailyPgmFindAll(String sdate, String edate, String brdc_pgm_id, String pgm_nm) throws ParseException {
 
-        PageHelper pageHelper = new PageHelper(null, null);
+        Date formatSdate = stringToDate(sdate);
+        Date formatEdate = stringToDate(edate);
 
-        Pageable pageable = pageHelper.getTakerCue();
+        CueSheetInterfaceDTO cueSheetInterfaceDTO = cueSheetService.findAllInterface(formatSdate, formatEdate, brdc_pgm_id, pgm_nm, "");
 
-        BooleanBuilder booleanBuilder = getSearch( sdate,  edate);
+        List<ParentProgramDTO> parentProgramDTOList = toTakerCueSheetList(cueSheetInterfaceDTO);
 
-        Page<CueSheet> result = cueSheetRepository.findAll(booleanBuilder,pageable);
-
-        AnsToTaker taker = new AnsToTaker();
-
-        Function<CueSheet, ParentProgramDTO> fn = (entity -> taker.ToStringXML(entity));
-
-        return new PageResultDTO<ParentProgramDTO, CueSheet>(result, fn);
+        return parentProgramDTOList;
 
     }
 
-    public String takerPgmToXml(PageResultDTO<ParentProgramDTO, CueSheet> pageResultDTO){
+    //테이커 큐시트&일일편성 목록 테이커DTO 리스트로 변환
+    public List<ParentProgramDTO> toTakerCueSheetList(CueSheetInterfaceDTO cueSheetInterfaceDTO) {
+
+        List<ParentProgramDTO> parentProgramDTOList = new ArrayList<>();
+
+        List<CueSheetDTO> cueSheetDTOList = cueSheetInterfaceDTO.getCueSheetDTO();
+        List<DailyProgramDTO> dailyProgramDTOList = cueSheetInterfaceDTO.getDailyProgramDTO();
+
+        for (CueSheetDTO cueSheet : cueSheetDTOList) {
+
+            String date = cueSheet.getBrdcDt(); //방송일자
+            int cueBrdcDt = 0;
+            if (date != null && date.trim().isEmpty() == false) { //방송일자 데이터가 있을경우
+                //int변환을 위해 -빼기[yyyy-MM-dd -> yyyyMMdd]
+                //String getTime = date.substring(0, 4) + date.substring(5, 7) + date.substring(8, 10);
+                //큐시트 방송일시 비교를 위해 int로 변환
+                cueBrdcDt = dateToint(date);
+            }
+
+            String time = cueSheet.getBrdcStartTime();
+            int cueStartTime = 0;
+            if (time != null && time.trim().isEmpty() == false) { //방송시작시간이 있을경우
+
+                //방송시작시작 Int변환을 위해 00:00:00 -> 000000으로 변환
+                //String getCueStime = time.substring(0,2)+time.substring(3,5)+time.substring(6,8);
+                //큐시트 방송시작시간 비교를 위해 int로 변환
+                cueStartTime = timeToInt(time);
+            }
+
+            //ConcurrentModificationException에러가 나서 이터레이터로 수정.
+            Iterator<DailyProgramDTO> iter = dailyProgramDTOList.listIterator();
+            while (iter.hasNext()) {
+                DailyProgramDTO dailyProgram = iter.next();
+
+                //일일편성 방송일시 비교를 위해 int로 변환
+                int dailyBrdcDt = dateToint(dailyProgram.getBrdcDt());
+
+                //일일편성 방송시작시간 비교를 위해 int로 변환
+                int dailyStartTime = timeToInt(dailyProgram.getBrdcStartTime());
+
+                /*//큐시트 방송일시가 일일편성 방송일시보다 크면.
+                if (cueBrdcDt > dailyBrdcDt){
+                    //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+                    prompterProgramDTOList.add(cueToPrompter(cueSheet));
+                    break;
+                }*/
+                //일일편성 방송일시가 큐시트 방송일시보다 크면.
+                if (cueBrdcDt < dailyBrdcDt) {
+                    parentProgramDTOList.add(dailyToTaker(dailyProgram));
+                    iter.remove();
+                }
+                //큐시트 방송일시와 일일편성 방송일시와 같으면
+                if (cueBrdcDt != 0 && dailyBrdcDt != 0 && cueBrdcDt == dailyBrdcDt) {
+                    if (cueStartTime > dailyStartTime) {//큐시트 시작시간이 크면 일일편성출력
+                        //프롬프터 큐시트목록 xml변환[ 일일편성 ]
+                        parentProgramDTOList.add(dailyToTaker(dailyProgram));
+                        iter.remove();
+                    }
+                    /*if (cueStartTime < dailyStartTime){//일일편성 시작시간이 크면 큐시트출력
+                        //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+                        prompterProgramDTOList.add(cueToPrompter(cueSheet));
+                    }*/
+                    if (cueStartTime == dailyStartTime) {//같으면 큐시트,일일편성 둘다 출력하되 큐시트 먼저
+                        /*//프롬프터 큐시트목록 xml변환[ 큐시트 ]
+                        prompterProgramDTOList.add(cueToPrompter(cueSheet));*/
+                        //프롬프터 큐시트목록 xml변환[ 일일편성 ]
+                        parentProgramDTOList.add(dailyToTaker(dailyProgram));
+                        iter.remove();
+                    }
+                }
+            }
+            //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+            parentProgramDTOList.add(cueToTaker(cueSheet));
+        }
+        return parentProgramDTOList;
+    }
+
+    //큐시트 리스트 테이커 큐시트DTO로 변환
+    public ParentProgramDTO cueToTaker(CueSheetDTO cueSheet) {
+
+        //프로그램 아이디가 있으면 넣고 없으면 ""
+        String brdcPgmId = "";
+        ProgramDTO programDTO = cueSheet.getProgram();
+        if (ObjectUtils.isEmpty(programDTO) == false) {
+            brdcPgmId = programDTO.getBrdcPgmId();
+        }
+
+        ParentProgramDTO pcsDto = ParentProgramDTO.builder()
+                .cueId(cueSheet.getCueId())
+                .chDivCd(cueSheet.getChDivCd())
+                .chDivNm("") // 수정.
+                .brdcDt(cueSheet.getBrdcDt())
+                .brdcStartTime(cueSheet.getBrdcStartTime())
+                .brdcEndTime(cueSheet.getBrdcEndTime())
+                .brdcPgmId(brdcPgmId) //수정.
+                .brdcPgmNm(cueSheet.getBrdcPgmNm())
+                .urgPgmschPgmNm("") // 수정.몬지모름
+                .brdcDivCD("") //수정
+                .cmDivCd("") //수정
+                .remark(cueSheet.getRemark())
+                .inputr(cueSheet.getInputrId())
+                .inputrNm(cueSheet.getInputrNm())
+                .inputDtm(cueSheet.getInputDtm())
+                .pd1(cueSheet.getPd1Id())
+                .pd2(cueSheet.getPd2Id())
+                .anc1(cueSheet.getAnc1Id())
+                .anc2(cueSheet.getAnc2Id())
+                .td1(cueSheet.getTd1Id())
+                .stdioId(cueSheet.getStdioId())
+                .subrmId(cueSheet.getSubrmId())
+                .cgId(0L) //수정. 몬지모름
+                .cgloc("") //수정. 몬지모름
+                .vfId(0L) //수정. 몬지모름
+                .vsId(0L) //수정. 몬지모름
+                .pd1Nm(cueSheet.getPd1Nm())
+                .pd2Nm(cueSheet.getPd2Nm())
+                .anc1Nm(cueSheet.getAnc1Nm())
+                .anc2Nm(cueSheet.getAnc2Nm())
+                .tdNm(cueSheet.getTd1Nm())
+                .stdioNm("") //수정.
+                .subrmNm("") //수정.
+                .rdEdtYn("") //수정.
+                .endpgmYn("") //수정.
+                .build();
+
+        return pcsDto;
+    }
+
+    //일일편성 리스트를 테이커 큐시트DTO로 변환
+    public ParentProgramDTO dailyToTaker(DailyProgramDTO dailyProgram) {
+
+        //프로그램 아이디가 있으면 넣고 없으면 ""
+        String brdcPgmId = "";
+        ProgramDTO programDTO = dailyProgram.getProgram();
+        if (ObjectUtils.isEmpty(programDTO) == false) {
+            brdcPgmId = programDTO.getBrdcPgmId();
+        }
+
+        //InputDtm 변환해서 넣어야함 String -> Date
+
+        ParentProgramDTO pcsDto = ParentProgramDTO.builder()
+                .cueId(null)
+                .chDivCd("")
+                .chDivNm("") // 수정.
+                .brdcDt(dailyProgram.getBrdcDt())
+                .brdcStartTime(dailyProgram.getBrdcStartTime())
+                .brdcEndTime(dailyProgram.getBrdcEndClk())
+                .brdcPgmId(brdcPgmId) //수정.
+                .brdcPgmNm(dailyProgram.getBrdcPgmNm())
+                .urgPgmschPgmNm("") // 수정.몬지모름
+                .brdcDivCD("") //수정
+                .cmDivCd("") //수정
+                .remark(dailyProgram.getRmk())
+                .inputr(dailyProgram.getInputrId())
+                .inputrNm(dailyProgram.getInputrNm())
+                .inputDtm(null) //Bis에서 들어온 데이터가 달라 변환이 안댐.
+                .pd1("")
+                .pd2("")
+                .anc1("")
+                .anc2("")
+                .td1("")
+                .subrmId(dailyProgram.getSubrmId())
+                .stdioId(dailyProgram.getStdioId())
+                .cgId(0L) //수정. 몬지모름
+                .cgloc("") //수정. 몬지모름
+                .vfId(0L) //수정. 몬지모름
+                .vsId(0L) //수정. 몬지모름
+                .pd1Nm("")
+                .pd2Nm("")
+                .anc1Nm("")
+                .anc2Nm("")
+                .tdNm("")
+                .stdioNm("") //수정.
+                .subrmNm("") //수정.
+                .rdEdtYn("") //수정.
+                .endpgmYn("") //수정.
+                .build();
+
+        return pcsDto;
+    }
+
+    public String takerPgmToXml(List<ParentProgramDTO> parentProgramDTOList) {
 
         //큐시트목록 xml을 담는 DTO
         TakerProgramDTO takerProgramDTO = new TakerProgramDTO();
@@ -112,10 +273,10 @@ public class InterfaceService {
         takerProgramResultDTO.setMsg("ok");
 
         //조회된 큐시트 데이터  set
-        List<ParentProgramDTO> parentProgramDTOList = pageResultDTO.getDtoList();
+        //ist<ParentProgramDTO> parentProgramDTOList = pageResultDTO.getDtoList();
         takerProgramDataDTO.setParentProgramDTOList(parentProgramDTOList);
         takerProgramDataDTO.setTotalcount(parentProgramDTOList.stream().count());
-        takerProgramDataDTO.setCurpage(pageResultDTO.getPage());
+        //takerProgramDataDTO.setCurpage(pageResultDTO.getPage());
         takerProgramDataDTO.setRowcount(0);
 
 
@@ -125,14 +286,14 @@ public class InterfaceService {
         //DTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(takerProgramDTO, TakerProgramDTO.class);
 
-       // name.out.println("xml : " + xml);
+        // name.out.println("xml : " + xml);
         return xml;
     }
 
     //테이커 큐시트 조회
     public List<TakerCueSheetDTO> cuefindAll(String rd_id, String play_seq, String cued_seq, String vplay_seq, String vcued_seq,
-                                       String del_yn, String ch_div_cd, String usr_id, String token, String usr_ip,
-                                       String format, String lang, String os_type){
+                                             String del_yn, String ch_div_cd, String usr_id, String token, String usr_ip,
+                                             String format, String lang, String os_type) {
 
         //큐시트 아이티와 삭제여부값 예외 처리[아이디가 String 타입으로 들어오기 때문에 Long값으로 변환.]
         Long cueId = 3L;
@@ -140,13 +301,13 @@ public class InterfaceService {
             cueId = Long.parseLong(rd_id);
         }*/
         //큐시트 아이티와 삭제여부값 예외 처리[여부값이 안들어 올시, N값 설정]
-        if (del_yn == null || del_yn.trim().isEmpty()){
+        if (del_yn == null || del_yn.trim().isEmpty()) {
             del_yn = "N";
         }
         //테이커큐시트 상세조회
         Optional<CueSheet> cueSheet = cueSheetRepository.findTakerCue(cueId, del_yn);
 
-        if (cueSheet.isPresent() == false){ //조회된 큐시트가 없으면 return null = 에러가 나지 않게 설정
+        if (cueSheet.isPresent() == false) { //조회된 큐시트가 없으면 return null = 에러가 나지 않게 설정
             return null;
         }
         //조회된 큐시트 정보로 TakerCueSheetDTO 리스트 빌드
@@ -156,22 +317,22 @@ public class InterfaceService {
     }
 
     //큐시티 엔티티로 조회된 큐시트 TakerCueSheetDTO형식으로 빌드
-    public List<TakerCueSheetDTO> cueSheetToTakerCueSheet(CueSheet cueSheet){
+    public List<TakerCueSheetDTO> cueSheetToTakerCueSheet(CueSheet cueSheet) {
 
         List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem();//큐시트 엔티티에서 큐시트 아이템 리스트 get
         List<TakerCueSheetDTO> takerCueSheetDTOList = new ArrayList<>();//테이커 큐시트 DTO를 담아서 리턴할 리스트
 
-        for (int i = 0; i < cueSheetItemList.size(); i++){
+        for (int i = 0; i < cueSheetItemList.size(); i++) {
             Article article = new Article();
             Issue issue = new Issue();
             article = cueSheetItemList.get(i).getArticle(); //큐시트 아이템에 기사정보get
 
-            if (ObjectUtils.isEmpty(article)){
+            if (ObjectUtils.isEmpty(article)) {
 
                 //프로그램 아이디 get null에러 방지
                 Program program = cueSheet.getProgram();
                 String brdcPgmId = "";
-                if (ObjectUtils.isEmpty(program) == false){
+                if (ObjectUtils.isEmpty(program) == false) {
                     brdcPgmId = program.getBrdcPgmId();
                 }
 
@@ -193,17 +354,17 @@ public class InterfaceService {
                         .build();
 
                 takerCueSheetDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
-            }else {
+            } else {
                 //이슈아이디 get null에러 방지
                 issue = article.getIssue();
                 Long issueId = 0L;
-                if (ObjectUtils.isEmpty(issue) == false){
+                if (ObjectUtils.isEmpty(issue) == false) {
                     issueId = issue.getIssuId();
                 }
                 //프로그램 아이디 get null에러 방지
                 Program program = cueSheet.getProgram();
                 String brdcPgmId = "";
-                if (ObjectUtils.isEmpty(program) == false){
+                if (ObjectUtils.isEmpty(program) == false) {
                     brdcPgmId = program.getBrdcPgmId();
                 }
 
@@ -264,14 +425,13 @@ public class InterfaceService {
             }
 
 
-
         }
 
         return takerCueSheetDTOList;
     }
 
     //조회된 큐시트 데이터 리스트를 XML DTO에 set 후 XML형식 String데이터로 파싱
-    public String takerCueToXml(List<TakerCueSheetDTO> takerCueSheetDTOList){
+    public String takerCueToXml(List<TakerCueSheetDTO> takerCueSheetDTOList) {
         //큐시트목록 xml을 담는 DTO
         TakerCueSheetXML takerCueSheetXML = new TakerCueSheetXML();
         //success="true" msg="ok" 담는DTO
@@ -301,7 +461,7 @@ public class InterfaceService {
     }
 
     //Date형식을 String으로 파싱
-    public String dateToString(Date date){
+    public String dateToString(Date date) {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String stringDate = dateFormat.format(date);
@@ -310,8 +470,8 @@ public class InterfaceService {
     }
 
     //채널코드 조회
-    public TakerCodeDTO codeFindAll( String key, String ch_div_cd, String usr_id, String token, String usr_ip, String format,
-                             String lang, String os_type){
+    public TakerCodeDTO codeFindAll(String key, String ch_div_cd, String usr_id, String token, String usr_ip, String format,
+                                    String lang, String os_type) {
 
         String hrnkCd = "channel";
 
@@ -323,11 +483,11 @@ public class InterfaceService {
     }
 
     //조회한 코드 데이터 엔티티 리스트 정보를 TakerCodeDTO로 빌드
-    public TakerCodeDTO codeEntityToTakerCodeDTO(List<Code> codeList){
+    public TakerCodeDTO codeEntityToTakerCodeDTO(List<Code> codeList) {
 
         List<TakerCodeHrnkDTO> takerCodeHrnkDTOList = new ArrayList<>(); //데이터DTO에 set 시켜줄 데이터 리스트
 
-        for (Code code : codeList){ //조회된 코드 엔티티 정보를 [cd, cdNm]  TakerCodeHrnkDTO 데이터에 set
+        for (Code code : codeList) { //조회된 코드 엔티티 정보를 [cd, cdNm]  TakerCodeHrnkDTO 데이터에 set
 
             TakerCodeHrnkDTO takerCodeHrnkDTO = TakerCodeHrnkDTO.builder()
                     .cd(code.getCd())
@@ -345,7 +505,7 @@ public class InterfaceService {
         return takerCodeDTO;
     }
 
-    public String codeToTakerCodeXml(TakerCodeDTO takerCodeDTO){
+    public String codeToTakerCodeXml(TakerCodeDTO takerCodeDTO) {
 
         //코드목록 XML을 담는 DTO [DTO TO XML]
         TakerCodeXML takerCodeXML = new TakerCodeXML();
@@ -372,99 +532,19 @@ public class InterfaceService {
 
     }
 
-    private BooleanBuilder getSearch(Date sdate, Date edate) {
-
-        BooleanBuilder booleanBuilder = new BooleanBuilder();
-
-        QCueSheet qCueSheet = QCueSheet.cueSheet;
-
-        booleanBuilder.and(qCueSheet.delYn.eq("N"));
-
-        /*if (!StringUtils.isEmpty(sdate) && !StringUtils.isEmpty(edate)){
-            booleanBuilder.and(qCueSheet.inputDtm.between(sdate, edate));
-        }*/
-     /*   if(!StringUtils.isEmpty(brdcPgmId)){
-            booleanBuilder.and(qCueSheet.program.brdcPgmId.eq(brdcPgmId));
-        }
-        if(!StringUtils.isEmpty(brdcPgmNm)){
-            booleanBuilder.and(qCueSheet.brdcPgmNm.contains(brdcPgmNm));
-        }
-        if(!StringUtils.isEmpty(searchWord)){
-            booleanBuilder.and(qCueSheet.brdcPgmNm.contains(searchWord).or(qCueSheet.pd1.userNm.contains(searchWord))
-                    .or(qCueSheet.pd2.userNm.contains(searchWord)));
-        }*/
-
-        return booleanBuilder;
-    }
-
-   /* public BooleanBuilder cueItemGetSearch(Long artclId, Long cueId){
-
-        BooleanBuilder booleanBuilder = new BooleanBuilder();
-
-        //dsl q쿼리 생성
-        QCueSheetItem qCueSheetItem = QCueSheetItem.cueSheetItem;
-
-        booleanBuilder.and(qCueSheetItem.delYn.eq("N"));
-        //쿼리 where 조건 추가.
-        if (StringUtils.isEmpty(artclId) == false){
-            booleanBuilder.and(qCueSheetItem.article.artclId.eq(artclId));
-        }
-        //쿼리 where 조건 추가.
-        if (StringUtils.isEmpty(cueId) == false){
-            //booleanBuilder.and(qCueSheetItem.cueId.eq(cueId));
-        }
-
-
-        return booleanBuilder;
-    }*/
-
-   /* public CueSheet cueSheetFindOrFail(Long cueId){
-
-        Optional<CueSheet> cueSheet = cueSheetRepository.findByCue(cueId);
-
-        if (!cueSheet.isPresent()){
-            throw new ResourceNotFoundException("CueSheetId not found. cueSheetId : " + cueId);
-        }
-
-        return cueSheet.get();
-
-    }*/
-
-   /* public List<CueSheetItemDTO> setSymbol(List<CueSheetItemDTO> cueSheetItemDTOList){
-
-        for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList){ //조회된 아이템에 List
-
-            Long cueItemId = cueSheetItemDTO.getCueItemId(); //아이템 아이디 get
-
-            //아이템 아이디로 방송아이콘 맵핑테이블 조회
-            List<CueSheetItemSymbol> cueSheetItemSymbolList = cueSheetItemSymbolRepository.findSymbol(cueItemId);
-
-            if (ObjectUtils.isEmpty(cueSheetItemSymbolList) == false){
-
-                List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTO = cueSheetItemSymbolMapper.toDtoList(cueSheetItemSymbolList);
-
-                cueSheetItemDTO.setCueSheetItemSymbolDTO(cueSheetItemSymbolDTO); //아이템에 set방송아이콘List
-
-            }
-        }
-
-        return cueSheetItemDTOList;
-
-    }*/
-
     //프롬프터 일일편성 목록조회
     public List<PrompterProgramDTO> getMstListService(String pro_id, String sdate, String fdate) throws ParseException {
 
         Date formatSdate = stringToDate(sdate);
         Date formatEdate = stringToDate(fdate);
 
-        CueSheetFindAllDTO cueSheetFindAllDTO = cueSheetService.findAll(formatSdate, formatEdate, pro_id, "","");
+        CueSheetInterfaceDTO cueSheetInterfaceDTO = cueSheetService.findAllInterface(formatSdate, formatEdate, pro_id, "", "");
 
-        List<PrompterProgramDTO> prompterProgramDTOList = toPrompterDailyPgm(cueSheetFindAllDTO);
+        List<PrompterProgramDTO> prompterProgramDTOList = toPrompterDailyPgm(cueSheetInterfaceDTO);
 
         return prompterProgramDTOList;
     }
-    
+
     //String형식의 데이터를 Date타입으로 변환.
     public Date stringToDate(String date) throws ParseException {
 
@@ -480,14 +560,14 @@ public class InterfaceService {
     }
 
     //일일편성 큐시트목록 유니온 목록조회 목록을 프롬프터 형식의 데이터로 변환
-    public List<PrompterProgramDTO> toPrompterDailyPgm(CueSheetFindAllDTO cueSheetFindAllDTO){
+    public List<PrompterProgramDTO> toPrompterDailyPgm(CueSheetInterfaceDTO cueSheetInterfaceDTO) {
 
         List<PrompterProgramDTO> prompterProgramDTOList = new ArrayList<>(); //리턴시켜줄 프롬프터 프로그램 리스트 생성
 
-        List<CueSheetDTO> cueSheetDTOList = cueSheetFindAllDTO.getCueSheetDTO(); //큐시트목록 조회 리스트
-        List<DailyProgramDTO> dailyProgramDTOList = cueSheetFindAllDTO.getDailyProgramDTO(); //알알편성목록 조회 리스트
+        List<CueSheetDTO> cueSheetDTOList = cueSheetInterfaceDTO.getCueSheetDTO(); //큐시트목록 조회 리스트
+        List<DailyProgramDTO> dailyProgramDTOList = cueSheetInterfaceDTO.getDailyProgramDTO(); //알알편성목록 조회 리스트
 
-        for (CueSheetDTO cueSheet : cueSheetDTOList){
+        for (CueSheetDTO cueSheet : cueSheetDTOList) {
 
             String date = cueSheet.getBrdcDt(); //방송일자
             int cueBrdcDt = 0;
@@ -500,14 +580,18 @@ public class InterfaceService {
 
             String time = cueSheet.getBrdcStartTime();
             int cueStartTime = 0;
-            if ( time != null && time.trim().isEmpty() == false) { //방송시작시간이 있을경우
+            if (time != null && time.trim().isEmpty() == false) { //방송시작시간이 있을경우
 
                 //방송시작시작 Int변환을 위해 00:00:00 -> 000000으로 변환
                 //String getCueStime = time.substring(0,2)+time.substring(3,5)+time.substring(6,8);
                 //큐시트 방송시작시간 비교를 위해 int로 변환
                 cueStartTime = timeToInt(time);
             }
-            for (DailyProgramDTO dailyProgram : dailyProgramDTOList){
+
+            //ConcurrentModificationException에러가 나서 이터레이터로 수정.
+            Iterator<DailyProgramDTO> iter = dailyProgramDTOList.listIterator();
+            while (iter.hasNext()) {
+                DailyProgramDTO dailyProgram = iter.next();
 
                 //일일편성 방송일시 비교를 위해 int로 변환
                 int dailyBrdcDt = dateToint(dailyProgram.getBrdcDt());
@@ -515,43 +599,49 @@ public class InterfaceService {
                 //일일편성 방송시작시간 비교를 위해 int로 변환
                 int dailyStartTime = timeToInt(dailyProgram.getBrdcStartTime());
 
-              /*  //큐시트 방송일시가 일일편성 방송일시보다 크면.
+                /*//큐시트 방송일시가 일일편성 방송일시보다 크면.
                 if (cueBrdcDt > dailyBrdcDt){
-
+                    //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+                    prompterProgramDTOList.add(cueToPrompter(cueSheet));
+                    break;
                 }*/
                 //일일편성 방송일시가 큐시트 방송일시보다 크면.
-                if (cueBrdcDt < dailyBrdcDt){
-
+                if (cueBrdcDt < dailyBrdcDt) {
+                    prompterProgramDTOList.add(dailyToPrompter(dailyProgram));
+                    iter.remove();
                 }
                 //큐시트 방송일시와 일일편성 방송일시와 같으면
-                if (cueBrdcDt != 0 && dailyBrdcDt != 0 && cueBrdcDt == dailyBrdcDt){
-                        if (cueStartTime > dailyStartTime){//큐시트 시작시간이 크면 일일편성출력
-                            //프롬프터 큐시트목록 xml변환[ 일일편성 ]
-                            prompterProgramDTOList.add(dailyToPrompter(dailyProgram));
-                        }
-                        /*if (cueStartTime < dailyStartTime){//일일편성 시작시간이 크면 큐시트출력
-                            
-                        }*/
-                        if (cueStartTime == dailyStartTime){//같으면 큐시트,일일편성 둘다 출력하되 큐시트 먼저
-                            //프롬프터 큐시트목록 xml변환[ 일일편성 ]
-                            prompterProgramDTOList.add(dailyToPrompter(dailyProgram));
-                        }
-                    
+                if (cueBrdcDt != 0 && dailyBrdcDt != 0 && cueBrdcDt == dailyBrdcDt) {
+                    if (cueStartTime > dailyStartTime) {//큐시트 시작시간이 크면 일일편성출력
+                        //프롬프터 큐시트목록 xml변환[ 일일편성 ]
+                        prompterProgramDTOList.add(dailyToPrompter(dailyProgram));
+                        iter.remove();
+                    }
+                    /*if (cueStartTime < dailyStartTime){//일일편성 시작시간이 크면 큐시트출력
+                        //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+                        prompterProgramDTOList.add(cueToPrompter(cueSheet));
+                    }*/
+                    if (cueStartTime == dailyStartTime) {//같으면 큐시트,일일편성 둘다 출력하되 큐시트 먼저
+                        /*//프롬프터 큐시트목록 xml변환[ 큐시트 ]
+                        prompterProgramDTOList.add(cueToPrompter(cueSheet));*/
+                        //프롬프터 큐시트목록 xml변환[ 일일편성 ]
+                        prompterProgramDTOList.add(dailyToPrompter(dailyProgram));
+                        iter.remove();
+                    }
                 }
-
             }
-            //프롬프터 큐시트목록 xml변환[ 일일편성 ]
+            //프롬프터 큐시트목록 xml변환[ 큐시트 ]
             prompterProgramDTOList.add(cueToPrompter(cueSheet));
-
         }
         return prompterProgramDTOList;
     }
+
     //프롬프터 큐시트목록 xml변환[ 일일편성 ]
-    public PrompterProgramDTO dailyToPrompter(DailyProgramDTO dailyProgram){
+    public PrompterProgramDTO dailyToPrompter(DailyProgramDTO dailyProgram) {
 
         ProgramDTO programDTO = dailyProgram.getProgram();//프로그램 get
         String brdcPgmId = "";//set해줄 프로그램 아이디
-        if (ObjectUtils.isEmpty(programDTO) == false){ //프로그램이 있으면 프로그램아이디 출력하여 set
+        if (ObjectUtils.isEmpty(programDTO) == false) { //프로그램이 있으면 프로그램아이디 출력하여 set
             brdcPgmId = programDTO.getBrdcPgmId();
         }
         PrompterProgramDTO program = PrompterProgramDTO.builder()
@@ -565,21 +655,22 @@ public class InterfaceService {
                 .build();
         return program;
     }
+
     //프롬프터 큐시트목록 xml변환[ 큐시트 ]
-    public PrompterProgramDTO cueToPrompter(CueSheetDTO cueSheet){
+    public PrompterProgramDTO cueToPrompter(CueSheetDTO cueSheet) {
 
         ProgramDTO programDTO = cueSheet.getProgram();//프로그램 get
         String brdcPgmId = "";//set해줄 프로그램 아이디
-        if (ObjectUtils.isEmpty(programDTO) == false){ //프로그램이 있으면 프로그램아이디 출력하여 set
+        if (ObjectUtils.isEmpty(programDTO) == false) { //프로그램이 있으면 프로그램아이디 출력하여 set
             brdcPgmId = programDTO.getBrdcPgmId();
         }
 
         //기사수 get
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheet.getCueSheetItem();
         int articleCount = 0;
-        for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList){
+        for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList) {
             ArticleCueItemDTO article = cueSheetItemDTO.getArticle();
-            if (ObjectUtils.isEmpty(article)){//기사가 포함되지 않았으면 contiue;
+            if (ObjectUtils.isEmpty(article)) {//기사가 포함되지 않았으면 contiue;
                 continue;
             }
             ++articleCount; //기사가 포함되어있으면 +1
@@ -600,7 +691,7 @@ public class InterfaceService {
     //time to int
     public int timeToInt(String time) {
 
-        String formatTime = time.substring(0,2)+time.substring(3,5)+time.substring(6,8);
+        String formatTime = time.substring(0, 2) + time.substring(3, 5) + time.substring(6, 8);
 
         int formatDailyStartTime = 0;
         if (formatTime != null & formatTime.trim().isEmpty() == false) {
@@ -611,7 +702,7 @@ public class InterfaceService {
     }
 
     //date to int
-    public int dateToint(String date){
+    public int dateToint(String date) {
 
         String formatDate = date.substring(0, 4) + date.substring(5, 7) + date.substring(8, 10);
 
@@ -624,7 +715,7 @@ public class InterfaceService {
     }
 
     //프로그램 프롬프터 Xml형식으로 변환
-    public String prompterProgramToXml(List<PrompterProgramDTO> prompterProgramDTOList){
+    public String prompterProgramToXml(List<PrompterProgramDTO> prompterProgramDTOList) {
 
         //프롬프터 xml형식으로 변환할
         PrompterProgramXML prompterProgramXML = new PrompterProgramXML();
@@ -654,7 +745,7 @@ public class InterfaceService {
     }
 
     //프롬프터 큐시트 상세 조회 -> PrompterCueSheetDTO리스트로 변환
-    public List<PrompterCueSheetDTO> getCuesheetService(Long cs_id){
+    public List<PrompterCueSheetDTO> getCuesheetService(Long cs_id) {
 
 
         CueSheet cueSheet = findCueSheet(cs_id); //프롬프트로 보내줄 큐시트를 조회[단건 : 조건 큐시트 아이디]
@@ -668,7 +759,7 @@ public class InterfaceService {
 
     }
 
-    public String prompterCueSheetXml(List<PrompterCueSheetDTO> prompterCueSheetDTOList){
+    public String prompterCueSheetXml(List<PrompterCueSheetDTO> prompterCueSheetDTOList) {
 
         //프롬프터 큐시트 xml형식으로 변환할 DTO
         PrompterCueSheetXML prompterCueSheetXML = new PrompterCueSheetXML();
@@ -698,17 +789,17 @@ public class InterfaceService {
     }
 
     // 조회된 큐시트 정보를 List<PrompterCueSheetDTO>빌드 [기사정보가 있는 큐시트아이템 정보를 프롬프트DTO로 빌드 후 리턴]
-    public  List<PrompterCueSheetDTO> cueToPrompterCue(List<CueSheetItem> cueSheetItemList){
+    public List<PrompterCueSheetDTO> cueToPrompterCue(List<CueSheetItem> cueSheetItemList) {
 
         List<PrompterCueSheetDTO> prompterCueSheetDTOList = new ArrayList<>();
 
-        for (CueSheetItem cueSheetItem : cueSheetItemList){ //큐시트 아이템 PrompterCueSheetDTO리스트로 변환[기사(article)이 있는 아이템만 변환]
+        for (CueSheetItem cueSheetItem : cueSheetItemList) { //큐시트 아이템 PrompterCueSheetDTO리스트로 변환[기사(article)이 있는 아이템만 변환]
 
             Article article = cueSheetItem.getArticle(); //큐시스트 아이템에서 기사 get
             CueSheet cueSheet = cueSheetItem.getCueSheet();
             Long cueId = cueSheet.getCueId();
 
-            if (ObjectUtils.isEmpty(article)){ //기사 정보가 없으면 contiue [프롬프트에서 기사정보만 쓰임]
+            if (ObjectUtils.isEmpty(article)) { //기사 정보가 없으면 contiue [프롬프트에서 기사정보만 쓰임]
                 continue;
             }
             //조회된 cueSheet정보의 기사정보로 PrompterCueSheetDTO생성
@@ -744,12 +835,12 @@ public class InterfaceService {
     }
 
     //프롬프트로 보내줄 큐시트를 조회[단건 : 조건 큐시트 아이디]
-    public CueSheet findCueSheet(Long cs_id){
+    public CueSheet findCueSheet(Long cs_id) {
 
         Optional<CueSheet> cueSheet = cueSheetRepository.findByCue(cs_id);
 
-        if (cueSheet.isPresent() == false){
-            throw new ResourceNotFoundException("큐시트를 찾을 수 없습니다. 큐시트 아이디 : "+cs_id);
+        if (cueSheet.isPresent() == false) {
+            throw new ResourceNotFoundException("큐시트를 찾을 수 없습니다. 큐시트 아이디 : " + cs_id);
         }
 
         return cueSheet.get();
@@ -837,5 +928,43 @@ public class InterfaceService {
             }
 
             return prompterProgramDTOList;
+
+        }*/
+
+            /*for (DailyProgramDTO dailyProgram : dailyProgramDTOList){
+
+                    //일일편성 방송일시 비교를 위해 int로 변환
+                    int dailyBrdcDt = dateToint(dailyProgram.getBrdcDt());
+
+                    //일일편성 방송시작시간 비교를 위해 int로 변환
+                    int dailyStartTime = timeToInt(dailyProgram.getBrdcStartTime());
+
+                    //큐시트 방송일시가 일일편성 방송일시보다 크면.
+                    if (cueBrdcDt > dailyBrdcDt){
+                    //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+                    prompterProgramDTOList.add(cueToPrompter(cueSheet));
+                    }
+                    //일일편성 방송일시가 큐시트 방송일시보다 크면.
+                    if (cueBrdcDt < dailyBrdcDt){
+        prompterProgramDTOList.add(dailyToPrompter(dailyProgram));
+        }
+        //큐시트 방송일시와 일일편성 방송일시와 같으면
+        if (cueBrdcDt != 0 && dailyBrdcDt != 0 && cueBrdcDt == dailyBrdcDt){
+        if (cueStartTime > dailyStartTime){//큐시트 시작시간이 크면 일일편성출력
+        //프롬프터 큐시트목록 xml변환[ 일일편성 ]
+        prompterProgramDTOList.add(dailyToPrompter(dailyProgram));
+        }
+        if (cueStartTime < dailyStartTime){//일일편성 시작시간이 크면 큐시트출력
+        //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+        prompterProgramDTOList.add(cueToPrompter(cueSheet));
+        }
+        if (cueStartTime == dailyStartTime){//같으면 큐시트,일일편성 둘다 출력하되 큐시트 먼저
+        //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+        prompterProgramDTOList.add(cueToPrompter(cueSheet));
+        //프롬프터 큐시트목록 xml변환[ 일일편성 ]
+        prompterProgramDTOList.add(dailyToPrompter(dailyProgram));
+        }
+
+        }
 
         }*/

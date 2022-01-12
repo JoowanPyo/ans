@@ -20,7 +20,7 @@ public class UserDTO {
 
     private String userId;
     private String userNm;
-    private String pwd;
+    //private String pwd;
     private String emplNo;
     private String freeYn;
     private String deptId;
@@ -56,7 +56,7 @@ public class UserDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date delDtm;
     private String inphonNo;
-    private String salt;
+    //private String salt;
     private List<UserGroupUserDTO> userGroupUserDTO = new ArrayList<>();
 
     /*private String userId;

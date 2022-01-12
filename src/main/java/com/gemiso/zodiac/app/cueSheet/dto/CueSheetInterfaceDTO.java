@@ -13,8 +13,8 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CueSheetFindAllDTO {
+public class CueSheetInterfaceDTO {
 
-    private List<CueSheetListDTO> cueSheetDTO = new ArrayList<>();
+    private List<CueSheetDTO> cueSheetDTO = new ArrayList<>();
     private List<DailyProgramDTO> dailyProgramDTO = new ArrayList<>();
 }

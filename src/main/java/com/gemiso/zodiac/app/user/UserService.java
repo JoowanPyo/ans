@@ -10,11 +10,13 @@ import com.gemiso.zodiac.app.user.mapper.UserMapper;
 import com.gemiso.zodiac.app.user.mapper.UserUpdateMapper;
 import com.gemiso.zodiac.app.userGroup.UserGroup;
 import com.gemiso.zodiac.app.userGroup.UserGroupRepository;
+import com.gemiso.zodiac.core.helper.EncodingHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,6 +48,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final UserAuthService userAuthService;
+
+    @Value("${password.salt-key:saltKey}")
+    private String saltKey;
 
   /*  @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -111,14 +117,20 @@ public class UserService {
         return userDTO;
     }
 
-    public void create(UserCreateDTO userCreateDTO) {
+    public void create(UserCreateDTO userCreateDTO) throws NoSuchAlgorithmException {
 
-        String password = encodePassword(userCreateDTO.getPwd()); //password encoding type 어떻게 할지
+        //들어온 패스워드 해싱[sha256]
+        String getPwd = userCreateDTO.getPwd();
+        EncodingHelper encodingHelper = new EncodingHelper(getPwd);
+        String hexPwd = encodingHelper.getHex();
+
+        //password encoding
+        String password = encodePassword(hexPwd);
         userCreateDTO.setPwd(password);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String tokenUserId = userAuthService.authUser.getUserId();
-        userCreateDTO.setInputrId(tokenUserId);
+        //String tokenUserId = userAuthService.authUser.getUserId();
+        userCreateDTO.setInputrId("joowan");
 
         User userEntity = userCreateMapper.toEntity(userCreateDTO);
 

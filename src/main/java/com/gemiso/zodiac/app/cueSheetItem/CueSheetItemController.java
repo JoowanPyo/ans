@@ -34,9 +34,11 @@ public class CueSheetItemController {
                                                          @Parameter(name = "cueId", description = "큐시트 아이디")
                                                          @RequestParam(value = "cueId", required = false) Long cueId,
                                                          @Parameter(name = "delYn", description = "삭제여부 (디폴트 : N)")
-                                                         @RequestParam(value = "delYn", required = false) String delYn) {
+                                                         @RequestParam(value = "delYn", required = false) String delYn,
+                                                         @Parameter(name = "spareYn", description = "스페어여부 (디폴트 : N)")
+                                                         @RequestParam(value = "spareYn", required = false) String spareYn) {
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(artlcId, cueId, delYn);
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(artlcId, cueId, delYn, spareYn);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
     }
@@ -119,7 +121,7 @@ public class CueSheetItemController {
 
         cueSheetItemService.ordUpdate(cueId, cueItemId, cueItemOrd);
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null);
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
 
@@ -139,7 +141,7 @@ public class CueSheetItemController {
 
         cueSheetItemService.createCueItem(cueId, artclId, cueItemOrd, cueItemDivCd);
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null);
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
 
@@ -155,7 +157,7 @@ public class CueSheetItemController {
 
         cueSheetItemService.createCueItemList(cueSheetItemCreateListDTO, cueId);
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null);
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
     }

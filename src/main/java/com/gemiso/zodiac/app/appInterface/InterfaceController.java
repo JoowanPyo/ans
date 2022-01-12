@@ -9,6 +9,7 @@ import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
+import com.gemiso.zodiac.core.helper.SearchDateInterface;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -40,9 +42,9 @@ public class InterfaceController {
                                   @Parameter(name = "pgm_nm", description = "프로그램 명")
                                   @RequestParam(value = "pgm_nm", required = false) String pgm_nm,
                                   @Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
-                                  @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                  @DateTimeFormat(pattern = "yyyy-MM-dd") String sdate,
                                   @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
-                                  @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                  @DateTimeFormat(pattern = "yyyy-MM-dd") String edate,
                                   @Parameter(name = "brdc_pgm_div_cd", description = "프로그램 구분 코드")
                                   @RequestParam(value = "brdc_pgm_div_cd", required = false) String brdc_pgm_div_cd,
                                   @Parameter(name = "del_yn", description = "삭제여부")
@@ -63,19 +65,19 @@ public class InterfaceController {
                                   @RequestParam(value = "os_type", required = false) String os_type,
                                   @RequestHeader(value = "securityKey") String securityKey) throws Exception {
 
-        PageResultDTO<ParentProgramDTO, CueSheet> pageResultDTO = null;
+        List<ParentProgramDTO> parentProgramDTOList = new ArrayList<>();
         String takerCueSheetDTO = "";
 
         //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
-            SearchDate searchDate = new SearchDate(sdate, edate);
-            pageResultDTO = interfaceService.dailyPgmFindAll(searchDate.getStartDate(), searchDate.getEndDate());
+            SearchDateInterface searchDate = new SearchDateInterface(sdate, edate);
+            parentProgramDTOList = interfaceService.dailyPgmFindAll(searchDate.getStartDate(), searchDate.getEndDate(), brdc_pgm_id, pgm_nm);
 
-            takerCueSheetDTO = interfaceService.takerPgmToXml(pageResultDTO);
+            takerCueSheetDTO = interfaceService.takerPgmToXml(parentProgramDTOList);
         } else {
-            pageResultDTO = interfaceService.dailyPgmFindAll(null, null);
+            parentProgramDTOList = interfaceService.dailyPgmFindAll(null, null, brdc_pgm_id, pgm_nm);
 
-            takerCueSheetDTO = interfaceService.takerPgmToXml(pageResultDTO);
+            takerCueSheetDTO = interfaceService.takerPgmToXml(parentProgramDTOList);
         }
 
         return takerCueSheetDTO;
@@ -107,7 +109,7 @@ public class InterfaceController {
         return new AnsApiResponse<>(cueSheetItemDTOList);
     }*/
 
-    @Operation(summary = "큐시트 목록조회[Taker]", description = "큐시트 목록조회[Taker]")
+    @Operation(summary = "큐시트 상세조회[Taker]", description = "큐시트 상세조회[Taker]")
     @GetMapping(path = "/cuesheet")
     public String cueFindAll(@Parameter(name = "rd_id", description = "프로그램 아이디")
                              @RequestParam(value = "rd_id", required = false) String rd_id,

@@ -34,7 +34,7 @@ public class ParentProgramDTO {
     @XmlElement(name="brdc_end_clk")
     private String brdcEndTime;
     @XmlElement(name = "brdc_pgm_id")
-    private Long brdcPgmId; // new 아이디랑 네임 둘다출력
+    private String brdcPgmId; // new 아이디랑 네임 둘다출력
     @XmlElement(name="brdc_pgm_nm")
     private String brdcPgmNm; //아이디랑 네임 둘다출력
     @XmlElement(name = "urg_pgmsch_pgm_nm")

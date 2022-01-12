@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Api(description = "사용자 API")
@@ -65,7 +66,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<UserDTO> create(
             @Parameter(name = "userCreateDTO", required = true, description = "필수값<br> userNm , password") @Valid @RequestBody UserCreateDTO userCreateDTO
-    ) {
+    ) throws NoSuchAlgorithmException {
 
         String userId = userCreateDTO.getUserId();
         if (userService.checkUser(userId)) {

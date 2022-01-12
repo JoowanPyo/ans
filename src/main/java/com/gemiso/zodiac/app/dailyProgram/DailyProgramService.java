@@ -134,7 +134,7 @@ public class DailyProgramService {
     //Date to String
     public String dateToString(Date date){
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         String returnDate = dateFormat.format(date);
 

@@ -1,9 +1,6 @@
 package com.gemiso.zodiac.app.dailyProgram;
 
-import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.program.Program;
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;

@@ -31,29 +31,28 @@ public class CueSheetController {
     @GetMapping(path = "")
     public AnsApiResponse<CueSheetFindAllDTO> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
-                                                      @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
+                                                        @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                      @Parameter(name = "brdcPgmId", description = "프로그램 아이디")
+                                                        @Parameter(name = "brdcPgmId", description = "프로그램 아이디")
                                                       @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
-                                                      @Parameter(name = "brdcPgmNm", description = "프로그램 명")
+                                                        @Parameter(name = "brdcPgmNm", description = "프로그램 명")
                                                       @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
-                                                      @Parameter(name = "searchWord", description = "검색키워드")
+                                                        @Parameter(name = "searchWord", description = "검색키워드")
                                                       @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
 
-        CueSheetFindAllDTO cueSheetDTOList = new CueSheetFindAllDTO();
+        CueSheetFindAllDTO cueSheetFindAllDTO = new CueSheetFindAllDTO();
 
 
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
             //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 24:00:00)
             SearchDate searchDate = new SearchDate(sdate, edate);
-            cueSheetDTOList = cueSheetService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), brdcPgmId, brdcPgmNm, searchWord);
+            cueSheetFindAllDTO = cueSheetService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), brdcPgmId, brdcPgmNm, searchWord);
 
         } else {
-            cueSheetDTOList = cueSheetService.findAll(null, null, brdcPgmId, brdcPgmNm, searchWord);
-
+            cueSheetFindAllDTO = cueSheetService.findAll(null, null, brdcPgmId, brdcPgmNm, searchWord);
         }
 
-        return new AnsApiResponse<>(cueSheetDTOList);
+        return new AnsApiResponse<>(cueSheetFindAllDTO);
 
     }
 
