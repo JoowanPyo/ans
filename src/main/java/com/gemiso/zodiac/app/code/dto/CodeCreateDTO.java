@@ -20,15 +20,7 @@ public class CodeCreateDTO {
     private String cdExpl;
     private String hrnkCdId;
     private String useYn;
-    //private String delYn;
     private Integer cdOrd;
-    private Date inputDtm;
-    //private Date updtDtm;
-    //private Date delDtm;
     private String inputrId;
-    //private String inputrNm;
-    //private String updtrId;
-    //private String updtrNm;
-    //private String delrId;
-    //private String delrNm;
+
 }

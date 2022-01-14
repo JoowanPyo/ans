@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,8 +19,11 @@ import java.util.List;
 @NoArgsConstructor
 public class UserCreateDTO {
 
+    @NotBlank
     private String userId;
+    @NotBlank
     private String userNm;
+    @NotBlank
     private String pwd;
     private String emplNo;
     private String freeYn;
@@ -26,6 +31,7 @@ public class UserCreateDTO {
     private String dutyCd;
     private String dutyCdNm;
     private String chiefYn;
+    @Email
     private String email;
     private String tel;
     private String telPubYn;

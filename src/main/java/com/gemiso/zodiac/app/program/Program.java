@@ -18,10 +18,8 @@ import java.util.Date;
 @DynamicUpdate
 public class Program {
 
-    /*@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)*/
     @Id
-    @Column(name = "brdc_pgm_id", nullable = false)
+    @Column(name = "brdc_pgm_id", length = 50, nullable = false)
     private String brdcPgmId;
 
     @Column(name = "brdc_pgm_nm", length = 450)

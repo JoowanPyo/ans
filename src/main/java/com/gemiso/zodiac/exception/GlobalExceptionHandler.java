@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,6 +21,8 @@ import javax.servlet.ServletException;
 import javax.validation.ConstraintViolationException;
 import java.security.InvalidParameterException;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 @ControllerAdvice
@@ -87,17 +90,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
     @ExceptionHandler(value = { ExpiredJwtException.class })
     public ResponseEntity<Object> handleExpiredJwtException(ExpiredJwtException ex){
         ApiErrorResponse.Error error =
-                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.EXPIRED_ACCESSTOKEN, ex.getLocalizedMessage());
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.expiredAccesstoken, ex.getLocalizedMessage());
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(value = { ServletException.class })
+   /* @ExceptionHandler(value = { ServletException.class })
     public ResponseEntity<Object> handleServletException(ServletException ex){
         ApiErrorResponse.Error error =
-                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.EXPIRED_ACCESSTOKEN, ex.getLocalizedMessage());
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.expiredAccesstoken, ex.getLocalizedMessage());
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.UNAUTHORIZED);
-    }
+    }*/
+
+   /* //vaiid Exception Handeler
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex){
+
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors()
+                .forEach(c -> errors.put(((FieldError)c).getField(), c.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(errors);
+    }*/
 
 }

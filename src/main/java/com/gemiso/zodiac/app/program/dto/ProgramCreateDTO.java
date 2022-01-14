@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
@@ -18,27 +19,16 @@ import java.util.List;
 @NoArgsConstructor
 public class ProgramCreateDTO {
 
-    //private Long brdcPgmId;
+    private Long brdcPgmId;
     private String brdcPgmNm;
     private String chDivCd;
-    //private String chDivCdNm;
     private String brdcPgmDivCd;
-    //private String brdcPgmDivCdNm;
     private String gneDivCd;
-    //private String gneDivCdNm;
     private String prdDivCd;
-    //private String prdDivCdNm;
     private String brdcStartTime;
     private String schTime;
     private String inputDtm;
-    //private Date updtDtm;
-    //private String delYn;
-    //private Date delDtm;
     private String inputrId;
-    //private String inputrNm;
-    //private String updtrId;
-    //private String updtrNm;
-    //private String delrId;
-    //private String delrNm;
+
 
 }

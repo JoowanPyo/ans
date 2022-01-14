@@ -118,23 +118,94 @@ public class BisInterfaceService {
                 }
             }
         }
-
         /*String userId = userAuthService.authUser.getUserId();*/
 
         if (CollectionUtils.isEmpty(dsProgramDTOList) == false) { //BIS에서 새로들오온 프로그램의 정보를 엔티티 빌드후 등록한다.
             for (DsProgramDTO dsProgramDTO : dsProgramDTOList) {
+
+                String chanTp = dsProgramDTO.getChanTp(); //Bis에서 조회된 채널정보 get
+                String jenreClf1 = dsProgramDTO.getJenreClf1();//Bis에서 조회된 장르구분 get
+                String productClf = dsProgramDTO.getProductClf();//Bis에서 조회된 제작구분 get
+
+                //채널유형 01:TV 02:라디오
+                String chDivCd = getChannelCd(chanTp);
+                //장르구분 100 보도, 200:교양, 300:오락
+                String gneDivCd = getGenreCd(jenreClf1);
+                //제작구분 100:자체제작, 200:외주제작, 300:국내구매, 400:해외구매, 500리패키지, 999:기타
+                String prdDivCd = getProduceCd(productClf);
+
                 Program program = Program.builder()
-                        .brdcPgmId(dsProgramDTO.getPgmCd())
-                        .brdcPgmNm(dsProgramDTO.getPgmNm())
-                        .chDivCd(dsProgramDTO.getChanTp())
-                        .gneDivCd(dsProgramDTO.getJenreClf1())
-                        .prdDivCd(dsProgramDTO.getProductClf())
+                        .brdcPgmId(dsProgramDTO.getPgmCd())//프로그램 아이디
+                        .brdcPgmNm(dsProgramDTO.getPgmNm())//프로그램 명
+                        .chDivCd(chDivCd)//채널구분
+                        .gneDivCd(gneDivCd)//장르구분
+                        .prdDivCd(prdDivCd)//제작구분
                         /*.inputrId(userId)*/
                         .build();
 
                 programRepository.save(program);
             }
         }
+    }
+
+    //프로그램 제작구분 100:자체제작, 200:외주제작, 300:국내구매, 400:해외구매, 500리패키지, 999:기타[Bis에서 조회된 정보 ANS형식으로 변환]
+    public String getProduceCd(String productClf){
+
+        String prdDivCd = "";
+
+        if (productClf != null && productClf.trim().isEmpty() == false) {
+            switch (productClf) {
+                case "100":
+                    prdDivCd = "자체제작";
+                case "200":
+                    prdDivCd = "외주제작";
+                case "300":
+                    prdDivCd = "국내구매";
+                case "400":
+                    prdDivCd = "해외구매";
+                case "500":
+                    prdDivCd = "리패키지";
+                case "999":
+                    prdDivCd = "기타";
+            }
+        }
+        return prdDivCd;
+    }
+
+    //프로그램 장르구분 100 보도, 200:교양, 300:오락[Bis에서 조회된 정보 ANS형식으로 변환]
+    public String getGenreCd(String jenreClf1){
+
+        String genDivCd = "";
+
+        if (jenreClf1 != null && jenreClf1.trim().isEmpty() == false) {
+            switch (jenreClf1) {
+                case "100":
+                    genDivCd = "보도";
+                case "200":
+                    genDivCd = "교양";
+                case "300":
+                    genDivCd = "오락";
+            }
+        }
+
+        return genDivCd;
+    }
+
+    //프로그램 채널유형 01:TV 02:라디오[Bis에서 조회된 정보 ANS형식으로 변환]
+    public String getChannelCd(String chDivCd){
+
+        String returnChDivCd = "";
+
+        if (chDivCd != null && chDivCd.trim().isEmpty() == false) {
+            switch (chDivCd) {
+                case "1":
+                    returnChDivCd = "tv";
+                case "2":
+                    returnChDivCd = "radio";
+            }
+        }
+
+        return returnChDivCd;
     }
 
     //Bis에서 기본편성 정보를 가져온다.

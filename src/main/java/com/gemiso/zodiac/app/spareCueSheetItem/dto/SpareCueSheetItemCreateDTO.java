@@ -2,7 +2,7 @@ package com.gemiso.zodiac.app.spareCueSheetItem.dto;
 
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolDTO;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

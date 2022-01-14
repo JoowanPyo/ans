@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.cueSheetItem.dto;
+package com.gemiso.zodiac.app.cueSheetItemSymbol.dto;
 
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import lombok.AllArgsConstructor;

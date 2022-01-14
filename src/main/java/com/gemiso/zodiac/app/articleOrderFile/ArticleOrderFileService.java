@@ -1,10 +1,10 @@
-package com.gemiso.zodiac.app.articleOrder;
+package com.gemiso.zodiac.app.articleOrderFile;
 
-import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderFileCreateDTO;
-import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderFileDTO;
+import com.gemiso.zodiac.app.articleOrderFile.dto.ArticleOrderFileCreateDTO;
+import com.gemiso.zodiac.app.articleOrderFile.dto.ArticleOrderFileDTO;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderSimpleDTO;
-import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderFileCreateMapper;
-import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderFileMapper;
+import com.gemiso.zodiac.app.articleOrderFile.mapper.ArticleOrderFileCreateMapper;
+import com.gemiso.zodiac.app.articleOrderFile.mapper.ArticleOrderFileMapper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;

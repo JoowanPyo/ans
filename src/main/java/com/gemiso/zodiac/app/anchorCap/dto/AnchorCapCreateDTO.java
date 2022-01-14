@@ -1,13 +1,12 @@
 package com.gemiso.zodiac.app.anchorCap.dto;
 
-import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
-import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateDTO;
-import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotNull;
 
 @Schema(name = "앵커자막 등록 DTO")
 @Data
@@ -20,14 +19,14 @@ public class AnchorCapCreateDTO {
     //private Long anchorCapId;
     @Schema(description = "자막 구분 코드")
     private String capDivCd;
-    //@Schema(description = "자막 구분 코드 명")
-    //private String capDivCdNm;
+    @NotNull
     @Schema(description = "라인 번호")
     private int lnNo;
     @Schema(description = "자막 내용")
     private String capCtt;
     @Schema(description = "자막 비고")
     private String capRmk;
+    @NotNull
     @Schema(description = "기사 아이디")
     private Long articleId;
     @Schema(description = "자막 템플릿 아이디")

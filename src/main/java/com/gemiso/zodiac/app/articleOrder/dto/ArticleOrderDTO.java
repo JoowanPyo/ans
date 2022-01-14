@@ -1,12 +1,8 @@
 package com.gemiso.zodiac.app.articleOrder.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
-import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
-import com.gemiso.zodiac.app.articleOrder.ArticleOrderFile;
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
+import com.gemiso.zodiac.app.articleOrderFile.dto.ArticleOrderFileDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

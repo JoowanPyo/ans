@@ -20,12 +20,5 @@ public class DictionaryCreateDTO {
     private String expl;
     private String wordKo;
     private String wordEn;
-    //private Date delDtm;
     private String inputrId;
-    //private String inputrNm;
-    //private String updtrId;
-    //private String updtrNm;
-    //private String delrId;
-    //private String delrNm;
-    //private String delYn;
 }

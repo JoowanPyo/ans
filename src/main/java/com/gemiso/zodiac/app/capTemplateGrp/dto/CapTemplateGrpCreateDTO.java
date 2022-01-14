@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -17,14 +18,8 @@ public class CapTemplateGrpCreateDTO {
 
     //private Long tmpltGrpId;
     private String chDivCd;
-    //private String chDivCdNm;
+    @NotNull
     private String tmpltGrpNm;
-    /*private String brdcPgmId;*/
     private String inputrId;
-    //private String inputrNm;
-    //private String updtrId;
-    //private String updtrNm;
-    //private String delYn;
-    private Date inputDtm;
-    //private Date updtDtm;
+
 }

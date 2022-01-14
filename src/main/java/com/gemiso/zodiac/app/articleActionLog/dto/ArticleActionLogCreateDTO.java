@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ArticleActionLogCreateDTO {
 
-    private Long id;
+    //private Long id;
     private String message;
     private String action;
     private String artclInfo;

@@ -2,9 +2,7 @@ package com.gemiso.zodiac.app.articleOrder;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gemiso.zodiac.app.article.Article;
-import com.gemiso.zodiac.app.code.Code;
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.user.UserGroupUser;
+import com.gemiso.zodiac.app.articleOrderFile.ArticleOrderFile;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;

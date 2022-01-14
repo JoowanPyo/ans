@@ -1,9 +1,9 @@
-package com.gemiso.zodiac.app.cueSheetItem;
+package com.gemiso.zodiac.app.cueSheetItemSymbol;
 
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolCreateDTO;
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolDTO;
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolResponseDTO;
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolUpdateDTO;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolCreateDTO;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolDTO;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolResponseDTO;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolUpdateDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;

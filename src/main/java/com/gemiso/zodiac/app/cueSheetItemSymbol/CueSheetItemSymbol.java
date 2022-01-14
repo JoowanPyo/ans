@@ -1,5 +1,6 @@
-package com.gemiso.zodiac.app.cueSheetItem;
+package com.gemiso.zodiac.app.cueSheetItemSymbol;
 
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.user.User;
 import lombok.*;

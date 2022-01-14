@@ -1,7 +1,7 @@
-package com.gemiso.zodiac.app.cueSheetItem.mapper;
+package com.gemiso.zodiac.app.cueSheetItemSymbol.mapper;
 
-import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemSymbol;
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSymbolDTO;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolDTO;
 import com.gemiso.zodiac.core.mapper.GenericMapper;
 import org.mapstruct.Mapper;
 

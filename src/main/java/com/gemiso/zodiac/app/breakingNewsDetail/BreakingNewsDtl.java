@@ -30,6 +30,6 @@ public class BreakingNewsDtl {
     private String ctt;
 
     @ManyToOne
-    @JoinColumn(name = "breaking_news_id")
+    @JoinColumn(name = "breaking_news_id", nullable = false)
     private BreakingNews breakingNews;
 }

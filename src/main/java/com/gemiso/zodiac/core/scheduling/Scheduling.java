@@ -20,6 +20,7 @@ public class Scheduling {
 
     //BIS프로그램 조회 및 등록
     @Scheduled(cron = "* * 3 * * ?")//3시간에 한번씩
+    /*@Scheduled(cron = "0 * * * * *")*/
     public void bisProgramCreate() throws Exception {
 
         //bis에서 프로그램 정보를 가져온다.

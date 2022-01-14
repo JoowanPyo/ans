@@ -1,7 +1,7 @@
-package com.gemiso.zodiac.app.cueSheetItem.dto;
+package com.gemiso.zodiac.app.cueSheetItemSymbol.dto;
 
+import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSimpleDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
-import com.gemiso.zodiac.app.symbol.dto.SymbolSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,10 +11,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CueSheetItemSymbolCreateDTO {
+public class CueSheetItemSymbolDTO {
 
-    //private Long id;
+
+    private Long id;
     private CueSheetItemSimpleDTO cueSheetItem;
-    private SymbolSimpleDTO symbol;
+    private SymbolDTO symbol;
     private int ord;
 }

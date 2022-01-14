@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,24 +19,17 @@ import java.util.List;
 public class BreakingNewsCreateDTO {
 
     //private Long breakingNewsId;
+    @NotNull
     private Date brdcDtm;
+    @NotNull
     private String titl;
+    @NotNull
     private String breakingNewsDiv;
-    //private String breakingNewsDivNm;
+    @NotNull
     private String lnTypCd;
-    //private String lnTypCdNm;
     private Date trnsfDtm;
+    @NotNull
     private String trnsfStCd;
-    //private String trnsfStCdNm;
-    //private Date inputDtm;
-    //private Date updtDtm;
-    //private Date delDtm;
-    //private String delYn;
     private String inputrId;
-    //private String inputrNm;
-    //private String updtrId;
-    //private String updtrNm;
-    //private String delrId;
-    //private String delrNm;
     private List<BreakingNewsDtlCreateDTO> breakingNewsDtls = new ArrayList<>();
 }

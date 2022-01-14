@@ -1165,8 +1165,12 @@ public class ArticleService {
         String orgApprDivCd = article.getApprvDivCd(); //현재 기사의 픽스 값을 get
         String orgLckYn = article.getLckYn(); //잠금 여부값 확인
         String inputr = article.getInputrId(); //기사 작성자 get
+        String lckrId = article.getLckrId();// 잠금 사용자 확인
 
-        if ("Y".equals(orgLckYn)) { //이미 lckYn 값이 Y이면 잠긴상태이므로 리턴 true로 예외처리로 넘어간다.
+        // 사용자 정보
+        String userId = userAuthService.authUser.getUserId();//토큰에서 유저 아이디를 가져온다.
+
+        if ("Y".equals(orgLckYn) && userId.equals(lckrId) == false) { //이미 lckYn 값이 Y이면 잠긴상태이므로 리턴 true로 예외처리로 넘어간다.
             ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
                     .artclId(article.getArtclId())
                     .lckYn(article.getLckYn())
@@ -1180,8 +1184,6 @@ public class ArticleService {
             return articleAuthConfirmDTO;
         }
 
-        // 사용자 정보
-        String userId = userAuthService.authUser.getUserId();//토큰에서 유저 아이디를 가져온다.
 
         //현재접속자 그룹정보를 그룹이넘 리스트로 불러온다.
         List<String> fixAuthList = getAppAuth(userId);

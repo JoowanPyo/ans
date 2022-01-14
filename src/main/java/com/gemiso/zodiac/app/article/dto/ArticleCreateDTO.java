@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.List;
 public class ArticleCreateDTO {
 
     //private Long artclId;
+    @NotNull
     private String chDivCd;
     //private String chDivCdNm;
     private String artclKindCd;
@@ -66,7 +69,7 @@ public class ArticleCreateDTO {
     private String regAppTyp;
     private Long brdcPgmId;
     private Date brdcSchdDtm;
-    private Date inputDtm;
+    //private Date inputDtm;
     //private Date updtDtm;
     private String inputrId;
     //private String updtrId;
@@ -82,6 +85,7 @@ public class ArticleCreateDTO {
     private Integer ancMentCttTime;
     private Integer artclExtTime;
     private Integer videoTime;
+    @NotNull
     private String deptCd;
     private String deviceCd;
     private String memo;

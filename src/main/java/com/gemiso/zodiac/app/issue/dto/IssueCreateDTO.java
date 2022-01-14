@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -18,22 +19,18 @@ public class IssueCreateDTO {
 
     //private Long issuId;
     private String chDivCd;
+    @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date issuDtm;
     private Integer issuOrd;
+    @NotNull
     private String issuKwd;
     private String issuCtt;
     private String issuFnshYn;
-    //private String issuDelYn;
-    //private Date delDtm;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date  issuFnshDtm;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private Date inputDtm;
-    //private Date updtDtm;
     private Long issuOrgId;
     private String inputrId;
-    //private String updtrId;
-    //private String delrId;
 
 }

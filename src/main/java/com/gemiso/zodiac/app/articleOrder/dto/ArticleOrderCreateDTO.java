@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -30,5 +31,6 @@ public class ArticleOrderCreateDTO {
     private String clientId;
     private Date inputDtm;
     //private Date updtDtm;
+    @NotNull
     private ArticleSimpleDTO article;
 }

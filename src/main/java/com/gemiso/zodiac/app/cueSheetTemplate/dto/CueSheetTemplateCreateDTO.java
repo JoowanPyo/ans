@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,22 +24,11 @@ public class CueSheetTemplateCreateDTO {
     private String brdcPgmNm;
     private String cueTmpltNm;
     private String newsDivCd;
-    //private String newsDivCdNm;
     private String rmk;
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    //private Date inputDtm;
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    //private Date updtDtm;
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    //private Date delDtm;
     private String delYn;
     private String inputrId;
-    //private String inputrNm;
-    //private String updtrId;
-    //private String updtrNm;
-    //private String delrId;
-    //private String delrNm;
+    @NotNull
     private ProgramSimpleDTO program;
+    @NotNull
     private BaseProgramSimpleDTO baseProgram;
-    //private List<CueTmplSymbolDTO> cueTmplSymbol = new ArrayList<>();
 }

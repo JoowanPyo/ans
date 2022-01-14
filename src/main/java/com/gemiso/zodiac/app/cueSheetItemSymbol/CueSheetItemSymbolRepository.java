@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.cueSheetItem;
+package com.gemiso.zodiac.app.cueSheetItemSymbol;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

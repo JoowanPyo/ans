@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -14,7 +16,10 @@ import lombok.NoArgsConstructor;
 public class CueCapTmpltCreateDTO {
 
     //private Long id;
+    @NotNull
     private String cgDivCd;
+    @NotNull
     private CapTemplateSimpleDTO capTemplate;
+    @NotNull
     private ProgramSimpleDTO program;
 }

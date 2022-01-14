@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
@@ -25,25 +26,11 @@ public class CueTmpltItemCreateDTO {
     private String cueItemOrdCd;
     private int cueItemTime;
     private String cueItemFrmCd;
-    //private String cueItemFrmCdNm;
     private String cueItemDivCd;
-    //private String cueItemDivCdNm;
-    //private String lckYn;
-    //private String delYn;
-    //private Date inputDtm;
-    //private Date updtDtm;
-    //private Date delDtm;
-    //private Date lckDtm;
     private String mediaChCd;
     private String mediaDurtn;
     private String inputrId;
-    //private String inputrNm;
-    //private String updtrId;
-    //private String updtrNm;
-    //private String delrId;
-    //private String delrNm;
-    //private String lckrId;
-    //private String lckrNm;
+    @NotNull
     private CueSheetTemplateSimpleDTO cueSheetTemplate;
     private List<CueTmpltItemCapCreateDTO> cueTmpltItemCap;
 }

@@ -1,5 +1,6 @@
-package com.gemiso.zodiac.app.articleOrder;
+package com.gemiso.zodiac.app.articleOrderFile;
 
+import com.gemiso.zodiac.app.articleOrder.ArticleOrder;
 import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.user.User;
 import lombok.*;

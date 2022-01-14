@@ -33,22 +33,11 @@ public class ArticleHistCreateDTO {
     private int artclOrd;
     @Schema(description = "원본 기사 아이디")
     private Long orgArtclId;
-    @Schema(description = "입력 일시")
-    private Date inputDtm;
+    //@Schema(description = "입력 일시")
+    //private Date inputDtm;
     @Schema(description = "버전")
     private int ver;
     @Schema(description = "기사 아이디")
     private ArticleDTO article;
 
-    /*//private Long artclHistId;
-    private String chDivCd;
-    private String artclTitl;
-    private String artclTitlEn;
-    private String artclCtt;
-    private String ancMentCtt;
-    private int artclOrd;
-    private Long orgArtclId;
-    private Date inputDtm;
-    private int ver;
-    private ArticleDTO article;*/
 }

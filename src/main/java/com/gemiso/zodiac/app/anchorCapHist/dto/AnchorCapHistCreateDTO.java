@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AnchorCapHistCreateDTO {
 
-    private Long ancCapHistId;
+    //private Long ancCapHistId;
     private int lnNo;
     private Long capTmpltId;
     private String capCtt;
