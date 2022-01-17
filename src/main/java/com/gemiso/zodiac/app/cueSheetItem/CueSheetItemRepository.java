@@ -16,4 +16,7 @@ public interface CueSheetItemRepository extends JpaRepository<CueSheetItem, Long
 
     @Query("select a from CueSheetItem a where a.cueItemId = :cueItemId and a.delYn = 'N'")
     Optional<CueSheetItem> findByCueItem(@Param("cueItemId")Long cueItemId);
+
+    @Query("select a from CueSheetItem a where a.delYn = 'N' and a.article.artclId =:artclId and a.article.delYn = 'N'")
+    Optional<CueSheetItem> findArticleCue(@Param("artclId")Long artclId);
 }

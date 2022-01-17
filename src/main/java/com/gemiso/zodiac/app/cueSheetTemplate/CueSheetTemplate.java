@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.baseProgram.BaseProgram;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbol;
 import com.gemiso.zodiac.app.program.Program;
-import com.gemiso.zodiac.app.tag.ArticleTag;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;

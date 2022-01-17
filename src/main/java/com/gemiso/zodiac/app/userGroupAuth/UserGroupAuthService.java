@@ -1,13 +1,15 @@
-package com.gemiso.zodiac.app.userGroup;
+package com.gemiso.zodiac.app.userGroupAuth;
 
 import com.gemiso.zodiac.app.appAuth.AppAuth;
 import com.gemiso.zodiac.app.appAuth.AppAuthRepository;
 import com.gemiso.zodiac.app.appAuth.dto.AppAuthDTO;
 import com.gemiso.zodiac.app.appAuth.mapper.AppAuthMapper;
-import com.gemiso.zodiac.app.userGroup.dto.UserGroupAuthCreateDTO;
-import com.gemiso.zodiac.app.userGroup.dto.UserGroupAuthDTO;
+import com.gemiso.zodiac.app.userGroup.UserGroup;
+import com.gemiso.zodiac.app.userGroup.UserGroupRepository;
+import com.gemiso.zodiac.app.userGroupAuth.dto.UserGroupAuthCreateDTO;
+import com.gemiso.zodiac.app.userGroupAuth.dto.UserGroupAuthDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupDTO;
-import com.gemiso.zodiac.app.userGroup.mapper.UserGroupAuthMapper;
+import com.gemiso.zodiac.app.userGroupAuth.mapper.UserGroupAuthMapper;
 import com.gemiso.zodiac.app.userGroup.mapper.UserGroupMapper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
-public class AddUserGroupAuthService {
+public class UserGroupAuthService {
 
     private final UserGroupRepository userGroupRepository;
     private final UserGroupAuthRepository userGroupAuthRepository;

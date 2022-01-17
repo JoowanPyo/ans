@@ -64,7 +64,7 @@ public class ArticleUpdateDTO {
     //private String delYn;
     private String notiYn;
     private String regAppTyp;
-    private Long brdcPgmId;
+    private String brdcPgmId;
     private Date brdcSchdDtm;
     //private Date inputDtm;
     private Date updtDtm;

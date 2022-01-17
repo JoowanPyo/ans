@@ -1,7 +1,6 @@
 package com.gemiso.zodiac.app.user.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
+import com.gemiso.zodiac.app.userGroupUser.dto.UserGroupUserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Data

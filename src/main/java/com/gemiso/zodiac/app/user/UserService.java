@@ -2,14 +2,16 @@ package com.gemiso.zodiac.app.user;
 
 import com.gemiso.zodiac.app.user.dto.UserCreateDTO;
 import com.gemiso.zodiac.app.user.dto.UserDTO;
-import com.gemiso.zodiac.app.user.dto.UserGroupUserDTO;
+import com.gemiso.zodiac.app.userGroupUser.dto.UserGroupUserDTO;
 import com.gemiso.zodiac.app.user.dto.UserUpdateDTO;
 import com.gemiso.zodiac.app.user.mapper.UserCreateMapper;
-import com.gemiso.zodiac.app.user.mapper.UserGroupUserMapper;
+import com.gemiso.zodiac.app.userGroupUser.mapper.UserGroupUserMapper;
 import com.gemiso.zodiac.app.user.mapper.UserMapper;
 import com.gemiso.zodiac.app.user.mapper.UserUpdateMapper;
 import com.gemiso.zodiac.app.userGroup.UserGroup;
 import com.gemiso.zodiac.app.userGroup.UserGroupRepository;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUserRepository;
 import com.gemiso.zodiac.core.helper.EncodingHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;

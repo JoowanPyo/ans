@@ -6,7 +6,7 @@ import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
-import com.gemiso.zodiac.app.tag.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.tagArticle.dto.ArticleTagDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -117,7 +117,7 @@ public class ArticleDTO {
     @Schema(description = "등록 어플리케이션 유형")
     private String regAppTyp;
     @Schema(description = "방송 프로그램 아이디")
-    private Long brdcPgmId;
+    private String brdcPgmId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "방송예정 일시")
     private Date brdcSchdDtm;

@@ -2,7 +2,6 @@ package com.gemiso.zodiac.app.scrollNews;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.scrollNewsDetail.ScrollNewsDetail;
-import com.gemiso.zodiac.app.tag.ArticleTag;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;

@@ -1,5 +1,6 @@
-package com.gemiso.zodiac.app.user.dto;
+package com.gemiso.zodiac.app.userGroupUser.dto;
 
+import com.gemiso.zodiac.app.user.dto.UserDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

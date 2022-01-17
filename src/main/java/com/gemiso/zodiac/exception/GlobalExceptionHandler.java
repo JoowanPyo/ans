@@ -22,6 +22,7 @@ import javax.validation.ConstraintViolationException;
 import java.security.InvalidParameterException;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -33,7 +34,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
     @ExceptionHandler(value = ConstraintViolationException.class)
     @ResponseBody
     protected ResponseEntity<ApiErrorResponse> handleConstraintViolationException(ConstraintViolationException exception) {
-        return new ResponseEntity<>(ApiErrorResponse.makeValidationErrorResponse(exception), HttpStatus.UNPROCESSABLE_ENTITY);
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.makeValidationErrorResponse(exception);
+        log.error(apiErrorResponse.toString());
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     /**

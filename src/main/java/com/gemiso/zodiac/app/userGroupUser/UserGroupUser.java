@@ -1,5 +1,6 @@
-package com.gemiso.zodiac.app.user;
+package com.gemiso.zodiac.app.userGroupUser;
 
+import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.userGroup.UserGroup;
 import lombok.*;
 

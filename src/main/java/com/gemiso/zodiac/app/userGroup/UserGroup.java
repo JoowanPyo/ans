@@ -1,7 +1,7 @@
 package com.gemiso.zodiac.app.userGroup;
 
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.user.UserGroupUser;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
+import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuth;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;

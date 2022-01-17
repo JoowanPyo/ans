@@ -103,7 +103,7 @@ public class CueSheetItemController {
     public AnsApiResponse<?> delete(@Parameter(name = "cueId", description = "큐시트아이디")
                                     @PathVariable("cueId") Long cueId,
                                     @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
-                                    @PathVariable("cueItemId") Long cueItemId) {
+                                    @PathVariable("cueItemId") Long cueItemId) throws Exception {
 
         cueSheetItemService.delete(cueId, cueItemId);
 

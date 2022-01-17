@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.userGroup.dto;
+package com.gemiso.zodiac.app.userGroupUser.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserGroupAuthCreateDTO {
+public class UserToGroupUdateDTO {
 
-    private Long appAuthId;
+    private Long userGrpId;
 }

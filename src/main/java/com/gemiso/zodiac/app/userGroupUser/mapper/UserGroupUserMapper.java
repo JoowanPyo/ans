@@ -1,11 +1,9 @@
-package com.gemiso.zodiac.app.user.mapper;
+package com.gemiso.zodiac.app.userGroupUser.mapper;
 
-import com.gemiso.zodiac.app.user.UserGroupUser;
-import com.gemiso.zodiac.app.user.dto.UserGroupUserDTO;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
+import com.gemiso.zodiac.app.userGroupUser.dto.UserGroupUserDTO;
 import com.gemiso.zodiac.core.mapper.GenericMapper;
 import org.mapstruct.Mapper;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UserGroupUserMapper extends GenericMapper<UserGroupUserDTO, UserGroupUser, UserGroupUserDTO> {

@@ -1,16 +1,12 @@
 package com.gemiso.zodiac.app.cueSheetItem;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.article.Article;
-import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheetItemCap.CueSheetItemCap;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.user.UserGroupUser;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;

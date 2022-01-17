@@ -1,13 +1,10 @@
 package com.gemiso.zodiac.app.appAuth;
 
-import com.gemiso.zodiac.app.code.Code;
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.userGroup.UserGroupAuth;
+import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuth;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.util.ArrayList;

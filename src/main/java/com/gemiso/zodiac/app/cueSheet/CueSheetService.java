@@ -2,7 +2,10 @@ package com.gemiso.zodiac.app.cueSheet;
 
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.*;
-import com.gemiso.zodiac.app.cueSheet.mapper.*;
+import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetCreateMapper;
+import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
+import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetOrderLockMapper;
+import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetUpdateMapper;
 import com.gemiso.zodiac.app.cueSheetHist.CueSheetHist;
 import com.gemiso.zodiac.app.cueSheetHist.CueSheetHistRepository;
 import com.gemiso.zodiac.app.cueSheetHist.dto.CueSheetHistCreateDTO;
@@ -56,14 +59,14 @@ public class CueSheetService {
     private final CueSheetItemCreateMapper cueSheetItemCreateMapper;
     private final CueSheetItemMapper cueSheetItemMapper;
     private final CueSheetHistCreateMapper cueSheetHistCreateMapper;
-    private final CueSheetListMapper cueSheetListMapper;
 
     private final ProgramService programService;
     private final UserAuthService userAuthService;
 
     private final DailyProgramService dailyProgramService;
 
-    //큐시트 목록조회
+
+    //큐시트 목록조회 + 유니온 일일편성 [큐시트 인터페이스+큐시트 아이템추가 목록]
     public CueSheetFindAllDTO findAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord){
 
         BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm,  searchWord);
@@ -77,31 +80,154 @@ public class CueSheetService {
 
         List<CueSheet> cueSheets = (List<CueSheet>) cueSheetRepository.findAll(booleanBuilder, Sort.by(orders));
 
-        List<CueSheetListDTO> cueSheetDTOList = cueSheetListMapper.toDtoList(cueSheets);
+        List<CueSheetDTO> cueSheetDTOList = cueSheetMapper.toDtoList(cueSheets);
 
-        //List<CueSheetDTO> newCueSheetDTOList = checkDelItem(cueSheetDTOList); //삭제된 기사아이템 제거.
+        List<CueSheetDTO> newCueSheetDTOList = checkDelItem(cueSheetDTOList); //삭제된 기사아이템 제거.
 
-        CueSheetFindAllDTO cueSheetFindAllDTO = unionPgm(cueSheetDTOList, sdate, edate, brdcPgmId, brdcPgmNm, searchWord); //큐시트 유니온 방송프로그램.
+        CueSheetFindAllDTO cueSheetFindAllDTO = unionPgmInterface(newCueSheetDTOList, sdate, edate, brdcPgmId,
+                brdcPgmNm, searchWord); //큐시트 유니온 방송프로그램.
+
+        //큐시트에 포함된 기사수를 계산한다[ 큐시트 목록조회시 화면에 필요 ]
+        cueSheetFindAllDTO = createArticleCount(cueSheetFindAllDTO);
 
         return cueSheetFindAllDTO;
 
 
     }
+
+    //큐시트에 포함된 기사수를 계산한다[ 큐시트 목록조회시 화면에 필요 ]
+    public CueSheetFindAllDTO createArticleCount(CueSheetFindAllDTO cueSheetFindAllDTO){
+
+        List<CueSheetDTO> returnCueSheetDTOList = new ArrayList<>();//새로등록할 큐시트 리스트
+        List<CueSheetDTO> cueSheetDTOList = cueSheetFindAllDTO.getCueSheetDTO();//조회된 큐시트 리스트get
+
+        for (CueSheetDTO cueSheetDTO : cueSheetDTOList){ //큐트리스트 기사수 체크
+
+            List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetDTO.getCueSheetItem();//큐시트에 포함된 큐시트 아이템 리스트get
+            Integer articleCount = 0;//기사수를 count해서 set해줄 객체 생성
+
+            for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList){//큐시트아이템 리스트 체크
+                ArticleCueItemDTO articleDTO = cueSheetItemDTO.getArticle();//큐시트아이템에 포함된 기사가 get
+
+                if (ObjectUtils.isEmpty(articleDTO)){// 큐시트 아이템에 기사가 포함되어 있지 않으면 contiue
+                    continue;
+                }
+                articleCount ++; //큐시트에 기사가 포함되어 있으면 count ++
+            }
+            cueSheetDTO.setArticleCount(articleCount); //체크된 count수 set
+            returnCueSheetDTOList.add(cueSheetDTO); //기사수가 포함된 큐시트 리턴할 큐시트 리스트에 add
+        }
+
+        cueSheetFindAllDTO.setCueSheetDTO(returnCueSheetDTOList);//큐시트 목록 기사수 포함된 큐시트리스르로 다시 set
+
+        return cueSheetFindAllDTO;
+    }
+
+    //삭제된 기사아이템 제거.[큐시트 인터페이스+큐시트 아이템추가 목록]
+    public List<CueSheetDTO> checkDelItem(List<CueSheetDTO> cueSheetDTOList){
+
+        List<CueSheetDTO> newCueSheetDTOList = new ArrayList<>();
+
+        //삭제된 큐시트 아이템 제거.
+        for (CueSheetDTO cueSheetDTO : cueSheetDTOList){
+            List<CueSheetItemDTO> orgCueSheetItemDTOList = cueSheetDTO.getCueSheetItem();
+            List<CueSheetItemDTO> newCueSheetItemDTOList = new ArrayList<>();
+            for (Iterator<CueSheetItemDTO> itr = orgCueSheetItemDTOList.iterator(); itr.hasNext();){
+
+                CueSheetItemDTO cueSheetItemDTO = itr.next();
+
+                String delYn = cueSheetItemDTO.getDelYn();//큐시트 아이템의 삭제여부 값
+                ArticleCueItemDTO articleCueItemDTO = cueSheetItemDTO.getArticle();//큐시트 아이템의 기사의 삭제여부 값
+
+                if (ObjectUtils.isEmpty(articleCueItemDTO) == false){ //큐시트 아이템에 기사가 포함된 경우.
+                    String articleDelYn = articleCueItemDTO.getDelYn();//큐시트 아이템에 포함된 기사의 삭제 여부값
+                    if ("Y".equals(articleDelYn)){ //기사 삭제 값이 Y인경우 조회된 큐시트아이템 삭제
+                        continue;
+                    }
+                }
+                if ("Y".equals(delYn)){ //조회된 큐시트 아이템 삭제여부값이 Y인 경우/.
+                    continue;
+                }
+
+                newCueSheetItemDTOList.add(cueSheetItemDTO);
+
+            }
+
+            cueSheetDTO.setCueSheetItem(newCueSheetItemDTOList);
+            newCueSheetDTOList.add(cueSheetDTO);
+        }
+
+        return newCueSheetDTOList;
+    }
+
+    // 큐시트목록, 일일편성목록 유니온.[큐시트목록조회 인터페이스 +큐시트 아이템추가 목록]
+    public CueSheetFindAllDTO unionPgmInterface(List<CueSheetDTO> cueSheetDTOList, Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord) {
+
+        //일일편성 목록조회[큐시트에 들어온 조회조건과 같이 조회한다.]
+        List<DailyProgramDTO> dailyProgramList = dailyProgramService.findAll(sdate, edate, brdcPgmId, brdcPgmNm, null, null, null, searchWord);
+
+        //조회된 큐시트 와 조회된 일일편성 유니온.
+        for (CueSheetDTO cueSheetDTO : cueSheetDTOList) {
+
+            //프로그램 get null포인트 에러 발생 방지 optional get
+            Optional<ProgramDTO> programDTO = Optional.ofNullable(cueSheetDTO.getProgram());
+            String cueBrdcPgmId = "";
+
+            if (programDTO.isPresent()) { //프로그램이 있을경우 프로그램 아이디 get
+                ProgramDTO program = programDTO.get();
+                cueBrdcPgmId = program.getBrdcPgmId();
+            }
+            String cueBrdcDt = cueSheetDTO.getBrdcDt(); // 큐시트 방송일자 get
+            String cueBrdcStartTime = cueSheetDTO.getBrdcStartTime(); //큐시트 방송시간 get
+
+            //ConcurrentModificationException에러가 나서 이터레이터로 수정.
+            Iterator<DailyProgramDTO> iter = dailyProgramList.listIterator();
+            while (iter.hasNext()) {
+                DailyProgramDTO dailyProgramDTO = iter.next();
+
+                ProgramDTO dailyProgram = dailyProgramDTO.getProgram(); //일일편성 프로그램get
+                String dailyBrdcPgmId = "";
+
+                if (ObjectUtils.isEmpty(dailyProgramDTO) == false) { //일일편성에 프로그램이 있을경우 프로그램 아이디 get
+                    dailyBrdcPgmId = dailyProgram.getBrdcPgmId();
+                }
+                String dailyBrdcDt = dailyProgramDTO.getBrdcDt(); //일일편성 방송일자 get
+                String dailyBrdcStartTime = dailyProgramDTO.getBrdcStartTime(); //일일편성 방송시작시간 get
+
+                if (cueBrdcPgmId.trim().isEmpty() == false && dailyBrdcPgmId.trim().isEmpty() == false
+                        && dailyBrdcPgmId.equals(cueBrdcPgmId)) { //큐시트&일일편성 방송프로그램 아이디가 있고 같으면
+
+                    if (dailyBrdcDt.equals(cueBrdcDt) && dailyBrdcStartTime.equals(cueBrdcStartTime)) { //방송일자, 방송시작시간이 같으면 삭제.
+                        iter.remove(); //생성된 큐시트와 일일편성이 같으면 일일편성 리스트에서 삭제
+                    }
+
+                }
+            }
+
+        }
+        //조회된 큐시트 + 방송프로그램
+        CueSheetFindAllDTO cueSheetFindAllDTO = new CueSheetFindAllDTO();
+        cueSheetFindAllDTO.setCueSheetDTO(cueSheetDTOList);
+        cueSheetFindAllDTO.setDailyProgramDTO(dailyProgramList);
+
+        return cueSheetFindAllDTO;
+    }
+
     //큐시트 목록조회 - 큐시트 리스트 + 일일편성 리스트 유니온
-    public CueSheetFindAllDTO unionPgm(List<CueSheetListDTO> cueSheetDTOList, Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord){
+    public CueSheetFindAllDTO unionPgm(List<CueSheetDTO> cueSheetDTOList, Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord){
 
         //일일편성 목록조회[큐시트에 들어온 조회조건과 같이 조회한다.]
         List<DailyProgramDTO> dailyProgramList = dailyProgramService.findAll(sdate, edate, brdcPgmId, brdcPgmNm, null,null, null, searchWord);
 
         //조회된 큐시트 와 조회된 일일편성 유니온.
-        for (CueSheetListDTO cueSheetDTO : cueSheetDTOList){
+        for (CueSheetDTO cueSheetDTO : cueSheetDTOList){
 
             //프로그램 get null포인트 에러 발생 방지 optional get
-            Optional<ProgramSimpleDTO> programDTO = Optional.ofNullable(cueSheetDTO.getProgram());
+            Optional<ProgramDTO> programDTO = Optional.ofNullable(cueSheetDTO.getProgram());
             String cueBrdcPgmId = "";
 
             if (programDTO.isPresent()){ //프로그램이 있을경우 프로그램 아이디 get
-                ProgramSimpleDTO program = programDTO.get();
+                ProgramDTO program = programDTO.get();
                 cueBrdcPgmId = program.getBrdcPgmId();
             }
             String cueBrdcDt = cueSheetDTO.getBrdcDt(); // 큐시트 방송일자 get
@@ -492,120 +618,6 @@ public class CueSheetService {
 
     }
 
-    //큐시트 목록조회 + 유니온 일일편성 [큐시트 인터페이스+큐시트 아이템추가 목록]
-    public CueSheetInterfaceDTO findAllInterface(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord){
-
-        BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm,  searchWord);
-
-        //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
-        List<Sort.Order> orders = new ArrayList<>();
-        Sort.Order order1 = new Sort.Order(Sort.Direction.DESC, "brdcDt");
-        orders.add(order1);
-        Sort.Order order2 = new Sort.Order(Sort.Direction.ASC, "brdcStartTime");
-        orders.add(order2);
-
-        List<CueSheet> cueSheets = (List<CueSheet>) cueSheetRepository.findAll(booleanBuilder, Sort.by(orders));
-
-        List<CueSheetDTO> cueSheetDTOList = cueSheetMapper.toDtoList(cueSheets);
-
-        List<CueSheetDTO> newCueSheetDTOList = checkDelItem(cueSheetDTOList); //삭제된 기사아이템 제거.
-
-        CueSheetInterfaceDTO cueSheetFindAllDTO = unionPgmInterface(newCueSheetDTOList, sdate, edate, brdcPgmId, brdcPgmNm, searchWord); //큐시트 유니온 방송프로그램.
-
-        return cueSheetFindAllDTO;
-
-
-    }
-
-    //삭제된 기사아이템 제거.[큐시트 인터페이스+큐시트 아이템추가 목록]
-    public List<CueSheetDTO> checkDelItem(List<CueSheetDTO> cueSheetDTOList){
-
-        List<CueSheetDTO> newCueSheetDTOList = new ArrayList<>();
-
-        //삭제된 큐시트 아이템 제거.
-        for (CueSheetDTO cueSheetDTO : cueSheetDTOList){
-            List<CueSheetItemDTO> orgCueSheetItemDTOList = cueSheetDTO.getCueSheetItem();
-            List<CueSheetItemDTO> newCueSheetItemDTOList = new ArrayList<>();
-            for (Iterator<CueSheetItemDTO> itr = orgCueSheetItemDTOList.iterator(); itr.hasNext();){
-
-                CueSheetItemDTO cueSheetItemDTO = itr.next();
-
-                String delYn = cueSheetItemDTO.getDelYn();//큐시트 아이템의 삭제여부 값
-                ArticleCueItemDTO articleCueItemDTO = cueSheetItemDTO.getArticle();//큐시트 아이템의 기사의 삭제여부 값
-
-                if (ObjectUtils.isEmpty(articleCueItemDTO) == false){ //큐시트 아이템에 기사가 포함된 경우.
-                    String articleDelYn = articleCueItemDTO.getDelYn();//큐시트 아이템에 포함된 기사의 삭제 여부값
-                    if ("Y".equals(articleDelYn)){ //기사 삭제 값이 Y인경우 조회된 큐시트아이템 삭제
-                        continue;
-                    }
-                }
-                if ("Y".equals(delYn)){ //조회된 큐시트 아이템 삭제여부값이 Y인 경우/.
-                    continue;
-                }
-
-                newCueSheetItemDTOList.add(cueSheetItemDTO);
-
-            }
-
-            cueSheetDTO.setCueSheetItem(newCueSheetItemDTOList);
-            newCueSheetDTOList.add(cueSheetDTO);
-        }
-
-        return newCueSheetDTOList;
-    }
-
-    // 큐시트목록, 일일편성목록 유니온.[큐시트목록조회 인터페이스 +큐시트 아이템추가 목록]
-    public CueSheetInterfaceDTO unionPgmInterface(List<CueSheetDTO> cueSheetDTOList, Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord) {
-
-        //일일편성 목록조회[큐시트에 들어온 조회조건과 같이 조회한다.]
-        List<DailyProgramDTO> dailyProgramList = dailyProgramService.findAll(sdate, edate, brdcPgmId, brdcPgmNm, null, null, null, searchWord);
-
-        //조회된 큐시트 와 조회된 일일편성 유니온.
-        for (CueSheetDTO cueSheetDTO : cueSheetDTOList) {
-
-            //프로그램 get null포인트 에러 발생 방지 optional get
-            Optional<ProgramDTO> programDTO = Optional.ofNullable(cueSheetDTO.getProgram());
-            String cueBrdcPgmId = "";
-
-            if (programDTO.isPresent()) { //프로그램이 있을경우 프로그램 아이디 get
-                ProgramDTO program = programDTO.get();
-                cueBrdcPgmId = program.getBrdcPgmId();
-            }
-            String cueBrdcDt = cueSheetDTO.getBrdcDt(); // 큐시트 방송일자 get
-            String cueBrdcStartTime = cueSheetDTO.getBrdcStartTime(); //큐시트 방송시간 get
-
-            //ConcurrentModificationException에러가 나서 이터레이터로 수정.
-            Iterator<DailyProgramDTO> iter = dailyProgramList.listIterator();
-            while (iter.hasNext()) {
-                DailyProgramDTO dailyProgramDTO = iter.next();
-
-                ProgramDTO dailyProgram = dailyProgramDTO.getProgram(); //일일편성 프로그램get
-                String dailyBrdcPgmId = "";
-
-                if (ObjectUtils.isEmpty(dailyProgramDTO) == false) { //일일편성에 프로그램이 있을경우 프로그램 아이디 get
-                    dailyBrdcPgmId = dailyProgram.getBrdcPgmId();
-                }
-                String dailyBrdcDt = dailyProgramDTO.getBrdcDt(); //일일편성 방송일자 get
-                String dailyBrdcStartTime = dailyProgramDTO.getBrdcStartTime(); //일일편성 방송시작시간 get
-
-                if (cueBrdcPgmId.trim().isEmpty() == false && dailyBrdcPgmId.trim().isEmpty() == false
-                        && dailyBrdcPgmId.equals(cueBrdcPgmId)) { //큐시트&일일편성 방송프로그램 아이디가 있고 같으면
-
-                    if (dailyBrdcDt.equals(cueBrdcDt) && dailyBrdcStartTime.equals(cueBrdcStartTime)) { //방송일자, 방송시작시간이 같으면 삭제.
-                        iter.remove(); //생성된 큐시트와 일일편성이 같으면 일일편성 리스트에서 삭제
-                    }
-
-                }
-            }
-
-        }
-        //조회된 큐시트 + 방송프로그램
-        CueSheetInterfaceDTO cueSheetInterfaceDTO = new CueSheetInterfaceDTO();
-        cueSheetInterfaceDTO.setCueSheetDTO(cueSheetDTOList);
-        cueSheetInterfaceDTO.setDailyProgramDTO(dailyProgramList);
-
-        return cueSheetInterfaceDTO;
-    }
 }
 
     /*//조회된 큐시트아이템 기사형식의 방송아이콘 URL추가생성

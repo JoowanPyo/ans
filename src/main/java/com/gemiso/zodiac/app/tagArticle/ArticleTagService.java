@@ -1,10 +1,15 @@
-package com.gemiso.zodiac.app.tag;
+package com.gemiso.zodiac.app.tagArticle;
 
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
+import com.gemiso.zodiac.app.tag.Tag;
+import com.gemiso.zodiac.app.tag.TagRepository;
+import com.gemiso.zodiac.app.tag.TagService;
 import com.gemiso.zodiac.app.tag.dto.*;
-import com.gemiso.zodiac.app.tag.mapper.ArticleTagCreateMapper;
-import com.gemiso.zodiac.app.tag.mapper.ArticleTagMapper;
+import com.gemiso.zodiac.app.tagArticle.mapper.ArticleTagCreateMapper;
+import com.gemiso.zodiac.app.tagArticle.mapper.ArticleTagMapper;
 import com.gemiso.zodiac.app.tag.mapper.TagMapper;
+import com.gemiso.zodiac.app.tagArticle.dto.ArticleTagCreateDTO;
+import com.gemiso.zodiac.app.tagArticle.dto.ArticleTagDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

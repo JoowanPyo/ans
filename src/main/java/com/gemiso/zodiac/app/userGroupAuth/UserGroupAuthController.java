@@ -1,6 +1,6 @@
-package com.gemiso.zodiac.app.userGroup;
+package com.gemiso.zodiac.app.userGroupAuth;
 
-import com.gemiso.zodiac.app.userGroup.dto.UserGroupAuthCreateDTO;
+import com.gemiso.zodiac.app.userGroupAuth.dto.UserGroupAuthCreateDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
@@ -18,9 +18,9 @@ import java.util.List;
 @RequestMapping("/userGroups")
 @Slf4j
 @RequiredArgsConstructor
-public class AddUserGroupAuthController {
+public class UserGroupAuthController {
 
-    private final AddUserGroupAuthService addUserGroupAuthService;
+    private final UserGroupAuthService userGroupAuthService;
 
     @Operation(summary = "사용자그룹 권한 등록", description = "사용자그룹 권한 등록")
     @PostMapping(path = "/{userGrpId}")
@@ -28,9 +28,9 @@ public class AddUserGroupAuthController {
     public AnsApiResponse<UserGroupDTO> create(@Parameter(name = "userGroupAuthCreateDTOList", required = true) @RequestBody List<UserGroupAuthCreateDTO> userGroupAuthCreateDTOList,
                                                @Parameter(name = "userGrpId", required = true) @PathVariable("userGrpId") Long userGrpId) {
 
-        addUserGroupAuthService.create(userGroupAuthCreateDTOList, userGrpId);
+        userGroupAuthService.create(userGroupAuthCreateDTOList, userGrpId);
 
-        UserGroupDTO userGroupDTO = addUserGroupAuthService.find(userGrpId);
+        UserGroupDTO userGroupDTO = userGroupAuthService.find(userGrpId);
 
         return new AnsApiResponse<>(userGroupDTO);
     }

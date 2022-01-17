@@ -1,6 +1,7 @@
-package com.gemiso.zodiac.app.tag.dto;
+package com.gemiso.zodiac.app.tagArticle.dto;
 
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
+import com.gemiso.zodiac.app.tag.dto.TagDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ArticleTagCreateDTO {
+public class ArticleTagDTO {
 
-    //private Long id;
-    private TagIdDTO tag;
+    private Long id;
+    private TagDTO tag;
     private ArticleSimpleDTO article;
 }

@@ -1,10 +1,11 @@
 package com.gemiso.zodiac.app.userGroup;
 
-import com.gemiso.zodiac.app.userGroup.dto.UserGroupAuthDTO;
+import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuth;
+import com.gemiso.zodiac.app.userGroupAuth.dto.UserGroupAuthDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupCreateDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupUpdateDTO;
-import com.gemiso.zodiac.app.userGroup.mapper.UserGroupAuthMapper;
+import com.gemiso.zodiac.app.userGroupAuth.mapper.UserGroupAuthMapper;
 import com.gemiso.zodiac.app.userGroup.mapper.UserGroupCreateMapper;
 import com.gemiso.zodiac.app.userGroup.mapper.UserGroupMapper;
 import com.gemiso.zodiac.app.userGroup.mapper.UserGroupUpdateMapper;

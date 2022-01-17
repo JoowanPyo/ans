@@ -1,6 +1,7 @@
-package com.gemiso.zodiac.app.userGroup;
+package com.gemiso.zodiac.app.userGroupAuth;
 
 import com.gemiso.zodiac.app.appAuth.AppAuth;
+import com.gemiso.zodiac.app.userGroup.UserGroup;
 import lombok.*;
 
 import javax.persistence.*;

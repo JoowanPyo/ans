@@ -42,8 +42,10 @@ import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.user.*;
-import com.gemiso.zodiac.app.userGroup.UserGroupAuth;
-import com.gemiso.zodiac.app.userGroup.UserGroupAuthRepository;
+import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuth;
+import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuthRepository;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUserRepository;
 import com.gemiso.zodiac.core.enumeration.ActionEnum;
 import com.gemiso.zodiac.core.enumeration.ActionMesg;
 import com.gemiso.zodiac.core.enumeration.FixAuth;
@@ -115,7 +117,7 @@ public class ArticleService {
 
 
     //기사 목록조회
-    public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, Long brdcPgmId,
+    public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
                                                       String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
                                                       Integer page, Integer limit/*, Long issuId*/) {
 
@@ -154,7 +156,7 @@ public class ArticleService {
     //기사 목록조회[이슈 기사]
     public PageResultDTO<ArticleDTO, Article> findAllIsuue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd, String artclTypDtlCd,
                                                            String artclCateCd, String deptCd, String inputrId,
-                                                           Long brdcPgmId, Long orgArtclId, String delYn,
+                                                           String brdcPgmId, Long orgArtclId, String delYn,
                                                            String searchword, Integer page, Integer limit){
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
@@ -471,6 +473,39 @@ public class ArticleService {
     public void delete(Long artclId) throws Exception {
 
         Article article = articleFindOrFail(artclId);
+
+        //큐시트아이템에 포함되어있고 삭제가 되어있지 않은 기사면 삭제를 못한다.
+        Optional<CueSheetItem> cueSheetItem = cueSheetItemRepository.findArticleCue(artclId);
+        if (cueSheetItem.isPresent()){
+            throw new ResourceNotFoundException("큐시트에 포함된 기사 입니다. 기사 아이디 : " + artclId);
+        }
+
+        ArticleDTO articleDTO = articleMapper.toDto(article);
+
+        //삭제정보 등록
+        articleDTO.setDelDtm(new Date());
+        String userId = userAuthService.authUser.getUserId();
+        articleDTO.setDelrId(userId);
+        articleDTO.setDelYn("Y");
+
+        articleMapper.updateFromDto(articleDTO, article);
+
+        articleRepository.save(article);
+
+        //기사 액션 로그 등록
+        articleActionLogDelete(article, userId);
+    }
+
+    //큐시트 아이템 삭제시, 포함된 기사(복사본) 삭제
+    public void deleteCueItem(Long artclId) throws Exception {
+
+        Article article = articleFindOrFail(artclId);
+
+        //큐시트아이템에 포함되어있고 삭제가 되어있지 않은 기사면 삭제를 못한다.
+       /* Optional<CueSheetItem> cueSheetItem = cueSheetItemRepository.findArticleCue(artclId);
+        if (cueSheetItem.isPresent()){
+            throw new ResourceNotFoundException("큐시트에 포함된 기사 입니다. 기사 아이디 : " + artclId);
+        }*/
 
         ArticleDTO articleDTO = articleMapper.toDto(article);
 
@@ -811,7 +846,7 @@ public class ArticleService {
     }
 
     //기사 목록조회시 조건 빌드[일반 목록조회 ]
-    public BooleanBuilder getSearch(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, Long brdcPgmId,
+    public BooleanBuilder getSearch(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
                                     String artclDivCd, String artclTypCd, String searchDivCd, String searchWord /*Long issuId*/) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
@@ -848,7 +883,7 @@ public class ArticleService {
             booleanBuilder.and(qArticle.inputrId.eq(inputrId));
         }
         //방송 프로그램 아이디로 조회
-        if (ObjectUtils.isEmpty(brdcPgmId) == false) {
+        if (brdcPgmId != null && brdcPgmId.trim().isEmpty() == false) {
             booleanBuilder.and(qArticle.brdcPgmId.eq(brdcPgmId));
         }
         //기사 구분 코드로 조회
@@ -883,7 +918,7 @@ public class ArticleService {
     //기사 목록조회 조회조건 빌드[이슈 기사]
     public BooleanBuilder getSearchIssue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd,
                                          String artclTypDtlCd, String artclCateCd, String deptCd, String inputrId,
-                                         Long brdcPgmId, Long orgArtclId, String delYn, String searchword){
+                                         String brdcPgmId, Long orgArtclId, String delYn, String searchword){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -927,7 +962,7 @@ public class ArticleService {
         }
         //검색조건 = 원본 기사 아이디
         if (ObjectUtils.isEmpty(orgArtclId) == false){
-            booleanBuilder.and(qArticle.brdcPgmId.eq(orgArtclId));
+            booleanBuilder.and(qArticle.orgArtclId.eq(orgArtclId));
         }
         //검색조건 = 삭제 여부
         if (delYn != null && delYn.trim().isEmpty() == false){

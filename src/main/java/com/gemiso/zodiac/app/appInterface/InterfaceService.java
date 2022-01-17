@@ -25,7 +25,7 @@ import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
-import com.gemiso.zodiac.app.cueSheet.dto.CueSheetInterfaceDTO;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetFindAllDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgramRepository;
@@ -71,21 +71,21 @@ public class InterfaceService {
         Date formatSdate = stringToDate(sdate);
         Date formatEdate = stringToDate(edate);
 
-        CueSheetInterfaceDTO cueSheetInterfaceDTO = cueSheetService.findAllInterface(formatSdate, formatEdate, brdc_pgm_id, pgm_nm, "");
+        CueSheetFindAllDTO cueSheetFindAllDTO = cueSheetService.findAll(formatSdate, formatEdate, brdc_pgm_id, pgm_nm, "");
 
-        List<ParentProgramDTO> parentProgramDTOList = toTakerCueSheetList(cueSheetInterfaceDTO);
+        List<ParentProgramDTO> parentProgramDTOList = toTakerCueSheetList(cueSheetFindAllDTO);
 
         return parentProgramDTOList;
 
     }
 
     //테이커 큐시트&일일편성 목록 테이커DTO 리스트로 변환
-    public List<ParentProgramDTO> toTakerCueSheetList(CueSheetInterfaceDTO cueSheetInterfaceDTO) {
+    public List<ParentProgramDTO> toTakerCueSheetList(CueSheetFindAllDTO cueSheetFindAllDTO) {
 
         List<ParentProgramDTO> parentProgramDTOList = new ArrayList<>();
 
-        List<CueSheetDTO> cueSheetDTOList = cueSheetInterfaceDTO.getCueSheetDTO();
-        List<DailyProgramDTO> dailyProgramDTOList = cueSheetInterfaceDTO.getDailyProgramDTO();
+        List<CueSheetDTO> cueSheetDTOList = cueSheetFindAllDTO.getCueSheetDTO();
+        List<DailyProgramDTO> dailyProgramDTOList = cueSheetFindAllDTO.getDailyProgramDTO();
 
         for (CueSheetDTO cueSheet : cueSheetDTOList) {
 
@@ -538,9 +538,9 @@ public class InterfaceService {
         Date formatSdate = stringToDate(sdate);
         Date formatEdate = stringToDate(fdate);
 
-        CueSheetInterfaceDTO cueSheetInterfaceDTO = cueSheetService.findAllInterface(formatSdate, formatEdate, pro_id, "", "");
+        CueSheetFindAllDTO cueSheetFindAllDTO = cueSheetService.findAll(formatSdate, formatEdate, pro_id, "", "");
 
-        List<PrompterProgramDTO> prompterProgramDTOList = toPrompterDailyPgm(cueSheetInterfaceDTO);
+        List<PrompterProgramDTO> prompterProgramDTOList = toPrompterDailyPgm(cueSheetFindAllDTO);
 
         return prompterProgramDTOList;
     }
@@ -560,12 +560,12 @@ public class InterfaceService {
     }
 
     //일일편성 큐시트목록 유니온 목록조회 목록을 프롬프터 형식의 데이터로 변환
-    public List<PrompterProgramDTO> toPrompterDailyPgm(CueSheetInterfaceDTO cueSheetInterfaceDTO) {
+    public List<PrompterProgramDTO> toPrompterDailyPgm(CueSheetFindAllDTO cueSheetFindAllDTO) {
 
         List<PrompterProgramDTO> prompterProgramDTOList = new ArrayList<>(); //리턴시켜줄 프롬프터 프로그램 리스트 생성
 
-        List<CueSheetDTO> cueSheetDTOList = cueSheetInterfaceDTO.getCueSheetDTO(); //큐시트목록 조회 리스트
-        List<DailyProgramDTO> dailyProgramDTOList = cueSheetInterfaceDTO.getDailyProgramDTO(); //알알편성목록 조회 리스트
+        List<CueSheetDTO> cueSheetDTOList = cueSheetFindAllDTO.getCueSheetDTO(); //큐시트목록 조회 리스트
+        List<DailyProgramDTO> dailyProgramDTOList = cueSheetFindAllDTO.getDailyProgramDTO(); //알알편성목록 조회 리스트
 
         for (CueSheetDTO cueSheet : cueSheetDTOList) {
 

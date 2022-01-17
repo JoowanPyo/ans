@@ -1,9 +1,9 @@
-package com.gemiso.zodiac.app.user;
+package com.gemiso.zodiac.app.userGroupUser;
 
 import com.gemiso.zodiac.app.user.dto.UserDTO;
-import com.gemiso.zodiac.app.user.dto.UserGroupUserDTO;
-import com.gemiso.zodiac.app.user.dto.UserGroupUserDeleteDTO;
-import com.gemiso.zodiac.app.user.dto.UserToGroupUdateDTO;
+import com.gemiso.zodiac.app.userGroupUser.dto.UserGroupUserDTO;
+import com.gemiso.zodiac.app.userGroupUser.dto.UserGroupUserDeleteDTO;
+import com.gemiso.zodiac.app.userGroupUser.dto.UserToGroupUdateDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,15 +21,15 @@ import java.util.List;
 @RequestMapping("/addUserGroups")
 @Slf4j
 @RequiredArgsConstructor
-public class AddUserGroupController {
+public class UserGroupUserController {
 
-    private final AddUserGroupService addUserGroupService;
+    private final UserGroupUserService userGroupUserService;
 
     @Operation(summary = "그룹 사용자 조회", description = "그룹에 등록되어 있는 사용자 목록 조회")
     @GetMapping(path = "/{userGrpId}")
     public AnsApiResponse<List<UserDTO>> find(@Parameter(name = "userGrpId", required = true) @PathVariable("userGrpId") Long userGrpId) {
 
-        List<UserDTO> userDTOList = addUserGroupService.find(userGrpId);
+        List<UserDTO> userDTOList = userGroupUserService.find(userGrpId);
 
         return new AnsApiResponse<>(userDTOList);
     }
@@ -39,7 +39,7 @@ public class AddUserGroupController {
     public AnsApiResponse<List<UserGroupUserDTO>> findAll(@Parameter(name = "userId", required = true)
                                                        @RequestParam(value = "userId", required = true) Long userGrpId) {
 
-        List<UserGroupUserDTO> userDTOList = addUserGroupService.findAll(userGrpId);
+        List<UserGroupUserDTO> userDTOList = userGroupUserService.findAll(userGrpId);
 
         return new AnsApiResponse<>(userDTOList);
 
@@ -51,9 +51,9 @@ public class AddUserGroupController {
     public AnsApiResponse<List<UserGroupUserDTO>> create(@Parameter(name = "userGrpId", required = true) @PathVariable("userGrpId") Long userGrpId,
                                                          @Parameter(name = "userId", required = true) @RequestParam(value = "userId", required = true) List<String> userIds) {
 
-        addUserGroupService.create(userIds, userGrpId);
+        userGroupUserService.create(userIds, userGrpId);
 
-        List<UserGroupUserDTO> returnUser = addUserGroupService.findAll(userGrpId);
+        List<UserGroupUserDTO> returnUser = userGroupUserService.findAll(userGrpId);
 
         return new AnsApiResponse<>(returnUser);
     }
@@ -65,9 +65,9 @@ public class AddUserGroupController {
             @Parameter(name = "userId", required = true) @PathVariable("userId") String userId) {
 
 
-        addUserGroupService.update(userToGroupUdateDTOList, userId);
+        userGroupUserService.update(userToGroupUdateDTOList, userId);
 
-        UserDTO returnUser = addUserGroupService.findUser(userId);
+        UserDTO returnUser = userGroupUserService.findUser(userId);
 
         return new AnsApiResponse<>(returnUser);
 
@@ -80,7 +80,7 @@ public class AddUserGroupController {
             @Parameter(name = "userDto", required = true, description = "필수값<br>") @RequestBody List<UserGroupUserDeleteDTO> userGroupUserDeleteDTOS,
             @Parameter(name = "userGrpId", required = true) @PathVariable("userGrpId") Long userGrpId) {
 
-        addUserGroupService.delete(userGroupUserDeleteDTOS, userGrpId);
+        userGroupUserService.delete(userGroupUserDeleteDTOS, userGrpId);
 
         return AnsApiResponse.noContent();
     }

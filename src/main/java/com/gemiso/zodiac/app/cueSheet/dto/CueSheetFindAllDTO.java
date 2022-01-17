@@ -15,6 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 public class CueSheetFindAllDTO {
 
-    private List<CueSheetListDTO> cueSheetDTO = new ArrayList<>();
+    private List<CueSheetDTO> cueSheetDTO = new ArrayList<>();
     private List<DailyProgramDTO> dailyProgramDTO = new ArrayList<>();
 }

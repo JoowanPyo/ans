@@ -1,10 +1,13 @@
-package com.gemiso.zodiac.app.user;
+package com.gemiso.zodiac.app.userGroupUser;
 
+import com.gemiso.zodiac.app.user.User;
+import com.gemiso.zodiac.app.user.UserRepository;
+import com.gemiso.zodiac.app.user.UserService;
 import com.gemiso.zodiac.app.user.dto.UserDTO;
-import com.gemiso.zodiac.app.user.dto.UserGroupUserDTO;
-import com.gemiso.zodiac.app.user.dto.UserGroupUserDeleteDTO;
-import com.gemiso.zodiac.app.user.dto.UserToGroupUdateDTO;
-import com.gemiso.zodiac.app.user.mapper.UserGroupUserMapper;
+import com.gemiso.zodiac.app.userGroupUser.dto.UserGroupUserDTO;
+import com.gemiso.zodiac.app.userGroupUser.dto.UserGroupUserDeleteDTO;
+import com.gemiso.zodiac.app.userGroupUser.dto.UserToGroupUdateDTO;
+import com.gemiso.zodiac.app.userGroupUser.mapper.UserGroupUserMapper;
 import com.gemiso.zodiac.app.user.mapper.UserMapper;
 import com.gemiso.zodiac.app.userGroup.UserGroup;
 import com.gemiso.zodiac.app.userGroup.UserGroupRepository;
@@ -28,7 +31,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
-public class AddUserGroupService {
+public class UserGroupUserService {
 
     private final UserService userService;
 

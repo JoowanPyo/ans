@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -14,7 +16,10 @@ import lombok.NoArgsConstructor;
 public class CueTmplSymbolCreateDTO {
 
     //private Long id;
+    @NotNull
     private CueSheetTemplateSimpleDTO cueSheetTemplate;
+    @NotNull
     private SymbolSimpleDTO symbol;
+    @NotNull
     private int ord;
 }

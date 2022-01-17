@@ -1,9 +1,9 @@
 package com.gemiso.zodiac.core.service;
 
-import com.gemiso.zodiac.app.user.UserGroupUser;
-import com.gemiso.zodiac.app.user.UserGroupUserRepository;
-import com.gemiso.zodiac.app.userGroup.UserGroupAuth;
-import com.gemiso.zodiac.app.userGroup.UserGroupAuthRepository;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUserRepository;
+import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuth;
+import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuthRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

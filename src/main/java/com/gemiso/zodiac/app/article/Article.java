@@ -6,14 +6,12 @@ import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
-import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.issue.Issue;
 import com.gemiso.zodiac.app.articleOrder.ArticleOrder;
-import com.gemiso.zodiac.app.tag.ArticleTag;
+import com.gemiso.zodiac.app.tagArticle.ArticleTag;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
@@ -184,8 +182,8 @@ public class Article extends BaseEntity {
     @Column(name = "reg_app_typ", length = 50)
     private String regAppTyp;
 
-    @Column(name = "brdc_pgm_id", length = 8)
-    private Long brdcPgmId;
+    @Column(name = "brdc_pgm_id", length = 50)
+    private String brdcPgmId;
 
     @Column(name = "brdc_schd_dtm")
     private Date brdcSchdDtm;

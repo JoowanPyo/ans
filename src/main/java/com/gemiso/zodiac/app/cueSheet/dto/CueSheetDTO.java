@@ -66,4 +66,5 @@ public class CueSheetDTO {
     private String remark;
     private ProgramDTO program;
     private List<CueSheetItemDTO> cueSheetItem = new ArrayList<>();
+    private Integer articleCount; //기사수[목록조회에 필요함]
 }

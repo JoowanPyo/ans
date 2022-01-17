@@ -1,7 +1,7 @@
 package com.gemiso.zodiac.app.userGroup.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
+import com.gemiso.zodiac.app.userGroupAuth.dto.UserGroupAuthDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

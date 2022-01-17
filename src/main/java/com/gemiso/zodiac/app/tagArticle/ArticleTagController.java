@@ -1,6 +1,6 @@
-package com.gemiso.zodiac.app.tag;
+package com.gemiso.zodiac.app.tagArticle;
 
-import com.gemiso.zodiac.app.tag.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.tagArticle.dto.ArticleTagDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;

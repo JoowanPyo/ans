@@ -1,8 +1,9 @@
-package com.gemiso.zodiac.app.tag;
+package com.gemiso.zodiac.app.tagArticle;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.tag.Tag;
 import com.gemiso.zodiac.app.user.User;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;

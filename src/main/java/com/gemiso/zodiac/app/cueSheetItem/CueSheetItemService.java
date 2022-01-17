@@ -3,6 +3,7 @@ package com.gemiso.zodiac.app.cueSheetItem;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.ArticleRepository;
 import com.gemiso.zodiac.app.article.ArticleService;
+import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
@@ -13,15 +14,15 @@ import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.*;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
-import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
-import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
-import com.gemiso.zodiac.app.cueSheetItemSymbol.mapper.CueSheetItemSymbolMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemUpdateMapper;
 import com.gemiso.zodiac.app.cueSheetItemCap.CueSheetItemCap;
 import com.gemiso.zodiac.app.cueSheetItemCap.CueSheetItemCapRepotitory;
 import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.mapper.CueSheetItemCapCreateMapper;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolDTO;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.mapper.CueSheetItemSymbolMapper;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -83,6 +84,7 @@ public class CueSheetItemService {
 
         return cueSheetItemDTOList;
     }
+
 
     public List<CueSheetItemDTO> setSymbol(List<CueSheetItemDTO> cueSheetItemDTOList){
 
@@ -254,19 +256,11 @@ public class CueSheetItemService {
 
     public void updateCueItemArticle(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId) throws Exception {
 
-        ArticleUpdateDTO articleUpdateDTO = cueSheetItemUpdateDTO.getArticle(); //큐시트 아이템의 수정기사를 불러온다
-
-        if (ObjectUtils.isEmpty(articleUpdateDTO) == false) {//기사내용 수정이 들어왔을경우.
-            Long artclId = articleUpdateDTO.getArtclId(); //수정기사의 아이디를 불러온다.
-
-            articleService.update(articleUpdateDTO, artclId); //기사 수정.
-        }
-
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
 
-        CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
-        cueSheetItemUpdateDTO.setCueSheet(cueSheetDTO);
-        cueSheetItemUpdateDTO.setCueItemId(cueItemId);
+        //CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
+        //cueSheetItemUpdateDTO.setCueSheet(cueSheetDTO);
+        //cueSheetItemUpdateDTO.setCueItemId(cueItemId);
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
         cueSheetItemUpdateDTO.setUpdtrId(userId);
@@ -274,9 +268,23 @@ public class CueSheetItemService {
         cueSheetItemUpdateMapper.updateFromDto(cueSheetItemUpdateDTO, cueSheetItem);
 
         cueSheetItemRepository.save(cueSheetItem);
+
+        ArticleUpdateDTO articleUpdateDTO = cueSheetItemUpdateDTO.getArticle(); //큐시트 아이템의 수정기사를 불러온다
+
+        if (ObjectUtils.isEmpty(articleUpdateDTO) == false) {//기사내용 수정이 들어왔을경우.
+            Long artclId = articleUpdateDTO.getArtclId(); //수정기사의 아이디를 불러온다.
+
+            String newCueItemTypCd = cueSheetItemUpdateDTO.getCueItemTypCd();//새로 들어온 큐시트 아이템 유형 코드
+
+            if (newCueItemTypCd != null && newCueItemTypCd.trim().isEmpty() == false){//새로 들어온 큐시트 아이템 유형 코드가 있을경우
+                articleUpdateDTO.setArtclTypDtlCd(newCueItemTypCd);
+            }
+
+            articleService.update(articleUpdateDTO, artclId); //기사 수정.
+        }
     }
 
-    public void delete(Long cueId, Long cueItemId){
+    public void delete(Long cueId, Long cueItemId) throws Exception {
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
 
@@ -291,6 +299,13 @@ public class CueSheetItemService {
         cueSheetItemMapper.updateFromDto(cueSheetItemDTO, cueSheetItem);
 
         cueSheetItemRepository.save(cueSheetItem);
+
+        //큐시트 아이템 삭제시 포함된 기사(복사된 기사)도 삭제
+        Article article = cueSheetItem.getArticle();
+        if (ObjectUtils.isEmpty(article) == false){
+            Long artclId = article.getArtclId();
+            articleService.deleteCueItem(artclId);
+        }
     }
 
     public void ordUpdate( Long cueId, Long cueItemId, int cueItemOrd){
@@ -357,6 +372,7 @@ public class CueSheetItemService {
         if (ObjectUtils.isEmpty(artclId) == false){
             booleanBuilder.and(qCueSheetItem.article.artclId.eq(artclId));
         }
+
         //쿼리 where 조건 추가.
         if (ObjectUtils.isEmpty(cueId) == false){
             booleanBuilder.and(qCueSheetItem.cueSheet.cueId.eq(cueId));
@@ -572,7 +588,7 @@ public class CueSheetItemService {
                 .apprvDtm(article.getApprvDtm())
                 .artclOrd(artclOrd)//기사 시퀀스 +1
                 .brdcCnt(article.getBrdcCnt())
-                .orgArtclId(article.getOrgArtclId())//원본기사 아이디set
+                .orgArtclId(article.getArtclId())//원본기사 아이디set
                 .urgYn(article.getUrgYn())
                 .frnotiYn(article.getFrnotiYn())
                 .embgYn(article.getEmbgYn())

@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.userGroup;
+package com.gemiso.zodiac.app.userGroupAuth;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
