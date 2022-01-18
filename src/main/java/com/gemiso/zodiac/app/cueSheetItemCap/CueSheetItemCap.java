@@ -43,7 +43,7 @@ public class CueSheetItemCap {
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_cap_div_cd)")
     private String cueItemCapDivCdNm;
 
-    @Column(name = "cap_ctt", length = 2000)
+    @Column(name = "cap_ctt", columnDefinition = "text")
     private String capCtt;
 
     @Column(name = "cap_ord")

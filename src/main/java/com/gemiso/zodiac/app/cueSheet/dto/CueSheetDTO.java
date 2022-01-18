@@ -64,6 +64,7 @@ public class CueSheetDTO {
     private String td2Id;
     private String td2Nm;
     private String remark;
+    private String brdcRunTime;
     private ProgramDTO program;
     private List<CueSheetItemDTO> cueSheetItem = new ArrayList<>();
     private Integer articleCount; //기사수[목록조회에 필요함]

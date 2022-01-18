@@ -247,8 +247,14 @@ public class Article extends BaseEntity {
     @Column(name = "parent_artlc_id", length = 8)
     private Long parentArtlcId;
 
-    @Column(name = "memo", columnDefinition = "TEXT")
+    @Column(name = "memo", columnDefinition = "text")
     private String memo;
+
+    @Column(name = "editor_id", length = 50)
+    private String editorId;
+
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = editor_id)")
+    private String editorNm;
 
     @ManyToOne
     @JoinColumn(name = "issu_id")

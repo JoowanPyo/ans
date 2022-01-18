@@ -12,7 +12,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
+import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -167,6 +169,10 @@ public class ArticleDTO {
     private IssueDTO issue;
     @Schema(description = "복사된 기사 아이디")
     private Long parentArtlcId;
+    @Schema(description = "에디터 아이디")
+    private String editorId;
+    @Schema(description = "에디터 명")
+    private String editorNm;
     //private List<ArticleHistSimpleDTO> articleHist = new ArrayList<>();
     @Schema(description = "기사자막 리스트")
     private List<ArticleCapSimpleDTO> articleCap = new ArrayList<>();

@@ -66,12 +66,12 @@ public class InterfaceService {
     private final CueSheetService cueSheetService;
 
 
-    public List<ParentProgramDTO> dailyPgmFindAll(String sdate, String edate, String brdc_pgm_id, String pgm_nm) throws ParseException {
+    public List<ParentProgramDTO> dailyPgmFindAll(Date sdate, Date edate, String brdc_pgm_id, String pgm_nm) throws ParseException {
 
-        Date formatSdate = stringToDate(sdate);
-        Date formatEdate = stringToDate(edate);
+        /*Date formatSdate = stringToDate(sdate);
+        Date formatEdate = stringToDate(edate);*/
 
-        CueSheetFindAllDTO cueSheetFindAllDTO = cueSheetService.findAll(formatSdate, formatEdate, brdc_pgm_id, pgm_nm, "");
+        CueSheetFindAllDTO cueSheetFindAllDTO = cueSheetService.findAll(sdate, edate, brdc_pgm_id, pgm_nm, "");
 
         List<ParentProgramDTO> parentProgramDTOList = toTakerCueSheetList(cueSheetFindAllDTO);
 
@@ -533,12 +533,9 @@ public class InterfaceService {
     }
 
     //프롬프터 일일편성 목록조회
-    public List<PrompterProgramDTO> getMstListService(String pro_id, String sdate, String fdate) throws ParseException {
+    public List<PrompterProgramDTO> getMstListService(String pro_id, Date sdate, Date fdate) throws ParseException {
 
-        Date formatSdate = stringToDate(sdate);
-        Date formatEdate = stringToDate(fdate);
-
-        CueSheetFindAllDTO cueSheetFindAllDTO = cueSheetService.findAll(formatSdate, formatEdate, pro_id, "", "");
+        CueSheetFindAllDTO cueSheetFindAllDTO = cueSheetService.findAll(sdate, fdate, pro_id, "", "");
 
         List<PrompterProgramDTO> prompterProgramDTOList = toPrompterDailyPgm(cueSheetFindAllDTO);
 
@@ -546,7 +543,7 @@ public class InterfaceService {
     }
 
     //String형식의 데이터를 Date타입으로 변환.
-    public Date stringToDate(String date) throws ParseException {
+   /* public Date stringToDate(String date) throws ParseException {
 
         Date formatDate = null;
 
@@ -557,7 +554,7 @@ public class InterfaceService {
         }
 
         return formatDate;
-    }
+    }*/
 
     //일일편성 큐시트목록 유니온 목록조회 목록을 프롬프터 형식의 데이터로 변환
     public List<PrompterProgramDTO> toPrompterDailyPgm(CueSheetFindAllDTO cueSheetFindAllDTO) {

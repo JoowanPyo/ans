@@ -374,6 +374,7 @@ public class BisInterfaceService {
                     .inputDtm(dschWeekDTO.getRegDt()) //입력일시
                     .updtDtm(dschWeekDTO.getUpdDt()) //수정일시
                     .program(program) //프로그램 아이디
+                    .brdcRunTime(broadRun)
                     .build();
 
             dailyProgramRepository.save(dailyProgram);
@@ -412,6 +413,7 @@ public class BisInterfaceService {
                     .inputDtm(dschWeekDTO.getRegDt()) //입력일시
                     .updtDtm(dschWeekDTO.getUpdDt()) //수정일시
                     .program(program) //프로그램 아이디
+                    .brdcRunTime(broadRun)
                     .build();
 
             dailyProgramRepository.save(dailyProgram);
@@ -596,6 +598,7 @@ public class BisInterfaceService {
                         .inputDtm(dsBasicScheduleDTO.getRegDt()) //입력일시
                         .updtDtm(dsBasicScheduleDTO.getUpdDt()) //수정일시
                         .program(programSimpleDTO) //방송프로그램
+                        .brdcRunTime(broadRun)
                         .build();
 
                 BaseProgram baseProgram = baseProgramMapper.toEntity(baseProgramDTO);
@@ -691,6 +694,7 @@ public class BisInterfaceService {
                         .inputDtm(dsBasicScheduleDTO.getRegDt()) //입력일시
                         .updtDtm(dsBasicScheduleDTO.getUpdDt()) //수정일시
                         .program(programSimpleDTO) //방송프로그램
+                        .brdcRunTime(broadRun)
                         .build();
 
                 BaseProgram baseProgram = baseProgramMapper.toEntity(baseProgramDTO);

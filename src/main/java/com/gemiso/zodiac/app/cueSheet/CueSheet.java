@@ -157,6 +157,9 @@ public class CueSheet {
     @Column(name = "remark", length = 500)
     private String remark;
 
+    @Column(name = "brdc_run_time", length = 8)
+    private String brdcRunTime;
+
     /*@Column(name = "brdc_pgm_id")*/
     @ManyToOne
     @JoinColumn(name = "brdc_pgm_id")

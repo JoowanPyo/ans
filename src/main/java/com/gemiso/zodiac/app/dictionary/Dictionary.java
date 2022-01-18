@@ -27,35 +27,35 @@ public class Dictionary extends BaseEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "expl")
+    @Column(name = "expl", length = 2000)
     private String expl;
 
     /*@Type(type = "jsonb")*/
-    @Column(name = "word_ko")
+    @Column(name = "word_ko", length = 255)
     private String wordKo;
 
     /*@Type(type = "jsonb")*/
-    @Column(name = "word_en")
+    @Column(name = "word_en", length = 255)
     private String wordEn;
 
     @Column(name = "del_dtm")
     private Date delDtm;
 
-    @Column(name = "inputr_id")
+    @Column(name = "inputr_id", length = 50)
     private String inputrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
-    @Column(name = "updtr_id")
+    @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
 
-    @Column(name = "delr_id")
+    @Column(name = "delr_id", length = 50)
     private String delrId;
 
     @Basic(fetch = FetchType.LAZY)

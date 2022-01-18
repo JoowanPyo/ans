@@ -131,8 +131,8 @@ public class UserService {
         userCreateDTO.setPwd(password);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        //String tokenUserId = userAuthService.authUser.getUserId();
-        userCreateDTO.setInputrId("joowan");
+        String tokenUserId = userAuthService.authUser.getUserId();
+        userCreateDTO.setInputrId(tokenUserId);
 
         User userEntity = userCreateMapper.toEntity(userCreateDTO);
 

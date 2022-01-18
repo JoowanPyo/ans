@@ -47,7 +47,7 @@ public class CueSheetMedia extends BaseEntity {
     @Column(name = "cont_id", length = 8)
     private int contId;
 
-    @Column(name = "trnsf_file_nm", length = 1000)
+    @Column(name = "trnsf_file_nm", length = 255)
     private String trnsfFileNm;
 
     @Column(name = "media_durtn", length = 20)

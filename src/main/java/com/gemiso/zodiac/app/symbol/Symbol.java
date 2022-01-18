@@ -28,13 +28,13 @@ import java.util.Date;
 public class Symbol extends BaseEntity {
 
     @Id
-    @Column(name = "symbol_id", nullable = false, length = 21)
+    @Column(name = "symbol_id", nullable = false, length = 50)
     private String symbolId;
 
     @Column(name = "symbol_nm", length = 50)
     private String symbolNm;
 
-    @Column(name = "expl", length = 200)
+    @Column(name = "expl", length = 2000)
     private String expl;
 
     @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)

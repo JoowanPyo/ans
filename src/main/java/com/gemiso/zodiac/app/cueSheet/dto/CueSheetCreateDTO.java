@@ -36,6 +36,7 @@ public class CueSheetCreateDTO {
     private String td1Id;
     private String td2Id;
     private String remark;
+    private String brdcRunTime;
     @NotNull
     private ProgramSimpleDTO program;
 }

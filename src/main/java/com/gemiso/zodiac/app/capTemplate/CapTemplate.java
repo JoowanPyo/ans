@@ -38,7 +38,7 @@ public class CapTemplate extends BaseEntity {
     @Column(name = "cap_tmplt_nm", length = 50)
     private String capTmpltNm;
 
-    @Column(name = "cap_tmplt_file_nm", length = 1000)
+    @Column(name = "cap_tmplt_file_nm", length = 255)
     private String capTmpltFileNm;
 
     @Column(name = "cap_class_cd", length = 50)

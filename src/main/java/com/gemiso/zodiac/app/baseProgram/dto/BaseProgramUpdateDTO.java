@@ -54,5 +54,6 @@ public class BaseProgramUpdateDTO {
     private String basDtUseYn;
     private String vsId;
     private String makeYear;
+    private String brdcRunTime;
     private ProgramSimpleDTO program;
 }

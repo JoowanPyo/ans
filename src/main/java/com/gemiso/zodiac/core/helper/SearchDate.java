@@ -11,8 +11,8 @@ public class SearchDate {
     private Date endDate;
     public SearchDate(Date startDate, Date endDate) throws Exception {
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mmss");
-        DateFormat hourFormat = new SimpleDateFormat("yyyy-MM-dd HH:mmss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat hourFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String startDateFormat = hourFormat.format(startDate);
         String endDateFormat = hourFormat.format(endDate);
 

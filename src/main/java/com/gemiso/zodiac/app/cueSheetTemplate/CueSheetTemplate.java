@@ -30,7 +30,7 @@ public class CueSheetTemplate extends BaseEntity {
     @Column(name = "cue_tmplt_id", length = 50, nullable = false)
     private Long cueTmpltId;
 
-    @Column(name = "brdc_pgm_nm", length = 150)
+    @Column(name = "brdc_pgm_nm", length = 450)
     private String brdcPgmNm;
 
     @Column(name = "cue_tmplt_nm", length = 150)

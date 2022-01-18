@@ -41,5 +41,6 @@ public class DailyProgramDTO {
     private String inputrNm;
     private String updtrId;
     private String updtrNm;
+    private String brdcRunTime;
     private ProgramDTO program;
 }

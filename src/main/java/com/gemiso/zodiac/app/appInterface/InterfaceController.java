@@ -5,24 +5,17 @@ import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetDTO;
 import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
-import com.gemiso.zodiac.app.cueSheet.CueSheet;
-import com.gemiso.zodiac.app.program.Program;
-import com.gemiso.zodiac.app.program.dto.ProgramDTO;
-import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.helper.SearchDateInterface;
-import com.gemiso.zodiac.core.page.PageResultDTO;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Api(description = "연계 인터페이스 API")
@@ -35,7 +28,7 @@ public class InterfaceController {
     private final InterfaceService interfaceService;
 
 
-    @Operation(summary = "일일편성 목록조회[Taker]", description = "일일편성 목록조회[Taker]")
+    @Operation(summary = "큐시트 일일편성 목록조회[Taker]", description = "큐시트 일일편성 목록조회[Taker]")
     @GetMapping(path = "/dailypgm")
     public String dailyPgmFindAll(@Parameter(name = "brdc_pgm_id", description = "프로그램 아이디")
                                   @RequestParam(value = "brdc_pgm_id", required = false) String brdc_pgm_id,
@@ -68,13 +61,15 @@ public class InterfaceController {
         List<ParentProgramDTO> parentProgramDTOList = new ArrayList<>();
         String takerCueSheetDTO = "";
 
-        //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
-        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
+        //날짜로 조회조건이 들어온 경우
+        if (sdate != null && sdate.trim().isEmpty() ==false && edate != null && edate.trim().isEmpty() == false) {
+
+            //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
             SearchDateInterface searchDate = new SearchDateInterface(sdate, edate);
             parentProgramDTOList = interfaceService.dailyPgmFindAll(searchDate.getStartDate(), searchDate.getEndDate(), brdc_pgm_id, pgm_nm);
 
             takerCueSheetDTO = interfaceService.takerPgmToXml(parentProgramDTOList);
-        } else {
+        } else { //날짜로 조회조건이 들어오지 않은 경우
             parentProgramDTOList = interfaceService.dailyPgmFindAll(null, null, brdc_pgm_id, pgm_nm);
 
             takerCueSheetDTO = interfaceService.takerPgmToXml(parentProgramDTOList);
@@ -216,11 +211,26 @@ public class InterfaceController {
                                     @RequestParam(value = "fdate", required = false) String fdate,
                                     @Parameter(name = "usr_id", description = "사용자 아이디???")
                                     @RequestParam(value = "usr_id", required = false) String usr_id,
-                                    @RequestHeader(value = "securityKey") String securityKey) throws ParseException {
+                                    @RequestHeader(value = "securityKey") String securityKey) throws Exception {
 
-        List<PrompterProgramDTO> prompterProgramDTOList = interfaceService.getMstListService(pro_id, sdate, fdate);
+        List<PrompterProgramDTO> prompterProgramDTOList = new ArrayList<>();
+        String prompterProgram = "";
 
-        String prompterProgram = interfaceService.prompterProgramToXml(prompterProgramDTOList);
+        //날짜로 조회조건이 들어온 경우
+        if (sdate != null && sdate.trim().isEmpty() ==false && fdate != null && fdate.trim().isEmpty() == false) {
+
+            //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
+            SearchDateInterface searchDate = new SearchDateInterface(sdate, fdate);
+
+            prompterProgramDTOList = interfaceService.getMstListService(pro_id, searchDate.getStartDate(), searchDate.getEndDate());
+
+            prompterProgram = interfaceService.prompterProgramToXml(prompterProgramDTOList);
+        }else {
+            prompterProgramDTOList = interfaceService.getMstListService(pro_id, null, null);
+
+            prompterProgram = interfaceService.prompterProgramToXml(prompterProgramDTOList);
+        }
+
 
         return prompterProgram;
     }

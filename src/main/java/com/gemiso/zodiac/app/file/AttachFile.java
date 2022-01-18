@@ -29,7 +29,7 @@ public class AttachFile {
         @Column(name = "file_div_cd", length = 50)
         private String fileDivCd;
 
-        @Column(name = "file_nm", length = 600)
+        @Column(name = "file_nm", length = 255)
         private String fileNm;
 
         @Column(name = "file_expl", length = 1000)
@@ -50,7 +50,7 @@ public class AttachFile {
         @Column(name = "input_dtm")
         private Date inputDtm;
 
-        @Column(name = "org_file_nm", length = 600)
+        @Column(name = "org_file_nm", length = 255)
         private String orgFileNm;
 
         @Column(name = "inputr_id", nullable = false, length = 50)

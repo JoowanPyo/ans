@@ -87,6 +87,8 @@ public class DailyProgram{
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
 
+    @Column(name = "brdc_run_time", length = 8)
+    private String brdcRunTime;
 
     /*@Column(name = "brdc_pgm_id")*/
     @ManyToOne

@@ -1043,18 +1043,9 @@ public class ArticleService {
 
     //기사 픽스
     public void vaildFixStaus(Long artclId, String apprvDivCd) throws Exception {
-  /*      boolean ret = false;
-
-        long start = System.currentTimeMillis();*/
-        // 기사 ID를 이용하여 기자 정보를 불러온다.
 
         //기사 조회.
-        Optional<Article> articleEntity = articleRepository.findArticle(artclId);
-        if (articleEntity.isPresent() == false) {
-            throw new ResourceNotFoundException("기사를 찾을수 없습니다. 기사아이디 :"+ artclId);
-        }
-
-        Article article = articleEntity.get();
+        Article article = articleFindOrFail(artclId);
 
         String orgApprvDivcd = article.getApprvDivCd(); //조회된 기사픽스 구분코드 get
         // 조회된 기사픽스 구분코드와 새로들어온 구분코드가 같으면 return
@@ -1073,17 +1064,16 @@ public class ArticleService {
         ProcessArticleFix paf = new ProcessArticleFix();
         paf.setArticle(article);
         paf.setApproveCode(apprvDivCd);
-
         //유저 Id
         if (paf.getFixStatus(userId, fixAuthList) == false) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-       /* long finish = System.currentTimeMillis();
-        long timeElapsed = finish - start;
-        ;*/
-
         ArticleDTO articleDTO = articleMapper.toDto(article);
+
+        if ("editorfix".equals(apprvDivCd)){
+            articleDTO.setEditorId(userId);
+        }
         articleDTO.setApprvDivCd(apprvDivCd); //픽스 구분코드 변경.
         articleDTO.setApprvrId(userId);//픽스 승인자 변경.
         articleDTO.setApprvDtm(new Date());
@@ -1116,25 +1106,6 @@ public class ArticleService {
         //기사 액션로그 등록
         articleActionLogRepository.save(articleActionLog);
     }
-
- /*   //그룹으로 제어하지말고 권한으로 제어.
-    public List<Long> getAppAuth(String userId) {
-
-        // 사용자에 대한 그룹 정보
-        List<UserGroupUser> userGroupUserList = userGroupUserRepository.findByUserId(userId);
-
-        List<Long> appAuthList = new ArrayList<Long>();
-
-        //조회된 유저그룹 리스트에서 유저그룹 Id를 하나씩 가져온다.
-        for (UserGroupUser ugu : userGroupUserList) {
-            UserGroup ug = ugu.getUserGroup(); //조회된 유저,그룹 맵핑테이블에서 유저그룹정보만 get
-            Long id = ug.getUserGrpId(); //유저그룹 ID get
-
-            if (appAuthList.contains(id) == false)
-                appAuthList.add(id);
-        }
-        return appAuthList;
-    }*/
 
     //권한확인
     public List<String> getAppAuth(String userId) {

@@ -35,6 +35,7 @@ public class ProcessArticleFix {
     }
 
 
+    //현재 픽스상테에서 픽스가 가능한지 확인.
     public boolean getFixStatus(String userId, List<String> fixAuthList) {
 
         if (ObjectUtils.isEmpty(originalArticle)){

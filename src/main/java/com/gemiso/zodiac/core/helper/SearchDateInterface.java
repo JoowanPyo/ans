@@ -6,15 +6,15 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class SearchDateInterface {
-    private String startDate;
-    private String endDate;
+    private Date startDate;
+    private Date endDate;
     public SearchDateInterface(String startDate, String endDate) throws Exception {
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mmss");
-        DateFormat hourFormat = new SimpleDateFormat("yyyy-MM-dd HH:mmss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat hourFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        Date sdate = simpleDateFormat.parse(startDate);
-        Date edate = simpleDateFormat.parse(endDate);
+        Date sdate = simpleDateFormat.parse(startDate.trim());
+        Date edate = simpleDateFormat.parse(endDate.trim());
 
         Calendar cal = Calendar.getInstance();
 
@@ -23,21 +23,21 @@ public class SearchDateInterface {
         cal.add(Calendar.MINUTE, 00);
         cal.add(Calendar.SECOND, 00);
 
-        String formatSdate = hourFormat.format(sdate);
-        String formatEdate = hourFormat.format(cal.getTime());
+       /* String formatSdate = hourFormat.format(sdate);
+        String formatEdate = hourFormat.format(cal.getTime());*/
 
         // 2021-09-28 12:12:00 => 2021-09-28 00:00:00
-        this.startDate = formatSdate;
+        this.startDate = sdate;
         // 2021-09-28 12:12:00 => 2021-09-28 23:59:59
-        this.endDate = formatEdate;
+        this.endDate = cal.getTime();
 
     }
 
-    public String getStartDate() {
+    public Date getStartDate() {
         return this.startDate;
     }
 
-    public String getEndDate() {
+    public Date getEndDate() {
         return this.endDate;
     }
 }

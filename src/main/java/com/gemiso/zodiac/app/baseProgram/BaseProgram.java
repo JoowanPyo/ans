@@ -157,6 +157,9 @@ public class BaseProgram {
     @Column(name = "make_year", length = 4)
     private String makeYear;
 
+    @Column(name = "brdc_run_time", length = 8)
+    private String brdcRunTime;
+
     @ManyToOne
     @JoinColumn(name = "brdc_pgm_id")
     private Program program;

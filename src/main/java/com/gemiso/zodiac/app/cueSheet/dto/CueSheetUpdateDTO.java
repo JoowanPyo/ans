@@ -59,6 +59,7 @@ public class CueSheetUpdateDTO {
     private String td2Id;
     //private String td2Nm;
     private String remark;
+    private String brdcRunTime;
     private ProgramSimpleDTO program;
     private List<CueSheetItemDTO> cueSheetItem = new ArrayList<>();
 }

@@ -55,6 +55,7 @@ public class JwtFilter implements Filter {
     @Override
     public final void init(FilterConfig filterConfig) throws ServletException {
 
+        ///users/createuser - 사용자등록 최초시
         String excludePattern = "/swagger-ui/index.html,/swagger-ui/springfox.css,/swagger-ui/swagger-ui-standalone-preset.js"
                 + ",/swagger-ui/springfox.css,/swagger-ui/swagger-ui-bundle.js,/swagger-ui/springfox.js,/swagger-ui/favicon-32x32.png"
                 + ",/swagger-ui/favicon-16x16.png, /swagger-ui/swagger-ui-standalone-preset.js,/swagger-ui/swagger-ui-standalone-preset.js"
@@ -64,7 +65,7 @@ public class JwtFilter implements Filter {
                 + ",/auth/createToken,/yonhapInternational,/yonhap,/interface/dailypgm,/interface/cuesheet,/interface/code"
                 + ",/interface/mediatransrate,/interface/getMstListService,/interface/getCuesheetService,/interface"
                 + ",/swagger-ui/index.html/swagger-resources,/swagger-ui/index.html/swagger-resources/configuration/ui"
-                + ",/swagger-ui/index.html/swagger-resources/configuration/security,/auth/login,/auth/againlogin,/auth/logout,/users/createuser";
+                + ",/swagger-ui/index.html/swagger-resources/configuration/security,/auth/login,/auth/againlogin,/auth/logout";
         excludedUrls = Arrays.asList(excludePattern.split(","));
 
     }
