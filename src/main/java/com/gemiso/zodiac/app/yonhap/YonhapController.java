@@ -62,18 +62,12 @@ public class YonhapController {
     public ResponseEntity<?> create(@Parameter(description = "필수값<br> ", required = true) @RequestBody YonhapCreateDTO yonhapCreateDTO
     ) throws Exception {
 
-        YonhapDTO yonhapDTO = new YonhapDTO();
 
-        /*try {*/
-            Long yonhapId = yonhapService.create(yonhapCreateDTO);
+        Long yonhapId = yonhapService.create(yonhapCreateDTO);
 
-            yonhapDTO = yonhapService.find(yonhapId);
+        YonhapDTO yonhapDTO = yonhapService.find(yonhapId);
 
-        /*} catch (Exception e) {
-            e.printStackTrace();
-            log.error("yonhap : " + e.getMessage());
-            return new ResponseEntity<YonhapDTO>(yonhapDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-        }*/
+
         return new ResponseEntity<YonhapDTO>(yonhapDTO, HttpStatus.CREATED);
 
     }

@@ -1,10 +1,7 @@
 package com.gemiso.zodiac.app.scrollNews.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gemiso.zodiac.app.articleCap.dto.ArticleCapCreateDTO;
-import com.gemiso.zodiac.app.scrollNewsDetail.ScrollNewsDetail;
 import com.gemiso.zodiac.app.scrollNewsDetail.dto.ScrollNewsDetailCreateDTO;
-import com.gemiso.zodiac.app.scrollNewsDetail.dto.ScrollNewsDetailDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +18,7 @@ import java.util.List;
 public class ScrollNewsCreateDTO {
 
     //private Long scrlNewsId;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date brdcDtm;
     private String scrlDivCd;
     //private String scrlDivCdNm;

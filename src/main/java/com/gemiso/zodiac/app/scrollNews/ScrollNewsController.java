@@ -53,7 +53,7 @@ public class ScrollNewsController {
             scrollNewsDTOList = scrollNewsService.findAll(null, null, delYn);
         }
 
-        return null;
+        return new AnsApiResponse<>(scrollNewsDTOList);
     }
 
     @Operation(summary = "스크롤 뉴스 상세조회", description = "스크롤 뉴스 상세조회")

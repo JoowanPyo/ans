@@ -19,7 +19,7 @@ public enum AuthEnum {
     CueSheetOrder("cuesheet.order"),
     AdminWrite("admin.write"),
     AdminRead("admin.read"),
-    PD("Pd"),
+    PD("pd"),
     Empty(""),;
 
     private static String ArticleFix_cd = "article.articlefix";
@@ -52,6 +52,8 @@ public enum AuthEnum {
             return EditorFix;
         if (certityList.contains(ArticleFix_cd))
             return ArticleFix;
+        if (certityList.contains(PD))
+            return PD;
 
         return AuthEnum.Empty;
 

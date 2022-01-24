@@ -15,6 +15,8 @@ public class ArticleSimpleDTO {
 
     @Schema(description = "기사 아이디")
     private Long artclId;
+    @Schema(description = "기사 시퀀스 아이디")
+    private String artclSeqId;
    /* private String chDivCd;
     private String artclKindCd;
     private String artclFrmCd;

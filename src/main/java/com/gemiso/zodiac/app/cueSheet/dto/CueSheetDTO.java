@@ -36,7 +36,9 @@ public class CueSheetDTO {
     private String cueStCd;
     private String cueStCdNm;
     private String stdioId;
+    private String stdioNm;
     private String subrmId;
+    private String subrmNm;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date lckDtm;
     private String lckYn;

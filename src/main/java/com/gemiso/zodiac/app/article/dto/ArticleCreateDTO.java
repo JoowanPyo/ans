@@ -23,6 +23,7 @@ import java.util.List;
 public class ArticleCreateDTO {
 
     //private Long artclId;
+    private String artclSeqId;
     @NotNull
     private String chDivCd;
     //private String chDivCdNm;

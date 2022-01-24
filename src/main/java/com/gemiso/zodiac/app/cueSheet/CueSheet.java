@@ -72,8 +72,16 @@ public class CueSheet {
     @Column(name = "stdio_id", length = 10)
     private String stdioId;
 
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.fclty_nm from tb_fclty_manage a where a.fclty_id = stdio_id)")
+    private String stdioNm;
+
     @Column(name = "subrm_id", length = 10)
     private String subrmId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.fclty_nm from tb_fclty_manage a where a.fclty_id = subrm_id)")
+    private String subrmNm;
 
     @Column(name = "lck_dtm")
     private Date lckDtm;

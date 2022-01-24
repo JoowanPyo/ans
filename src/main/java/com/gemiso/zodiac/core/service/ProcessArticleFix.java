@@ -97,7 +97,7 @@ public class ProcessArticleFix {
         else if (auth.equals(AuthEnum.AnchorFix))
             return anchorFix(DbApprove, newApprove,  apprvrId,  userId);
         else if (auth.equals(AuthEnum.DeskFix))
-            return destFix(DbApprove, newApprove);
+            return deskFix(DbApprove, newApprove);
         else if (auth.equals(AuthEnum.PD))
             return pdFix(DbApprove, newApprove);
         else if (auth.equals(AuthEnum.AdminWrite))
@@ -177,11 +177,11 @@ public class ProcessArticleFix {
 
     }
 
-    public boolean destFix( FixEnum DbApprove , FixEnum newApprove )
+    public boolean deskFix( FixEnum DbApprove , FixEnum newApprove )
     {
         List<FixEnum> confirmList = new ArrayList<>();
 
-        if (IsUnfix( DbApprove, newApprove) )
+        if (IsUnfix( DbApprove, newApprove) ) //desk는 앵커포함 이전픽스도 풀기 가능.
         {
             confirmList.add(FixEnum.FIX_NONE);
             confirmList.add(FixEnum.ARTICLE_FIX);
@@ -190,7 +190,7 @@ public class ProcessArticleFix {
         }
         else
         {
-            //    confirmList.add(ARTICLE_FIX);
+            //    confirmList.add(ARTICLE_FIX); //desk는 에디터 이후 픽스 걸기 가능.
             confirmList.add(FixEnum.EDITOR_FIX);
             confirmList.add(FixEnum.ANCHOR_FIX);
             confirmList.add(FixEnum.DESK_FIX);
@@ -204,7 +204,7 @@ public class ProcessArticleFix {
     {
         List<FixEnum> confirmList = new ArrayList<>();
 
-        if (IsUnfix( DbApprove, newApprove) )
+        if (IsUnfix( DbApprove, newApprove) )//pd는 픽스를 풀수 있는 권한만 있음.
         {
             confirmList.add(FixEnum.FIX_NONE);
             confirmList.add(FixEnum.ARTICLE_FIX);

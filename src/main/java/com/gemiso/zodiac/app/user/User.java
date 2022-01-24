@@ -68,6 +68,7 @@ public class User extends BaseEntity {
     @Column(name = "user_div_cd", length = 50)
     private String userDivCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = user_div_cd)")
     private String userDivCdNm;
 

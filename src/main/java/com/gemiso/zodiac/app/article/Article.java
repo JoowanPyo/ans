@@ -36,6 +36,9 @@ public class Article extends BaseEntity {
     @Column(name = "artcl_id", nullable = false)
     private Long artclId;
 
+    @Column(name = "artcl_seq_id", length = 21)
+    private String artclSeqId;
+
     /*@Column(name = "issu_id", nullable = false)
     private Long issuId;*/
 

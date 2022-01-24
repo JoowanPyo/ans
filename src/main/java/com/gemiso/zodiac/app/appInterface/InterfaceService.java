@@ -161,29 +161,34 @@ public class InterfaceService {
 
         //프로그램 아이디가 있으면 넣고 없으면 ""
         String brdcPgmId = "";
+        String brdcDivCd = "";
         ProgramDTO programDTO = cueSheet.getProgram();
         if (ObjectUtils.isEmpty(programDTO) == false) {
             brdcPgmId = programDTO.getBrdcPgmId();
+            brdcDivCd = programDTO.getBrdcPgmDivCd();
         }
 
         ParentProgramDTO pcsDto = ParentProgramDTO.builder()
-                .cueId(cueSheet.getCueId())
-                .chDivCd(cueSheet.getChDivCd())
-                .chDivNm("") // 수정.
-                .brdcDt(cueSheet.getBrdcDt())
-                .brdcStartTime(cueSheet.getBrdcStartTime())
-                .brdcEndTime(cueSheet.getBrdcEndTime())
-                .brdcPgmId(brdcPgmId) //수정.
-                .brdcPgmNm(cueSheet.getBrdcPgmNm())
+                .cueId(cueSheet.getCueId()) //큐시트 아이디
+                .rdStNm(cueSheet.getCueStCdNm())//방송상태
+                .chDivCd(cueSheet.getChDivCd()) //채널 구분 코드
+                .chDivNm(cueSheet.getChDivCdNm()) // 채널 구분 코드 명
+                .brdcDt(cueSheet.getBrdcDt()) //방송일자
+                .brdcSeq(null)
+                .brdcStartTime(cueSheet.getBrdcStartTime()) //방송시작 시간
+                .brdcEndTime(cueSheet.getBrdcEndTime()) //방송종료 시간
+                .brdcRunTime(cueSheet.getBrdcRunTime())//방송 길이
+                .brdcPgmId(brdcPgmId) // 프로그램 아이디
+                .brdcPgmNm(cueSheet.getBrdcPgmNm()) //프로그램 명
                 .urgPgmschPgmNm("") // 수정.몬지모름
-                .brdcDivCD("") //수정
+                .brdcDivCD(brdcDivCd) //방송 구분 코드
                 .cmDivCd("") //수정
-                .remark(cueSheet.getRemark())
-                .inputr(cueSheet.getInputrId())
-                .inputrNm(cueSheet.getInputrNm())
-                .inputDtm(cueSheet.getInputDtm())
-                .pd1(cueSheet.getPd1Id())
-                .pd2(cueSheet.getPd2Id())
+                .remark(cueSheet.getRemark()) //비고
+                .inputr(cueSheet.getInputrId())//입력자
+                .inputrNm(cueSheet.getInputrNm())//입렵자명
+                .inputDtm(cueSheet.getInputDtm())//입력일시
+                .pd1(cueSheet.getPd1Id())//피디1
+                .pd2(cueSheet.getPd2Id())//피디2
                 .anc1(cueSheet.getAnc1Id())
                 .anc2(cueSheet.getAnc2Id())
                 .td1(cueSheet.getTd1Id())
@@ -198,8 +203,8 @@ public class InterfaceService {
                 .anc1Nm(cueSheet.getAnc1Nm())
                 .anc2Nm(cueSheet.getAnc2Nm())
                 .tdNm(cueSheet.getTd1Nm())
-                .stdioNm("") //수정.
-                .subrmNm("") //수정.
+                .stdioNm(cueSheet.getStdioNm()) //스튜디오 명
+                .subrmNm(cueSheet.getSubrmNm()) //부조명
                 .rdEdtYn("") //수정.
                 .endpgmYn("") //수정.
                 .build();
@@ -223,17 +228,18 @@ public class InterfaceService {
                 .cueId(null)
                 .chDivCd("")
                 .chDivNm("") // 수정.
-                .brdcDt(dailyProgram.getBrdcDt())
-                .brdcStartTime(dailyProgram.getBrdcStartTime())
-                .brdcEndTime(dailyProgram.getBrdcEndClk())
-                .brdcPgmId(brdcPgmId) //수정.
-                .brdcPgmNm(dailyProgram.getBrdcPgmNm())
+                .brdcDt(dailyProgram.getBrdcDt()) //방송일시
+                .brdcStartTime(dailyProgram.getBrdcStartTime()) //방송 시작 시간
+                .brdcEndTime(dailyProgram.getBrdcEndClk()) // 방송 종료 시간
+                .brdcRunTime(dailyProgram.getBrdcRunTime()) //방송길이
+                .brdcPgmId(brdcPgmId) //프로그램 아이디
+                .brdcPgmNm(dailyProgram.getBrdcPgmNm())//프로그램 명
                 .urgPgmschPgmNm("") // 수정.몬지모름
-                .brdcDivCD("") //수정
+                .brdcDivCD(dailyProgram.getBrdcDivCd()) //방송구분코드
                 .cmDivCd("") //수정
-                .remark(dailyProgram.getRmk())
-                .inputr(dailyProgram.getInputrId())
-                .inputrNm(dailyProgram.getInputrNm())
+                .remark(dailyProgram.getRmk())//비고
+                .inputr(dailyProgram.getInputrId())//입력자
+                .inputrNm(dailyProgram.getInputrNm())//입력자 명
                 .inputDtm(null) //Bis에서 들어온 데이터가 달라 변환이 안댐.
                 .pd1("")
                 .pd2("")
@@ -251,8 +257,8 @@ public class InterfaceService {
                 .anc1Nm("")
                 .anc2Nm("")
                 .tdNm("")
-                .stdioNm("") //수정.
-                .subrmNm("") //수정.
+                .stdioNm("") //수정. - 스튜디오명 서브쿼리로 넣어야 하나?
+                .subrmNm("") //수정. - 부조명 서브쿼리로 넣어야 하나?
                 .rdEdtYn("") //수정.
                 .endpgmYn("") //수정.
                 .build();

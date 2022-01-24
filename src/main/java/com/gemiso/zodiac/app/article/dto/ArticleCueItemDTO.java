@@ -24,6 +24,8 @@ public class ArticleCueItemDTO {
 
     @Schema(description = "기사 아이디")
     private Long artclId;
+    @Schema(description = "기사 시퀀스 아이디")
+    private String artclSeqId;
     @Schema(description = "채널 구분 코드")
     private String chDivCd;
     @Schema(description = "채널 구분 코드 명")
