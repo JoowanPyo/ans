@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.cueSheet;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.gemiso.zodiac.app.baseProgram.BaseProgram;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.program.Program;
 import lombok.*;
@@ -70,14 +71,14 @@ public class CueSheet {
     private String cueStCdNm;
 
     @Column(name = "stdio_id", length = 10)
-    private String stdioId;
+    private Long stdioId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.fclty_nm from tb_fclty_manage a where a.fclty_id = stdio_id)")
     private String stdioNm;
 
     @Column(name = "subrm_id", length = 10)
-    private String subrmId;
+    private Long subrmId;
 
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.fclty_nm from tb_fclty_manage a where a.fclty_id = subrm_id)")
@@ -168,10 +169,13 @@ public class CueSheet {
     @Column(name = "brdc_run_time", length = 8)
     private String brdcRunTime;
 
-    /*@Column(name = "brdc_pgm_id")*/
     @ManyToOne
     @JoinColumn(name = "brdc_pgm_id")
     private Program program;
+
+    @ManyToOne
+    @JoinColumn(name = "bas_pgmsch_id")
+    private BaseProgram baseProgram;
 
     @OneToMany(mappedBy = "cueSheet")
     @JsonManagedReference

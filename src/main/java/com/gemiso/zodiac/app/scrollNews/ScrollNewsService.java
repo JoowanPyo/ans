@@ -118,7 +118,7 @@ public class ScrollNewsService {
         scrollNewsDTO.setDelYn("Y"); //삭제 여부값 Y
 
         scrollNewsMapper.updateFromDto(scrollNewsDTO, scrollNews);
-        scrollNewsRepository.deleteById(scrlNewsId); //스크롤 뉴스 삭제
+        scrollNewsRepository.save(scrollNews); //스크롤 뉴스 삭제
 
     }
 

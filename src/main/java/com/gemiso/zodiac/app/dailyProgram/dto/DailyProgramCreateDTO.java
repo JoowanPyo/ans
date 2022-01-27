@@ -26,8 +26,8 @@ public class DailyProgramCreateDTO {
     private String brdcPgmNm;
     private String srcDivCd;
     //private String srcDivCdNm;
-    private String stdioId;
-    private String subrmId;
+    private Long stdioId;
+    private Long subrmId;
     private String pgmschYn;
     private String rmk;
     private String inputDtm;

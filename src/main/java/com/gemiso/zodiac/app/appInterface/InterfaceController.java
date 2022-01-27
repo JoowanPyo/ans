@@ -245,7 +245,7 @@ public class InterfaceController {
                                      @RequestParam(value = "user_ip", required = false) String user_ip,
                                      @RequestHeader(value = "securityKey") String securityKey) {
 
-        List<PrompterCueSheetDTO> prompterCueSheetDTOList = interfaceService.getCuesheetService(11L);
+        List<PrompterCueSheetDTO> prompterCueSheetDTOList = interfaceService.getCuesheetService(cs_id);
 
         String prompterCueSheetXml = interfaceService.prompterCueSheetXml(prompterCueSheetDTOList);
 

@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.cueSheet.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gemiso.zodiac.app.baseProgram.dto.BaseProgramSimpleDTO;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
@@ -35,9 +36,9 @@ public class CueSheetDTO {
     private String brdcPgmNm;
     private String cueStCd;
     private String cueStCdNm;
-    private String stdioId;
+    private Long stdioId;
     private String stdioNm;
-    private String subrmId;
+    private Long subrmId;
     private String subrmNm;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date lckDtm;
@@ -68,6 +69,7 @@ public class CueSheetDTO {
     private String remark;
     private String brdcRunTime;
     private ProgramDTO program;
+    private BaseProgramSimpleDTO baseProgram;
     private List<CueSheetItemDTO> cueSheetItem = new ArrayList<>();
     private Integer articleCount; //기사수[목록조회에 필요함]
 }

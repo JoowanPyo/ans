@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheet.dto;
 
+import com.gemiso.zodiac.app.baseProgram.dto.BaseProgramSimpleDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,8 +26,8 @@ public class CueSheetCreateDTO {
     private String brdcSchTime;
     private String brdcPgmNm;
     private String cueStCd;
-    private String stdioId;
-    private String subrmId;
+    private Long stdioId;
+    private Long subrmId;
     private Date inputDtm;
     private String inputrId;
     private String pd1Id;
@@ -37,6 +38,6 @@ public class CueSheetCreateDTO {
     private String td2Id;
     private String remark;
     private String brdcRunTime;
-    @NotNull
+    private BaseProgramSimpleDTO baseProgram;
     private ProgramSimpleDTO program;
 }

@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.cueSheet.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gemiso.zodiac.app.baseProgram.dto.BaseProgramSimpleDTO;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
@@ -33,8 +34,8 @@ public class CueSheetUpdateDTO {
     private String brdcPgmNm;
     private String cueStCd;
     //private String cueStCdNm;
-    private String stdioId;
-    private String subrmId;
+    private Long stdioId;
+    private Long subrmId;
     //private Date lckDtm;
     //private String lckYn;
     //private Date delDtm;
@@ -60,6 +61,7 @@ public class CueSheetUpdateDTO {
     //private String td2Nm;
     private String remark;
     private String brdcRunTime;
+    private BaseProgramSimpleDTO baseProgram;
     private ProgramSimpleDTO program;
     //private List<CueSheetItemDTO> cueSheetItem = new ArrayList<>();
 }

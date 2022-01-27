@@ -16,6 +16,8 @@ public class PageResultDTO<DTO, EN> {
 
     private int totalPage;
 
+    private Long totalCount;
+
     private int page;
 
     private int size;
@@ -31,6 +33,8 @@ public class PageResultDTO<DTO, EN> {
         dtoList = result.stream().map(fn).collect(Collectors.toList());
 
         totalPage = result.getTotalPages();
+
+        totalCount = result.getTotalElements();
 
         makePageList(result.getPageable());
     }

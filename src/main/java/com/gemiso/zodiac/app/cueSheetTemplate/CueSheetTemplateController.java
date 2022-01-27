@@ -28,12 +28,14 @@ public class CueSheetTemplateController {
     @Operation(summary = "큐시트 템플릿 목록조회", description = "큐시트 템플릿 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<CueSheetTemplateDTO>> findAll(@Parameter(name = "searchWord", description = "검색키워드")
-                                                          @RequestParam(value = "searchWord", required = false) String searchWord,
-                                                             @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디")
-                                                          @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId
+                                                             @RequestParam(value = "searchWord", required = false) String searchWord,
+                                                             @Parameter(name = "basPgmsch_id", description = "방송프로그램 아이디")
+                                                             @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
+                                                             @Parameter(name = "basPgmschId", description = "기본편성 아이디")
+                                                             @RequestParam(value = "basPgmschId", required = false) Long basPgmschId
     ) {
 
-        List<CueSheetTemplateDTO> cueSheetTemplateDTOList = cueSheetTemplateService.findAll(searchWord, brdcPgmId);
+        List<CueSheetTemplateDTO> cueSheetTemplateDTOList = cueSheetTemplateService.findAll(searchWord, brdcPgmId, basPgmschId);
 
         return new AnsApiResponse<>(cueSheetTemplateDTOList);
 
@@ -42,7 +44,7 @@ public class CueSheetTemplateController {
     @Operation(summary = "큐시트 템플릿 상세조회", description = "큐시트 템플릿 상세조회")
     @GetMapping(path = "/{cueTmpltId}")
     public AnsApiResponse<CueSheetTemplateDTO> find(@Parameter(name = "cueTmpltId", required = true, description = "큐시트 템플릿 아이디")
-                                                 @PathVariable("cueTmpltId") Long cueTmpltId) {
+                                                    @PathVariable("cueTmpltId") Long cueTmpltId) {
 
         CueSheetTemplateDTO cueSheetTemplateDTO = cueSheetTemplateService.find(cueTmpltId);
 
@@ -54,7 +56,7 @@ public class CueSheetTemplateController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<CueSheetTemplateDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                   @RequestBody @Valid CueSheetTemplateCreateDTO cueSheetTemplateCreateDTO) {
+                                                      @RequestBody @Valid CueSheetTemplateCreateDTO cueSheetTemplateCreateDTO) {
 
         Long cueTmpltId = cueSheetTemplateService.create(cueSheetTemplateCreateDTO);
 
@@ -66,9 +68,9 @@ public class CueSheetTemplateController {
     @Operation(summary = "큐시트 템플릿 수정", description = "큐시트 템플릿 수정")
     @PutMapping(path = "/{cueTmpltId}")
     public AnsApiResponse<CueSheetTemplateDTO> update(@Parameter(name = "cueTmpltId", required = true, description = "큐시트 템플릿 아이디")
-                                                   @PathVariable("cueTmpltId") Long cueTmpltId,
+                                                      @PathVariable("cueTmpltId") Long cueTmpltId,
                                                       @Parameter(description = "필수값<br> ", required = true)
-                                                   @RequestBody @Valid CueSheetTemplateUpdateDTO cueSheetTemplateUpdateDTO) {
+                                                      @RequestBody @Valid CueSheetTemplateUpdateDTO cueSheetTemplateUpdateDTO) {
 
         cueSheetTemplateService.update(cueTmpltId, cueSheetTemplateUpdateDTO);
 
@@ -82,7 +84,7 @@ public class CueSheetTemplateController {
     @PostMapping(path = "/{cueTmpltId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "cueTmpltId", required = true, description = "큐시트 템플릿 아이디")
-                                 @PathVariable("cueTmpltId") Long cueTmpltId) {
+                                    @PathVariable("cueTmpltId") Long cueTmpltId) {
 
         cueSheetTemplateService.delete(cueTmpltId);
 

@@ -96,7 +96,7 @@ public class ScrollNewsController {
     }
 
     @Operation(summary = "스크롤 뉴스 삭제", description = "스크롤 뉴스 삭제")
-    @DeleteMapping(path = "")
+    @DeleteMapping(path = "/{scrlNewsId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "scrlNewsId", required = true, description = "스크롤 뉴스 아이디", in = ParameterIn.PATH)
                                     @PathVariable("scrlNewsId") Long scrlNewsId) {

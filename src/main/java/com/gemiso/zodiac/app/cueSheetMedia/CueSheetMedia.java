@@ -103,6 +103,9 @@ public class CueSheetMedia extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
     private String delrNm;
 
+    @Column(name = "cue_media_titl", length = 300)
+    private String cueMediaTitl;
+
     /*@Column(name = "cue_item_id", nullable = false)
     private Long cueItemId;*/
 

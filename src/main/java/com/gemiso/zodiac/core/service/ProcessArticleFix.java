@@ -68,16 +68,16 @@ public class ProcessArticleFix {
             case "none":
                 returnFixCode = FixEnum.FIX_NONE;
                 break;
-            case "articlefix":
+            case "article_fix":
                 returnFixCode = FixEnum.ARTICLE_FIX;
                 break;
-            case "editorfix":
+            case "editor_fix":
                 returnFixCode = FixEnum.EDITOR_FIX;
                 break;
-            case "anchorfix":
+            case "anchor_fix":
                 returnFixCode = FixEnum.ANCHOR_FIX;
                 break;
-            case "deskfix":
+            case "desk_fix":
                 returnFixCode = FixEnum.DESK_FIX;
                 break;
 

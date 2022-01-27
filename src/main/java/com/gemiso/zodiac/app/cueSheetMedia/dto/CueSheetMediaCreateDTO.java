@@ -30,6 +30,7 @@ public class CueSheetMediaCreateDTO {
     private String videoEdtrNm;
     private String videoEdtrId;
     private String inputrId;
+    private String cueMediaTitl;
     @NotNull
     private CueSheetItemSimpleDTO cueSheetItem;
 }

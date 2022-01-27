@@ -41,5 +41,6 @@ public class CueSheetMediaUpdateDTO {
     //private String inputrNm;
     //private String updtrNm;
     //private String delrNm;
+    private String cueMediaTitl;
     private CueSheetItemSimpleDTO cueSheetItem;
 }

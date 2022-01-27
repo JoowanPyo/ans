@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
@@ -35,9 +36,9 @@ public class CueSheetTemplateService {
 
 
     //큐시트 템플릿 목록조회
-    public List<CueSheetTemplateDTO> findAll(String searchWord, String brdcPgmId){
+    public List<CueSheetTemplateDTO> findAll(String searchWord, String brdcPgmId, Long basPgmschId){
 
-        BooleanBuilder booleanBuilder = getSearch(searchWord, brdcPgmId); //목록조회 조회조건 빌드.
+        BooleanBuilder booleanBuilder = getSearch(searchWord, brdcPgmId, basPgmschId); //목록조회 조회조건 빌드.
 
         //생성된 목록조건으로 큐시트 템플릿 목록조회.
         List<CueSheetTemplate> cueSheetTemplateList = (List<CueSheetTemplate>) cueSheetTemplateRepository.findAll(booleanBuilder);
@@ -121,7 +122,7 @@ public class CueSheetTemplateService {
 
     }
 
-    public BooleanBuilder getSearch(String searchWord, String brdcPgmId){
+    public BooleanBuilder getSearch(String searchWord, String brdcPgmId, Long basPgmschId){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -137,6 +138,10 @@ public class CueSheetTemplateService {
         //방송프로그램 아이디가 조회 조건으로 들어온 경우
         if (brdcPgmId != null && brdcPgmId.trim().isEmpty() ==false){
             booleanBuilder.and(qCueSheetTemplate.program.brdcPgmId.eq(brdcPgmId));
+        }
+        //기본편성 아이디로 조회 조건으로 들어온 경우
+        if (ObjectUtils.isEmpty(basPgmschId) == false){
+            booleanBuilder.and(qCueSheetTemplate.baseProgram.basePgmschId.eq(basPgmschId));
         }
 
         return booleanBuilder;

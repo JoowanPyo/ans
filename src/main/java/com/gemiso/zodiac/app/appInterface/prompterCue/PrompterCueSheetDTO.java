@@ -78,6 +78,8 @@ public class PrompterCueSheetDTO {
     @XmlElement(name = "anc_reqd_sec")
     private Integer ancReqdSec;
 
+    @XmlElement(name = "NEWS_ACUM_TIME")
+    private Integer newsAcumTime;
 
 
 }

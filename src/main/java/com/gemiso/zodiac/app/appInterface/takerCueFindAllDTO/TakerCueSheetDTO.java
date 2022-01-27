@@ -9,7 +9,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -30,7 +32,7 @@ public class TakerCueSheetDTO {
     @XmlElement(name="rd_ord")
     private int rdOrd;
     @XmlElement(name="rd_ord_mrk")
-    private int rdOrdMrk;
+    private String rdOrdMrk;
     @XmlElement(name="rd_dtl_div_cd")
     private String rdDtlDivCd;
     @XmlElement(name="mc_st_cd")
@@ -116,7 +118,7 @@ public class TakerCueSheetDTO {
     @XmlElement(name = "input_dtm")
     private String inputDtm;
     @XmlElement(name = "video")
-    private String video;
+    private List<TakerCueVideoDTO> takerCueVideoDTO = new ArrayList<>();
 
 
 
