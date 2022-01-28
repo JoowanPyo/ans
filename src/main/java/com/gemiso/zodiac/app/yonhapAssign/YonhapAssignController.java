@@ -33,17 +33,17 @@ public class YonhapAssignController {
     @Operation(summary = "연합담당자지정 목록조회", description = "연합담당자지정 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<YonhapAssignDTO>> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
-                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                          @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
-                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                          @Parameter(name = "yonhapId", description = "연합기사 아이디")
-                                                      @RequestParam(value = "yonhapId", required = false) Long yonhapId,
+                                                         @RequestParam(value = "yonhapId", required = false) Long yonhapId,
                                                          @Parameter(name = "wireId", description = "연합외신기사 아이디")
-                                                      @RequestParam(value = "wireId", required = false) Long wireId,
+                                                         @RequestParam(value = "wireId", required = false) Long wireId,
                                                          @Parameter(name = "designatorId", description = "지정자 아이디")
-                                                      @RequestParam(value = "designatorId", required = false) String designatorId,
+                                                         @RequestParam(value = "designatorId", required = false) String designatorId,
                                                          @Parameter(name = "assignerId", description = "담당자 아이디")
-                                                      @RequestParam(value = "assignerId", required = false) String assignerId) throws Exception {
+                                                         @RequestParam(value = "assignerId", required = false) String assignerId) throws Exception {
 
         List<YonhapAssignDTO> yonhapAssignDTOList = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public class YonhapAssignController {
     @Operation(summary = "연합담당자지정 상세조회", description = "연합담당자지정 상세조회")
     @GetMapping(path = "/{assignId}")
     public AnsApiResponse<YonhapAssignDTO> find(@Parameter(name = "assignId", description = "연합담당자지정 아이디")
-                                             @PathVariable("assignId") Long assignId) {
+                                                @PathVariable("assignId") Long assignId) {
 
         YonhapAssignDTO yonhapAssignDTO = yonhapAssignService.find(assignId);
 
@@ -75,7 +75,7 @@ public class YonhapAssignController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<YonhapAssignResponseDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                 @RequestBody YonhapAssignCreateDTO yonhapAssignCreateDTO) {
+                                                          @RequestBody YonhapAssignCreateDTO yonhapAssignCreateDTO) {
 
         YonhapAssignResponseDTO returnId = new YonhapAssignResponseDTO();
 
@@ -88,9 +88,9 @@ public class YonhapAssignController {
     @Operation(summary = "연합담당자지정  수정", description = "연합담당자지정 수정")
     @PutMapping(path = "/{assignId}")
     public AnsApiResponse<YonhapAssignResponseDTO> update(@Parameter(name = "assignId", description = "연합담당자지정 아이디")
-                                                 @PathVariable("assignId") Long assignId,
+                                                          @PathVariable("assignId") Long assignId,
                                                           @Parameter(description = "필수값<br> ", required = true)
-                                                 @RequestBody YonhapAssignUpdateDTO yonhapAssignUpdateDTO) {
+                                                          @RequestBody YonhapAssignUpdateDTO yonhapAssignUpdateDTO) {
 
         YonhapAssignResponseDTO returnId = new YonhapAssignResponseDTO();
 
@@ -104,7 +104,7 @@ public class YonhapAssignController {
     @Operation(summary = "연합담당자지정  삭제", description = "연합담당자지정 삭제")
     @DeleteMapping(path = "/{assignId}")
     public AnsApiResponse<?> delete(@Parameter(name = "assignId", description = "연합담당자지정 아이디")
-                                 @PathVariable("assignId") Long assignId) {
+                                    @PathVariable("assignId") Long assignId) {
 
         yonhapAssignService.delete(assignId);
 

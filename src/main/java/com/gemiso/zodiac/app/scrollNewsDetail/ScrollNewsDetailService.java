@@ -28,10 +28,10 @@ public class ScrollNewsDetailService {
     private final ScrollNewsDetailMapper scrollNewsDetailMapper;
 
     //스크롤 뉴스 상세 목록조회
-    public List<ScrollNewsDetailDTO> findAll(Long scrlNewsId){
+    public List<ScrollNewsDetailDTO> findAll(Long scrlNewsId, String category){
 
         //목록조회 조건 빌드
-        BooleanBuilder booleanBuilder = getSearch(scrlNewsId);
+        BooleanBuilder booleanBuilder = getSearch(scrlNewsId, category);
 
         //빌드된 조회 조건으로 엔티티 목록조회
         List<ScrollNewsDetail> scrollNewsDetailList =
@@ -83,7 +83,7 @@ public class ScrollNewsDetailService {
     }
 
     //스크롤 뉴스 상세 목록조회 조회조건 빌드
-    public BooleanBuilder getSearch(Long scrlNewsId){
+    public BooleanBuilder getSearch(Long scrlNewsId, String category){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -92,6 +92,11 @@ public class ScrollNewsDetailService {
         //스크롤 뉴스 아이디로 조회조건이 들어왔을 경우.
         if (ObjectUtils.isEmpty(scrlNewsId) ==false){
             booleanBuilder.and(qScrollNewsDetail.scrollNews.scrlNewsId.eq(scrlNewsId));
+        }
+
+        //카테고리코드
+        if (category != null && category.trim().isEmpty() == false){
+            booleanBuilder.and(qScrollNewsDetail.category.eq(category));
         }
 
         return booleanBuilder;

@@ -403,10 +403,15 @@ public class CueSheetItemService {
         return booleanBuilder;
     }
 
-    public void createCueItem(Long cueId, Long artclId, int cueItemOrd, String cueItemDivCd){
+    public void createCueItem(Long cueId, Long artclId, int cueItemOrd, String cueItemDivCd, String spareYn){
 
         //기사 복사[복사된 기사 Id get]
         Article copyArtcl = copyArticle(artclId);
+
+        //예비큐시트 값 set
+        if (spareYn == null && spareYn.trim().isEmpty() ){
+            spareYn = "N"; //예비여부값이 안들어오면 N 값 디폴트
+        }
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
         String userId = userAuthService.authUser.getUserId();
@@ -419,6 +424,7 @@ public class CueSheetItemService {
                 .cueItemDivCd(cueItemDivCd)
                 .inputrId(userId)
                 .article(copyArtcl)
+                .spareYn(spareYn)//예비큐시트 값
                 .build();
 
 
@@ -433,7 +439,12 @@ public class CueSheetItemService {
 
     }
 
-    public void createCueItemList(List<CueSheetItemCreateListDTO> cueSheetItemCreateListDTO, Long cueId){
+    public void createCueItemList(List<CueSheetItemCreateListDTO> cueSheetItemCreateListDTO, Long cueId, String spareYn){
+
+        //예비큐시트 값 set
+        if (spareYn == null && spareYn.trim().isEmpty() ){
+            spareYn = "N"; //예비여부값이 안들어오면 N 값 디폴트
+        }
 
         for (CueSheetItemCreateListDTO createListDTO : cueSheetItemCreateListDTO){
             Long artclId = createListDTO.getArtclId();
@@ -455,6 +466,7 @@ public class CueSheetItemService {
                     .inputrId(userId)
                     .cueItemDivCd(cueItemDivCd)
                     .article(copyArtcl)
+                    .spareYn(spareYn)
                     .build();
 
 

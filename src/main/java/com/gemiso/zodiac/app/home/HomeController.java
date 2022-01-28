@@ -38,7 +38,8 @@ public class HomeController {
                                            @RequestParam(value = "inputrId", required = false) String inputrId) {
 
         PageResultDTO<ArticleDTO, Article> pageList = articleService.findAll(null, null, null, rptrId, inputrId,
-                null, null, null, null, null, null, null/*, issuId*/);
+                null, null, null, null, null, null, null,
+                null, null, null, null);
 
         return new AnsApiResponse<>(pageList);
     }

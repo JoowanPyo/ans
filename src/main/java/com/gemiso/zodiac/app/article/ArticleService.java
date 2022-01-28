@@ -116,7 +116,7 @@ public class ArticleService {
     //기사 목록조회
     public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
                                                       String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
-                                                      Integer page, Integer limit/*, Long issuId*/) {
+                                                      Integer page, Integer limit, String apprvDivCd, String deptCd, String artclCateCd, String artclTypDtlCd) {
 
         /*page = Optional.ofNullable(page).orElse(0);
         limit = Optional.ofNullable(limit).orElse(50);
@@ -140,7 +140,7 @@ public class ArticleService {
 
         //검색조건생성 [where생성]
         BooleanBuilder booleanBuilder = getSearch(sdate, edate, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd, artclTypCd,
-                searchDivCd, searchWord/*, issuId*/);
+                searchDivCd, searchWord, apprvDivCd, deptCd, artclCateCd, artclTypDtlCd);
 
         //전체조회[page type]
         Page<Article> result = articleRepository.findAll(booleanBuilder, pageable);
@@ -154,14 +154,14 @@ public class ArticleService {
     public PageResultDTO<ArticleDTO, Article> findAllIsuue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd, String artclTypDtlCd,
                                                            String artclCateCd, String deptCd, String inputrId,
                                                            String brdcPgmId, Long orgArtclId, String delYn,
-                                                           String searchword, Integer page, Integer limit) {
+                                                           String searchword, Integer page, Integer limit, String apprvDivCd) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
         Pageable pageable = pageHelper.getArticlePageInfo();
 
         BooleanBuilder booleanBuilder = getSearchIssue(sdate, edate, issuKwd, artclDivCd, artclTypCd,
-                artclTypDtlCd, artclCateCd, deptCd, inputrId, brdcPgmId, orgArtclId, delYn, searchword);
+                artclTypDtlCd, artclCateCd, deptCd, inputrId, brdcPgmId, orgArtclId, delYn, searchword, apprvDivCd);
 
         //전체조회[page type]
         Page<Article> result = articleRepository.findAll(booleanBuilder, pageable);
@@ -850,7 +850,8 @@ public class ArticleService {
 
     //기사 목록조회시 조건 빌드[일반 목록조회 ]
     public BooleanBuilder getSearch(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
-                                    String artclDivCd, String artclTypCd, String searchDivCd, String searchWord /*Long issuId*/) {
+                                    String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
+                                    String apprvDivCd, String deptCd, String artclCateCd, String artclTypDtlCd) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -909,6 +910,23 @@ public class ArticleService {
             }
 
         }
+        //픽스구분코드
+        if (apprvDivCd != null && apprvDivCd.trim().isEmpty() == false){
+            booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCd));
+        }
+        //부서코드
+        if (deptCd != null && deptCd.trim().isEmpty() == false){
+            booleanBuilder.and(qArticle.deptCd.eq(deptCd));
+        }
+        //기사카테고리코드
+        if (artclCateCd != null && artclCateCd.trim().isEmpty() == false){
+            booleanBuilder.and(qArticle.artclCateCd.eq(artclCateCd));
+        }
+        //기사유형상세코드
+        if (artclTypDtlCd != null && artclTypDtlCd.trim().isEmpty() == false){
+            booleanBuilder.and(qArticle.artclCateCd.eq(artclTypDtlCd));
+        }
+
         /*//기사 타입 코드로 조회
         if (!StringUtils.isEmpty(issuId)) {
             booleanBuilder.and(qArticle.issue.issuId.eq(issuId));
@@ -921,7 +939,7 @@ public class ArticleService {
     //기사 목록조회 조회조건 빌드[이슈 기사]
     public BooleanBuilder getSearchIssue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd,
                                          String artclTypDtlCd, String artclCateCd, String deptCd, String inputrId,
-                                         String brdcPgmId, Long orgArtclId, String delYn, String searchword) {
+                                         String brdcPgmId, Long orgArtclId, String delYn, String searchword, String apprvDivCd) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -976,6 +994,11 @@ public class ArticleService {
         //검색조건 = 검색어[이슈 제목]
         if (searchword != null && searchword.trim().isEmpty() == false) {
             booleanBuilder.and(qArticle.issue.issuKwd.contains(searchword));
+        }
+
+        //픽스구분코드
+        if (apprvDivCd != null && apprvDivCd.trim().isEmpty() == false){
+            booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCd));
         }
 
         return booleanBuilder;

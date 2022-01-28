@@ -39,6 +39,7 @@ public class CueSheetTemplate extends BaseEntity {
     @Column(name = "news_div_cd", length = 50)
     private String newsDivCd;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = news_div_cd)")
     private String newsDivCdNm;
 
@@ -71,6 +72,54 @@ public class CueSheetTemplate extends BaseEntity {
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
     private String delrNm;
+
+    @Column(name = "pd_1_id", length = 50)
+    private String pd1Id;
+
+    @Column(name = "pd_2_id")
+    private String pd2Id;
+
+    @Column(name = "anc_1_id")
+    private String anc1Id;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = anc_1_id)")
+    private String anc1Nm;
+
+    @Column(name = "anc_2_id")
+    private String anc2Id;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = anc_2_id)")
+    private String anc2Nm;
+
+    @Column(name = "td_1_id")
+    private String td1Id;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = td_1_id)")
+    private String td1Nm;
+
+    @Column(name = "td_2_id")
+    private String td2Id;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = td_2_id)")
+    private String td2Nm;
+
+    @Column(name = "stdio_id")
+    private Long stdioId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.fclty_nm from tb_fclty_manage a where a.fclty_id = td_2_id)")
+    private String stdioNm;
+
+    @Column(name = "subrm_id")
+    private Long subrmId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.fclty_nm from tb_fclty_manage a where a.fclty_id = subrm_id)")
+    private String subrmNm;
 
     @ManyToOne
     @JoinColumn(name = "brdc_pgm_id")

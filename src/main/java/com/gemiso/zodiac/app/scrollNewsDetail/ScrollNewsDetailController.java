@@ -27,9 +27,11 @@ public class ScrollNewsDetailController {
     @Operation(summary = "스크롤 뉴스 상세 목록조회", description = "스크롤 뉴스 상세 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<ScrollNewsDetailDTO>> findAll(@Parameter(name = "scrlNewsId", description = "스크롤 뉴스 아이디")
-                                                             @RequestParam(value = "scrlNewsId", required = false) Long scrlNewsId) {
+                                                             @RequestParam(value = "scrlNewsId", required = false) Long scrlNewsId,
+                                                             @Parameter(name = "category", description = "카테고리 코드")
+                                                             @RequestParam(value = "category", required = false) String category) {
 
-        List<ScrollNewsDetailDTO> scrollNewsDetailList = scrollNewsDetailService.findAll(scrlNewsId);
+        List<ScrollNewsDetailDTO> scrollNewsDetailList = scrollNewsDetailService.findAll(scrlNewsId, category);
 
         return new AnsApiResponse<>(scrollNewsDetailList);
     }

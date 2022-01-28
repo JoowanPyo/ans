@@ -3,6 +3,7 @@ package com.gemiso.zodiac.app.scrollNewsDetail;
 import com.gemiso.zodiac.app.scrollNews.ScrollNews;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 
@@ -22,8 +23,12 @@ public class ScrollNewsDetail {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "category", length = 255)
+    @Column(name = "category", length = 50)
     private String category;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = category)")
+    private String categoryNm;
 
     @Column(name = "titl", length = 255)
     private String titl;

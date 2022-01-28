@@ -137,9 +137,11 @@ public class CueSheetItemController {
                                                                @Parameter(name = "cueItemOrd", description = "기사아이디")
                                                                @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd,
                                                                @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드")
-                                                               @RequestParam(value = "cueItemDivCd", required = false) String cueItemDivCd) {
+                                                               @RequestParam(value = "cueItemDivCd", required = false) String cueItemDivCd,
+                                                               @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
+                                                               @RequestParam(value = "spareYn", required = false) String spareYn) {
 
-        cueSheetItemService.createCueItem(cueId, artclId, cueItemOrd, cueItemDivCd);
+        cueSheetItemService.createCueItem(cueId, artclId, cueItemOrd, cueItemDivCd, spareYn);
 
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
 
@@ -153,9 +155,11 @@ public class CueSheetItemController {
     public AnsApiResponse<List<CueSheetItemDTO>> createCueItemList(@Parameter(description = "필수값<br> ", required = true)
                                                                    @RequestBody @Valid List<CueSheetItemCreateListDTO> cueSheetItemCreateListDTO,
                                                                    @Parameter(name = "cueId", description = "큐시트아이디")
-                                                                   @PathVariable("cueId") Long cueId) {
+                                                                   @PathVariable("cueId") Long cueId,
+                                                                   @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
+                                                                   @RequestParam(value = "spareYn", required = false) String spareYn) {
 
-        cueSheetItemService.createCueItemList(cueSheetItemCreateListDTO, cueId);
+        cueSheetItemService.createCueItemList(cueSheetItemCreateListDTO, cueId, spareYn);
 
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
 
