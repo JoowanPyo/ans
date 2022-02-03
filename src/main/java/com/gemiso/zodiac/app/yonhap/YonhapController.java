@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.yonhap;
 
 import com.gemiso.zodiac.app.yonhap.dto.YonhapCreateDTO;
 import com.gemiso.zodiac.app.yonhap.dto.YonhapDTO;
+import com.gemiso.zodiac.app.yonhap.dto.YonhapResponseDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
@@ -67,8 +68,10 @@ public class YonhapController {
 
         YonhapDTO yonhapDTO = yonhapService.find(yonhapId);
 
+        YonhapResponseDTO yonhapResponseDTO = yonhapService.formatYonhap(yonhapDTO);
 
-        return new ResponseEntity<YonhapDTO>(yonhapDTO, HttpStatus.CREATED);
+
+        return new ResponseEntity<YonhapResponseDTO>(yonhapResponseDTO, HttpStatus.CREATED);
 
     }
 }

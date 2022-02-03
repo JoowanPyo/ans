@@ -787,7 +787,7 @@ public class InterfaceService {
         //프롬프터 xml형식으로 변환할
         PrompterProgramXML prompterProgramXML = new PrompterProgramXML();
 
-        //Lsit<prompterProgram>
+      /*  //Lsit<prompterProgram>
         PrompterProgramDataDTO prompterProgramDataDTO = new PrompterProgramDataDTO();
 
         //success="true" msg="ok" 담는DTO
@@ -799,11 +799,13 @@ public class InterfaceService {
         //result 데이터 set
         prompterProgramDataDTO.setTotalcount(prompterProgramDTOList.stream().count());
         prompterProgramResultDTO.setMsg("ok");
-        prompterProgramResultDTO.setSuccess("true");
+        prompterProgramResultDTO.setSuccess("true");*/
 
         //XML 변환할 Code데이터 set
-        prompterProgramXML.setData(prompterProgramDataDTO);
-        prompterProgramXML.setResult(prompterProgramResultDTO);
+       /* prompterProgramXML.setData(prompterProgramDataDTO);
+        prompterProgramXML.setResult(prompterProgramResultDTO);*/
+
+        prompterProgramXML.setPrompterProgramDTO(prompterProgramDTOList);
 
         //DTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(prompterProgramXML, PrompterProgramXML.class);
@@ -831,7 +833,7 @@ public class InterfaceService {
         //프롬프터 큐시트 xml형식으로 변환할 DTO
         PrompterCueSheetXML prompterCueSheetXML = new PrompterCueSheetXML();
 
-        //set Lsit<PrompterCueSheetDTO>
+     /*   //set Lsit<PrompterCueSheetDTO>
         PrompterCueSheetDataDTO prompterCueSheetDataDTO = new PrompterCueSheetDataDTO();
 
         //success="true" msg="ok" 담는DTO
@@ -847,7 +849,9 @@ public class InterfaceService {
 
         //XML 변환할 데이터 set
         prompterCueSheetXML.setData(prompterCueSheetDataDTO);
-        prompterCueSheetXML.setResult(prompterCueSheetResultDTO);
+        prompterCueSheetXML.setResult(prompterCueSheetResultDTO);*/
+
+        prompterCueSheetXML.setCueSheetDTO(prompterCueSheetDTOList);
 
         //DTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(prompterCueSheetXML, PrompterCueSheetXML.class);

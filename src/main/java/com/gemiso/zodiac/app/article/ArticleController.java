@@ -264,8 +264,8 @@ public class ArticleController {
     @PutMapping(path = "/{artclId}/fix")
     public AnsApiResponse<ArticleDTO> fix(@Parameter(name = "artclId", description = "기사 아이디")
                                           @PathVariable("artclId") Long artclId,
-                                          @Parameter(name = "apprvDivCd", description = "픽스 상태 코드(none[픽스가 없는상태]" +
-                                                  ", articlefix[기자 픽스], editorfix[에디터 픽스], anchorfix[앵커 픽스], deskfix[데스크 픽스])")
+                                          @Parameter(name = "apprvDivCd", description = "픽스 상태 코드(fix_none[픽스가 없는상태]" +
+                                                  ", article_fix[기자 픽스], editor_fix[에디터 픽스], anchor_fix[앵커 픽스], desk_fix[데스크 픽스])")
                                           @RequestParam(value = "apprvDivCd", required = true) String apprvDivCd) throws Exception {
 
 

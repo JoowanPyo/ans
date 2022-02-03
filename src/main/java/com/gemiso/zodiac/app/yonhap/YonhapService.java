@@ -4,10 +4,7 @@ import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.file.AttachFileRepository;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.mapper.AttachFileMapper;
-import com.gemiso.zodiac.app.yonhap.dto.YonhapAttachFileCreateDTO;
-import com.gemiso.zodiac.app.yonhap.dto.YonhapAttachFileDTO;
-import com.gemiso.zodiac.app.yonhap.dto.YonhapCreateDTO;
-import com.gemiso.zodiac.app.yonhap.dto.YonhapDTO;
+import com.gemiso.zodiac.app.yonhap.dto.*;
 import com.gemiso.zodiac.app.yonhap.mapper.YonhapAttachFileMapper;
 import com.gemiso.zodiac.app.yonhap.mapper.YonhapMapper;
 import com.gemiso.zodiac.core.util.PropertyUtil;
@@ -25,6 +22,7 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -68,7 +66,7 @@ public class YonhapService {
         List<YonhapAttchFile> attchFile = yonhapAttchFileRepository.findId(yonhapId);
         List<YonhapAttachFileDTO> yonhapAttachFileDTOS = yonhapAttachFileMapper.toDtoList(attchFile);
 
-        yonhapDTO.setUpload_files(yonhapAttachFileDTOS);
+        yonhapDTO.setYonhapAttchFiles(yonhapAttachFileDTOS);
 
         return yonhapDTO;
     }
@@ -206,6 +204,50 @@ public class YonhapService {
 
         return yonhapId;
 
+    }
+
+    public YonhapResponseDTO formatYonhap(YonhapDTO yonhapDTO){
+
+        YonhapResponseDTO yonhapResponseDTO = YonhapResponseDTO.builder()
+                .yh_artcl_id(yonhapDTO.getYonhapId())
+                .cont_id(yonhapDTO.getContId())
+                .imprt(yonhapDTO.getImprt())
+                .svc_typ(yonhapDTO.getSvcTyp())
+                .artcl_titl(yonhapDTO.getArtclTitl())
+                .artcl_smltitl(yonhapDTO.getArtclSmltitl())
+                .artcl_ctt(yonhapDTO.getArtclCtt())
+                .credit(yonhapDTO.getCredit())
+                .source(yonhapDTO.getSource())
+                .artcl_cate_cd(yonhapDTO.getArtclCateCd())
+                .artcl_cate_nm(yonhapDTO.getArtclCateNm())
+                .region_cd(yonhapDTO.getRegionCd())
+                .region_nm(yonhapDTO.getRegionNm())
+                .ctt_class_cd(yonhapDTO.getCttClassCd())
+                .ctt_class_nm(yonhapDTO.getCttClassNm())
+                .ctt_class_add_cd(yonhapDTO.getCttClassAddCd())
+                .issu_cd(yonhapDTO.getIssuCd())
+                .stock_cd(yonhapDTO.getStockCd())
+                .artclqnty(yonhapDTO.getArtclqnty())
+                .cmnt(yonhapDTO.getCmnt())
+                .rel_cont_id(yonhapDTO.getRelContId())
+                .ref_cont_info(yonhapDTO.getRefContInfo())
+                .embg_dtm(dateToString(yonhapDTO.getEmbgDtm()))
+                .input_dtm(dateToString(yonhapDTO.getInputDtm()))
+                .trnsf_dtm(dateToString(yonhapDTO.getTrnsfDtm()))
+                .action(yonhapDTO.getAction())
+                .upload_files(yonhapDTO.getYonhapAttchFiles())
+                .build();
+
+        return yonhapResponseDTO;
+    }
+
+    public String dateToString(Date date){
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        String returnDate = simpleDateFormat.format(date);
+
+        return returnDate;
     }
 
     public BooleanBuilder getSearch(Date sdate, Date edate, List<String> artcl_cate_cds, List<String> region_cds, String search_word) {

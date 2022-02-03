@@ -5,10 +5,10 @@ import java.util.HashMap;
 public enum FixEnum {
 
     FIX_NONE(0, "none"),
-    ARTICLE_FIX(1, "articlefix"),
-    EDITOR_FIX(2, "editorfix"),
-    ANCHOR_FIX(3, "anchorfix"),
-    DESK_FIX(4, "deskfix");
+    ARTICLE_FIX(1, "article_fix"),
+    EDITOR_FIX(2, "editor_fix"),
+    ANCHOR_FIX(3, "anchor_fix"),
+    DESK_FIX(4, "desk_fix");
 
     private static final HashMap<String, Integer> enumFix = new HashMap<>();
     static {

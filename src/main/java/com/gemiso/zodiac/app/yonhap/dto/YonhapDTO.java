@@ -28,13 +28,15 @@ public class YonhapDTO {
     private String credit;
     private String source;
     private String artclCateCd;
+    private String artclCateNm;
     private String regionCd;
     private String regionNm;
     private String cttClassCd;
+    private String cttClassNm;
     private String cttClassAddCd;
     private String issuCd;
     private String stockCd;
-    private int artclqnty;
+    private Integer artclqnty;
     private String cmnt;
     private String relContId;
     private String refContInfo;
@@ -45,6 +47,6 @@ public class YonhapDTO {
     private Date trnsfDtm;
     private String action;
 
-    private List<YonhapAttachFileDTO> upload_files;
+    private List<YonhapAttachFileDTO> yonhapAttchFiles;
 
 }
