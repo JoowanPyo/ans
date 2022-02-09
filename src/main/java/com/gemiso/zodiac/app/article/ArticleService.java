@@ -154,14 +154,14 @@ public class ArticleService {
     public PageResultDTO<ArticleDTO, Article> findAllIsuue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd, String artclTypDtlCd,
                                                            String artclCateCd, String deptCd, String inputrId,
                                                            String brdcPgmId, Long orgArtclId, String delYn,
-                                                           String searchword, Integer page, Integer limit, String apprvDivCd) {
+                                                           String searchDivCd, String searchWord, Integer page, Integer limit, String apprvDivCd) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
         Pageable pageable = pageHelper.getArticlePageInfo();
 
         BooleanBuilder booleanBuilder = getSearchIssue(sdate, edate, issuKwd, artclDivCd, artclTypCd,
-                artclTypDtlCd, artclCateCd, deptCd, inputrId, brdcPgmId, orgArtclId, delYn, searchword, apprvDivCd);
+                artclTypDtlCd, artclCateCd, deptCd, inputrId, brdcPgmId, orgArtclId, delYn, searchDivCd, searchWord, apprvDivCd);
 
         //전체조회[page type]
         Page<Article> result = articleRepository.findAll(booleanBuilder, pageable);
@@ -939,11 +939,12 @@ public class ArticleService {
     //기사 목록조회 조회조건 빌드[이슈 기사]
     public BooleanBuilder getSearchIssue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd,
                                          String artclTypDtlCd, String artclCateCd, String deptCd, String inputrId,
-                                         String brdcPgmId, Long orgArtclId, String delYn, String searchword, String apprvDivCd) {
+                                         String brdcPgmId, Long orgArtclId, String delYn, String searchDivCd, String searchWord, String apprvDivCd) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         QArticle qArticle = QArticle.article;
+        QUser qUser = QUser.user;
 
         //이슈 검색일 조건
         if (ObjectUtils.isEmpty(sdate) && ObjectUtils.isEmpty(edate)) {
@@ -991,9 +992,17 @@ public class ArticleService {
         } else {
             booleanBuilder.and(qArticle.delYn.eq("N")); //삭제여부값 안들어 올시 디폴트 'N'
         }
-        //검색조건 = 검색어[이슈 제목]
-        if (searchword != null && searchword.trim().isEmpty() == false) {
-            booleanBuilder.and(qArticle.issue.issuKwd.contains(searchword));
+        //검색어로 조회
+        if (searchWord != null && searchWord.trim().isEmpty() == false) {
+            //검색구분코드 01 일때 기사 제목으로 검색
+            if (searchDivCd.equals("01")) {
+                booleanBuilder.and(qArticle.artclTitl.contains(searchWord).or(qArticle.artclTitlEn.contains(searchWord)));
+            }
+            //검색구분코드 02 일때 기자이름으로 검색
+            if (searchDivCd.equals("02")) {
+                booleanBuilder.and(qArticle.rptrId.eq(String.valueOf(qUser.userNm.contains(searchWord))));
+            }
+
         }
 
         //픽스구분코드

@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.yonhap.dto;
+package com.gemiso.zodiac.app.yonhapAttchFile.dto;
 
 import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.yonhap.Yonhap;

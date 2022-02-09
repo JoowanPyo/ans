@@ -305,7 +305,7 @@ public class InterfaceService {
                                              String format, String lang, String os_type) {
 
         //큐시트 아이티와 삭제여부값 예외 처리[아이디가 String 타입으로 들어오기 때문에 Long값으로 변환.]
-        Long cueId = 3L;
+        Long cueId = 61L;
         /*if (rd_id != null && rd_id.trim().isEmpty() ==false) {
             cueId = Long.parseLong(rd_id);
         }*/
@@ -390,7 +390,7 @@ public class InterfaceService {
                         .chDivCd(cueSheet.getChDivCd()) // 채널구분코드
                         .cueDivCdNm(cueSheet.getCueDivCdNm()) //채널구분코드 명
                         .rdOrd(cueSheetItem.getCueItemOrd())//순번
-                        .rdOrdMrk(cueSheetItem.getCueItemOrdCd())//표시되는 순번
+                        .rdOrdMrk(cueSheetItem.getCueItemOrd())//표시되는 순번
                         .rdDtlDivCd(cueSheetItem.getCueItemDivCd()) //큐시트아이템 구분 코드
                         .mcStCd(cueSheetItem.getBrdcStCd()) //방송상태코드
                         .cmDivCd(returnSymbolId)//심볼 아이디 (채널명) ex VNS1, VNS2, VNS3
@@ -423,7 +423,7 @@ public class InterfaceService {
                         .chDivCd(cueSheet.getChDivCd())// 채널구분코드
                         .cueDivCdNm(cueSheet.getCueDivCdNm())//채널구분코드 명
                         .rdOrd(cueSheetItem.getCueItemOrd())//큐시트 아이템 순번
-                        .rdOrdMrk(cueSheetItem.getCueItemOrdCd())//표시되는 순번
+                        .rdOrdMrk(cueSheetItem.getCueItemOrd())//표시되는 순번
                         .rdDtlDivCd(cueSheetItem.getCueItemDivCd()) //큐시트아이템 구분 코드
                         .mcStCd(cueSheetItem.getBrdcStCd()) //방송상태코드
                         .cmDivCd(returnSymbolId)//심볼 아이디 (채널명) ex VNS1, VNS2, VNS3
@@ -744,6 +744,7 @@ public class InterfaceService {
         }
 
         PrompterProgramDTO program = PrompterProgramDTO.builder()
+                .csId(cueSheet.getCueId())
                 .brdcPgmId(brdcPgmId)
                 .proNm(cueSheet.getBrdcPgmNm())
                 .onAirDate(cueSheet.getBrdcDt())
@@ -865,6 +866,7 @@ public class InterfaceService {
         List<PrompterCueSheetDTO> prompterCueSheetDTOList = new ArrayList<>();
 
         Integer newsAcumTime = 0;
+        int ord = 1;
 
         for (CueSheetItem cueSheetItem : cueSheetItemList) { //큐시트 아이템 PrompterCueSheetDTO리스트로 변환[기사(article)이 있는 아이템만 변환]
 
@@ -873,50 +875,65 @@ public class InterfaceService {
             Long cueId = cueSheet.getCueId();
 
             if (ObjectUtils.isEmpty(article)) { //기사 정보가 없으면 contiue [프롬프트에서 기사정보만 쓰임]
-                continue;
+                
+                //조회된 cueSheetItem정보로 PrompterCueSheetDTO생성
+                PrompterCueSheetDTO prompterCueSheetDTO = PrompterCueSheetDTO.builder()
+                        .cueId(cueSheetItem.getCueItemId())
+                        .rdSeq("")
+                        .openYn("")
+                        .artclTitl(cueSheetItem.getCueItemTitl()) //국문제목
+                        .artclTitlEn(cueSheetItem.getCueItemTitlEn()) // 영문제목
+                        .artclCtt(cueSheetItem.getCueItemCtt())
+                        .newsAcumTime(newsAcumTime) //누적시간
+                        .build();
+
+                //빌드된 PrompterCueSheetDTO를 PrompterCueSheetDTO List에 add
+                prompterCueSheetDTOList.add(prompterCueSheetDTO);
+                
+            }else { //기사 아이템인 경우
+
+                Integer articleCttTime = article.getArtclCttTime(); // 기사 소요시간
+                Integer ancCttTime = article.getAncMentCttTime(); // 앵커 소요시간
+
+                if (articleCttTime != null && ancCttTime != null) { //기사,앵커 소요시간이 둘다 Null이 아닌경우
+                    // 기사 소요시간 + 앵커 소요시간 + 누적시간 = 누적시간
+                    newsAcumTime = articleCttTime + ancCttTime + newsAcumTime;
+                } else if (articleCttTime == null && ancCttTime != null) { // 앵커시간이 Null인경우
+                    newsAcumTime = ancCttTime + newsAcumTime;
+                } else if (articleCttTime != null && ancCttTime == null) { //기사시간이 Null인경우
+                    newsAcumTime = articleCttTime + newsAcumTime;
+                }
+
+
+                //조회된 cueSheet정보의 기사정보로 PrompterCueSheetDTO생성
+                PrompterCueSheetDTO prompterCueSheetDTO = PrompterCueSheetDTO.builder()
+                        .cueId(cueSheetItem.getCueItemId())
+                        .rdSeq("")
+                        .chDivCd(article.getChDivCd())
+                        .rdOrd(ord) //순번
+                        .prdDivCd(article.getPrdDivCd())
+                        .openYn("")
+                        .artclId(article.getArtclId())
+                        .artclFldCd(article.getArtclFldCd())
+                        .artclFldNm(article.getArtclFldCdNm())
+                        .artclFrmCd(article.getArtclFrmCd())
+                        .artclFrmNm(article.getArtclFrmCdNm())
+                        .artclTitl(article.getArtclTitl()) //국문제목
+                        .artclTitlEn(article.getArtclTitlEn()) // 영문제목
+                        .artclCtt(article.getArtclCtt())
+                        .rptrId(article.getRptrId()) //기자 아이디
+                        .rptrNm(article.getRptrNm()) //기자 명
+                        .deptCd(article.getDeptCd())
+                        .artclReqdSec(articleCttTime) //기사 소요시간
+                        .ancReqdSec(ancCttTime) //앵커기사 소요시간
+                        .newsAcumTime(newsAcumTime) //누적시간
+                        .build();
+
+
+                //빌드된 PrompterCueSheetDTO를 PrompterCueSheetDTO List에 add
+                prompterCueSheetDTOList.add(prompterCueSheetDTO);
             }
-            
-            Integer articleCttTime = article.getArtclCttTime(); // 기사 소요시간
-            Integer ancCttTime = article.getAncMentCttTime(); // 앵커 소요시간
-
-            if (articleCttTime != null && ancCttTime != null) { //기사,앵커 소요시간이 둘다 Null이 아닌경우
-                // 기사 소요시간 + 앵커 소요시간 + 누적시간 = 누적시간
-                newsAcumTime = articleCttTime + ancCttTime + newsAcumTime;
-            }else if (articleCttTime == null && ancCttTime != null ){ // 앵커시간이 Null인경우
-                newsAcumTime = ancCttTime + newsAcumTime;
-            }else if (articleCttTime != null && ancCttTime == null){ //기사시간이 Null인경우
-                newsAcumTime = articleCttTime + newsAcumTime;
-            }
-
-
-            //조회된 cueSheet정보의 기사정보로 PrompterCueSheetDTO생성
-            PrompterCueSheetDTO prompterCueSheetDTO = PrompterCueSheetDTO.builder()
-                    .cueId(cueId)
-                    .rdSeq("")
-                    .chDivCd(article.getChDivCd())
-                    .rdOrd(cueSheetItem.getCueItemOrd()) //순번
-                    .prdDivCd(article.getPrdDivCd())
-                    .openYn("")
-                    .artclId(article.getArtclId())
-                    .artclFldCd(article.getArtclFldCd())
-                    .artclFldNm(article.getArtclFldCdNm())
-                    .artclFrmCd(article.getArtclFrmCd())
-                    .artclFrmNm(article.getArtclFrmCdNm())
-                    .artclTitl(article.getArtclTitl()) //국문제목
-                    .artclTitlEn(article.getArtclTitlEn()) // 영문제목
-                    .artclCtt(article.getArtclCtt())
-                    .rptrId(article.getRptrId()) //기자 아이디
-                    .rptrNm(article.getRptrNm()) //기자 명
-                    .deptCd(article.getDeptCd())
-                    .artclReqdSec(articleCttTime) //기사 누적시간
-                    .ancReqdSec(ancCttTime) //앵커기사 누적시간
-                    .newsAcumTime(newsAcumTime)
-                    .build();
-            
-            
-            //빌드된 PrompterCueSheetDTO를 PrompterCueSheetDTO List에 add
-            prompterCueSheetDTOList.add(prompterCueSheetDTO);
-
+            ++ord;
         }
 
         //PrompterCueSheetDTO List return

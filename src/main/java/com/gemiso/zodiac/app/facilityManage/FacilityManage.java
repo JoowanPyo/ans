@@ -47,4 +47,13 @@ public class FacilityManage extends BaseEntity {
     @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
     private String updtrNm;
+
+    @PrePersist
+    public void prePersist() {
+
+        if (this.delYn == null || this.delYn == "") {
+            this.delYn = "N";
+        }
+
+    }
 }

@@ -18,6 +18,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PrompterProgramDTO {
 
+    @XmlElement(name="CS_ID")
+    private Long csId; // 방송 상태값
+
     @XmlElement(name="PRO_ID")
     private String brdcPgmId; //프로그램 아이디
 

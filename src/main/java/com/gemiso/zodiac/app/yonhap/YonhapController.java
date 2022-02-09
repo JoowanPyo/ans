@@ -57,6 +57,16 @@ public class YonhapController {
         return new AnsApiResponse<>(yonhapDTOList);
     }
 
+    @Operation(summary = "연합 상세조회", description = "연합 상세조회")
+    @GetMapping(path = "/{yonhapId}")
+    public AnsApiResponse<YonhapDTO> find(@Parameter(name = "yonhapId", description = "연합 아이디") @PathVariable("yonhapId")Long yonhapId){
+
+        YonhapDTO yonhapDTO = yonhapService.find(yonhapId);
+
+        return new AnsApiResponse<>(yonhapDTO);
+
+    }
+
     @Operation(summary = "연합 등록", description = "연합 등록")
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
@@ -69,6 +79,13 @@ public class YonhapController {
         YonhapDTO yonhapDTO = yonhapService.find(yonhapId);
 
         YonhapResponseDTO yonhapResponseDTO = yonhapService.formatYonhap(yonhapDTO);
+
+        /*if(yonhapResponseDTO != null && yonhapResponseDTO.getFiles().size() > 0 ) {
+            for (Iterator<AttachFileDomain> iterator = yh_vo.getFiles().iterator(); iterator.hasNext();) {
+                AttachFileDomain _attc_file_vo = iterator.next();
+                _attc_file_vo.setFile_loc("/data/store/"+_attc_file_vo.getFile_loc());
+            }
+        }*/
 
 
         return new ResponseEntity<YonhapResponseDTO>(yonhapResponseDTO, HttpStatus.CREATED);

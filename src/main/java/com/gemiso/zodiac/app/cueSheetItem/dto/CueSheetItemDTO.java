@@ -78,6 +78,7 @@ public class CueSheetItemDTO {
     private String artclTop;
     private String headLn;
     private String artclRef;
+    private String spareYn;
     private CueSheetSimpleDTO cueSheet;
     private ArticleCueItemDTO article;
     private CueSheetTemplateSimpleDTO cueSheetTemplate;

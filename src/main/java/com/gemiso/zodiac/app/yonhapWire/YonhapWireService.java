@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.yonhapWire;
 
 import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireCreateDTO;
 import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireDTO;
+import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireResponseDTO;
 import com.gemiso.zodiac.app.yonhapWire.mapper.YonhapCreateMapper;
 import com.gemiso.zodiac.app.yonhapWire.mapper.YonhapWireMapper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -50,7 +52,8 @@ public class YonhapWireService {
         List<YonhapWire> yonhapWireList = yonhapWireRepository.findYhArtclId(contId);
 
         //기존연합이 있을경우 updqte
-        if (ObjectUtils.isEmpty(yonhapWireList)) {
+        if (CollectionUtils.isEmpty(yonhapWireList) == false) {
+
             Long OrgYhArtclId = yonhapWireList.get(0).getWireId();
             yonhapWireCreateDTO.setWire_id(OrgYhArtclId);
 
@@ -275,5 +278,40 @@ public class YonhapWireService {
             }
         }
         return booleanBuilder;
+    }
+
+    public YonhapWireResponseDTO formatWire(YonhapWireDTO yonhapWireDTO){
+
+        YonhapWireResponseDTO yonhapWireResponseDTO = YonhapWireResponseDTO.builder()
+                .yh_artcl_id(yonhapWireDTO.getWireId())
+                .cont_id(yonhapWireDTO.getContId())
+                .action(yonhapWireDTO.getAction())
+                .imprt(yonhapWireDTO.getImprt())
+                .svc_typ(yonhapWireDTO.getSvcTyp())
+                .artcl_titl(yonhapWireDTO.getArtclTitl())
+                .artcl_ctt(yonhapWireDTO.getArtclCtt())
+                .artclqnty(yonhapWireDTO.getArtclqnty())
+                .agcy_cd(yonhapWireDTO.getAgcyCd())
+                .agcy_nm(yonhapWireDTO.getAgcyNm())
+                .source(yonhapWireDTO.getSource())
+                .credit(yonhapWireDTO.getCredit())
+                .input_dtm(dateToString(yonhapWireDTO.getInputDtm()))
+                .trnsf_dtm(dateToString(yonhapWireDTO.getTrnsfDtm()))
+                .build();
+
+        return yonhapWireResponseDTO;
+    }
+
+    public String dateToString(Date date){
+
+        String returnDate = "";
+
+        if (ObjectUtils.isEmpty(date) == false) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            returnDate = simpleDateFormat.format(date);
+        }
+
+        return returnDate;
     }
 }

@@ -65,7 +65,7 @@ public class ApiErrorResponse extends BaseApiResponse {
         private HashMap<String, List<String>> errors = new HashMap<>();
 
         public Error(ErrorCodes code, String message) {
-            this.code = code;
+             this.code = code;
             this.message = message;
         }
 
@@ -94,7 +94,7 @@ public class ApiErrorResponse extends BaseApiResponse {
     }
 
     public ApiErrorResponse(Error error, HttpStatus status) {
-        this.error = error;
+         this.error = error;
         this.status = status;
         this.success = false;
     }

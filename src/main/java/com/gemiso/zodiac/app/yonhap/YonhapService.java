@@ -5,23 +5,28 @@ import com.gemiso.zodiac.app.file.AttachFileRepository;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.mapper.AttachFileMapper;
 import com.gemiso.zodiac.app.yonhap.dto.*;
-import com.gemiso.zodiac.app.yonhap.mapper.YonhapAttachFileMapper;
+import com.gemiso.zodiac.app.yonhapAttchFile.YonhapAttchFileRepository;
+import com.gemiso.zodiac.app.yonhapAttchFile.mapper.YonhapAttachFileMapper;
 import com.gemiso.zodiac.app.yonhap.mapper.YonhapMapper;
+import com.gemiso.zodiac.app.yonhapAttchFile.YonhapAttchFile;
+import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileCreateDTO;
+import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileDTO;
+import com.gemiso.zodiac.app.yonhapPoto.YonhapPoto;
+import com.gemiso.zodiac.app.yonhapPotoAttchFile.YonhapPotoAttchFile;
+import com.gemiso.zodiac.app.yonhapPotoAttchFile.YonhapPotoAttchFileRepository;
 import com.gemiso.zodiac.core.util.PropertyUtil;
 import com.gemiso.zodiac.core.util.UploadFileBean;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jdom2.JDOMException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,6 +42,7 @@ public class YonhapService {
     private final YonhapRepository yonhapRepository;
     private final YonhapAttchFileRepository yonhapAttchFileRepository;
     private final AttachFileRepository attachFileRepository;
+    private final YonhapPotoAttchFileRepository yonhapPotoAttchFileRepository;
 
     private final YonhapMapper yonhapMapper;
     private final YonhapAttachFileMapper yonhapAttachFileMapper;
@@ -71,6 +77,19 @@ public class YonhapService {
         return yonhapDTO;
     }
 
+    //String To Date
+    public Date stringToDate(String str) throws ParseException {
+
+        Date returnDate = new Date();
+
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyymmddhhmmss");
+
+        if (str != null && str.trim().isEmpty() == false){
+            returnDate = transFormat.parse(str);
+        }
+
+        return returnDate;
+    }
 
     public Long create(YonhapCreateDTO yonhapCreateDTO) throws Exception {
 
@@ -78,12 +97,14 @@ public class YonhapService {
 
         Long yonhapId = null;
 
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyymmddhhmmss");
+        String getEmbgDtm = yonhapCreateDTO.getEmbg_dtm();
+        String getInputDtm = yonhapCreateDTO.getInput_dtm();
+        String getTrnsfDtm = yonhapCreateDTO.getTrnsf_dtm();
 
-        Date embgDtm = null;
-        Date inputDtm = null;
-        Date trnsfDtm = null;
-        if(!StringUtils.isEmpty(yonhapCreateDTO.getEmbg_dtm())) {
+        Date embgDtm = stringToDate(getEmbgDtm);
+        Date inputDtm = stringToDate(getInputDtm);
+        Date trnsfDtm = stringToDate(getTrnsfDtm);
+ /*       if(!StringUtils.isEmpty(yonhapCreateDTO.getEmbg_dtm())) {
             embgDtm = transFormat.parse(yonhapCreateDTO.getEmbg_dtm());
         }
         if(!StringUtils.isEmpty(yonhapCreateDTO.getInput_dtm())) {
@@ -91,75 +112,60 @@ public class YonhapService {
         }
         if(!StringUtils.isEmpty(yonhapCreateDTO.getTrnsf_dtm())) {
             trnsfDtm = transFormat.parse(yonhapCreateDTO.getTrnsf_dtm());
-        }
+        }*/
         int artclqnty = Integer.parseInt(yonhapCreateDTO.getArtclqnty());
 
+        String contId = yonhapCreateDTO.getCont_id();
+
+        List<Yonhap> yonhap = yonhapRepository.findByYonhap(contId);
+
         //콘텐츠 아이디로
-        if (!StringUtils.isEmpty(yonhapCreateDTO.getCont_id())) {
+        if (CollectionUtils.isEmpty(yonhap) == false) {
 
-            List<Yonhap> yonhap = yonhapRepository.findByYonhap(yonhapCreateDTO.getCont_id());
+                yonhapId = yonhap.get(0).getYonhapId();
 
-            yonhapId = yonhap.get(0).getYonhapId();
+                Yonhap yonhapEntity = Yonhap.builder()
+                        .yonhapId(yonhapId)
+                        .contId(yonhapCreateDTO.getCont_id())
+                        .imprt(yonhapCreateDTO.getImprt())
+                        .svcTyp(yonhapCreateDTO.getSvc_typ())
+                        .artclTitl(yonhapCreateDTO.getArtcl_titl())
+                        .artclSmltitl(yonhapCreateDTO.getArtcl_smltitl())
+                        .artclCtt(yonhapCreateDTO.getArtcl_ctt())
+                        .credit(yonhapCreateDTO.getCredit())
+                        .source(yonhapCreateDTO.getSource())
+                        .artclCateCd(yonhapCreateDTO.getArtcl_cate_nm())
+                        .regionNm(yonhapCreateDTO.getRegion_nm())
+                        .cttClassCd(yonhapCreateDTO.getCtt_class_nm())
+                        .cttClassAddCd(yonhapCreateDTO.getCtt_class_add_cd())
+                        .issuCd(yonhapCreateDTO.getIssu_cd())
+                        .stockCd(yonhapCreateDTO.getStock_cd())
+                        .artclqnty(artclqnty)
+                        .cmnt(yonhapCreateDTO.getCmnt())
+                        .relContId(yonhapCreateDTO.getRel_cont_id())
+                        .refContInfo(yonhapCreateDTO.getRef_cont_info())
+                        .embgDtm(embgDtm)
+                        .inputDtm(inputDtm)
+                        .trnsfDtm(trnsfDtm)
+                        .action(yonhapCreateDTO.getAction())
+                        .build();
 
-            // 수정
-            //yh_artcl_id = yh_vo.getYh_artcl_id();
-            //yhArtclId = yonhap.getYhArtclId();
-
-            //yonhapCreateDTO.setYh_artcl_id(yhArtclId);
-
-
-			/* 지역코드 안들어왔을시, 임의로 넣어주는값 확인.
-			if(StringUtils.isEmpty(yh_vo.getRegion_cd())) {
-				//지역코드
-				yh_vo.setRegion_cd("9999999");
-				yh_vo.setRegion_nm("");
-			}
-			*/
-
-
-            Yonhap yonhapEntity = Yonhap.builder()
-                    .yonhapId(yonhapId)
-                    .contId(yonhapCreateDTO.getCont_id())
-                    .imprt(yonhapCreateDTO.getImprt())
-                    .svcTyp(yonhapCreateDTO.getSvc_typ())
-                    .artclTitl(yonhapCreateDTO.getArtcl_titl())
-                    .artclSmltitl(yonhapCreateDTO.getArtcl_smltitl())
-                    .artclCtt(yonhapCreateDTO.getArtcl_ctt())
-                    .credit(yonhapCreateDTO.getCredit())
-                    .source(yonhapCreateDTO.getSource())
-                    .artclCateCd(yonhapCreateDTO.getArtcl_cate_nm())
-                    .regionNm(yonhapCreateDTO.getRegion_nm())
-                    .cttClassCd(yonhapCreateDTO.getCtt_class_nm())
-                    .cttClassAddCd(yonhapCreateDTO.getCtt_class_add_cd())
-                    .issuCd(yonhapCreateDTO.getIssu_cd())
-                    .stockCd(yonhapCreateDTO.getStock_cd())
-                    .artclqnty(artclqnty)
-                    .cmnt(yonhapCreateDTO.getCmnt())
-                    .relContId(yonhapCreateDTO.getRel_cont_id())
-                    .refContInfo(yonhapCreateDTO.getRef_cont_info())
-                    .embgDtm(embgDtm)
-                    .inputDtm(inputDtm)
-                    .trnsfDtm(trnsfDtm)
-                    .action(yonhapCreateDTO.getAction())
-                    .build();
 
             log.info("연합 UPDATE ENTITY       :::"+yonhapEntity);
 
             yonhapRepository.save(yonhapEntity);
 
+            yonhapId = yonhapEntity.getYonhapId();
 
             // 파일등록
             if (yonhapCreateDTO.getUpload_files() != null && yonhapCreateDTO.getUpload_files().size() > 0) {
 
-                uploadYonhapFiles(yonhapId, yonhapCreateDTO.getUpload_files(), "07", yonhapEntity);
+                uploadYonhapFiles(yonhapId, yonhapCreateDTO.getUpload_files(), "07");
 
             }
 
 
         } else {
-/*            yh_artcl_id = yonhapDAO.getYonhapId();
-            yonhapCreateDTO.setYh_artcl_id(yh_artcl_id);*/
-
 
             Yonhap yonhapEntity = Yonhap.builder()
                     .contId(yonhapCreateDTO.getCont_id())
@@ -195,7 +201,7 @@ public class YonhapService {
             // 파일등록
             if (yonhapCreateDTO.getUpload_files() != null && yonhapCreateDTO.getUpload_files().size() > 0) {
 
-                uploadYonhapFiles(yonhapId, yonhapCreateDTO.getUpload_files(), "07", yonhapEntity);
+                uploadYonhapFiles(yonhapId, yonhapCreateDTO.getUpload_files(), "07");
 
             }
 
@@ -243,10 +249,13 @@ public class YonhapService {
 
     public String dateToString(Date date){
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String returnDate = "";
 
-        String returnDate = simpleDateFormat.format(date);
+        if (ObjectUtils.isEmpty(date) == false) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+            returnDate = simpleDateFormat.format(date);
+        }
         return returnDate;
     }
 
@@ -288,7 +297,7 @@ public class YonhapService {
         return booleanBuilder;
     }
 
-    public void uploadYonhapFiles(Long yh_artcl_id, List<YonhapAttachFileCreateDTO> yh_attc_file_vo_list, String divcd, Yonhap yonhap) throws Exception {
+    public void uploadYonhapFiles(Long yh_artcl_id, List<YonhapAttachFileCreateDTO> yh_attc_file_vo_list, String divcd) throws Exception {
 
 
         PropertyUtil xu = new PropertyUtil();
@@ -308,7 +317,7 @@ public class YonhapService {
         if (yh_attc_file_vo_list != null && yh_attc_file_vo_list.size() > 0) {
 
             for (YonhapAttachFileCreateDTO file : yh_attc_file_vo_list) {
-                YonhapAttchFile yonhapAttchFile = yonhapAttchFileRepository.findFile(file.getFile_id());
+                YonhapAttchFile yonhapAttchFile = yonhapAttchFileRepository.findFile(yh_artcl_id);
                 yonhapAttchFileRepository.deleteById(yonhapAttchFile.getId());
             }
 
@@ -318,12 +327,12 @@ public class YonhapService {
                 //파일등록을 로컬에 안해준다?
                 //MultipartFile multipartFile = new MockMultipartFile(file.getFile_titl(), new FileInputStream(new File(upDir)));
 
-                // 업로드 파일 명
-                String fileName = file.getFile_titl();
+                int fileSize = file.getFile_size();
 
+                // 업로드 파일 명
+                String fileName = file.getFile_nm();
                 // 파일 아이디 생성.
                 //String file_id = attachFileDAO.getFileId();
-
                 //확장자 파싱
                 String ext = cutExtension(fileName);
 
@@ -335,50 +344,91 @@ public class YonhapService {
 
                 AttachFileDTO fb = new AttachFileDTO();
 
-                //fb.setFile_id(file_id);
-                /*fb.setOrg_file_nm(fileName);
-                fb.setFile_nm(rname);
-                fb.setFile_divcd(divcd);
-                fb.setFile_loc(upDir);*/
-
+                //fb.setFile_id(file_id); 아이디 jpa자동생성
                 fb.setOrgFileNm(fileName);
-                //fb.setFileNm(rname);
+                //fb.setFile_nm(rname); 아이디생성 아직 안됫으므로 인설트이후 다시 업데이트
                 fb.setFileDivCd(divcd);
+                //fb.setFile_ext(utils.cutExtension(fileName)); 확장자 따로 저장 안함
+                fb.setFileSize(fileSize);
                 fb.setFileLoc(upDir);
-                //fb.setFile_upldr_id("system");
+                fb.setInputrId("system");
 
                 AttachFile attachFile = attachFileMapper.toEntity(fb);
 
                 attachFileRepository.save(attachFile);
 
-                // 파일 업로드 경로
-                // String path = realpath + File.separator + rname;
-                //file.setFile_id(file_id);
+                Long fileId = attachFile.getFileId();
+
+                String rname = fileId + "." + ext; //파일 네임 재생성 아이디+확장자 ex) 123.jpg
+
+                fb.setFileNm(rname);
+                
+                attachFileMapper.updateFromDto(fb, attachFile);
+                
+                attachFileRepository.save(attachFile);// fileNm재등록 업데이트
+
+                file.setFile_id(fileId);
                 file.setYh_artcl_id(yh_artcl_id);
 
-                //YonhapAttchFile yonhapAttchFile = yonhapAttachFileMapper.toEntity(file);
-
-                YonhapAttchFile yonhapAttchFile = YonhapAttchFile.builder()
-                        .attachFile(attachFile)
-                        .yonhap(yonhap)
-                        .fileOrd(file.getFile_ord())
-                        .fileTitl(file.getFile_titl())
-                        .mimeType(file.getMime_type())
-                        .cap(file.getCap())
-                        .yhUrl(file.getYh_url())
-                        .build();
-
-                //일단 mars FileAttach.XML에 divcd = 07, Yonhap
                 if (divcd.equals("07")) {
-                    yonhapAttchFileRepository.save(yonhapAttchFile);
-                }
+                    postYonhapFile(file);
 
-                String rname = yonhapAttchFile.getId() + "." + ext;
-                attachFile.setFileNm(rname);
-                attachFileRepository.save(attachFile);
+                } else if (divcd.equals("06")) {
+                    postYonhapPhotoFile(file);
+
+                } /*else if (divcd.equals("01")) {
+                    yonhapDAO.postYonhapPressDataFile(file);
+
+                }*/
+
 
             }
         }
+
+    }
+
+    //연합파일 등록
+    public void postYonhapFile(YonhapAttachFileCreateDTO file){
+
+        Long yhArtclId = file.getYh_artcl_id();
+        Long fileId = file.getFile_id();
+
+        Yonhap yonhap = Yonhap.builder().yonhapId(yhArtclId).build();
+        AttachFile attachFile = AttachFile.builder().fileId(fileId).build();
+
+        YonhapAttchFile yonhapAttchFile = YonhapAttchFile.builder()
+                .yonhap(yonhap)
+                .attachFile(attachFile)
+                .fileOrd(file.getFile_ord())
+                .fileTitl(file.getFile_titl())
+                .mimeType(file.getMime_typ())
+                .cap(file.getCap())
+                .yhUrl(file.getYh_url())
+                .build();
+
+        yonhapAttchFileRepository.save(yonhapAttchFile);
+
+    }
+    //연합포토파일 등록
+    public void postYonhapPhotoFile(YonhapAttachFileCreateDTO file){
+
+        Long yonhapPotoId = file.getYh_artcl_id();
+        Long fileId = file.getFile_id();
+
+        AttachFile attachFile = AttachFile.builder().fileId(fileId).build();
+        YonhapPoto yonhapPoto = YonhapPoto.builder().yonhapArtclId(yonhapPotoId).build();
+
+        YonhapPotoAttchFile yonhapPotoAttchFile = YonhapPotoAttchFile.builder()
+                .yonhapPoto(yonhapPoto)
+                .attachFile(attachFile)
+                .fileOrd(file.getFile_ord())
+                .fileTypCd(file.getFile_typ_cd())
+                .mimeTyp(file.getMime_typ())
+                .yonhapUrl(file.getYh_url())
+                .expl(file.getExpl())
+                .build();
+
+        yonhapPotoAttchFileRepository.save(yonhapPotoAttchFile);
 
     }
 

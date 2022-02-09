@@ -1,4 +1,10 @@
 package com.gemiso.zodiac.app.yonhapPoto.mapper;
 
-public class YonhapPotoCreateMapper {
+import com.gemiso.zodiac.app.yonhapPoto.YonhapPoto;
+import com.gemiso.zodiac.app.yonhapPoto.dto.YonhapPotoCreateDTO;
+import com.gemiso.zodiac.core.mapper.GenericMapper;
+import org.mapstruct.Mapper;
+
+@Mapper(componentModel = "spring")
+public interface YonhapPotoCreateMapper extends GenericMapper<YonhapPotoCreateDTO, YonhapPoto, YonhapPotoCreateDTO> {
 }

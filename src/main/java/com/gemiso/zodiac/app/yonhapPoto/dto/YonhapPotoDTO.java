@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import java.util.Date;
 
-/*@Data
+@Data
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor*/
+@NoArgsConstructor
 public class YonhapPotoDTO {
 
     private Long yonhapArtclId;
@@ -32,13 +32,7 @@ public class YonhapPotoDTO {
     private String credit;
     private String cmnt;
     private Date inputDtm;
-
-    @Column(name = "trnsf_dtm")
     private Date trnsfDtm;
-
-    @Column(name = "embg_dtm")
     private Date embgDtm;
-
-    @Column(name = "action", columnDefinition = "bpchar(1)")
     private String action;
 }

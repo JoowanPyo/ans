@@ -10,6 +10,8 @@ import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
+import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.*;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemCreateMapper;
@@ -70,6 +72,7 @@ public class CueSheetItemService {
     //private final ArticleMapper articleMapper;
     private final CueSheetItemCapCreateMapper cueSheetItemCapCreateMapper;
 
+    private final CueSheetService cueSheetService;
     private final UserAuthService userAuthService;
 
     public List<CueSheetItemDTO> findAll(Long artclId, Long cueId, String delYn, String spareYn){
@@ -720,6 +723,32 @@ public class CueSheetItemService {
                 .build();
     }
 
+    //큐시트 방송완료 후 예비큐시트 추가수정.
+    public CueSheetSimpleDTO updateSpareCueItem(Long cueId, Long cueItemId, int cueItemOrd, String spareYn){
+
+        CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
+
+        CueSheet cueSheet = cueSheetService.cueSheetFindOrFail(cueId);
+        String cueStCd = cueSheet.getCueStCd();
+
+        if ("end_on_air".equals(cueStCd) == false){
+            throw new ResourceNotFoundException("방송완료 상태에서만 수정이 가능 합니다. 예비 큐시트 아이템 아이디 : " +cueItemId );
+        }
+
+        CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
+        cueSheetItemDTO.setSpareYn(spareYn);
+
+        cueSheetItemMapper.updateFromDto(cueSheetItemDTO, cueSheetItem);
+
+        cueSheetItemRepository.save(cueSheetItem);
+
+        ordUpdate(cueId, cueItemId, cueItemOrd);
+
+        CueSheetSimpleDTO cueSheetSimpleDTO = new CueSheetSimpleDTO();
+        cueSheetSimpleDTO.setCueId(cueId);
+
+        return cueSheetSimpleDTO;
+    }
 
 
 

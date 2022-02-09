@@ -1,14 +1,14 @@
 package com.gemiso.zodiac.app.yonhap.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
+import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -47,6 +47,7 @@ public class YonhapDTO {
     private Date trnsfDtm;
     private String action;
 
+    private List<AttachFileDTO> files = new ArrayList<AttachFileDTO>();
     private List<YonhapAttachFileDTO> yonhapAttchFiles;
 
 }

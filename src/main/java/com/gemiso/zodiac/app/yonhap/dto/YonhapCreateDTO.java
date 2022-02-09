@@ -1,11 +1,14 @@
 package com.gemiso.zodiac.app.yonhap.dto;
 
+import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
+import com.gemiso.zodiac.app.file.dto.YonhapFileDTO;
+import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileCreateDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -41,5 +44,6 @@ public class YonhapCreateDTO {
     private String trnsf_dtm;
     private String action;
 
+    private List<AttachFileDTO> files = new ArrayList<AttachFileDTO>();
     private List<YonhapAttachFileCreateDTO> upload_files;
 }

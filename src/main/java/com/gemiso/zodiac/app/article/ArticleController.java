@@ -124,7 +124,8 @@ public class ArticleController {
             @Parameter(name = "brdcPgmId", description = "방송 프로그램 아이디") @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
             @Parameter(name = "orgArtclId", description = "원본 기사 아이디") @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,
             @Parameter(name = "delYn", description = "삭제 여부") @RequestParam(value = "delYn", required = false) String delYn,
-            @Parameter(name = "searchword", description = "검색어[이슈 제목]") @RequestParam(value = "searchword", required = false) String searchword,
+            @Parameter(name = "searchDivCd", description = "검색구분코드<br>01 - 기사제목<br>02 - 기자명") @RequestParam(value = "searchDivCd", required = false) String searchDivCd,
+            @Parameter(name = "searchWord", description = "검색키워드") @RequestParam(value = "searchWord", required = false) String searchWord,
             @Parameter(name = "apprvDivCd", description = "픽스구분코드(fix_none,article_fix,editor_fix,anchor_fix,desk_fix)") @RequestParam(value = "apprvDivCd", required = false) String apprvDivCd,
             @Parameter(name = "page", description = "시작페이지") @RequestParam(value = "page", required = false) Integer page,
             @Parameter(name = "limit", description = "한 페이지에 데이터 수") @RequestParam(value = "limit", required = false) Integer limit) throws Exception {
@@ -140,7 +141,7 @@ public class ArticleController {
 
         PageResultDTO<ArticleDTO, Article> pageList = articleService.findAllIsuue(searchDate.getStartDate(),
                 searchDate.getEndDate(), issuKwd,artclDivCd, artclTypCd, artclTypDtlCd, artclCateCd, deptCd, inputrId,
-                brdcPgmId, orgArtclId, delYn, searchword, page, limit, apprvDivCd);
+                brdcPgmId, orgArtclId, delYn, searchDivCd, searchWord, page, limit, apprvDivCd);
 
 
         return new ApiCollectionResponse<>(pageList);

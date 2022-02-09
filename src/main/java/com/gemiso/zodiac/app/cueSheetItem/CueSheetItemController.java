@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheetItem;
 
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateListDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
@@ -164,6 +165,22 @@ public class CueSheetItemController {
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
+    }
+
+    @Operation(summary = "예비 큐시트 아이템 수정", description = "예비 큐시트 아이템 수정")
+    @PutMapping(path = "/{cueId}/Item/{cueItemId}/updatespare")
+    public AnsApiResponse<CueSheetSimpleDTO> updateSpareCueItem(@Parameter(name = "cueId", description = "큐시트아이디")
+                                               @PathVariable("cueId") Long cueId,
+                                               @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
+                                               @PathVariable("cueItemId") Long cueItemId,
+                                               @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
+                                               @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd,
+                                               @Parameter(name = "spareYn", description = "예비여부(Y,N)")
+                                               @RequestParam(value = "spareYn", required = false) String spareYn) {
+
+        CueSheetSimpleDTO cueSheetSimpleDTO = cueSheetItemService.updateSpareCueItem(cueId, cueItemId, cueItemOrd, spareYn);
+
+        return new AnsApiResponse(cueSheetSimpleDTO);
     }
 
 }

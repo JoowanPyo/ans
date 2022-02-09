@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.yonhapWire;
 
 import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireCreateDTO;
 import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireDTO;
+import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireResponseDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
@@ -67,7 +68,7 @@ public class YonhapWireController {
     ) throws Exception {
          HttpHeaders headers = null;
 
-        YonhapWireDTO yonhapWireDTO = new YonhapWireDTO();
+        YonhapWireResponseDTO yonhapWireResponseDTO = new YonhapWireResponseDTO();
 
         /*try {*/
             Long wireId = yonhapWireService.create(yonhapWireCreateDTO);
@@ -76,7 +77,8 @@ public class YonhapWireController {
 
                 headers = new HttpHeaders();
                 headers.setLocation(ucBuilder.path("/yonhapInternational/{yh_artcl_id}").buildAndExpand(wireId).toUri());
-                yonhapWireDTO = yonhapWireService.find(wireId);
+                YonhapWireDTO yonhapWireDTO = yonhapWireService.find(wireId);
+                yonhapWireResponseDTO = yonhapWireService.formatWire(yonhapWireDTO);
             }
 
 
@@ -85,7 +87,7 @@ public class YonhapWireController {
             log.error("yonhap : " + e.getMessage());
             return new ResponseEntity<YonhapWireDTO>(yonhapWireDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }*/
-        return new ResponseEntity<YonhapWireDTO>(yonhapWireDTO, headers, HttpStatus.CREATED);
+        return new ResponseEntity<YonhapWireResponseDTO>(yonhapWireResponseDTO, headers, HttpStatus.CREATED);
     }
 
 }

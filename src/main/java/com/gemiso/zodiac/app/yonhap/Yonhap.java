@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.yonhap;
 
+import com.gemiso.zodiac.app.yonhapAttchFile.YonhapAttchFile;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
