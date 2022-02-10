@@ -1,7 +1,7 @@
 package com.gemiso.zodiac.app.yonhapPotoAttchFile;
 
 import com.gemiso.zodiac.app.file.AttachFile;
-import com.gemiso.zodiac.app.yonhapPoto.YonhapPoto;
+import com.gemiso.zodiac.app.yonhapPhoto.YonhapPhoto;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -46,6 +46,6 @@ public class YonhapPotoAttchFile {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "yonhap_artcl_id")
-    private YonhapPoto yonhapPoto;
+    private YonhapPhoto yonhapPhoto;
 
 }

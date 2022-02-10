@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.yonhapPoto.dto;
+package com.gemiso.zodiac.app.yonhapPhoto.dto;
 
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileCreateDTO;
@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class YonhapPotoCreateDTO {
+public class YonhapPhotoCreateDTO {
 
     private String id;
     private String code;

@@ -35,15 +35,15 @@ public class YonhapWireController {
     @Operation(summary = "연합외신 목록조회", description = "연합외신 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<YonhapWireDTO>> findAll(@Parameter(name = "sdate", description = "검색시작일[yyyy-MM-dd]", required = false)
-                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                        @Parameter(name = "edate", description = "검색종료일[yyyy-MM-dd]", required = false)
-                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                        @Parameter(name = "agcyCd", description = "통신사코드")
-                                                    @RequestParam(value = "agcyCd", required = false) String agcyCd,
+                                                       @RequestParam(value = "agcyCd", required = false) String agcyCd,
                                                        @Parameter(name = "searchWord", description = "검색어")
-                                                    @RequestParam(value = "searchWord", required = false) String searchWord,
+                                                       @RequestParam(value = "searchWord", required = false) String searchWord,
                                                        @Parameter(name = "imprt", description = "중요도 List<String>", required = false)
-                                                    @RequestParam(value = "imprt", required = false) List<String> imprtList) throws Exception {
+                                                       @RequestParam(value = "imprt", required = false) List<String> imprtList) throws Exception {
 
         List<YonhapWireDTO> yonhapWireDTOList = new ArrayList<>();
 
@@ -53,11 +53,20 @@ public class YonhapWireController {
 
             yonhapWireDTOList = yonhapWireService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), agcyCd, searchWord, imprtList);
 
-        }else {
+        } else {
 
             yonhapWireDTOList = yonhapWireService.findAll(null, null, agcyCd, searchWord, imprtList);
         }
         return new AnsApiResponse<>(yonhapWireDTOList);
+    }
+
+    @Operation(summary = "연합외신 상세조회", description = "연합외신 상세조회")
+    @GetMapping(path = "/{wireId}")
+    public AnsApiResponse<YonhapWireDTO> find(@Parameter(name = "wireId", description = "연합외신 아이디") @PathVariable("wireId")Long wireId){
+
+        YonhapWireDTO yonhapWireDTO = yonhapWireService.find(wireId);
+
+        return new AnsApiResponse<>(yonhapWireDTO);
     }
 
     @Operation(summary = "연합외신 등록", description = "연합외신 등록")
@@ -66,20 +75,20 @@ public class YonhapWireController {
     public ResponseEntity<?> create(@Parameter(description = "필수값<br> ", required = true)
                                     @RequestBody YonhapWireCreateDTO yonhapWireCreateDTO, UriComponentsBuilder ucBuilder
     ) throws Exception {
-         HttpHeaders headers = null;
+        HttpHeaders headers = null;
 
         YonhapWireResponseDTO yonhapWireResponseDTO = new YonhapWireResponseDTO();
 
         /*try {*/
-            Long wireId = yonhapWireService.create(yonhapWireCreateDTO);
+        Long wireId = yonhapWireService.create(yonhapWireCreateDTO);
 
-            if (ObjectUtils.isEmpty(wireId) == false) {
+        if (ObjectUtils.isEmpty(wireId) == false) {
 
-                headers = new HttpHeaders();
-                headers.setLocation(ucBuilder.path("/yonhapInternational/{yh_artcl_id}").buildAndExpand(wireId).toUri());
-                YonhapWireDTO yonhapWireDTO = yonhapWireService.find(wireId);
-                yonhapWireResponseDTO = yonhapWireService.formatWire(yonhapWireDTO);
-            }
+            headers = new HttpHeaders();
+            headers.setLocation(ucBuilder.path("/yonhapInternational/{yh_artcl_id}").buildAndExpand(wireId).toUri());
+            YonhapWireDTO yonhapWireDTO = yonhapWireService.find(wireId);
+            yonhapWireResponseDTO = yonhapWireService.formatWire(yonhapWireDTO);
+        }
 
 
         /*} catch (Exception e) {

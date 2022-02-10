@@ -1,18 +1,21 @@
-package com.gemiso.zodiac.app.yonhapPoto.dto;
+package com.gemiso.zodiac.app.yonhapPhoto.dto;
 
+import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
+import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileCreateDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class YonhapPotoDTO {
+public class YonhapPhotoDTO {
 
     private Long yonhapArtclId;
     private String contId;
@@ -22,11 +25,15 @@ public class YonhapPotoDTO {
     private String artclSmltitl;
     private String artclCtt;
     private String artclCateCd;
+    private String artclCateNm;
     private String regionCd;
     private String regionNm;
     private String cttClassCd;
+    private String cttClassNm;
     private String cttClassAddCd;
+    private String cttClassAddNm;
     private String yonhapPhotoDivCd;
+    private String yonhapPhotoDivNm;
     private String yonhapPublNo;
     private String src;
     private String credit;
@@ -35,4 +42,7 @@ public class YonhapPotoDTO {
     private Date trnsfDtm;
     private Date embgDtm;
     private String action;
+
+    private List<AttachFileDTO> files = new ArrayList<AttachFileDTO>();
+    private List<YonhapAttachFileCreateDTO> upload_files;
 }

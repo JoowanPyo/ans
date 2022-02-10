@@ -731,10 +731,6 @@ public class CueSheetItemService {
         CueSheet cueSheet = cueSheetService.cueSheetFindOrFail(cueId);
         String cueStCd = cueSheet.getCueStCd();
 
-        if ("end_on_air".equals(cueStCd) == false){
-            throw new ResourceNotFoundException("방송완료 상태에서만 수정이 가능 합니다. 예비 큐시트 아이템 아이디 : " +cueItemId );
-        }
-
         CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
         cueSheetItemDTO.setSpareYn(spareYn);
 

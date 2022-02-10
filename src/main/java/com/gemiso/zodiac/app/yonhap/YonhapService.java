@@ -6,12 +6,14 @@ import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.mapper.AttachFileMapper;
 import com.gemiso.zodiac.app.yonhap.dto.*;
 import com.gemiso.zodiac.app.yonhapAttchFile.YonhapAttchFileRepository;
+import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileResponseDTO;
 import com.gemiso.zodiac.app.yonhapAttchFile.mapper.YonhapAttachFileMapper;
 import com.gemiso.zodiac.app.yonhap.mapper.YonhapMapper;
 import com.gemiso.zodiac.app.yonhapAttchFile.YonhapAttchFile;
 import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileCreateDTO;
 import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileDTO;
-import com.gemiso.zodiac.app.yonhapPoto.YonhapPoto;
+import com.gemiso.zodiac.app.yonhapPhoto.YonhapPhoto;
+import com.gemiso.zodiac.app.yonhapPhoto.dto.YonhapExceptionDomain;
 import com.gemiso.zodiac.app.yonhapPotoAttchFile.YonhapPotoAttchFile;
 import com.gemiso.zodiac.app.yonhapPotoAttchFile.YonhapPotoAttchFileRepository;
 import com.gemiso.zodiac.core.util.PropertyUtil;
@@ -241,11 +243,17 @@ public class YonhapService {
                 .input_dtm(dateToString(yonhapDTO.getInputDtm()))
                 .trnsf_dtm(dateToString(yonhapDTO.getTrnsfDtm()))
                 .action(yonhapDTO.getAction())
-                .upload_files(yonhapDTO.getYonhapAttchFiles())
+                //.upload_files(formatYonhapFile(yonhapDTO.getYonhapAttchFiles()))
                 .build();
 
         return yonhapResponseDTO;
     }
+
+    /*public YonhapAttachFileResponseDTO formatYonhapFile(List<YonhapAttachFileDTO> yonhapAttachFileDTOList){
+
+
+
+    }*/
 
     public String dateToString(Date date){
 
@@ -416,10 +424,10 @@ public class YonhapService {
         Long fileId = file.getFile_id();
 
         AttachFile attachFile = AttachFile.builder().fileId(fileId).build();
-        YonhapPoto yonhapPoto = YonhapPoto.builder().yonhapArtclId(yonhapPotoId).build();
+        YonhapPhoto yonhapPhoto = YonhapPhoto.builder().yonhapArtclId(yonhapPotoId).build();
 
         YonhapPotoAttchFile yonhapPotoAttchFile = YonhapPotoAttchFile.builder()
-                .yonhapPoto(yonhapPoto)
+                .yonhapPhoto(yonhapPhoto)
                 .attachFile(attachFile)
                 .fileOrd(file.getFile_ord())
                 .fileTypCd(file.getFile_typ_cd())

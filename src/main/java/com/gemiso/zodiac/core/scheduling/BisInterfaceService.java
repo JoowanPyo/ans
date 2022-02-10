@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.core.service;
+package com.gemiso.zodiac.core.scheduling;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gemiso.zodiac.app.baseProgram.BaseProgram;
@@ -11,6 +11,7 @@ import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.program.ProgramRepository;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
 import com.gemiso.zodiac.core.scheduling.dto.*;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;

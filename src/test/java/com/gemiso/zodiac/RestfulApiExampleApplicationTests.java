@@ -1,7 +1,6 @@
 package com.gemiso.zodiac;
 
-import com.gemiso.zodiac.core.scheduling.Scheduling;
-import com.gemiso.zodiac.core.service.BisInterfaceService;
+import com.gemiso.zodiac.core.scheduling.BisInterfaceService;
 import com.mysema.commons.lang.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,8 @@
-package com.gemiso.zodiac.app.yonhapPoto;
+package com.gemiso.zodiac.app.yonhapPhoto;
 
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -20,7 +21,7 @@ import java.util.Date;
 @Setter
 @DynamicUpdate
 @EntityListeners(value = {AuditingEntityListener.class})
-public class YonhapPoto {
+public class YonhapPhoto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,6 +49,10 @@ public class YonhapPoto {
     @Column(name = "artcl_cate_cd", length = 50)
     private String artclCateCd;
 
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_cate_cd)")
+    private String artclCateNm;
+
     @Column(name = "region_cd", length = 50)
     private String regionCd;
 
@@ -57,11 +62,23 @@ public class YonhapPoto {
     @Column(name = "ctt_class_cd", length = 50)
     private String cttClassCd;
 
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = ctt_class_cd)")
+    private String cttClassNm;
+
     @Column(name = "ctt_class_add_cd", length = 100)
     private String cttClassAddCd;
 
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = ctt_class_add_cd)")
+    private String cttClassAddNm;
+
     @Column(name = "yonhap_photo_div_cd", length = 50)
     private String yonhapPhotoDivCd;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.cd_nm from tb_cd a where a.cd = yonhap_photo_div_cd)")
+    private String yonhapPhotoDivNm;
 
     @Column(name = "yonhap_publ_no", length = 50)
     private String yonhapPublNo;

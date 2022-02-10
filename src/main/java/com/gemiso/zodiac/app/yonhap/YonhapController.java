@@ -11,10 +11,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -70,11 +72,21 @@ public class YonhapController {
     @Operation(summary = "연합 등록", description = "연합 등록")
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> create(@Parameter(description = "필수값<br> ", required = true) @RequestBody YonhapCreateDTO yonhapCreateDTO
+    public ResponseEntity<?> create(@Parameter(description = "필수값<br> ", required = true) @RequestBody YonhapCreateDTO yonhapCreateDTO,
+                                    UriComponentsBuilder ucBuilder
     ) throws Exception {
 
+        HttpHeaders headers = null;
 
         Long yonhapId = yonhapService.create(yonhapCreateDTO);
+
+        /*if (ObjectUtils.isEmpty(yonhapId) == false){
+
+            headers = new HttpHeaders();
+            headers.setLocation(ucBuilder.path("/yonhap/{yh_artcl_id}").buildAndExpand(yonhapId).toUri());
+
+            yh_vo.setYh_artcl_id(yh_artcl_id);
+        }*/
 
         YonhapDTO yonhapDTO = yonhapService.find(yonhapId);
 
@@ -88,7 +100,7 @@ public class YonhapController {
         }*/
 
 
-        return new ResponseEntity<YonhapResponseDTO>(yonhapResponseDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(yonhapResponseDTO, HttpStatus.CREATED);
 
     }
 }

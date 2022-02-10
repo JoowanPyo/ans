@@ -168,7 +168,7 @@ public class CueSheetItemController {
     }
 
     @Operation(summary = "예비 큐시트 아이템 수정", description = "예비 큐시트 아이템 수정")
-    @PutMapping(path = "/{cueId}/Item/{cueItemId}/updatespare")
+    @PutMapping(path = "/{cueId}/item/{cueItemId}/updatespare")
     public AnsApiResponse<CueSheetSimpleDTO> updateSpareCueItem(@Parameter(name = "cueId", description = "큐시트아이디")
                                                @PathVariable("cueId") Long cueId,
                                                @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")

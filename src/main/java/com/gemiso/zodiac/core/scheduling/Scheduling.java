@@ -3,7 +3,6 @@ package com.gemiso.zodiac.core.scheduling;
 import com.gemiso.zodiac.core.scheduling.dto.BisBasicScheduleDTO;
 import com.gemiso.zodiac.core.scheduling.dto.BisDailyScheduleDTO;
 import com.gemiso.zodiac.core.scheduling.dto.BisProgramDTO;
-import com.gemiso.zodiac.core.service.BisInterfaceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
