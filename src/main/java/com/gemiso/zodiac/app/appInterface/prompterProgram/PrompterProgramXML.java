@@ -14,12 +14,12 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PrompterProgramXML {
 
-    /*@XmlElement(name = "result")
+    @XmlElement(name = "result")
     private PrompterProgramResultDTO result;
 
     @XmlElement(name = "data")
-    private PrompterProgramDataDTO data;*/
+    private PrompterProgramDataDTO data;
 
-    @XmlElement(name = "record")
-    private List<PrompterProgramDTO> prompterProgramDTO = new ArrayList<>();
+    /*@XmlElement(name = "record")
+    private List<PrompterProgramDTO> prompterProgramDTO = new ArrayList<>();*/
 }

@@ -16,7 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class BaseProgramDTO {
 
-   /* private String basePgmschId;*/
+    private String basePgmschId;
     private String basDt;
     private String chDivCd;
     private String brdcDay;

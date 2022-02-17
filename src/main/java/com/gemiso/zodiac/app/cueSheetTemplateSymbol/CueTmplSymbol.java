@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.cueSheetTemplateSymbol;
 
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
+import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -28,8 +29,8 @@ public class CueTmplSymbol {
     /*@NotFound(
           action = NotFoundAction.IGNORE)*/
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "cue_tmplt_id")
-    private CueSheetTemplate cueSheetTemplate;
+    @JoinColumn(name = "cue_tmplt_item_id")
+    private CueTmpltItem cueTmpltItem;
 
     /*@NotFound(
           action = NotFoundAction.IGNORE)*/

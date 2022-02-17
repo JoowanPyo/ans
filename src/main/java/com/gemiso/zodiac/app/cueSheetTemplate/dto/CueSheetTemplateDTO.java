@@ -60,5 +60,5 @@ public class CueSheetTemplateDTO {
     private String subrmNm;
     private ProgramSimpleDTO program;
     private BaseProgramSimpleDTO baseProgram;
-    private List<CueTmplSymbolDTO> cueTmplSymbol = new ArrayList<>();
+    //private List<CueTmplSymbolDTO> cueTmplSymbol = new ArrayList<>();
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.CueTmpltItemCap;
+import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbol;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -117,6 +118,10 @@ public class CueTmpltItem extends BaseEntity {
     @OneToMany(mappedBy = "cueTmpltItem")
     @JsonManagedReference
     private List<CueTmpltItemCap> cueTmpltItemCap = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cueTmpltItem")
+    @JsonManagedReference
+    private List<CueTmplSymbol> cueTmplSymbol = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {

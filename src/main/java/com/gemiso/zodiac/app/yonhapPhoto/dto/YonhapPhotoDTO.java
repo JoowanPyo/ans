@@ -2,6 +2,8 @@ package com.gemiso.zodiac.app.yonhapPhoto.dto;
 
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileCreateDTO;
+import com.gemiso.zodiac.app.yonhapPotoAttchFile.YonhapPhotoAttchFile;
+import com.gemiso.zodiac.app.yonhapPotoAttchFile.dto.YonhapPhotoAttchFileDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,5 +46,5 @@ public class YonhapPhotoDTO {
     private String action;
 
     private List<AttachFileDTO> files = new ArrayList<AttachFileDTO>();
-    private List<YonhapAttachFileCreateDTO> upload_files;
+    private List<YonhapPhotoAttchFileDTO> yonhapPhotoAttchFiles = new ArrayList<>();
 }

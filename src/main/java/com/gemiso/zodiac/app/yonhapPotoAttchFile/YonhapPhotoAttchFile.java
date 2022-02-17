@@ -18,7 +18,7 @@ import javax.persistence.*;
 @ToString(exclude = "userGroupUser")
 @Setter
 @DynamicUpdate
-public class YonhapPotoAttchFile {
+public class YonhapPhotoAttchFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface YonhapAttchFileRepository extends JpaRepository<YonhapAttchFile, Long> {
 
@@ -12,5 +13,5 @@ public interface YonhapAttchFileRepository extends JpaRepository<YonhapAttchFile
     List<YonhapAttchFile> findId(@Param("id")Long id);
 
     @Query("select a from YonhapAttchFile a where a.attachFile.fileId = :fileId")
-    YonhapAttchFile findFile(@Param("fileId")Long fileId);
+    List<YonhapAttchFile> findFile(@Param("fileId")Long fileId);
 }

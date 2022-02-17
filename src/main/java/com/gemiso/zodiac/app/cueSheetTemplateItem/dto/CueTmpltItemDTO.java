@@ -4,11 +4,13 @@ import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.CueTmpltItemCap;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapSimpleDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -47,4 +49,5 @@ public class CueTmpltItemDTO {
     private String lckrNm;
     private CueSheetTemplateSimpleDTO cueSheetTemplate;
     private List<CueTmpltItemCapSimpleDTO> cueTmpltItemCap;
+    private List<CueTmplSymbolDTO> cueTmplSymbol = new ArrayList<>();
 }

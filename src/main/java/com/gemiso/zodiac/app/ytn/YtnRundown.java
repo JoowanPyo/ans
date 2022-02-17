@@ -20,7 +20,7 @@ import java.util.Date;
 @Setter
 @DynamicUpdate
 @EntityListeners(value = {AuditingEntityListener.class})
-public class Ytn {
+public class YtnRundown {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

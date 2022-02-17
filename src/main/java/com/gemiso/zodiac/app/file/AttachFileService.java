@@ -72,8 +72,8 @@ public class AttachFileService {
             String day = fromat2.format(time);
 
             //업로드 디렉토리 path
-            upDir = ub.getUpdir() + "/" + year + "/" + day;
-            realpath = ub.getDest() + "/" + upDir;
+            upDir = ub.getUpdir() + File.separator + year + File.separator + day;
+            realpath = ub.getDest() + File.separator + upDir;
             log.info("file size : " + uploadsize+ ", Dest : " + ub.getDest());
             //디렉토리 생성
             if (isMakeDir(realpath)) {

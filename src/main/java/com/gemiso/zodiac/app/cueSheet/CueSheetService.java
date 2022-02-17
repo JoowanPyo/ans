@@ -329,11 +329,13 @@ public class CueSheetService {
 
         //프로그램 정보가 새로 들어왔을 시 프로그램 정보 업데이트를 위해 엔티티에서 프로그램 null값으로 셋팅
         ProgramSimpleDTO program = cueSheetUpdateDTO.getProgram();
-        if (ObjectUtils.isEmpty(program) == false){
+        String brdcPgmId = program.getBrdcPgmId();
+        /*if (ObjectUtils.isEmpty(program) == false){
+            cueSheet.setProgram(null);
+        }*/
+        if (brdcPgmId != null && brdcPgmId.trim().isEmpty() == false){
             cueSheet.setProgram(null);
         }
-
-        //cueSheet.setProgram(null);
 
         cueSheetUpdateMapper.updateFromDto(cueSheetUpdateDTO, cueSheet);
 

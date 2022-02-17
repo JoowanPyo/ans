@@ -15,4 +15,5 @@ public interface CueTmpltItemRepository extends JpaRepository<CueTmpltItem, Long
 
     @Query("select a from CueTmpltItem a where a.cueSheetTemplate.cueTmpltId=:cueTmpltId")
     List<CueTmpltItem> findCueTmplItemList(@Param("cueTmpltId")Long cueTmpltId);
+
 }

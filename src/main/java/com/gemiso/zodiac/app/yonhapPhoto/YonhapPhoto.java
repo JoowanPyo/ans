@@ -1,5 +1,8 @@
 package com.gemiso.zodiac.app.yonhapPhoto;
 
+import com.gemiso.zodiac.app.yonhap.Yonhap;
+import com.gemiso.zodiac.app.yonhapAttchFile.YonhapAttchFile;
+import com.gemiso.zodiac.app.yonhapPotoAttchFile.YonhapPhotoAttchFile;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
@@ -7,7 +10,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(
@@ -105,4 +110,6 @@ public class YonhapPhoto {
     @Column(name = "action", columnDefinition = "bpchar(1)")
     private String action;
 
+    @OneToMany(mappedBy="yonhapPhoto")//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제
+    private List<YonhapPhotoAttchFile> yonhapPhotoAttchFiles = new ArrayList<>();
 }

@@ -1,10 +1,19 @@
 package com.gemiso.zodiac.app.yonhapWire;
 
-import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireCreateDTO;
-import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireDTO;
-import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireResponseDTO;
+import com.gemiso.zodiac.app.file.AttachFile;
+import com.gemiso.zodiac.app.file.AttachFileRepository;
+import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
+import com.gemiso.zodiac.app.file.mapper.AttachFileMapper;
+import com.gemiso.zodiac.app.yonhap.YonhapService;
+import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileCreateDTO;
+import com.gemiso.zodiac.app.yonhapPhoto.dto.YonhapExceptionDomain;
+import com.gemiso.zodiac.app.yonhapWire.dto.*;
 import com.gemiso.zodiac.app.yonhapWire.mapper.YonhapCreateMapper;
 import com.gemiso.zodiac.app.yonhapWire.mapper.YonhapWireMapper;
+import com.gemiso.zodiac.app.yonhapWireAttchFile.YonhapWireAttchFile;
+import com.gemiso.zodiac.app.yonhapWireAttchFile.YonhapWireAttchFileRepository;
+import com.gemiso.zodiac.app.yonhapWireAttchFile.dto.YonhapWireAttchFileDTO;
+import com.gemiso.zodiac.app.yonhapWireAttchFile.mapper.YonhapWireAttchFileMapper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +25,10 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -26,9 +37,15 @@ import java.util.List;
 public class YonhapWireService {
 
     private final YonhapWireRepository yonhapWireRepository;
+    private final AttachFileRepository attachFileRepository;
+    private final YonhapWireAttchFileRepository yonhapWireAttchFileRepository;
 
     private final YonhapWireMapper yonhapWireMapper;
     private final YonhapCreateMapper yonhapCreateMapper;
+    private final AttachFileMapper attachFileMapper;
+    private final YonhapWireAttchFileMapper yonhapWireAttchFileMapper;
+
+    private final YonhapService yonhapService;
 
     public List<YonhapWireDTO> findAll(Date sdate, Date edate, String agcyCd,
                                              String searchWord, List<String> imprtList){
@@ -240,12 +257,194 @@ public class YonhapWireService {
 
     public YonhapWireDTO find(Long yhWireId){
 
-        YonhapWire yonhapWire = yonhapWireRepository.findById(yhWireId)
-                .orElseThrow(() -> new ResourceNotFoundException("YonhapWireId not found. YonhapWireId : " + yhWireId));
+        YonhapWire yonhapWire = findYonhapWire(yhWireId);
+
+        List<YonhapWireAttchFile> yonhapWireAttchFile = yonhapWireAttchFileRepository.findByYonhapWireFile(yhWireId);
 
         YonhapWireDTO yonhapWireDTO = yonhapWireMapper.toDto(yonhapWire);
 
+        if (CollectionUtils.isEmpty(yonhapWireAttchFile) == false){
+            List<YonhapWireAttchFileDTO> yonhapWireAttchFileDTOS = yonhapWireAttchFileMapper.toDtoList(yonhapWireAttchFile);
+            yonhapWireDTO.setYonhapWireAttchFiles(yonhapWireAttchFileDTOS);
+        }
+
         return yonhapWireDTO;
+
+    }
+
+    public YonhapWire findYonhapWire(Long yhWireId){
+
+        Optional<YonhapWire> yonhapWire = yonhapWireRepository.findYhWire(yhWireId);
+
+        if (yonhapWire.isPresent() == false){
+            throw new ResourceNotFoundException("연합외신 기사를 찾을 수 없습니다. 외신 아이디: "+ yhWireId);
+        }
+
+        return yonhapWire.get();
+    }
+
+    public YonhapExceptionDomain createAptn(YonhapAptnCreateDTO yonhapAptnCreateDTO) throws Exception {
+
+        Long aptnId = null;
+
+        String contId = yonhapAptnCreateDTO.getCont_id();
+
+        List<YonhapWire> yonhapWireList = yonhapWireRepository.findYhArtclId(contId);
+
+        if (ObjectUtils.isEmpty(yonhapWireList) == false){
+
+            aptnId = yonhapWireList.get(0).getWireId();
+
+            YonhapWire yonhapWire = YonhapWire.builder()
+                    .wireId(aptnId)
+                    .contId(contId)
+                    .artclTitl(yonhapAptnCreateDTO.getArtcl_titl())
+                    .artclCtt(yonhapAptnCreateDTO.getArtcl_ctt())
+                    .agcyNm("APTN")
+                    .agcyCd("aptn")
+                    .build();
+
+            try {
+                yonhapWireRepository.save(yonhapWire); //외신 aptn 등록
+            }catch (Exception e){
+                return new YonhapExceptionDomain(aptnId, "5001", "yonhapAptn", e.getMessage(), "");
+            }
+
+            List<YonhapAttachFileCreateDTO> attachFileList = yonhapAptnCreateDTO.getUpload_files();
+
+            if (CollectionUtils.isEmpty(attachFileList) == false){
+                try {
+                    yonhapService.uploadYonhapFiles(aptnId, attachFileList, "08");
+                }catch (Exception e){
+                    return new YonhapExceptionDomain(aptnId, "5002", "yonhapAptn", e.getMessage(), "");
+                }
+            }
+            
+        }else {
+
+            YonhapWire yonhapWire = YonhapWire.builder()
+                    .contId(contId)
+                    .artclTitl(yonhapAptnCreateDTO.getArtcl_titl())
+                    .artclCtt(yonhapAptnCreateDTO.getArtcl_ctt())
+                    .agcyNm("APTN")//008
+                    .agcyCd("aptn")
+                    .build();
+
+            try {
+                yonhapWireRepository.save(yonhapWire); //외신 aptn 등록
+                aptnId = yonhapWire.getWireId();
+            }catch (Exception e){
+                return new YonhapExceptionDomain(aptnId, "5001", "yonhapAptn", e.getMessage(), "");
+            }
+
+            List<YonhapAttachFileCreateDTO> attachFileList = yonhapAptnCreateDTO.getUpload_files();
+
+            //파일등록
+            if (CollectionUtils.isEmpty(attachFileList) == false){
+                try {
+                    yonhapService.uploadYonhapFiles(aptnId, attachFileList, "08");
+                }catch (Exception e){
+                    return new YonhapExceptionDomain(aptnId, "5002", "yonhapAptn", e.getMessage(), "");
+                }
+            }
+            
+        }
+
+        return new YonhapExceptionDomain(aptnId, "2000", "yonhapPhoto", "", "");
+
+    }
+
+    public YonhapExceptionDomain createReuter(YonhapReuterCreateDTO yonhapReuterCreateDTO){
+
+        Long reuterId = null;
+
+        String contId = yonhapReuterCreateDTO.getWire_artcl_id();
+
+        List<YonhapWire> yonhapWireList = yonhapWireRepository.findYhArtclId(contId);
+
+        if (CollectionUtils.isEmpty(yonhapWireList) == false){
+
+            reuterId = yonhapWireList.get(0).getWireId();
+
+            YonhapWire yonhapWire = YonhapWire.builder()
+                    .wireId(reuterId)
+                    .contId(contId)
+                    .artclTitl(yonhapReuterCreateDTO.getWire_artcl_titl())
+                    .artclCtt(yonhapReuterCreateDTO.getWire_artcl_ctt())
+                    .agcyNm("REUTER")//009
+                    .agcyCd("reuter")
+                    .build();
+
+            try {
+                yonhapWireRepository.save(yonhapWire); //외신 aptn 등록
+            }catch (Exception e){
+                return new YonhapExceptionDomain(reuterId, "5001", "yonhapAptn", e.getMessage(), "");
+            }
+
+        }else {
+
+            YonhapWire yonhapWire = YonhapWire.builder()
+                    .contId(contId)
+                    .artclTitl(yonhapReuterCreateDTO.getWire_artcl_titl())
+                    .artclCtt(yonhapReuterCreateDTO.getWire_artcl_ctt())
+                    .agcyNm("REUTER")//009
+                    .agcyCd("reuter")
+                    .build();
+
+            try {
+                yonhapWireRepository.save(yonhapWire); //외신 aptn 등록
+                reuterId = yonhapWire.getWireId();
+            }catch (Exception e){
+                return new YonhapExceptionDomain(reuterId, "5001", "yonhapAptn", e.getMessage(), "");
+            }
+
+        }
+        return new YonhapExceptionDomain(reuterId, "2000", "yonhapPhoto", "", "");
+    }
+
+    public YonhapAptnDTO formatAptn(YonhapWireDTO yonhapWireDTO){
+
+        List<YonhapWireAttchFileDTO> yonhapWireAttchFiles = yonhapWireDTO.getYonhapWireAttchFiles();
+
+        List<AttachFileDTO> attachFileDTOS = new ArrayList<>();
+
+        if (CollectionUtils.isEmpty(yonhapWireAttchFiles) == false) {
+            Long[] fileId = new Long[yonhapWireAttchFiles.size()];
+
+            int i = 0;
+            for (YonhapWireAttchFileDTO wireAttchFile : yonhapWireAttchFiles) {
+
+                AttachFileDTO attachFileDTO = wireAttchFile.getAttachFile();
+                fileId[i] = attachFileDTO.getFileId();
+                i++;
+            }
+
+            List<AttachFile> attachFiles = attachFileRepository.findFileInfo(fileId);
+            attachFileDTOS = attachFileMapper.toDtoList(attachFiles);
+        }
+
+        YonhapAptnDTO yonhapAptnDTO = YonhapAptnDTO.builder()
+                .yh_artcl_id(yonhapWireDTO.getWireId())
+                .cont_id(yonhapWireDTO.getContId())
+                .artcl_titl(yonhapWireDTO.getArtclTitl())
+                .artcl_ctt(yonhapWireDTO.getArtclCtt())
+                .files(attachFileDTOS)
+                .build();
+
+        return yonhapAptnDTO;
+    }
+
+    public YonhapReuterDTO formatReuter(YonhapWireDTO yonhapWireDTO){
+
+        YonhapReuterDTO yonhapReuterDTO = YonhapReuterDTO.builder()
+                //wire_artcl_id(yonhapWireDTO.getWireId())
+                .wire_artcl_id(yonhapWireDTO.getContId())
+                .wire_artcl_titl(yonhapWireDTO.getArtclTitl())
+                .wire_artcl_ctt(yonhapWireDTO.getArtclCtt())
+                //.files(attachFileDTOS)
+                .build();
+
+        return yonhapReuterDTO;
 
     }
 

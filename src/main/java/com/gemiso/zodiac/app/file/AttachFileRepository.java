@@ -5,10 +5,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.nio.file.OpenOption;
+import java.util.List;
 import java.util.Optional;
 
 public interface AttachFileRepository extends JpaRepository<AttachFile, Long> {
 
     @Query("select a from AttachFile a where a.fileId =:fileId")
     Optional<AttachFile> findAttachFile(@Param("fileId")Long fileId);
+
+    @Query("select a from AttachFile a where a.fileId in (:fileId)")
+    List<AttachFile> findFileInfo(@Param("fileId")Long[] fileId);
 }

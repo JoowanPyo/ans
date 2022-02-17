@@ -1,5 +1,8 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItem;
 
+import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolDTO;
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemCreateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemDTO;
@@ -14,11 +17,17 @@ import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapCreateDT
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.mapper.CueTmpltItemCapCreateMapper;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.mapper.CueTmpltItemCapMapper;
+import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbol;
+import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbolRepository;
+import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateSymbol.mapper.CueTmplSymbolMapper;
+import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,14 +44,20 @@ import java.util.Optional;
 @Transactional
 public class CueTmpltItemService {
 
+    //방송아이콘 url저장 주소
+    @Value("${files.url-key}")
+    private String fileUrl;
+
     private final CueTmpltItemRepository cueTmpltItemRepository;
     private final CueTmpltItemCapRepository cueTmpltItemCapRepository;
+    private final CueTmplSymbolRepository cueTmplSymbolRepository;
     /*private final CueSheetTemplateRepository cueSheetTemplateRepository;*/
 
     private final CueTmpltItemMapper cueTmpltItemMapper;
     private final CueTmpltItemCreateMapper cueTmpltItemCreateMapper;
     private final CueTmpltItemUpdateMapper cueTmpltItemUpdateMapper;
     private final CueTmpltItemCapCreateMapper cueTmpltItemCapCreateMapper;
+    private final CueTmplSymbolMapper cueTmplSymbolMapper;
 
     private final UserAuthService userAuthService;
 
@@ -57,8 +72,45 @@ public class CueTmpltItemService {
 
         //큐시트템필릿 아이템 엔티티 리스트 DTO리스트로 변환
         List<CueTmpltItemDTO> cueTmpltItemDTOList = cueTmpltItemMapper.toDtoList(cueTmpltItems);
+
+        cueTmpltItemDTOList = setSymbol(cueTmpltItemDTOList);
         
         return cueTmpltItemDTOList;
+    }
+
+    public List<CueTmpltItemDTO> setSymbol(List<CueTmpltItemDTO> cueTmpltItemDTOList){
+
+        for (CueTmpltItemDTO cueTmpltItemDTO : cueTmpltItemDTOList){ //조회된 아이템에 List
+
+            Long cueTmpltItemId = cueTmpltItemDTO.getCueTmpltItemId(); //아이템 아이디 get
+
+            //아이템 아이디로 방송아이콘 맵핑테이블 조회
+            List<CueTmplSymbol> cueTmplSymbolList = cueTmplSymbolRepository.findCueTmplSymbol(cueTmpltItemId);
+
+            if (ObjectUtils.isEmpty(cueTmplSymbolList) == false){ //조회된 방송아콘 맵핑테이블 List가 있으면 url추가후 큐시트 아이템DTO에 추가
+
+                List<CueTmplSymbolDTO> cueSheetItemSymbolDTOList = cueTmplSymbolMapper.toDtoList(cueTmplSymbolList);
+
+                for (CueTmplSymbolDTO cueSheetItemSymbolDTO : cueSheetItemSymbolDTOList){
+
+                    SymbolDTO symbolDTO = cueSheetItemSymbolDTO.getSymbol();
+
+                    String fileLoc = symbolDTO.getAttachFile().getFileLoc();//파일로그 get
+                    String url = fileUrl + fileLoc; //url + 파일로그
+
+                    symbolDTO.setUrl(url);//방송아이콘이 저장된 url set
+
+                    cueSheetItemSymbolDTO.setSymbol(symbolDTO);//url 추가 DTO set
+                }
+
+
+                cueTmpltItemDTO.setCueTmplSymbol(cueSheetItemSymbolDTOList); //아이템에 set방송아이콘List
+
+            }
+        }
+
+        return cueTmpltItemDTOList;
+
     }
 
     //큐시트 템플릿 아이템 상세조회

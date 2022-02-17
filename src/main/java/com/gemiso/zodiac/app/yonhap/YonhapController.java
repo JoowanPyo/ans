@@ -3,6 +3,7 @@ package com.gemiso.zodiac.app.yonhap;
 import com.gemiso.zodiac.app.yonhap.dto.YonhapCreateDTO;
 import com.gemiso.zodiac.app.yonhap.dto.YonhapDTO;
 import com.gemiso.zodiac.app.yonhap.dto.YonhapResponseDTO;
+import com.gemiso.zodiac.app.yonhapPhoto.dto.YonhapExceptionDomain;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
@@ -76,28 +77,16 @@ public class YonhapController {
                                     UriComponentsBuilder ucBuilder
     ) throws Exception {
 
-        HttpHeaders headers = null;
 
-        Long yonhapId = yonhapService.create(yonhapCreateDTO);
+        YonhapExceptionDomain yonhapExceptionDomain = yonhapService.create(yonhapCreateDTO);
 
-        /*if (ObjectUtils.isEmpty(yonhapId) == false){
+        if (yonhapExceptionDomain.getCode().equals("2000") == false) {
+            return new ResponseEntity<YonhapExceptionDomain>(yonhapExceptionDomain, HttpStatus.CREATED);
+        }
 
-            headers = new HttpHeaders();
-            headers.setLocation(ucBuilder.path("/yonhap/{yh_artcl_id}").buildAndExpand(yonhapId).toUri());
-
-            yh_vo.setYh_artcl_id(yh_artcl_id);
-        }*/
-
-        YonhapDTO yonhapDTO = yonhapService.find(yonhapId);
+        YonhapDTO yonhapDTO = yonhapService.find(yonhapExceptionDomain.getId());
 
         YonhapResponseDTO yonhapResponseDTO = yonhapService.formatYonhap(yonhapDTO);
-
-        /*if(yonhapResponseDTO != null && yonhapResponseDTO.getFiles().size() > 0 ) {
-            for (Iterator<AttachFileDomain> iterator = yh_vo.getFiles().iterator(); iterator.hasNext();) {
-                AttachFileDomain _attc_file_vo = iterator.next();
-                _attc_file_vo.setFile_loc("/data/store/"+_attc_file_vo.getFile_loc());
-            }
-        }*/
 
 
         return new ResponseEntity<>(yonhapResponseDTO, HttpStatus.CREATED);

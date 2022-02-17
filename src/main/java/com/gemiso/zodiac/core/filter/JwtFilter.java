@@ -65,7 +65,8 @@ public class JwtFilter implements Filter {
                 + ",/auth/createToken,/yonhapInternational,/yonhap,/interface/dailypgm,/interface/cuesheet,/interface/code"
                 + ",/interface/mediatransrate,/interface/getMstListService,/interface/getCuesheetService,/interface"
                 + ",/swagger-ui/index.html/swagger-resources,/swagger-ui/index.html/swagger-resources/configuration/ui"
-                + ",/swagger-ui/index.html/swagger-resources/configuration/security,/auth/login,/auth/againlogin,/auth/logout";
+                + ",/swagger-ui/index.html/swagger-resources/configuration/security,/auth/login,/auth/againlogin,/auth/logout"
+                + ",/yonhapInternational/aptn,/yonhapInternational/reuter";
         excludedUrls = Arrays.asList(excludePattern.split(","));
 
     }

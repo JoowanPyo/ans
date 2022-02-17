@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface CueTmplSymbolRepository extends JpaRepository<CueTmplSymbol, Long> {
 
-    @Query("select a from CueTmplSymbol a where a.cueSheetTemplate.cueTmpltId = :cueTmpltId")
-    List<CueTmplSymbol> findCueTmplSymbol(@Param("cueTmpltId")Long cueTmpltId);
+    @Query("select a from CueTmplSymbol a where a.cueTmpltItem.cueTmpltItemId = :cueTmpltItemId")
+    List<CueTmplSymbol> findCueTmplSymbol(@Param("cueTmpltItemId")Long cueTmpltItemId);
+
 }

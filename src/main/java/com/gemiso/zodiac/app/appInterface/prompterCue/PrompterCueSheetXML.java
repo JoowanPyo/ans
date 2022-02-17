@@ -14,12 +14,12 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PrompterCueSheetXML {
 
-   /* @XmlElement(name = "result")
+    @XmlElement(name = "result")
     private PrompterCueSheetResultDTO result;
 
     @XmlElement(name = "data")
-    private PrompterCueSheetDataDTO data;*/
+    private PrompterCueSheetDataDTO data;
 
-    @XmlElement(name = "record")
-    private List<PrompterCueSheetDTO> cueSheetDTO = new ArrayList<>();
+    /*@XmlElement(name = "record")
+    private List<PrompterCueSheetDTO> cueSheetDTO = new ArrayList<>();*/
 }

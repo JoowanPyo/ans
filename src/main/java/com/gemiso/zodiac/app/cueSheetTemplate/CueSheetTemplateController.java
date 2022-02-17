@@ -29,7 +29,7 @@ public class CueSheetTemplateController {
     @GetMapping(path = "")
     public AnsApiResponse<List<CueSheetTemplateDTO>> findAll(@Parameter(name = "searchWord", description = "검색키워드")
                                                              @RequestParam(value = "searchWord", required = false) String searchWord,
-                                                             @Parameter(name = "basPgmsch_id", description = "방송프로그램 아이디")
+                                                             @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디")
                                                              @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
                                                              @Parameter(name = "basPgmschId", description = "기본편성 아이디")
                                                              @RequestParam(value = "basPgmschId", required = false) Long basPgmschId

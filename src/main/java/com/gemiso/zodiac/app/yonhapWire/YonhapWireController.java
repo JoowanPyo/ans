@@ -1,8 +1,7 @@
 package com.gemiso.zodiac.app.yonhapWire;
 
-import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireCreateDTO;
-import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireDTO;
-import com.gemiso.zodiac.app.yonhapWire.dto.YonhapWireResponseDTO;
+import com.gemiso.zodiac.app.yonhapPhoto.dto.YonhapExceptionDomain;
+import com.gemiso.zodiac.app.yonhapWire.dto.*;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
@@ -62,7 +61,7 @@ public class YonhapWireController {
 
     @Operation(summary = "연합외신 상세조회", description = "연합외신 상세조회")
     @GetMapping(path = "/{wireId}")
-    public AnsApiResponse<YonhapWireDTO> find(@Parameter(name = "wireId", description = "연합외신 아이디") @PathVariable("wireId")Long wireId){
+    public AnsApiResponse<YonhapWireDTO> find(@Parameter(name = "wireId", description = "연합외신 아이디") @PathVariable("wireId") Long wireId) {
 
         YonhapWireDTO yonhapWireDTO = yonhapWireService.find(wireId);
 
@@ -90,13 +89,41 @@ public class YonhapWireController {
             yonhapWireResponseDTO = yonhapWireService.formatWire(yonhapWireDTO);
         }
 
-
-        /*} catch (Exception e) {
-            e.printStackTrace();
-            log.error("yonhap : " + e.getMessage());
-            return new ResponseEntity<YonhapWireDTO>(yonhapWireDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-        }*/
         return new ResponseEntity<YonhapWireResponseDTO>(yonhapWireResponseDTO, headers, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "연합외신 등록 APTN", description = "연합외신 등록 APTN")
+    @PostMapping(path = "/aptn")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<?> createAptn(@Parameter(description = "필수값<br> ", required = true)
+                                        @RequestBody YonhapAptnCreateDTO yonhapAptnCreateDTO, UriComponentsBuilder ucBuilder) throws Exception {
+
+
+        YonhapExceptionDomain yonhapExceptionDomain = yonhapWireService.createAptn(yonhapAptnCreateDTO);
+
+        if (yonhapExceptionDomain.getCode().equals("2000") == false) {
+            return new ResponseEntity<YonhapExceptionDomain>(yonhapExceptionDomain, HttpStatus.CREATED);
+        }
+
+        YonhapWireDTO yonhapWireDTO = yonhapWireService.find(yonhapExceptionDomain.getId());
+        YonhapAptnDTO yonhapAptnDTO = yonhapWireService.formatAptn(yonhapWireDTO);
+
+        return new ResponseEntity<>(yonhapAptnDTO, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "연합외신 등록 REUTER", description = "연합외신 등록 REUTER")
+    @PostMapping(path = "/reuter")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<?> createReuter(@Parameter(description = "필수값<br> ", required = true)
+                                              @RequestBody YonhapReuterCreateDTO yonhapReuterCreateDTO){
+
+        YonhapExceptionDomain yonhapExceptionDomain = yonhapWireService.createReuter(yonhapReuterCreateDTO);
+
+        YonhapWireDTO yonhapWireDTO = yonhapWireService.find(yonhapExceptionDomain.getId());
+        YonhapReuterDTO yonhapReuterDTO = yonhapWireService.formatReuter(yonhapWireDTO);
+
+
+        return new ResponseEntity<>(yonhapReuterDTO, HttpStatus.CREATED);
     }
 
 }

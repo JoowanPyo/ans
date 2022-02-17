@@ -27,7 +27,7 @@ public class CueSheetTemplate extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cue_tmplt_id", length = 50, nullable = false)
+    @Column(name = "cue_tmplt_id", nullable = false)
     private Long cueTmpltId;
 
     @Column(name = "brdc_pgm_nm", length = 450)
@@ -111,7 +111,7 @@ public class CueSheetTemplate extends BaseEntity {
     private Long stdioId;
 
     @Basic(fetch = FetchType.LAZY)
-    @Formula("(select a.fclty_nm from tb_fclty_manage a where a.fclty_id = td_2_id)")
+    @Formula("(select a.fclty_nm from tb_fclty_manage a where a.fclty_id = stdio_id)")
     private String stdioNm;
 
     @Column(name = "subrm_id")
@@ -129,9 +129,9 @@ public class CueSheetTemplate extends BaseEntity {
     @JoinColumn(name = "bas_pgmsch_id")
     private BaseProgram baseProgram;
 
-    @OneToMany(mappedBy = "cueSheetTemplate")
+    /*@OneToMany(mappedBy = "cueSheetTemplate")
     @JsonManagedReference
-    private List<CueTmplSymbol> cueTmplSymbol = new ArrayList<>();
+    private List<CueTmplSymbol> cueTmplSymbol = new ArrayList<>();*/
 
     @PrePersist
     public void prePersist() {

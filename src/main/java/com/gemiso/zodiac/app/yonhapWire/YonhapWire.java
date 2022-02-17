@@ -1,13 +1,17 @@
 package com.gemiso.zodiac.app.yonhapWire;
 
 
+import com.gemiso.zodiac.app.yonhapAttchFile.YonhapAttchFile;
+import com.gemiso.zodiac.app.yonhapWireAttchFile.YonhapWireAttchFile;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(
@@ -74,5 +78,7 @@ public class YonhapWire {
     @Column(name = "action", columnDefinition = "bpchar(1)")
     private String action;
 
+    @OneToMany(mappedBy="yonhapWire")//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제
+    private List<YonhapWireAttchFile> yonhapWireAttchFiles = new ArrayList<>();
 
 }

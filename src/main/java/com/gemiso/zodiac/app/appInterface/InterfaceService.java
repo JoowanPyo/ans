@@ -714,11 +714,13 @@ public class InterfaceService {
         PrompterProgramDTO program = PrompterProgramDTO.builder()
                 .brdcPgmId(brdcPgmId)
                 .proNm(dailyProgram.getBrdcPgmNm())
+                .chDivCd("")
                 .onAirDate(dailyProgram.getBrdcDt())
                 .startTime(dailyProgram.getBrdcStartTime())
                 .endTime(dailyProgram.getBrdcEndClk())
                 .aricleCount(0)
                 .brdcStCd("")
+                .rdEditYn("")
                 .build();
         return program;
     }
@@ -732,7 +734,7 @@ public class InterfaceService {
             brdcPgmId = programDTO.getBrdcPgmId();
         }
 
-        //기사수 get
+                //기사수 get
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheet.getCueSheetItem();
         int articleCount = 0;
         for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList) {
@@ -743,8 +745,11 @@ public class InterfaceService {
             ++articleCount; //기사가 포함되어있으면 +1
         }
 
+
+
         PrompterProgramDTO program = PrompterProgramDTO.builder()
                 .csId(cueSheet.getCueId())
+                .chDivCd(cueSheet.getChDivCd())
                 .brdcPgmId(brdcPgmId)
                 .proNm(cueSheet.getBrdcPgmNm())
                 .onAirDate(cueSheet.getBrdcDt())
@@ -752,6 +757,7 @@ public class InterfaceService {
                 .endTime(cueSheet.getBrdcEndTime())
                 .aricleCount(articleCount)
                 .brdcStCd(cueSheet.getCueStCd())
+                .rdEditYn("")
                 .build();
         return program;
     }
@@ -788,7 +794,7 @@ public class InterfaceService {
         //프롬프터 xml형식으로 변환할
         PrompterProgramXML prompterProgramXML = new PrompterProgramXML();
 
-      /*  //Lsit<prompterProgram>
+        //Lsit<prompterProgram>
         PrompterProgramDataDTO prompterProgramDataDTO = new PrompterProgramDataDTO();
 
         //success="true" msg="ok" 담는DTO
@@ -800,13 +806,13 @@ public class InterfaceService {
         //result 데이터 set
         prompterProgramDataDTO.setTotalcount(prompterProgramDTOList.stream().count());
         prompterProgramResultDTO.setMsg("ok");
-        prompterProgramResultDTO.setSuccess("true");*/
+        prompterProgramResultDTO.setSuccess("true");
 
         //XML 변환할 Code데이터 set
-       /* prompterProgramXML.setData(prompterProgramDataDTO);
-        prompterProgramXML.setResult(prompterProgramResultDTO);*/
+        prompterProgramXML.setData(prompterProgramDataDTO);
+        prompterProgramXML.setResult(prompterProgramResultDTO);
 
-        prompterProgramXML.setPrompterProgramDTO(prompterProgramDTOList);
+       /* prompterProgramXML.setPrompterProgramDTO(prompterProgramDTOList);*/
 
         //DTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(prompterProgramXML, PrompterProgramXML.class);
@@ -834,7 +840,7 @@ public class InterfaceService {
         //프롬프터 큐시트 xml형식으로 변환할 DTO
         PrompterCueSheetXML prompterCueSheetXML = new PrompterCueSheetXML();
 
-     /*   //set Lsit<PrompterCueSheetDTO>
+        //set Lsit<PrompterCueSheetDTO>
         PrompterCueSheetDataDTO prompterCueSheetDataDTO = new PrompterCueSheetDataDTO();
 
         //success="true" msg="ok" 담는DTO
@@ -850,9 +856,9 @@ public class InterfaceService {
 
         //XML 변환할 데이터 set
         prompterCueSheetXML.setData(prompterCueSheetDataDTO);
-        prompterCueSheetXML.setResult(prompterCueSheetResultDTO);*/
+        prompterCueSheetXML.setResult(prompterCueSheetResultDTO);
 
-        prompterCueSheetXML.setCueSheetDTO(prompterCueSheetDTOList);
+        /*prompterCueSheetXML.setCueSheetDTO(prompterCueSheetDTOList);*/
 
         //DTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(prompterCueSheetXML, PrompterCueSheetXML.class);
@@ -880,6 +886,7 @@ public class InterfaceService {
                 PrompterCueSheetDTO prompterCueSheetDTO = PrompterCueSheetDTO.builder()
                         .cueId(cueSheetItem.getCueItemId())
                         .rdSeq("")
+                        .rdOrd(cueSheetItem.getCueItemOrd())
                         .openYn("")
                         .artclTitl(cueSheetItem.getCueItemTitl()) //국문제목
                         .artclTitlEn(cueSheetItem.getCueItemTitlEn()) // 영문제목
@@ -910,7 +917,8 @@ public class InterfaceService {
                         .cueId(cueSheetItem.getCueItemId())
                         .rdSeq("")
                         .chDivCd(article.getChDivCd())
-                        .rdOrd(ord) //순번
+                        .rdOrd(cueSheetItem.getCueItemOrd()) //순번
+                        .rdOrdMrk(ord)
                         .prdDivCd(article.getPrdDivCd())
                         .openYn("")
                         .artclId(article.getArtclId())

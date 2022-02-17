@@ -18,29 +18,36 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PrompterProgramDTO {
 
-    @XmlElement(name="CS_ID")
+    @XmlElement(name="rd_id")
     private Long csId; // 방송 상태값
+
+    @XmlElement(name="brdc_pgm_nm")
+    private String proNm; //프로그램 명
+
+    @XmlElement(name="brdc_dt")
+    private String onAirDate; // 방송일자
+
+    @XmlElement(name = "ch_div_cd")
+    private String chDivCd; //채널구분코드
+
+    @XmlElement(name="brdc_start_clk")
+    private String startTime; // 시작시간
+
+    @XmlElement(name="brdc_end_clk")
+    private String endTime; // 종료시간
+
+    @XmlElement(name="articlecount")
+    private Integer aricleCount; // 기사 건수
+
+    @XmlElement(name="rd_st_nm")
+    private String brdcStCd; // 방송 상태값
+
+    @XmlElement(name = "rd_edit_yn")
+    private String rdEditYn; //수정 여부
 
     @XmlElement(name="PRO_ID")
     private String brdcPgmId; //프로그램 아이디
 
-    @XmlElement(name="PRO_NM")
-    private String proNm; //프로그램 명
-
-    @XmlElement(name="ON_AIR_DATE")
-    private String onAirDate; // 방송일자
-
-    @XmlElement(name="START_TIME")
-    private String startTime; // 시작시간
-
-    @XmlElement(name="END_TIME")
-    private String endTime; // 종료시간
-
-    @XmlElement(name="DISPLAY_SEQ")
-    private Integer aricleCount; // 기사 건수
-
-    @XmlElement(name="NODSTATUS_NM")
-    private String brdcStCd; // 방송 상태값
 
     /*@XmlElement(name="CS_SPEND_TIME")
     private String csSpendTime;
