@@ -32,7 +32,7 @@ public class YonhapWire {
     @Column(name = "wire_id", nullable = false)
     private Long wireId;
 
-    @Column(name = "cont_id")
+    @Column(name = "cont_id", length = 100)
     private String contId;
 
     @Column(name = "imprt", columnDefinition = "bpchar(1)")

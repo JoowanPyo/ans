@@ -27,29 +27,32 @@ public class YtnRundown {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column(name = "cont_id", length = 100)
+    private String contId;
+
     @Column(name = "brdc_dtm", nullable = false)
-    private Date brdcDtm;
+    private String brdcDtm;
 
     @Column(name = "brdc_start_dtm", nullable = false)
-    private Date brdcStartDtm;
+    private String brdcStartDtm;
 
     @Column(name = "brdc_end_dtm", nullable = false)
-    private Date brdcEndDtm;
+    private String brdcEndDtm;
 
     @Column(name = "number")
-    private int number;
+    private int ord;
 
     @Column(name = "form", length = 20)
-    private String form;
+    private String frm;
 
     @Column(name = "mc", length = 20)
     private String mc;
 
     @Column(name = "reporter", length = 50)
-    private String reporter;
+    private String rprt;
 
     @Column(name = "video")
-    private int video;
+    private String video;
 
     @Column(name = "time", length = 20)
     private String time;

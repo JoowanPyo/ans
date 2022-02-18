@@ -33,7 +33,7 @@ public class YonhapPhoto {
     @Column(name = "yonhap_artcl_id", nullable = false)
     private Long yonhapArtclId;
 
-    @Column(name = "cont_id")
+    @Column(name = "cont_id", length = 100)
     private String contId;
 
     @Column(name = "imprt", columnDefinition = "bpchar(1)")

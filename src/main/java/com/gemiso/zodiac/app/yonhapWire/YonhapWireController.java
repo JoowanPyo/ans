@@ -115,7 +115,7 @@ public class YonhapWireController {
     @PostMapping(path = "/reuter")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> createReuter(@Parameter(description = "필수값<br> ", required = true)
-                                              @RequestBody YonhapReuterCreateDTO yonhapReuterCreateDTO){
+                                          @RequestBody YonhapReuterCreateDTO yonhapReuterCreateDTO) {
 
         YonhapExceptionDomain yonhapExceptionDomain = yonhapWireService.createReuter(yonhapReuterCreateDTO);
 

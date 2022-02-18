@@ -34,7 +34,7 @@ public class Yonhap {
   /*  @Column(name = "yonhap_id", length = 21 ,nullable = false)
     private String yonhapId;*/
 
-    @Column(name = "cont_id", length = 21, nullable = false)
+    @Column(name = "cont_id", length = 50, nullable = false)
     private String contId;
 
     @Column(name = "imprt", columnDefinition = "bpchar(1)")
