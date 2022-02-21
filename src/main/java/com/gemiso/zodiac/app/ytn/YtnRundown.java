@@ -64,4 +64,7 @@ public class YtnRundown {
     @Column(name = "input_dtm")
     private Date inputDtm;
 
+    @Column(name = "title", length = 500)
+    private String title;
+
 }

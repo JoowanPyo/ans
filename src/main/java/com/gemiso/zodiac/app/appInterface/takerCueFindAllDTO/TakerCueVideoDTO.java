@@ -25,6 +25,9 @@ public class TakerCueVideoDTO {
     private String playout_id;
 
     @XmlAttribute
+    private String seq;
+
+    @XmlAttribute
     private String duration;
 
 }

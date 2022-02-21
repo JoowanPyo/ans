@@ -28,7 +28,7 @@ public class CueSheetItemSymbolController {
     @Operation(summary = "큐시트 아이템 심볼 상세조회", description = "큐시트 아이템 심볼 상세조회")
     @GetMapping(path = "/{cueItemSymbolId}")
     public AnsApiResponse<CueSheetItemSymbolDTO> find(@Parameter(name = "cueItemSymbolId", description = "큐시트아이템 아이디")
-                                                   @PathVariable("cueItemSymbolId") Long cueItemSymbolId) {
+                                                      @PathVariable("cueItemSymbolId") Long cueItemSymbolId) {
 
         CueSheetItemSymbolDTO cueSheetItemSymbolDTO = cueSheetItemSymbolService.find(cueItemSymbolId);
 
@@ -39,16 +39,16 @@ public class CueSheetItemSymbolController {
     @PostMapping(path = "/{cueItemId}")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<CueSheetItemSymbolResponseDTO> create(@Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
-                                                     @PathVariable("cueItemId") Long cueItemId,
+                                                                @PathVariable("cueItemId") Long cueItemId,
                                                                 @Parameter(description = "필수값<br> ", required = true)
-                                                     @RequestBody @Valid CueSheetItemSymbolCreateDTO cueSheetItemSymbolCreateDTO) {
+                                                                @RequestBody @Valid CueSheetItemSymbolCreateDTO cueSheetItemSymbolCreateDTO) {
 
         CueSheetItemSymbolResponseDTO cueSheetItemSymbolDTO = new CueSheetItemSymbolResponseDTO();
 
         Long id = cueSheetItemSymbolService.create(cueSheetItemSymbolCreateDTO, cueItemId);
 
         cueSheetItemSymbolDTO.setCueItemSymbolId(id);
-      /*  CueSheetItemSymbolDTO cueSheetItemSymbolDTO = cueSheetItemSymbolService.find(id);*/
+        /*  CueSheetItemSymbolDTO cueSheetItemSymbolDTO = cueSheetItemSymbolService.find(id);*/
 
         return new AnsApiResponse<CueSheetItemSymbolResponseDTO>(cueSheetItemSymbolDTO);
     }
@@ -56,9 +56,9 @@ public class CueSheetItemSymbolController {
     @Operation(summary = "큐시트 아이템 심볼 수정", description = "큐시트 아이템 심볼 수정")
     @PutMapping(path = "/{cueItemId}")
     public AnsApiResponse<CueSheetItemSymbolResponseDTO> update(@Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
-                                                     @PathVariable("cueItemId") Long cueItemId,
+                                                                @PathVariable("cueItemId") Long cueItemId,
                                                                 @Parameter(description = "필수값<br> ", required = true)
-                                                     @RequestBody @Valid CueSheetItemSymbolUpdateDTO cueSheetItemSymbolUpdateDTO) {
+                                                                @RequestBody @Valid CueSheetItemSymbolUpdateDTO cueSheetItemSymbolUpdateDTO) {
 
         CueSheetItemSymbolResponseDTO cueSheetItemSymbolDTO = new CueSheetItemSymbolResponseDTO();
 
@@ -74,7 +74,7 @@ public class CueSheetItemSymbolController {
     @DeleteMapping(path = "/{cueItemSymbolId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "cueItemSymbolId", description = "큐시트아이템 방송아이콘 아이디")
-                                     @PathVariable("cueItemSymbolId") Long cueItemSymbolId){
+                                    @PathVariable("cueItemSymbolId") Long cueItemSymbolId) {
 
         cueSheetItemSymbolService.delete(cueItemSymbolId);
 

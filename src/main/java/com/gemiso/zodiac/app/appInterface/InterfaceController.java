@@ -4,6 +4,7 @@ import com.gemiso.zodiac.app.appInterface.codeDTO.TakerCodeDTO;
 import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetDTO;
 import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
 import com.gemiso.zodiac.core.helper.SearchDateInterface;
 import io.swagger.annotations.Api;
@@ -135,10 +136,10 @@ public class InterfaceController {
                              @RequestHeader(value = "securityKey") String securityKey) {
 
 
-        List<TakerCueSheetDTO> takerCueSheetDTOList = interfaceService.cuefindAll(rd_id, play_seq, cued_seq, vplay_seq, vcued_seq, del_yn,
+        TakerCueSheetDataDTO takerCueSheetDataDTO = interfaceService.cuefindAll(rd_id, play_seq, cued_seq, vplay_seq, vcued_seq, del_yn,
                 ch_div_cd, usr_id, token, usr_ip, format, lang, os_type);
 
-        String takerCue = interfaceService.takerCueToXml(takerCueSheetDTOList);
+        String takerCue = interfaceService.takerCueToXml(takerCueSheetDataDTO);
 
         return takerCue;
     }

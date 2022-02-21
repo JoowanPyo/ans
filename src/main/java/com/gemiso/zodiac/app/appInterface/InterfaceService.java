@@ -25,6 +25,7 @@ import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetFindAllDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
@@ -44,6 +45,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import javax.xml.bind.annotation.XmlElement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -58,6 +60,7 @@ public class InterfaceService {
     private final CueSheetRepository cueSheetRepository;
     private final CodeRepository codeRepository;
     private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
+    private final CueSheetItemRepository cueSheetItemRepository;
     private final DailyProgramRepository dailyProgramRepository;
     //private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
     //private final ProgramRepository programRepository;
@@ -300,12 +303,13 @@ public class InterfaceService {
     }
 
     //테이커 큐시트 조회
-    public List<TakerCueSheetDTO> cuefindAll(String rd_id, String play_seq, String cued_seq, String vplay_seq, String vcued_seq,
+    public TakerCueSheetDataDTO cuefindAll(String rd_id, String play_seq, String cued_seq, String vplay_seq, String vcued_seq,
                                              String del_yn, String ch_div_cd, String usr_id, String token, String usr_ip,
                                              String format, String lang, String os_type) {
 
         //큐시트 아이티와 삭제여부값 예외 처리[아이디가 String 타입으로 들어오기 때문에 Long값으로 변환.]
-        Long cueId = 61L;
+        Long cueId = 60L;
+        //Long cueId = null;
         /*if (rd_id != null && rd_id.trim().isEmpty() ==false) {
             cueId = Long.parseLong(rd_id);
         }*/
@@ -316,14 +320,180 @@ public class InterfaceService {
         //테이커큐시트 상세조회
         Optional<CueSheet> cueSheet = cueSheetRepository.findTakerCue(cueId, del_yn);
 
-        //조회된 큐시트 정보로 TakerCueSheetDTO 리스트 빌드
-        List<TakerCueSheetDTO> takerCueSheetDTOList = cueSheetToTakerCueSheet(cueSheet.get());
+        TakerCueSheetDataDTO takerCueSheetDataDTO = new TakerCueSheetDataDTO();
 
         if (cueSheet.isPresent() == false) { //조회된 큐시트가 없으면 return 빈모델리스트 = 에러가 나지 않게 설정
-            return takerCueSheetDTOList;
+            return takerCueSheetDataDTO;
         }
 
-        return takerCueSheetDTOList;
+        CueSheet cueSheetEntity = cueSheet.get();
+
+        //조회된 큐시트 정보로 TakerCueSheetDTO 리스트 빌드
+        List<TakerCueSheetDTO> takerCueSheetDTOList = cueSheetToTakerCueSheet(cueSheetEntity);
+
+        //예비 큐시트 아이템 정보를 taker정보로 빌드.
+        List<TakerCueSheetSpareDTO> takerCueSheetSpareDTO = findSpareCueSheet(cueId, del_yn, cueSheetEntity);
+
+        takerCueSheetDataDTO.setTakerCueSheetDTO(takerCueSheetDTOList);//기본 큐시트아이템 정보 set
+        takerCueSheetDataDTO.setTakerCueSheetSpareDTO(takerCueSheetSpareDTO);//예비 큐시트 아이템 정보 set
+
+        return takerCueSheetDataDTO;
+    }
+
+    //테이커 큐시트 예비 큐시트 조회
+    public List<TakerCueSheetSpareDTO> findSpareCueSheet(Long cueId, String del_yn, CueSheet cueSheet){
+
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findSpareCue(cueId, del_yn);
+
+        List<TakerCueSheetSpareDTO> takerCueSheetSpareDTOList = new ArrayList<>();
+
+        for (CueSheetItem cueSheetItem : cueSheetItemList) {
+            Article article = cueSheetItem.getArticle(); //큐시트 아이템에 기사정보get
+            Issue issue = new Issue();
+
+            Long cueItemId = cueSheetItem.getCueItemId();
+            //큐시트 아이템 방송아이콘 List 조회
+            List<CueSheetItemSymbol> cueSheetItemSymbolList = cueSheetItemSymbolRepository.findSymbol(cueItemId);
+
+            //cmDivCd, cmDivCd 값 구하기 [채널값으로 심볼에 들어가는 NS-1, NS-2, NS-3 값 구하기]
+            String returnSymbolId = "";
+            String returnSymbolNm = "";
+            for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+                Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+
+                if (ObjectUtils.isEmpty(symbol)){  //심볼이 있을경우
+                    String symbolId = symbol.getSymbolId(); //심볼아이디
+                    String symbolNm = symbol.getSymbolNm(); //심볼 명
+
+                    switch(symbolId){ // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                        case "VNS1":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "VNS2":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "VNS3":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                    }
+                }
+            }
+
+            //큐시트 아이템 비디오 정보 get
+            List<CueSheetMedia> cueSheetMediaList = cueSheetItem.getCueSheetMedia();
+
+            List<TakerCueVideoDTO> takerCueVideoDTOList = getVideoDTOList(cueSheetMediaList);
+
+            int rdOrd = 0; //순번값 set
+
+            if (ObjectUtils.isEmpty(article)) { //기사가 포함이 안된 큐시트 아이템 일시
+
+                //프로그램 아이디 get null에러 방지
+                Program program = cueSheet.getProgram();
+                String brdcPgmId = "";
+                if (ObjectUtils.isEmpty(program) == false) {
+                    brdcPgmId = program.getBrdcPgmId();
+                }
+
+                //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
+                TakerCueSheetSpareDTO takerCueSheetDTO = TakerCueSheetSpareDTO.builder()
+                        .brdcPgmId(brdcPgmId)
+                        .rdSeq(0)
+                        .chDivCd(cueSheet.getChDivCd()) // 채널구분코드
+                        .cueDivCdNm(cueSheet.getCueDivCdNm()) //채널구분코드 명
+                        .rdOrd(cueSheetItem.getCueItemOrd())//순번
+                        .rdOrdMrk(cueSheetItem.getCueItemOrd())//표시되는 순번
+                        .rdDtlDivCd(cueSheetItem.getCueItemDivCd()) //큐시트아이템 구분 코드
+                        .mcStCd(cueSheetItem.getBrdcStCd()) //방송상태코드
+                        .cmDivCd(returnSymbolId)//심볼 아이디 (채널명) ex VNS1, VNS2, VNS3
+                        .rdDtlDivNm(cueSheetItem.getCueItemDivCdNm())//큐시트아이템 구분 코드 명
+                        .mcStNm(cueSheetItem.getBrdcStCdNm())//방송상태코드 명
+                        .cmDivNm(returnSymbolNm)//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
+                        .takerCueVideoDTO(takerCueVideoDTOList)//???
+                        .build();
+
+                takerCueSheetSpareDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
+
+            } else {
+                //이슈아이디 get null에러 방지
+                issue = article.getIssue();
+                Long issueId = 0L;
+                if (ObjectUtils.isEmpty(issue) == false) {
+                    issueId = issue.getIssuId();
+                }
+                //프로그램 아이디 get null에러 방지
+                Program program = cueSheet.getProgram();
+                String brdcPgmId = "";
+                if (ObjectUtils.isEmpty(program) == false) {
+                    brdcPgmId = program.getBrdcPgmId();
+                }
+
+                //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
+                TakerCueSheetSpareDTO takerCueSheetDTO = TakerCueSheetSpareDTO.builder()
+                        .brdcPgmId(brdcPgmId)
+                        .rdSeq(0)
+                        .chDivCd(cueSheet.getChDivCd())// 채널구분코드
+                        .cueDivCdNm(cueSheet.getCueDivCdNm())//채널구분코드 명
+                        .rdOrd(cueSheetItem.getCueItemOrd())//큐시트 아이템 순번
+                        .rdOrdMrk(cueSheetItem.getCueItemOrd())//표시되는 순번
+                        .rdDtlDivCd(cueSheetItem.getCueItemDivCd()) //큐시트아이템 구분 코드
+                        .mcStCd(cueSheetItem.getBrdcStCd()) //방송상태코드
+                        .cmDivCd(returnSymbolId)//심볼 아이디 (채널명) ex VNS1, VNS2, VNS3
+                        .rdDtlDivNm(cueSheetItem.getCueItemDivCdNm())//큐시트아이템 구분 코드 명
+                        .mcStNm(cueSheetItem.getBrdcStCdNm())//방송상태 명
+                        .cmDivNm(cueSheet.getChDivCdNm())//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
+                        .artclId(article.getArtclId())
+                        .artclFrmCd(article.getArtclFrmCd())
+                        .artclFrmNm(article.getArtclFrmCdNm())
+                        .artclFldCd(article.getArtclFldCd())
+                        .artclFldNm(article.getArtclFldCdNm())
+                        .artclTitl(article.getArtclTitl())
+                        .rptrNm(article.getRptrNm())
+                        .deptCd(article.getDeptCd())
+                        .deptNm(article.getDeptNm())
+                        .artclReqdSec(Optional.ofNullable(article.getArtclReqdSec()).orElse(0))
+                        .artclSmryCtt(0)//???
+                        .artclDivCd(article.getArtclDivCd())
+                        .artclDivNm(article.getArtclDivCdNm())
+                        .issuId(issueId)
+                        .lckrId(article.getLckrId())
+                        .lckrNm(article.getLckrNm())
+                        .lckDtm(article.getLckDtm())
+                        .apprvDivCd(article.getApprvDivCd())
+                        .apprvDivNm(article.getApprvDivCdNm())
+                        .apprvDtm(article.getApprvDtm())
+                        .apprvrId(article.getApprvrId())
+                        .apprvrNm(article.getApprvrNm())
+                        .artclOrd(article.getArtclOrd())
+                        .brdcCnt(Optional.ofNullable(article.getBrdcCnt()).orElse(0))
+                        .orgArtclId(article.getOrgArtclId())
+                        .rptPlnId(article.getRptrId())
+                        .brdcFnshYn("")//???
+                        .urgYn(article.getUrgYn())
+                        .frnotiYn(article.getFrnotiYn())
+                        .embgYn(article.getEmbgYn())
+                        .updtLckYn(article.getLckYn())
+                        .internetOnlyYn("")//???
+                        .snsYn("")//???
+                        .inputrId(article.getInputrId())
+                        .inputrNm(article.getInputrNm())
+                        .inputDtm(dateToString(article.getInputDtm())) //Date형식의 입력일시를 String으로 변환
+                        .takerCueVideoDTO(takerCueVideoDTOList)//???
+                        .build();
+
+                takerCueSheetSpareDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
+
+
+            }
+            ++rdOrd;
+        }
+
+        return takerCueSheetSpareDTOList;
+
+
     }
 
     //큐시티 엔티티로 조회된 큐시트 TakerCueSheetDTO형식으로 빌드
@@ -484,7 +654,8 @@ public class InterfaceService {
 
         List<TakerCueVideoDTO> returnDTOList = new ArrayList<>(); //리턴할 비디오 DTO 리스트
 
-        for (CueSheetMedia cueSheetMedia : cueSheetMediaList){//큐시트 아이템에 포함된 큐시트 미디어 정보 get
+        //Mam되면 수정
+        /*for (CueSheetMedia cueSheetMedia : cueSheetMediaList){//큐시트 아이템에 포함된 큐시트 미디어 정보 get
 
             //테이커 비디오 정보 빌드
             TakerCueVideoDTO takerCueVideoDTO = TakerCueVideoDTO.builder()
@@ -495,27 +666,43 @@ public class InterfaceService {
 
             returnDTOList.add(takerCueVideoDTO);
 
-        }
+        }*/
+
+        //테이커 비디오 정보 빌드
+        TakerCueVideoDTO takerCueVideoDTO = TakerCueVideoDTO.builder()
+                .title("media title") //미디어 제목
+                .playout_id("11") // clip Id
+                .seq("1")
+                .duration("01:30") // 미디어 길이
+                .build();
+
+        returnDTOList.add(takerCueVideoDTO);
 
         return returnDTOList;
     }
 
     //조회된 큐시트 데이터 리스트를 XML DTO에 set 후 XML형식 String데이터로 파싱
-    public String takerCueToXml(List<TakerCueSheetDTO> takerCueSheetDTOList) {
+    public String takerCueToXml(TakerCueSheetDataDTO takerCueSheetDataDTO) {
         //큐시트목록 xml을 담는 DTO
         TakerCueSheetXML takerCueSheetXML = new TakerCueSheetXML();
         //success="true" msg="ok" 담는DTO
         TakerCueSheetResultDTO takerCueSheetResultDTO = new TakerCueSheetResultDTO();
         //<data totalcount="6" curpage="0" rowcount="0">&&List<cue>
-        TakerCueSheetDataDTO takerCueSheetDataDTO = new TakerCueSheetDataDTO();
+        //TakerCueSheetDataDTO takerCueSheetDataDTO = new TakerCueSheetDataDTO();
 
         //result 데이터 set
         takerCueSheetResultDTO.setMsg("ok");
         takerCueSheetResultDTO.setSuccess("true");
 
         //dataDTO 데이터 set
-        takerCueSheetDataDTO.setTakerCueSheetDTO(takerCueSheetDTOList);
-        takerCueSheetDataDTO.setTotalcount(takerCueSheetDTOList.stream().count());
+        //takerCueSheetDataDTO.setTakerCueSheetDTO(takerCueSheetDTOList);
+
+        //큐시트 아이템, 예비 큐시트 아이템 조회된 토탈 카운트 get
+        List<TakerCueSheetDTO> takerCueSheetDTO = takerCueSheetDataDTO.getTakerCueSheetDTO();
+        List<TakerCueSheetSpareDTO> takerCueSheetSpareDTO = takerCueSheetDataDTO.getTakerCueSheetSpareDTO();
+        Long totalCount = takerCueSheetDTO.stream().count() + takerCueSheetSpareDTO.stream().count();
+
+        takerCueSheetDataDTO.setTotalcount(totalCount);
         takerCueSheetDataDTO.setCurpage(0);
         takerCueSheetDataDTO.setRowcount(0);
 

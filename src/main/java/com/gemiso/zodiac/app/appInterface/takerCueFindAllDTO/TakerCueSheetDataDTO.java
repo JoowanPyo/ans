@@ -23,6 +23,9 @@ public class TakerCueSheetDataDTO {
     @XmlElement(name = "record")
     private List<TakerCueSheetDTO> takerCueSheetDTO = new ArrayList<>();
 
+    @XmlElement(name = "spareRecord")
+    private List<TakerCueSheetSpareDTO> takerCueSheetSpareDTO = new ArrayList<>();
+
    /* @XmlElement(name = "record")
     private List<ParentProgramDTO> parentCueSheetDTOList;*/
 

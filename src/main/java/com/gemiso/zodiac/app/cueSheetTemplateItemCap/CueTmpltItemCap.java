@@ -3,6 +3,7 @@ package com.gemiso.zodiac.app.cueSheetTemplateItemCap;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
+import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -99,6 +100,10 @@ public class CueTmpltItemCap extends BaseEntity {
     @JoinColumn(name = "cue_tmplt_item_id")
     @JsonBackReference
     private CueTmpltItem cueTmpltItem;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "symbol_id")
+    private Symbol symbol;
 
     @PrePersist
     public void prePersist() {

@@ -18,7 +18,6 @@ import javax.validation.constraints.NotNull;
 public class CueTmplSymbolCreateDTO {
 
     //private Long id;
-    @NotNull
     private CueTmpltItemSimpleDTO cueTmpltItem;
     @NotNull
     private SymbolSimpleDTO symbol;

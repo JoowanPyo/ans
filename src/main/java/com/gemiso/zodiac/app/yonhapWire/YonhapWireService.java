@@ -350,7 +350,7 @@ public class YonhapWireService {
             
         }
 
-        return new YonhapExceptionDomain(aptnId, "2000", "yonhapPhoto", "", "");
+        return new YonhapExceptionDomain(aptnId, "2000", "yonhapAptn", "", "");
 
     }
 
@@ -455,16 +455,16 @@ public class YonhapWireService {
 
         QYonhapWire qYonhapWire = QYonhapWire.yonhapWire;
 
-        if (!StringUtils.isEmpty(sdate) && !StringUtils.isEmpty(edate)){
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
             booleanBuilder.and(qYonhapWire.inputDtm.between(sdate, edate));
         }
-        if (!StringUtils.isEmpty(agcyCd)){
+        if (agcyCd != null && agcyCd.trim().isEmpty() == false){
             booleanBuilder.and(qYonhapWire.agcyCd.eq(agcyCd));
         }
-        if (!StringUtils.isEmpty(searchWord)){
+        if (searchWord != null && searchWord.trim().isEmpty() == false){
             booleanBuilder.and(qYonhapWire.artclTitl.contains(searchWord));
         }
-        if (!ObjectUtils.isEmpty(imprtList)){
+        if (ObjectUtils.isEmpty(imprtList) == false){
 
             for (int i =0; i < imprtList.size(); i++){
                 String imprt = imprtList.get(i);

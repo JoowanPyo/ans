@@ -8,6 +8,7 @@ import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrp;
 import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
+import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.user.User;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -111,6 +112,10 @@ public class CueSheetItemCap {
     @JoinColumn(name = "cue_item_id")
     @JsonBackReference
     private CueSheetItem cueSheetItem;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "symbol_id")
+    private Symbol symbol;
     
 
     @PrePersist

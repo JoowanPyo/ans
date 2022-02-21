@@ -3,6 +3,7 @@ package com.gemiso.zodiac.app.cueSheetItemCap.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSimpleDTO;
+import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,4 +45,5 @@ public class CueSheetItemCapSimpleDTO {
     private String delrNm;
     private CapTemplateDTO capTemplate;
     //private CueSheetItemSimpleDTO cueSheetItem;
+    private SymbolDTO symbol;
 }

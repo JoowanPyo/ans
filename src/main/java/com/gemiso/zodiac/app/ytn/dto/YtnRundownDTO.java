@@ -5,12 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import java.util.Date;
 
 @Data
@@ -24,13 +19,14 @@ public class YtnRundownDTO {
     private String brdcDtm;
     private String brdcStartDtm;
     private String brdcEndDtm;
-    private int number;
-    private String form;
+    private int ord;
+    private String frm;
     private String mc;
-    private String reporter;
+    private String rprt;
     private String video;
     private String time;
     private String article;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
+    private String title;
 }
