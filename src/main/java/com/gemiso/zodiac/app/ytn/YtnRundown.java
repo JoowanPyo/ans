@@ -40,7 +40,7 @@ public class YtnRundown {
     private String brdcEndDtm;
 
     @Column(name = "number")
-    private int ord;
+    private String ord;
 
     @Column(name = "form", length = 20)
     private String frm;

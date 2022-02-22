@@ -81,7 +81,7 @@ public class CueSheetTemplateController {
     }
 
     @Operation(summary = "큐시트 템플릿 삭제", description = "큐시트 템플릿 삭제")
-    @PostMapping(path = "/{cueTmpltId}")
+    @DeleteMapping(path = "/{cueTmpltId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "cueTmpltId", required = true, description = "큐시트 템플릿 아이디")
                                     @PathVariable("cueTmpltId") Long cueTmpltId) {

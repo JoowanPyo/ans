@@ -16,7 +16,6 @@ import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramResultDTO;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
-import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.code.CodeRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
@@ -45,7 +44,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import javax.xml.bind.annotation.XmlElement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -385,7 +383,7 @@ public class InterfaceService {
             //큐시트 아이템 비디오 정보 get
             List<CueSheetMedia> cueSheetMediaList = cueSheetItem.getCueSheetMedia();
 
-            List<TakerCueVideoDTO> takerCueVideoDTOList = getVideoDTOList(cueSheetMediaList);
+            List<TakerCueSheetVideoDTO> takerCueSheetVideoDTOList = getVideoDTOList(cueSheetMediaList);
 
             int rdOrd = 0; //순번값 set
 
@@ -412,7 +410,7 @@ public class InterfaceService {
                         .rdDtlDivNm(cueSheetItem.getCueItemDivCdNm())//큐시트아이템 구분 코드 명
                         .mcStNm(cueSheetItem.getBrdcStCdNm())//방송상태코드 명
                         .cmDivNm(returnSymbolNm)//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
-                        .takerCueVideoDTO(takerCueVideoDTOList)//???
+                        .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
                         .build();
 
                 takerCueSheetSpareDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
@@ -481,7 +479,7 @@ public class InterfaceService {
                         .inputrId(article.getInputrId())
                         .inputrNm(article.getInputrNm())
                         .inputDtm(dateToString(article.getInputDtm())) //Date형식의 입력일시를 String으로 변환
-                        .takerCueVideoDTO(takerCueVideoDTOList)//???
+                        .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
                         .build();
 
                 takerCueSheetSpareDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
@@ -540,7 +538,7 @@ public class InterfaceService {
             //큐시트 아이템 비디오 정보 get
             List<CueSheetMedia> cueSheetMediaList = cueSheetItem.getCueSheetMedia();
 
-            List<TakerCueVideoDTO> takerCueVideoDTOList = getVideoDTOList(cueSheetMediaList);
+            List<TakerCueSheetVideoDTO> takerCueSheetVideoDTOList = getVideoDTOList(cueSheetMediaList);
 
             int rdOrd = 0; //순번값 set
 
@@ -567,7 +565,7 @@ public class InterfaceService {
                         .rdDtlDivNm(cueSheetItem.getCueItemDivCdNm())//큐시트아이템 구분 코드 명
                         .mcStNm(cueSheetItem.getBrdcStCdNm())//방송상태코드 명
                         .cmDivNm(returnSymbolNm)//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
-                        .takerCueVideoDTO(takerCueVideoDTOList)//???
+                        .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
                         .build();
 
                 takerCueSheetDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
@@ -636,7 +634,7 @@ public class InterfaceService {
                         .inputrId(article.getInputrId())
                         .inputrNm(article.getInputrNm())
                         .inputDtm(dateToString(article.getInputDtm())) //Date형식의 입력일시를 String으로 변환
-                        .takerCueVideoDTO(takerCueVideoDTOList)//???
+                        .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
                         .build();
 
                 takerCueSheetDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
@@ -650,33 +648,38 @@ public class InterfaceService {
     }
 
     //큐시트 아이템 비디오 정보 get
-    public List<TakerCueVideoDTO> getVideoDTOList(List<CueSheetMedia> cueSheetMediaList){
+    public List<TakerCueSheetVideoDTO> getVideoDTOList(List<CueSheetMedia> cueSheetMediaList){
 
-        List<TakerCueVideoDTO> returnDTOList = new ArrayList<>(); //리턴할 비디오 DTO 리스트
+        List<TakerCueSheetVideoDTO> returnDTOList = new ArrayList<>(); //리턴할 비디오 DTO 리스트
 
         //Mam되면 수정
         /*for (CueSheetMedia cueSheetMedia : cueSheetMediaList){//큐시트 아이템에 포함된 큐시트 미디어 정보 get
 
             //테이커 비디오 정보 빌드
-            TakerCueVideoDTO takerCueVideoDTO = TakerCueVideoDTO.builder()
+            TakerCueSheetVideoDTO takerCueSheetVideoDTO = TakerCueSheetVideoDTO.builder()
                     .title(cueSheetMedia.getCueMediaTitl()) //미디어 제목
                     .playout_id("") // clip Id
                     .duration(cueSheetMedia.getMediaDurtn()) // 미디어 길이
                     .build();
 
-            returnDTOList.add(takerCueVideoDTO);
+            returnDTOList.add(takerCueSheetVideoDTO);
 
         }*/
 
-        //테이커 비디오 정보 빌드
-        TakerCueVideoDTO takerCueVideoDTO = TakerCueVideoDTO.builder()
+        TakerCueSheetVideoClipDTO takerCueSheetVideoClipDTO = TakerCueSheetVideoClipDTO.builder()
                 .title("media title") //미디어 제목
                 .playout_id("11") // clip Id
                 .seq("1")
                 .duration("01:30") // 미디어 길이
                 .build();
 
-        returnDTOList.add(takerCueVideoDTO);
+
+        //테이커 비디오 정보 빌드
+        TakerCueSheetVideoDTO takerCueSheetVideoDTO = TakerCueSheetVideoDTO.builder()
+                .takerCueSheetVideoClipDTO(takerCueSheetVideoClipDTO)
+                .build();
+
+        returnDTOList.add(takerCueSheetVideoDTO);
 
         return returnDTOList;
     }

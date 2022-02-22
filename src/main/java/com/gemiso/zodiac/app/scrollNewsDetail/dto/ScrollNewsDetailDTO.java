@@ -16,10 +16,8 @@ import lombok.NoArgsConstructor;
 public class ScrollNewsDetailDTO {
 
     private Long id;
-    private String category;
-    private String categoryNm;
     private String titl;
     private int cttOrd;
-    private String ctt;
+    private String cttJson;
     private ScrollNewsSimpleDTO scrollNews;
 }

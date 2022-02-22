@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.cueSheetTemplateSymbol;
 
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolCreateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolUpdateDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
@@ -48,26 +49,26 @@ public class CueTmplSymbolController {
     @Operation(summary = "큐시트 템플릿 방송아이콘 등록", description = "큐시트 템플릿 방송아이콘 등록")
     @PostMapping(path = "/{cueTmpltItemId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public AnsApiResponse<CueTmplSymbolDTO> create(@Parameter(name = "cueTmpltItemId", required = true, description = "큐시트 템플릿 아이템 아이디")
+    public AnsApiResponse<CueTmplSymbolSimpleDTO> create(@Parameter(name = "cueTmpltItemId", required = true, description = "큐시트 템플릿 아이템 아이디")
                                                    @PathVariable("cueTmpltItemId") Long cueTmpltItemId,
                                                    @Parameter(description = "필수값<br> ", required = true)
                                                    @RequestBody @Valid CueTmplSymbolCreateDTO cueTmplSymbolCreateDTO) {
 
-        cueTmplSymbolService.create(cueTmpltItemId, cueTmplSymbolCreateDTO);
+        CueTmplSymbolSimpleDTO cueTmplSymbolSimpleDTO = cueTmplSymbolService.create(cueTmpltItemId, cueTmplSymbolCreateDTO);
 
-        return AnsApiResponse.ok();
+        return new AnsApiResponse<>(cueTmplSymbolSimpleDTO);
     }
 
     @Operation(summary = "큐시트 템플릿 방송아이콘 수정", description = "큐시트 템플릿 방송아이콘 수정")
     @PutMapping(path = "/{cueTmpltItemId}")
-    public AnsApiResponse<?> update(@Parameter(name = "cueTmpltItemId", description = "큐시트 템플릿 아이템 아이디")
+    public AnsApiResponse<CueTmplSymbolSimpleDTO> update(@Parameter(name = "cueTmpltItemId", description = "큐시트 템플릿 아이템 아이디")
                                     @PathVariable("cueTmpltItemId") Long cueTmpltItemId,
                                     @Parameter(description = "필수값<br> ", required = true)
                                     @RequestBody @Valid CueTmplSymbolUpdateDTO cueTmplSymbolUpdateDTO) {
 
-        cueTmplSymbolService.update(cueTmpltItemId, cueTmplSymbolUpdateDTO);
+        CueTmplSymbolSimpleDTO cueTmplSymbolSimpleDTO = cueTmplSymbolService.update(cueTmpltItemId, cueTmplSymbolUpdateDTO);
 
-        return AnsApiResponse.ok();
+        return new AnsApiResponse<>(cueTmplSymbolSimpleDTO);
     }
 
     @Operation(summary = "큐시트 템플릿 방송아이콘 삭제", description = "큐시트 템플릿 방송아이콘 삭제")

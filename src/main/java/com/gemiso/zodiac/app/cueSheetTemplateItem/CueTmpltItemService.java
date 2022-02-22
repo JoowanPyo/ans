@@ -294,6 +294,9 @@ public class CueTmpltItemService {
 
         QCueTmpltItem qCueTmpltItem = QCueTmpltItem.cueTmpltItem;
 
+        //삭제처리 목록조회에서 배제
+        booleanBuilder.and(qCueTmpltItem.delYn.eq("N"));
+        
         //검색조건이 큐시트템플릿 아이디가 들어올 경우
         if (ObjectUtils.isEmpty(cueTmpltId) == false){
             booleanBuilder.and(qCueTmpltItem.cueSheetTemplate.cueTmpltId.eq(cueTmpltId));

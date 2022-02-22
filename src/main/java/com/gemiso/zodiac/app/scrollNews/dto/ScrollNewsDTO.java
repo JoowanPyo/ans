@@ -42,5 +42,6 @@ public class ScrollNewsDTO {
     private String updtrNm;
     private String delrId;
     private String delrNm;
+    private String cgText;
     private List<ScrollNewsDetailDTO> scrollNewsDetail = new ArrayList<>();
 }

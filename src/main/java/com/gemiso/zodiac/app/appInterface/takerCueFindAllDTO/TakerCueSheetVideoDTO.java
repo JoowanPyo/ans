@@ -5,10 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -16,9 +15,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NoArgsConstructor
 @XmlRootElement(name = "video")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TakerCueVideoDTO {
+public class TakerCueSheetVideoDTO {
 
-    @XmlAttribute
+    @XmlElement(name = "clip")
+    private TakerCueSheetVideoClipDTO takerCueSheetVideoClipDTO;
+
+    /*@XmlAttribute
     private String title;
 
     @XmlAttribute
@@ -28,6 +30,6 @@ public class TakerCueVideoDTO {
     private String seq;
 
     @XmlAttribute
-    private String duration;
+    private String duration;*/
 
 }

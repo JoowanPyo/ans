@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.app.scrollNews;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.scrollNews.dto.ScrollNewsCreateDTO;
 import com.gemiso.zodiac.app.scrollNews.dto.ScrollNewsDTO;
 import com.gemiso.zodiac.app.scrollNews.dto.ScrollNewsSimpleDTO;
@@ -70,7 +72,7 @@ public class ScrollNewsService {
     }
 
     //스크롤 뉴스 등록
-    public Long create(ScrollNewsCreateDTO scrollNewsCreateDTO) {
+    public Long create(ScrollNewsCreateDTO scrollNewsCreateDTO) throws Exception {
 
         String userId = userAuthService.authUser.getUserId(); //토큰 사용자 아이디 get
         scrollNewsCreateDTO.setInputrId(userId); //입력자 set
@@ -87,7 +89,7 @@ public class ScrollNewsService {
         return scrlNewsId;
     }
 
-    public void update(ScrollNewsUpdateDTO scrollNewsUpdateDTO, Long scrlNewsId) {
+    public void update(ScrollNewsUpdateDTO scrollNewsUpdateDTO, Long scrlNewsId) throws Exception {
 
         ScrollNews scrollNews = findScrollNews(scrlNewsId); //스크롤뉴스 아이디로 조회 및 존재유무 확인
 
@@ -123,7 +125,7 @@ public class ScrollNewsService {
     }
 
     //스크롤 뉴스 상세 업데이트
-    public void updateDetail(List<ScrollNewsDetailCreateDTO> scrollNewsDetailCreateDTO, Long scrlNewsId) {
+    public void updateDetail(List<ScrollNewsDetailCreateDTO> scrollNewsDetailCreateDTO, Long scrlNewsId) throws Exception {
 
         //스크롤뉴스 상세 List조회[기존에 등록되어 있던 스크롤뉴스 상세 삭재 후 재등록]
         List<ScrollNewsDetail> scrollNewsDetails = scrollNewsDetailRepository.findDetailsList(scrlNewsId);
@@ -139,7 +141,7 @@ public class ScrollNewsService {
     }
 
     //스크롤 뉴스 상세 리스트 등록
-    public void createDetail(List<ScrollNewsDetailCreateDTO> scrollNewsDetailCreateDTO, Long scrlNewsId) {
+    public void createDetail(List<ScrollNewsDetailCreateDTO> scrollNewsDetailCreateDTO, Long scrlNewsId) throws Exception {
 
         //스크롤 뉴스 상세에 등록할 스크롤 뉴스 아이디 빌드
         ScrollNewsSimpleDTO scrollNewsSimpleDTO = ScrollNewsSimpleDTO.builder().scrlNewsId(scrlNewsId).build();
@@ -147,6 +149,13 @@ public class ScrollNewsService {
         //스크를 뉴스 상세 등록DTO 리스트 등록
         for (ScrollNewsDetailCreateDTO dto : scrollNewsDetailCreateDTO) {
 
+            //내용 Json타입으로 변환
+            String ctt = dto.getCttJson();
+            if (ctt != null && ctt.trim().isEmpty() == false){
+                ctt = entityToJson(ctt);
+            }
+
+            dto.setCttJson(ctt);//내용 Json타입으로 변환
             dto.setScrollNews(scrollNewsSimpleDTO);//스크롤 뉴스 아이디 set
             ScrollNewsDetail scrollNewsDetail = scrollNewsDetailCreateMapper.toEntity(dto);//스크롤 뉴스 상세DTO 엔티티 변환
             scrollNewsDetailRepository.save(scrollNewsDetail);//스크롤 뉴스 상세 등록
@@ -154,6 +163,18 @@ public class ScrollNewsService {
         }
 
     }
+
+    //내용 Json변환
+    //기사 액션로그 엔티티 Json변환
+    public String entityToJson(String ctt) throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String jsonInString = mapper.writeValueAsString(ctt);
+
+        return jsonInString;
+    }
+
 
     //스크롤뉴스 아이디로 조회 및 존재유무 확인
     public ScrollNews findScrollNews(Long scrlNewsId) {

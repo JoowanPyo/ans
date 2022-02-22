@@ -70,7 +70,7 @@ public class ScrollNewsController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<ScrollNewsSimpleDTO> create(@Parameter(description = "필수값<br> titl[제목], fileNm[파일명]" +
-            ",trnsfStCd[전송상태]", required = true) @RequestBody @Valid ScrollNewsCreateDTO scrollNewsCreateDTO) {
+            ",trnsfStCd[전송상태]", required = true) @RequestBody @Valid ScrollNewsCreateDTO scrollNewsCreateDTO) throws Exception {
 
         Long scrlNewsId = scrollNewsService.create(scrollNewsCreateDTO);
 
@@ -85,7 +85,7 @@ public class ScrollNewsController {
     public AnsApiResponse<ScrollNewsSimpleDTO> update(@Parameter(name = "scrlNewsId", required = true, description = "스크롤 뉴스 아이디", in = ParameterIn.PATH)
                                                       @PathVariable("scrlNewsId") Long scrlNewsId,
                                                       @Parameter(description = "필수값<br> titl[제목], fileNm[파일명],trnsfStCd[전송상태]", required = true)
-                                                      @RequestBody @Valid ScrollNewsUpdateDTO scrollNewsUpdateDTO) {
+                                                      @RequestBody @Valid ScrollNewsUpdateDTO scrollNewsUpdateDTO) throws Exception {
 
         scrollNewsService.update(scrollNewsUpdateDTO, scrlNewsId);
 

@@ -84,6 +84,9 @@ public class ScrollNews extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
     private String delrNm;
 
+    @Column(name = "cg_text", columnDefinition = "text")
+    private String cgText;
+
     @OneToMany(mappedBy = "scrollNews")
     @JsonManagedReference
     private List<ScrollNewsDetail> scrollNewsDetail = new ArrayList<>();

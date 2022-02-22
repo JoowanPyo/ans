@@ -118,5 +118,5 @@ public class TakerCueSheetSpareDTO {
     @XmlElement(name = "input_dtm")
     private String inputDtm;
     @XmlElement(name = "video")
-    private List<TakerCueVideoDTO> takerCueVideoDTO = new ArrayList<>();
+    private List<TakerCueSheetVideoDTO> takerCueSheetVideoDTO = new ArrayList<>();
 }

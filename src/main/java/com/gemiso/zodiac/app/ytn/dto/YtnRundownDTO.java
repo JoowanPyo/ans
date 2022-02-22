@@ -19,7 +19,7 @@ public class YtnRundownDTO {
     private String brdcDtm;
     private String brdcStartDtm;
     private String brdcEndDtm;
-    private int ord;
+    private String ord;
     private String frm;
     private String mc;
     private String rprt;

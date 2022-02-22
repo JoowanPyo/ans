@@ -92,7 +92,7 @@ public class YtnRundownService {
                         .brdcDtm(ytnRundownCreateDTO.getBrdcDate())
                         .brdcStartDtm(ytnRundownCreateDTO.getStartTime())
                         .brdcEndDtm(ytnRundownCreateDTO.getEndTime())
-                        .ord(stringToInt(ytnRowDTO.getNO()))
+                        .ord(ytnRowDTO.getNO())
                         .frm(ytnRowDTO.getFORM())
                         .mc(ytnRowDTO.getMC())
                         .rprt(ytnRowDTO.getREPORTER())
@@ -119,7 +119,7 @@ public class YtnRundownService {
                         .brdcDtm(ytnRundownCreateDTO.getBrdcDate())
                         .brdcStartDtm(ytnRundownCreateDTO.getStartTime())
                         .brdcEndDtm(ytnRundownCreateDTO.getEndTime())
-                        .ord(stringToInt(ytnRowDTO.getNO()))
+                        .ord(ytnRowDTO.getNO())
                         .frm(ytnRowDTO.getFORM())
                         .mc(ytnRowDTO.getMC())
                         .rprt(ytnRowDTO.getREPORTER())
@@ -150,7 +150,7 @@ public class YtnRundownService {
 
         //1개에 데이터만 필요하기 때문에 ytnRowDTO 1개 생성후 리스트에 add
         YtnRowDTO ytnRowDTO = YtnRowDTO.builder()
-                .NO(intToString(ytnRundownDTO.getOrd()))
+                .NO(ytnRundownDTO.getOrd())
                 .MC(ytnRundownDTO.getMc())
                 .TITLE(ytnRundownDTO.getTitle())
                 .FORM(ytnRundownDTO.getFrm())

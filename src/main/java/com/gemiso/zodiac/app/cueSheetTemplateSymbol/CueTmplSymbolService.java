@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolCreateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolUpdateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.mapper.CueTmplSymbolCreateMapper;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.mapper.CueTmplSymbolMapper;
@@ -60,7 +61,7 @@ public class CueTmplSymbolService {
     }
 
     //큐시트 템플릿 아이템 방송아이콘 등록 단건
-    public void create(Long cueTmpltItemId, CueTmplSymbolCreateDTO cueTmplSymbolCreateDTO){
+    public CueTmplSymbolSimpleDTO create(Long cueTmpltItemId, CueTmplSymbolCreateDTO cueTmplSymbolCreateDTO){
 
         //큐시트 아이템 방송아이콘에 넣어줄 큐시트아이템 아이디 빌드
         CueTmpltItemSimpleDTO cueTmpltItemSimpleDTO = CueTmpltItemSimpleDTO.builder().cueTmpltItemId(cueTmpltItemId).build();
@@ -71,12 +72,15 @@ public class CueTmplSymbolService {
 
         Long id = cueTmplSymbol.getId();
 
-        //return id;
+        CueTmplSymbolSimpleDTO cueTmplSymbolSimpleDTO = new CueTmplSymbolSimpleDTO();
+        cueTmplSymbolSimpleDTO.setId(id);
+
+        return cueTmplSymbolSimpleDTO;
 
     }
 
     //큐시트 템플릿 아이템 방송아이콘 수정
-    public void update(Long cueTmpltItemId, CueTmplSymbolUpdateDTO cueTmplSymbolUpdateDTO){
+    public CueTmplSymbolSimpleDTO update(Long cueTmpltItemId, CueTmplSymbolUpdateDTO cueTmplSymbolUpdateDTO){
 
         List<CueTmplSymbol> cueTmplSymbolList = cueTmplSymbolRepository.findCueTmplSymbol(cueTmpltItemId);
 
@@ -97,6 +101,13 @@ public class CueTmplSymbolService {
         CueTmplSymbol cueTmplSymbol = cueTmplSymbolUpdateMapper.toEntity(cueTmplSymbolUpdateDTO);
 
         cueTmplSymbolRepository.save(cueTmplSymbol);
+
+        Long id = cueTmplSymbol.getId();
+
+        CueTmplSymbolSimpleDTO cueTmplSymbolSimpleDTO = new CueTmplSymbolSimpleDTO();
+        cueTmplSymbolSimpleDTO.setId(id);
+
+        return cueTmplSymbolSimpleDTO;
     }
 
     //큐시트 템플릿 아이템 방송아이콘 삭제
