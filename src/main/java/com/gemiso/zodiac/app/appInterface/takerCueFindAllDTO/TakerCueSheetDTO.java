@@ -32,7 +32,7 @@ public class TakerCueSheetDTO {
     @XmlElement(name="rd_ord")
     private int rdOrd;
     @XmlElement(name="rd_ord_mrk")
-    private int rdOrdMrk;
+    private String rdOrdMrk;
     @XmlElement(name="rd_dtl_div_cd")
     private String rdDtlDivCd;
     @XmlElement(name="mc_st_cd")

@@ -4,6 +4,7 @@ import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.ArticleRepository;
 import com.gemiso.zodiac.app.article.ArticleService;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
@@ -195,7 +196,37 @@ public class CueSheetItemService {
             createCap(cueSheetItemCapDTOList, cueItemId, userId);//큐시트 아이템 자막 리스트 등록
         }
 
+        int cueItemOrd = cueSheetItemCreateDTO.getCueItemOrd();
+
+        ordUpdate( cueId,  cueItemId,  cueItemOrd);
+
         return cueItemId;//return 큐시트 아이템 아이디
+    }
+
+    public void createTemplate(List<CueSheetItemCreateDTO> cueSheetItemCreateDTOList, Long cueId){
+
+        //큐시트 아이디 등록
+        CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
+
+        for (CueSheetItemCreateDTO cueSheetItemCreateDTO : cueSheetItemCreateDTOList) {
+            cueSheetItemCreateDTO.setCueSheet(cueSheetDTO);
+            //토큰 사용자 Id(현재 로그인된 사용자 ID)
+            String userId = userAuthService.authUser.getUserId();
+            cueSheetItemCreateDTO.setInputrId(userId);
+
+            CueSheetItem cueSheetItem = cueSheetItemCreateMapper.toEntity(cueSheetItemCreateDTO);
+            cueSheetItemRepository.save(cueSheetItem); //큐시트아이템 등록
+
+            Long cueItemId = cueSheetItem.getCueItemId();
+
+            //큐시트 아이템 자막 리스트 get
+            List<CueSheetItemCapCreateDTO> cueSheetItemCapDTOList = cueSheetItemCreateDTO.getCueSheetItemCap();
+            //큐시트 아이템 자막 리스트가 있으면 등록
+            if (CollectionUtils.isEmpty(cueSheetItemCapDTOList) == false) {
+                createCap(cueSheetItemCapDTOList, cueItemId, userId);//큐시트 아이템 자막 리스트 등록
+            }
+        }
+
     }
 
     //큐시트 아이템 자막 등록
@@ -301,48 +332,56 @@ public class CueSheetItemService {
 
         cueSheetItemMapper.updateFromDto(cueSheetItemDTO, cueSheetItem);
 
-        cueSheetItemRepository.save(cueSheetItem);
-
         //큐시트 아이템 삭제시 포함된 기사(복사된 기사)도 삭제
         Article article = cueSheetItem.getArticle();
         if (ObjectUtils.isEmpty(article) == false){
             Long artclId = article.getArtclId();
-            articleService.deleteCueItem(artclId);
+            Article chkArticle = articleService.articleFindOrFailCueItem(artclId);
+
+            if (ObjectUtils.isEmpty(chkArticle) == false){
+                articleService.deleteCueItem(artclId);
+            }
+            cueSheetItem.setArticle(null);
         }
+
+        cueSheetItemRepository.save(cueSheetItem);
+
+
     }
 
-    public void ordUpdate( Long cueId, Long cueItemId, int cueItemOrd){
+    public void ordCdUpdate(Long cueId, List<CueSheetItemOrdUpdateDTO> cueSheetItemOrdUpdateDTOList){
 
-
-        CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
-
-        CueSheetItemDTO updateCueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
-        updateCueSheetItemDTO.setCueItemOrd(cueItemOrd);
-
-        cueSheetItemMapper.updateFromDto(updateCueSheetItemDTO, cueSheetItem);
-        cueSheetItemRepository.save(cueSheetItem); //큐시트아이템 등록
-
-        //큐시트 아이템 순번 재등록
         List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
 
-        for (int i =  cueSheetItemList.size() - 1; i >= 0 ; i--){
-            if (!cueItemId.equals(cueSheetItemList.get(i).getCueItemId())){
-                continue;
+        // 조회된 큐시트아이템 리스트와 업데이트할 리스트 size가 같아야 한다.
+        if (cueSheetItemList.size() == cueSheetItemOrdUpdateDTOList.size()) { 
+
+            for (CueSheetItem cueSheetItem : cueSheetItemList) { //조회된 원본 큐시트 아이템
+
+                Long orgCueItemId = cueSheetItem.getCueItemId();//원본 큐시트 아이템 아이디를 가져온다.
+
+                //순번과 순번코드를 새로 등록할 큐시트아이템 DTO리스트
+                for (CueSheetItemOrdUpdateDTO cueSheetItemOrdUpdateDTO : cueSheetItemOrdUpdateDTOList) {
+
+                    Long newCueItemId = cueSheetItemOrdUpdateDTO.getCueItemId(); //업데이트된 순서정보 큐시트아이템 아이디를 가져온다.
+                    int newOrd = cueSheetItemOrdUpdateDTO.getCueItemOrd(); //업데이트할 순서
+                    String newOrdCd = cueSheetItemOrdUpdateDTO.getCueItemOrdCd(); //업데이트할 순서코드
+
+                    //조회된 큐시트 아이디와 업데이트 큐시트 아이디가 같으면 순서,순서코드 업데이트후 수정.
+                    if (orgCueItemId.equals(newCueItemId)) {
+
+                        cueSheetItem.setCueItemOrd(newOrd);
+                        cueSheetItem.setCueItemOrdCd(newOrdCd);
+
+                        cueSheetItemRepository.save(cueSheetItem);
+                        continue;
+                    }
+
+                }
+
             }
-            cueSheetItemList.remove(i);//신규 등록된 큐시트 아이템 리스트에서 삭제
-        }
-
-        cueSheetItemList.add(cueItemOrd, cueSheetItem); //신규등록하려는 큐시트 아이템 원하는 순번에 리스트 추가
-
-        //조회된 큐시트 아이템 Ord 업데이트
-        int index = 0;
-        for (CueSheetItem cueSheetItems : cueSheetItemList){
-
-            CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItems);
-            cueSheetItemDTO.setCueItemOrd(index);//순번 재등록
-            CueSheetItem setCueSheetItem = cueSheetItemMapper.toEntity(cueSheetItemDTO);
-            cueSheetItemRepository.save(setCueSheetItem);//순번 업데이트
-            index++;//순번 + 1
+        }else{
+            throw new ResourceNotFoundException("조회된 큐시트아이템과 업데이트할 큐시트아이템 값이 맞지 않습니다.");
         }
 
     }
@@ -744,6 +783,42 @@ public class CueSheetItemService {
         cueSheetSimpleDTO.setCueId(cueId);
 
         return cueSheetSimpleDTO;
+    }
+
+    public void ordUpdate( Long cueId, Long cueItemId, int cueItemOrd){
+
+
+        CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
+
+        CueSheetItemDTO updateCueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
+        updateCueSheetItemDTO.setCueItemOrd(cueItemOrd);
+
+        cueSheetItemMapper.updateFromDto(updateCueSheetItemDTO, cueSheetItem);
+        cueSheetItemRepository.save(cueSheetItem); //큐시트아이템 등록
+
+        //큐시트 아이템 순번 재등록
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
+
+        for (int i =  cueSheetItemList.size() - 1; i >= 0 ; i--){
+            if (!cueItemId.equals(cueSheetItemList.get(i).getCueItemId())){
+                continue;
+            }
+            cueSheetItemList.remove(i);//신규 등록된 큐시트 아이템 리스트에서 삭제
+        }
+
+        cueSheetItemList.add(cueItemOrd, cueSheetItem); //신규등록하려는 큐시트 아이템 원하는 순번에 리스트 추가
+
+        //조회된 큐시트 아이템 Ord 업데이트
+        int index = 0;
+        for (CueSheetItem cueSheetItems : cueSheetItemList){
+
+            CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItems);
+            cueSheetItemDTO.setCueItemOrd(index);//순번 재등록
+            CueSheetItem setCueSheetItem = cueSheetItemMapper.toEntity(cueSheetItemDTO);
+            cueSheetItemRepository.save(setCueSheetItem);//순번 업데이트
+            index++;//순번 + 1
+        }
+
     }
 
 

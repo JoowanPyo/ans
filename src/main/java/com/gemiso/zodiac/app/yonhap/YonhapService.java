@@ -151,14 +151,14 @@ public class YonhapService {
             try {
                 yonhapRepository.save(yonhapEntity);
                 yonhapId = yonhapEntity.getYonhapId();
-            }catch (Exception e){
+            }catch (RuntimeException e){
                 return new YonhapExceptionDomain(yonhapId, "5001", "yonhap", e.getMessage(), "");
             }
             // 파일등록
             if (yonhapCreateDTO.getUpload_files() != null && yonhapCreateDTO.getUpload_files().size() > 0) {
                 try {
                     uploadYonhapFiles(yonhapId, yonhapCreateDTO.getUpload_files(), "07");
-                }catch (Exception e){
+                }catch (RuntimeException e){
                     return new YonhapExceptionDomain(yonhapId, "5002", "yonhap", e.getMessage(), "");
                 }
             }
@@ -196,7 +196,7 @@ public class YonhapService {
             try {
                 yonhapRepository.save(yonhapEntity);
                 yonhapId = yonhapEntity.getYonhapId();
-            }catch (Exception e){
+            }catch (RuntimeException e){
                 return new YonhapExceptionDomain(yonhapId, "5001", "yonhap", e.getMessage(), "");
             }
 
@@ -204,7 +204,7 @@ public class YonhapService {
             if (yonhapCreateDTO.getUpload_files() != null && yonhapCreateDTO.getUpload_files().size() > 0) {
                 try {
                     uploadYonhapFiles(yonhapId, yonhapCreateDTO.getUpload_files(), "07");
-                }catch (Exception e){
+                }catch (RuntimeException e){
                     return new YonhapExceptionDomain(yonhapId, "5002", "yonhap", e.getMessage(), "");
                 }
             }

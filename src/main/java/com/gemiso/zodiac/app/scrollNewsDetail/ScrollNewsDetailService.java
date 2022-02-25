@@ -1,10 +1,7 @@
 package com.gemiso.zodiac.app.scrollNewsDetail;
 
-import com.gemiso.zodiac.app.scrollNews.QScrollNews;
-import com.gemiso.zodiac.app.scrollNews.ScrollNews;
 import com.gemiso.zodiac.app.scrollNewsDetail.dto.ScrollNewsDetailDTO;
 import com.gemiso.zodiac.app.scrollNewsDetail.mapper.ScrollNewsDetailMapper;
-import com.gemiso.zodiac.app.scrollNewsDetail.mapper.ScrollNewsDetailUpdateMapper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +25,10 @@ public class ScrollNewsDetailService {
     private final ScrollNewsDetailMapper scrollNewsDetailMapper;
 
     //스크롤 뉴스 상세 목록조회
-    public List<ScrollNewsDetailDTO> findAll(Long scrlNewsId, String category){
+    public List<ScrollNewsDetailDTO> findAll(Long scrlNewsId){
 
         //목록조회 조건 빌드
-        BooleanBuilder booleanBuilder = getSearch(scrlNewsId, category);
+        BooleanBuilder booleanBuilder = getSearch(scrlNewsId);
 
         //빌드된 조회 조건으로 엔티티 목록조회
         List<ScrollNewsDetail> scrollNewsDetailList =
@@ -83,7 +80,7 @@ public class ScrollNewsDetailService {
     }
 
     //스크롤 뉴스 상세 목록조회 조회조건 빌드
-    public BooleanBuilder getSearch(Long scrlNewsId, String category){
+    public BooleanBuilder getSearch(Long scrlNewsId){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -95,9 +92,9 @@ public class ScrollNewsDetailService {
         }
 
         //카테고리코드
-        if (category != null && category.trim().isEmpty() == false){
+        /*if (category != null && category.trim().isEmpty() == false){
             booleanBuilder.and(qScrollNewsDetail.category.eq(category));
-        }
+        }*/
 
         return booleanBuilder;
     }

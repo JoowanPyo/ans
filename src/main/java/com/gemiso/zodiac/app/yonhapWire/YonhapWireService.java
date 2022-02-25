@@ -24,6 +24,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.EntityExistsException;
+import javax.persistence.PersistenceException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -306,19 +308,19 @@ public class YonhapWireService {
 
             try {
                 yonhapWireRepository.save(yonhapWire); //외신 aptn 등록
-            }catch (Exception e){
+            }catch (RuntimeException e){
                 return new YonhapExceptionDomain(aptnId, "5001", "yonhapAptn", e.getMessage(), "");
             }
 
-            List<YonhapAttachFileCreateDTO> attachFileList = yonhapAptnCreateDTO.getUpload_files();
+            /*List<YonhapAttachFileCreateDTO> attachFileList = yonhapAptnCreateDTO.getUpload_files();
 
             if (CollectionUtils.isEmpty(attachFileList) == false){
                 try {
                     yonhapService.uploadYonhapFiles(aptnId, attachFileList, "08");
-                }catch (Exception e){
+                }catch (RuntimeException e){
                     return new YonhapExceptionDomain(aptnId, "5002", "yonhapAptn", e.getMessage(), "");
                 }
-            }
+            }*/
             
         }else {
 
@@ -333,20 +335,20 @@ public class YonhapWireService {
             try {
                 yonhapWireRepository.save(yonhapWire); //외신 aptn 등록
                 aptnId = yonhapWire.getWireId();
-            }catch (Exception e){
+            }catch (RuntimeException e){
                 return new YonhapExceptionDomain(aptnId, "5001", "yonhapAptn", e.getMessage(), "");
             }
 
-            List<YonhapAttachFileCreateDTO> attachFileList = yonhapAptnCreateDTO.getUpload_files();
+            /*List<YonhapAttachFileCreateDTO> attachFileList = yonhapAptnCreateDTO.getUpload_files();
 
             //파일등록
             if (CollectionUtils.isEmpty(attachFileList) == false){
                 try {
                     yonhapService.uploadYonhapFiles(aptnId, attachFileList, "08");
-                }catch (Exception e){
+                }catch (RuntimeException e){
                     return new YonhapExceptionDomain(aptnId, "5002", "yonhapAptn", e.getMessage(), "");
                 }
-            }
+            }*/
             
         }
 
@@ -377,7 +379,7 @@ public class YonhapWireService {
 
             try {
                 yonhapWireRepository.save(yonhapWire); //외신 aptn 등록
-            }catch (Exception e){
+            }catch (RuntimeException e){
                 return new YonhapExceptionDomain(reuterId, "5001", "yonhapAptn", e.getMessage(), "");
             }
 
@@ -394,7 +396,7 @@ public class YonhapWireService {
             try {
                 yonhapWireRepository.save(yonhapWire); //외신 aptn 등록
                 reuterId = yonhapWire.getWireId();
-            }catch (Exception e){
+            }catch (RuntimeException e){
                 return new YonhapExceptionDomain(reuterId, "5001", "yonhapAptn", e.getMessage(), "");
             }
 

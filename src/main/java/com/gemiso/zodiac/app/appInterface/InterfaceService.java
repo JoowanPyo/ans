@@ -345,6 +345,8 @@ public class InterfaceService {
 
         List<TakerCueSheetSpareDTO> takerCueSheetSpareDTOList = new ArrayList<>();
 
+        int rdSeq = 1; //순번값 set
+
         for (CueSheetItem cueSheetItem : cueSheetItemList) {
             Article article = cueSheetItem.getArticle(); //큐시트 아이템에 기사정보get
             Issue issue = new Issue();
@@ -385,8 +387,6 @@ public class InterfaceService {
 
             List<TakerCueSheetVideoDTO> takerCueSheetVideoDTOList = getVideoDTOList(cueSheetMediaList);
 
-            int rdOrd = 0; //순번값 set
-
             if (ObjectUtils.isEmpty(article)) { //기사가 포함이 안된 큐시트 아이템 일시
 
                 //프로그램 아이디 get null에러 방지
@@ -399,11 +399,11 @@ public class InterfaceService {
                 //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
                 TakerCueSheetSpareDTO takerCueSheetDTO = TakerCueSheetSpareDTO.builder()
                         .brdcPgmId(brdcPgmId)
-                        .rdSeq(0)
+                        .rdSeq(rdSeq)
                         .chDivCd(cueSheet.getChDivCd()) // 채널구분코드
                         .cueDivCdNm(cueSheet.getCueDivCdNm()) //채널구분코드 명
                         .rdOrd(cueSheetItem.getCueItemOrd())//순번
-                        .rdOrdMrk(cueSheetItem.getCueItemOrd())//표시되는 순번
+                        .rdOrdMrk(cueSheetItem.getCueItemOrdCd())//표시되는 순번
                         .rdDtlDivCd(cueSheetItem.getCueItemDivCd()) //큐시트아이템 구분 코드
                         .mcStCd(cueSheetItem.getBrdcStCd()) //방송상태코드
                         .cmDivCd(returnSymbolId)//심볼 아이디 (채널명) ex VNS1, VNS2, VNS3
@@ -414,6 +414,8 @@ public class InterfaceService {
                         .build();
 
                 takerCueSheetSpareDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
+
+                ++rdSeq;
 
             } else {
                 //이슈아이디 get null에러 방지
@@ -436,13 +438,13 @@ public class InterfaceService {
                         .chDivCd(cueSheet.getChDivCd())// 채널구분코드
                         .cueDivCdNm(cueSheet.getCueDivCdNm())//채널구분코드 명
                         .rdOrd(cueSheetItem.getCueItemOrd())//큐시트 아이템 순번
-                        .rdOrdMrk(cueSheetItem.getCueItemOrd())//표시되는 순번
+                        .rdOrdMrk(cueSheetItem.getCueItemOrdCd())//표시되는 순번
                         .rdDtlDivCd(cueSheetItem.getCueItemDivCd()) //큐시트아이템 구분 코드
                         .mcStCd(cueSheetItem.getBrdcStCd()) //방송상태코드
                         .cmDivCd(returnSymbolId)//심볼 아이디 (채널명) ex VNS1, VNS2, VNS3
                         .rdDtlDivNm(cueSheetItem.getCueItemDivCdNm())//큐시트아이템 구분 코드 명
                         .mcStNm(cueSheetItem.getBrdcStCdNm())//방송상태 명
-                        .cmDivNm(cueSheet.getChDivCdNm())//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
+                        .cmDivNm(returnSymbolNm)//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
                         .artclId(article.getArtclId())
                         .artclFrmCd(article.getArtclFrmCd())
                         .artclFrmNm(article.getArtclFrmCdNm())
@@ -484,9 +486,9 @@ public class InterfaceService {
 
                 takerCueSheetSpareDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
 
+                ++rdSeq;
 
             }
-            ++rdOrd;
         }
 
         return takerCueSheetSpareDTOList;
@@ -497,12 +499,15 @@ public class InterfaceService {
     //큐시티 엔티티로 조회된 큐시트 TakerCueSheetDTO형식으로 빌드
     public List<TakerCueSheetDTO> cueSheetToTakerCueSheet(CueSheet cueSheet) {
 
-        List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem();//큐시트 엔티티에서 큐시트 아이템 리스트 get
+        //List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem();//큐시트 엔티티에서 큐시트 아이템 리스트 get
+
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueSheet.getCueId());
         List<TakerCueSheetDTO> takerCueSheetDTOList = new ArrayList<>();//테이커 큐시트 DTO를 담아서 리턴할 리스트
-        
+
+        int rdSeq = 1; //순번값 set
+
         for (CueSheetItem cueSheetItem : cueSheetItemList) {
             Article article = cueSheetItem.getArticle(); //큐시트 아이템에 기사정보get
-            Issue issue = new Issue();
 
             Long cueItemId = cueSheetItem.getCueItemId();
             //큐시트 아이템 방송아이콘 List 조회
@@ -540,113 +545,137 @@ public class InterfaceService {
 
             List<TakerCueSheetVideoDTO> takerCueSheetVideoDTOList = getVideoDTOList(cueSheetMediaList);
 
-            int rdOrd = 0; //순번값 set
-
             if (ObjectUtils.isEmpty(article)) { //기사가 포함이 안된 큐시트 아이템 일시
 
-                //프로그램 아이디 get null에러 방지
-                Program program = cueSheet.getProgram();
-                String brdcPgmId = "";
-                if (ObjectUtils.isEmpty(program) == false) {
-                    brdcPgmId = program.getBrdcPgmId();
-                }
 
                 //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
-                TakerCueSheetDTO takerCueSheetDTO = TakerCueSheetDTO.builder()
-                        .brdcPgmId(brdcPgmId)
-                        .rdSeq(0)
-                        .chDivCd(cueSheet.getChDivCd()) // 채널구분코드
-                        .cueDivCdNm(cueSheet.getCueDivCdNm()) //채널구분코드 명
-                        .rdOrd(cueSheetItem.getCueItemOrd())//순번
-                        .rdOrdMrk(cueSheetItem.getCueItemOrd())//표시되는 순번
-                        .rdDtlDivCd(cueSheetItem.getCueItemDivCd()) //큐시트아이템 구분 코드
-                        .mcStCd(cueSheetItem.getBrdcStCd()) //방송상태코드
-                        .cmDivCd(returnSymbolId)//심볼 아이디 (채널명) ex VNS1, VNS2, VNS3
-                        .rdDtlDivNm(cueSheetItem.getCueItemDivCdNm())//큐시트아이템 구분 코드 명
-                        .mcStNm(cueSheetItem.getBrdcStCdNm())//방송상태코드 명
-                        .cmDivNm(returnSymbolNm)//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
-                        .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
-                        .build();
+                TakerCueSheetDTO takerCueSheetDTO = buildTakerCue(cueSheet, cueSheetItem, rdSeq, returnSymbolId
+                        , returnSymbolNm, takerCueSheetVideoDTOList);
 
                 takerCueSheetDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
+
+                rdSeq++; //순서값 +
 
             } else {
-                //이슈아이디 get null에러 방지
-                issue = article.getIssue();
-                Long issueId = 0L;
-                if (ObjectUtils.isEmpty(issue) == false) {
-                    issueId = issue.getIssuId();
-                }
-                //프로그램 아이디 get null에러 방지
-                Program program = cueSheet.getProgram();
-                String brdcPgmId = "";
-                if (ObjectUtils.isEmpty(program) == false) {
-                    brdcPgmId = program.getBrdcPgmId();
-                }
 
                 //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
-                TakerCueSheetDTO takerCueSheetDTO = TakerCueSheetDTO.builder()
-                        .brdcPgmId(brdcPgmId)
-                        .rdSeq(0)
-                        .chDivCd(cueSheet.getChDivCd())// 채널구분코드
-                        .cueDivCdNm(cueSheet.getCueDivCdNm())//채널구분코드 명
-                        .rdOrd(cueSheetItem.getCueItemOrd())//큐시트 아이템 순번
-                        .rdOrdMrk(cueSheetItem.getCueItemOrd())//표시되는 순번
-                        .rdDtlDivCd(cueSheetItem.getCueItemDivCd()) //큐시트아이템 구분 코드
-                        .mcStCd(cueSheetItem.getBrdcStCd()) //방송상태코드
-                        .cmDivCd(returnSymbolId)//심볼 아이디 (채널명) ex VNS1, VNS2, VNS3
-                        .rdDtlDivNm(cueSheetItem.getCueItemDivCdNm())//큐시트아이템 구분 코드 명
-                        .mcStNm(cueSheetItem.getBrdcStCdNm())//방송상태 명
-                        .cmDivNm(cueSheet.getChDivCdNm())//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
-                        .artclId(article.getArtclId())
-                        .artclFrmCd(article.getArtclFrmCd())
-                        .artclFrmNm(article.getArtclFrmCdNm())
-                        .artclFldCd(article.getArtclFldCd())
-                        .artclFldNm(article.getArtclFldCdNm())
-                        .artclTitl(article.getArtclTitl())
-                        .rptrNm(article.getRptrNm())
-                        .deptCd(article.getDeptCd())
-                        .deptNm(article.getDeptNm())
-                        .artclReqdSec(Optional.ofNullable(article.getArtclReqdSec()).orElse(0))
-                        .artclSmryCtt(0)//???
-                        .artclDivCd(article.getArtclDivCd())
-                        .artclDivNm(article.getArtclDivCdNm())
-                        .issuId(issueId)
-                        .lckrId(article.getLckrId())
-                        .lckrNm(article.getLckrNm())
-                        .lckDtm(article.getLckDtm())
-                        .apprvDivCd(article.getApprvDivCd())
-                        .apprvDivNm(article.getApprvDivCdNm())
-                        .apprvDtm(article.getApprvDtm())
-                        .apprvrId(article.getApprvrId())
-                        .apprvrNm(article.getApprvrNm())
-                        .artclOrd(article.getArtclOrd())
-                        .brdcCnt(Optional.ofNullable(article.getBrdcCnt()).orElse(0))
-                        .orgArtclId(article.getOrgArtclId())
-                        .rptPlnId(article.getRptrId())
-                        .brdcFnshYn("")//???
-                        .urgYn(article.getUrgYn())
-                        .frnotiYn(article.getFrnotiYn())
-                        .embgYn(article.getEmbgYn())
-                        .updtLckYn(article.getLckYn())
-                        .internetOnlyYn("")//???
-                        .snsYn("")//???
-                        .inputrId(article.getInputrId())
-                        .inputrNm(article.getInputrNm())
-                        .inputDtm(dateToString(article.getInputDtm())) //Date형식의 입력일시를 String으로 변환
-                        .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
-                        .build();
+                TakerCueSheetDTO takerCueSheetDTO = buildTakerCueArticle(cueSheet, cueSheetItem, rdSeq, returnSymbolId
+                        ,returnSymbolNm,  takerCueSheetVideoDTOList, article);
 
                 takerCueSheetDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
 
+                rdSeq++; //순서값 +
 
             }
-            ++rdOrd;
         }
 
         return takerCueSheetDTOList;
     }
 
+    //테이커큐시트 정보 큐시트 엔티티 정보로 빌드( 기사 x)
+    public TakerCueSheetDTO buildTakerCue(CueSheet cueSheet, CueSheetItem cueSheetItem, int rdSeq
+            , String returnSymbolId, String returnSymbolNm, List<TakerCueSheetVideoDTO> takerCueSheetVideoDTOList){
+
+        //프로그램 아이디 get null에러 방지
+        Program program = cueSheet.getProgram();
+        String brdcPgmId = "";
+        if (ObjectUtils.isEmpty(program) == false) {
+            brdcPgmId = program.getBrdcPgmId();
+        }
+
+        //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
+        TakerCueSheetDTO takerCueSheetDTO = TakerCueSheetDTO.builder()
+                .brdcPgmId(brdcPgmId)
+                .rdSeq(rdSeq)
+                .chDivCd(cueSheet.getChDivCd()) // 채널구분코드
+                .cueDivCdNm(cueSheet.getCueDivCdNm()) //채널구분코드 명
+                .rdOrd(cueSheetItem.getCueItemOrd())//순번
+                .rdOrdMrk(cueSheetItem.getCueItemOrdCd())//표시되는 순번(알파벳? 숫자 같이 들어가 있고 안들어가는 부분이 있음)
+                .rdDtlDivCd(cueSheetItem.getCueItemDivCd()) //큐시트아이템 구분 코드
+                .mcStCd(cueSheetItem.getBrdcStCd()) //방송상태코드
+                .cmDivCd(returnSymbolId)//심볼 아이디 (채널명) ex VNS1, VNS2, VNS3
+                .rdDtlDivNm(cueSheetItem.getCueItemDivCdNm())//큐시트아이템 구분 코드 명
+                .mcStNm(cueSheetItem.getBrdcStCdNm())//방송상태코드 명
+                .cmDivNm(returnSymbolNm)//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
+                .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
+                .build();
+
+        return takerCueSheetDTO;
+    }
+
+    //테이커큐시트 정보 큐시트 엔티티 정보로 빌드( 기사 o)
+    public TakerCueSheetDTO buildTakerCueArticle(CueSheet cueSheet, CueSheetItem cueSheetItem, int rdSeq
+            , String returnSymbolId, String returnSymbolNm, List<TakerCueSheetVideoDTO> takerCueSheetVideoDTOList, Article article) {
+
+        //이슈아이디 get null에러 방지
+        Issue issue = article.getIssue();
+        Long issueId = 0L;
+        if (ObjectUtils.isEmpty(issue) == false) {
+            issueId = issue.getIssuId();
+        }
+        //프로그램 아이디 get null에러 방지
+        Program program = cueSheet.getProgram();
+        String brdcPgmId = "";
+        if (ObjectUtils.isEmpty(program) == false) {
+            brdcPgmId = program.getBrdcPgmId();
+        }
+
+        //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
+        TakerCueSheetDTO takerCueSheetDTO = TakerCueSheetDTO.builder()
+                .brdcPgmId(brdcPgmId)
+                .rdSeq(rdSeq)
+                .chDivCd(cueSheet.getChDivCd())// 채널구분코드
+                .cueDivCdNm(cueSheet.getCueDivCdNm())//채널구분코드 명
+                .rdOrd(cueSheetItem.getCueItemOrd())//큐시트 아이템 순번
+                .rdOrdMrk(cueSheetItem.getCueItemOrdCd())//표시되는 순번(알파벳? 숫자 같이 들어가 있고 안들어가는 부분이 있음)
+                .rdDtlDivCd(cueSheetItem.getCueItemDivCd()) //큐시트아이템 구분 코드
+                .mcStCd(cueSheetItem.getBrdcStCd()) //방송상태코드
+                .cmDivCd(returnSymbolId)//심볼 아이디 (채널명) ex VNS1, VNS2, VNS3
+                .rdDtlDivNm(cueSheetItem.getCueItemDivCdNm())//큐시트아이템 구분 코드 명
+                .mcStNm(cueSheetItem.getBrdcStCdNm())//방송상태 명
+                .cmDivNm(returnSymbolNm)//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
+                .artclId(article.getArtclId())
+                .artclFrmCd(article.getArtclFrmCd())
+                .artclFrmNm(article.getArtclFrmCdNm())
+                .artclFldCd(article.getArtclFldCd())
+                .artclFldNm(article.getArtclFldCdNm())
+                .artclTitl(article.getArtclTitl())
+                .rptrNm(article.getRptrNm())
+                .deptCd(article.getDeptCd())
+                .deptNm(article.getDeptNm())
+                .artclReqdSec(Optional.ofNullable(article.getArtclReqdSec()).orElse(0))
+                .artclSmryCtt(0)//???
+                .artclDivCd(article.getArtclDivCd())
+                .artclDivNm(article.getArtclDivCdNm())
+                .issuId(issueId)
+                .lckrId(article.getLckrId())
+                .lckrNm(article.getLckrNm())
+                .lckDtm(article.getLckDtm())
+                .apprvDivCd(article.getApprvDivCd())
+                .apprvDivNm(article.getApprvDivCdNm())
+                .apprvDtm(article.getApprvDtm())
+                .apprvrId(article.getApprvrId())
+                .apprvrNm(article.getApprvrNm())
+                .artclOrd(article.getArtclOrd())
+                .brdcCnt(Optional.ofNullable(article.getBrdcCnt()).orElse(0))
+                .orgArtclId(article.getOrgArtclId())
+                .rptPlnId(article.getRptrId())
+                .brdcFnshYn("")//???
+                .urgYn(article.getUrgYn())
+                .frnotiYn(article.getFrnotiYn())
+                .embgYn(article.getEmbgYn())
+                .updtLckYn(article.getLckYn())
+                .internetOnlyYn("")//???
+                .snsYn("")//???
+                .inputrId(article.getInputrId())
+                .inputrNm(article.getInputrNm())
+                .inputDtm(dateToString(article.getInputDtm())) //Date형식의 입력일시를 String으로 변환
+                .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
+                .build();
+
+        return takerCueSheetDTO;
+
+    }
     //큐시트 아이템 비디오 정보 get
     public List<TakerCueSheetVideoDTO> getVideoDTOList(List<CueSheetMedia> cueSheetMediaList){
 
@@ -1119,6 +1148,7 @@ public class InterfaceService {
                         .artclTitl(article.getArtclTitl()) //국문제목
                         .artclTitlEn(article.getArtclTitlEn()) // 영문제목
                         .artclCtt(article.getArtclCtt())
+                        .ancCtt(article.getAncMentCtt())//앵커맨트
                         .rptrId(article.getRptrId()) //기자 아이디
                         .rptrNm(article.getRptrNm()) //기자 명
                         .deptCd(article.getDeptCd())

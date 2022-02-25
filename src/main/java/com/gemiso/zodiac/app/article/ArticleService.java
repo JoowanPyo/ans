@@ -848,6 +848,20 @@ public class ArticleService {
 
     }
 
+    //기사 정보조회 존재여부 확인
+    public Article articleFindOrFailCueItem(Long artclId) {
+
+        Optional<Article> article = articleRepository.findArticle(artclId);
+
+        Article emptyArticle = null;
+        if (!article.isPresent()) {
+            return emptyArticle;
+        }
+
+        return article.get();
+
+    }
+
     //기사 목록조회시 조건 빌드[일반 목록조회 ]
     public BooleanBuilder getSearch(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
                                     String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,

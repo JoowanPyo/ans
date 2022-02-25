@@ -15,11 +15,12 @@ public class YonhapReuterCreateDTO {
     private String agcy_cd;
     private int brdc_cnt;
     private int grphc_count;
-    private String video_nm;
 
+    private String video_nm;
     private String wire_artcl_id;
     private String wire_artcl_titl;
     private String wire_artcl_ctt;
+    private String mam_cont_id;
 
     private int artcl_brdc_count;
 

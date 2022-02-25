@@ -67,7 +67,6 @@ public class CueSheetController {
         return new AnsApiResponse<>(cueSheetDTO);
     }
 
-
     @Operation(summary = "큐시트 등록", description = "큐시트 등록")
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
