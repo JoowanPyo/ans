@@ -33,7 +33,7 @@ public class Configuration extends AbstractConfiguration
             //System.getProperty key값이 실행되는 위치를 String으로 출력
             configfileName = System.getProperty("app.config.file", defaultFile.getAbsolutePath());
             log.info("configFileName    :" +configfileName);
-            this.configFileName = configfileName;
+            //this.configFileName = configfileName;
         } else {
             File fileName = new File(configUrl.getFile());
             //파일경로를 가져온다

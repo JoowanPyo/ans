@@ -12,15 +12,22 @@ import com.gemiso.zodiac.app.cueSheetHist.dto.CueSheetHistCreateDTO;
 import com.gemiso.zodiac.app.cueSheetHist.mapper.CueSheetHistCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
+import com.gemiso.zodiac.app.cueSheetItem.QCueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolDTO;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.mapper.CueSheetItemSymbolMapper;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgramService;
 import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
 import com.gemiso.zodiac.app.program.ProgramService;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
+import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.core.enumeration.ActionEnum;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -51,6 +58,7 @@ public class CueSheetService {
     private final CueSheetRepository cueSheetRepository;
     private final CueSheetItemRepository cueSheetItemRepository;
     private final CueSheetHistRepository cueSheetHistRepository;
+    private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
 
     private final CueSheetMapper cueSheetMapper;
     private final CueSheetCreateMapper cueSheetCreateMapper;
@@ -59,6 +67,7 @@ public class CueSheetService {
     private final CueSheetItemCreateMapper cueSheetItemCreateMapper;
     private final CueSheetItemMapper cueSheetItemMapper;
     private final CueSheetHistCreateMapper cueSheetHistCreateMapper;
+    private final CueSheetItemSymbolMapper cueSheetItemSymbolMapper;
 
     private final ProgramService programService;
     private final UserAuthService userAuthService;
@@ -272,37 +281,87 @@ public class CueSheetService {
 
         CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetDTO.getCueSheetItem();
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemFindAll(cueId);
 
-        List<CueSheetItemDTO> newCueSheetItemDTOList = new ArrayList<>();
-        for (Iterator<CueSheetItemDTO> itr = cueSheetItemDTOList.iterator(); itr.hasNext();){
-
-            CueSheetItemDTO cueSheetItemDTO = itr.next();
-
-            String delYn = cueSheetItemDTO.getDelYn();//큐시트 아이템의 삭제여부 값
-            ArticleCueItemDTO articleCueItemDTO = cueSheetItemDTO.getArticle();//큐시트 아이템의 기사 정보 get
-
-            if (ObjectUtils.isEmpty(articleCueItemDTO) == false){ //큐시트 아이템에 기사가 포함된 경우.
-                String articleDelYn = articleCueItemDTO.getDelYn();//큐시트 아이템에 포함된 기사의 삭제 여부값
-                if ("Y".equals(articleDelYn)){ //기사 삭제 값이 Y인경우 조회된 큐시트아이템 삭제
-                    continue;
-                }
-                /*articleCueItemDTO = symbolUrlSet(articleCueItemDTO);//기사에 방송아이콘의 방송아이콘URL 추가.
-                cueSheetItemDTO.setArticle(articleCueItemDTO);//방송아이콘 추가한 기사 큐시트 아이템에 set*/
-            }
-            if ("Y".equals(delYn)) { //조회된 큐시트 아이템 삭제여부값이 Y인 경우/.
-                continue;
-            }
-
-            newCueSheetItemDTOList.add(cueSheetItemDTO);
-        }
-        cueSheetDTO.setCueSheetItem(newCueSheetItemDTOList);
+        cueSheetDTO.setCueSheetItem(cueSheetItemDTOList);
 
         return cueSheetDTO;
 
     }
+    
+    //큐시트아이템 목록조회(검색조건 :  큐시트 아이디)
+    public List<CueSheetItemDTO> cueSheetItemFindAll(Long cueId){
 
-    //큐시트 등록
+        BooleanBuilder booleanBuilder = getSearchCueItem(cueId);
+
+        List<CueSheetItem> cueSheetItemList = (List<CueSheetItem>) cueSheetItemRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "cueItemOrd"));
+
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
+
+        cueSheetItemDTOList = setSymbol(cueSheetItemDTOList);
+
+        return cueSheetItemDTOList;
+    }
+
+    //방송아이콘 url 추가
+    public List<CueSheetItemDTO> setSymbol(List<CueSheetItemDTO> cueSheetItemDTOList){
+
+        for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList){ //조회된 아이템에 List
+
+            Long cueItemId = cueSheetItemDTO.getCueItemId(); //아이템 아이디 get
+
+            //아이템 아이디로 방송아이콘 맵핑테이블 조회
+            List<CueSheetItemSymbol> cueSheetItemSymbolList = cueSheetItemSymbolRepository.findSymbol(cueItemId);
+
+            if (ObjectUtils.isEmpty(cueSheetItemSymbolList) == false){ //조회된 방송아콘 맵핑테이블 List가 있으면 url추가후 큐시트 아이템DTO에 추가
+
+                List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTO = cueSheetItemSymbolMapper.toDtoList(cueSheetItemSymbolList);
+
+                for (CueSheetItemSymbolDTO getCueSheetItemSymbol : cueSheetItemSymbolDTO){
+
+                    SymbolDTO symbolDTO = getCueSheetItemSymbol.getSymbol();
+
+                    String fileLoc = symbolDTO.getAttachFile().getFileLoc();//파일로그 get
+                    String url = fileUrl + fileLoc; //url + 파일로그
+
+                    symbolDTO.setUrl(url);//방송아이콘이 저장된 url set
+
+                    getCueSheetItemSymbol.setSymbol(symbolDTO);//url 추가 DTO set
+                }
+
+
+                cueSheetItemDTO.setCueSheetItemSymbolDTO(cueSheetItemSymbolDTO); //아이템에 set방송아이콘List
+
+            }
+        }
+
+        return cueSheetItemDTOList;
+
+    }
+    
+    //큐시트아이템 목록조회 조건검색빌드
+    public BooleanBuilder getSearchCueItem(Long cueId) {
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+        //dsl q쿼리 생성
+        QCueSheetItem qCueSheetItem = QCueSheetItem.cueSheetItem;
+
+        //삭제여부
+        booleanBuilder.and(qCueSheetItem.delYn.eq("N"));
+        //예비큐시트 여부
+        //booleanBuilder.and(qCueSheetItem.spareYn.eq("N"));
+
+        //큐시트아이디로 검색조건 설정.
+        if (ObjectUtils.isEmpty(cueId) == false){
+            booleanBuilder.and(qCueSheetItem.cueSheet.cueId.eq(cueId));
+        }
+
+        return booleanBuilder;
+    }
+
+
+        //큐시트 등록
     public Long create(CueSheetCreateDTO cueSheetCreateDTO){
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
@@ -549,7 +608,7 @@ public class CueSheetService {
             cueSheet.setLckrId(null);
             cueSheet.setLckDtm(null);
             cueSheet.setDelYn("N");
-            cueSheet.setCueStCd(null);
+            //cueSheet.setCueStCd(null);
             //cueSheetOrderLockDTO.setLckYn("N");
         }
 
@@ -696,4 +755,41 @@ public class CueSheetService {
 
         }
         return articleCueItemDTO;//방송아이콘URL추가된 기사 리턴
+    }*/
+
+    //큐시트 상세조회***************JPA연관관계 설정당시 조회
+    /*public CueSheetDTO find(Long cueId){
+
+        CueSheet cueSheet = cueSheetFindOrFail(cueId);
+
+        CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
+
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetDTO.getCueSheetItem();
+
+        List<CueSheetItemDTO> newCueSheetItemDTOList = new ArrayList<>();
+        for (Iterator<CueSheetItemDTO> itr = cueSheetItemDTOList.iterator(); itr.hasNext();){
+
+            CueSheetItemDTO cueSheetItemDTO = itr.next();
+
+            String delYn = cueSheetItemDTO.getDelYn();//큐시트 아이템의 삭제여부 값
+            ArticleCueItemDTO articleCueItemDTO = cueSheetItemDTO.getArticle();//큐시트 아이템의 기사 정보 get
+
+            if (ObjectUtils.isEmpty(articleCueItemDTO) == false){ //큐시트 아이템에 기사가 포함된 경우.
+                String articleDelYn = articleCueItemDTO.getDelYn();//큐시트 아이템에 포함된 기사의 삭제 여부값
+                if ("Y".equals(articleDelYn)){ //기사 삭제 값이 Y인경우 조회된 큐시트아이템 삭제
+                    continue;
+                }
+                *//*articleCueItemDTO = symbolUrlSet(articleCueItemDTO);//기사에 방송아이콘의 방송아이콘URL 추가.
+                cueSheetItemDTO.setArticle(articleCueItemDTO);//방송아이콘 추가한 기사 큐시트 아이템에 set*//*
+            }
+            if ("Y".equals(delYn)) { //조회된 큐시트 아이템 삭제여부값이 Y인 경우/.
+                continue;
+            }
+
+            newCueSheetItemDTOList.add(cueSheetItemDTO);
+        }
+        cueSheetDTO.setCueSheetItem(newCueSheetItemDTOList);
+
+        return cueSheetDTO;
+
     }*/

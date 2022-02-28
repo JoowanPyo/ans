@@ -26,6 +26,7 @@ import com.gemiso.zodiac.app.cueSheet.dto.CueSheetFindAllDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
+import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
@@ -59,13 +60,8 @@ public class InterfaceService {
     private final CodeRepository codeRepository;
     private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
     private final CueSheetItemRepository cueSheetItemRepository;
-    private final DailyProgramRepository dailyProgramRepository;
-    //private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
-    //private final ProgramRepository programRepository;
 
-    private final DailyProgramMapper dailyProgramMapper;
-    //private final CueSheetItemSymbolMapper cueSheetItemSymbolMapper;
-    //private final ProgramMapper programMapper;
+    private final CueSheetItemMapper cueSheetItemMapper;
 
     private final CueSheetService cueSheetService;
 
@@ -1043,9 +1039,11 @@ public class InterfaceService {
     public List<PrompterCueSheetDTO> getCuesheetService(Long cs_id) {
 
 
-        CueSheet cueSheet = findCueSheet(cs_id); //프롬프트로 보내줄 큐시트를 조회[단건 : 조건 큐시트 아이디]
+        CueSheetDTO cueSheetDTO = cueSheetService.find(cs_id); //프롬프트로 보내줄 큐시트를 조회[단건 : 조건 큐시트 아이디]
 
-        List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //조회된 큐시트상세 정보에서 큐시트 아이템get
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetDTO.getCueSheetItem(); //조회된 큐시트상세 정보에서 큐시트 아이템get*/
+
+        List<CueSheetItem> cueSheetItemList = cueSheetItemMapper.toEntityList(cueSheetItemDTOList);
 
         // 조회된 큐시트 정보를 List<PrompterCueSheetDTO>빌드 [기사정보가 있는 큐시트아이템 정보를 프롬프트DTO로 빌드 후 리턴]
         List<PrompterCueSheetDTO> prompterCueSheetDTOList = cueToPrompterCue(cueSheetItemList);
@@ -1169,7 +1167,7 @@ public class InterfaceService {
     }
 
     //프롬프트로 보내줄 큐시트를 조회[단건 : 조건 큐시트 아이디]
-    public CueSheet findCueSheet(Long cs_id) {
+    /*public CueSheet findCueSheet(Long cs_id) {
 
         Optional<CueSheet> cueSheet = cueSheetRepository.findByCue(cs_id);
 
@@ -1178,7 +1176,7 @@ public class InterfaceService {
         }
 
         return cueSheet.get();
-    }
+    }*/
 }
 
     /*public BooleanBuilder getSearchCue(String rd_id, String play_seq, String cued_seq, String vplay_seq, String vcued_seq,

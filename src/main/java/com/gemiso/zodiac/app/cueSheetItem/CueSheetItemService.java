@@ -90,6 +90,7 @@ public class CueSheetItemService {
     }
 
 
+    //방송아이콘 url 추가
     public List<CueSheetItemDTO> setSymbol(List<CueSheetItemDTO> cueSheetItemDTOList){
 
         for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList){ //조회된 아이템에 List
