@@ -43,6 +43,9 @@ public class ArticleCap {
     @Column(name = "cap_rmk", length = 2000)
     private String capRmk;
 
+    @Column(name = "ln_ord")
+    private int lnOrd;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artcl_id")
     @JsonBackReference

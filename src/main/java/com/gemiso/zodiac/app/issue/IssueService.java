@@ -161,7 +161,7 @@ public class IssueService {
         QIssue qIssue = QIssue.issue;
 
         if (!StringUtils.isEmpty(sdate) && !StringUtils.isEmpty(edate)){
-            booleanBuilder.and(qIssue.inputDtm.between(sdate, edate));
+            booleanBuilder.and(qIssue.issuDtm.between(sdate, edate));
         }
         if (!StringUtils.isEmpty(issuDelYn)){
             booleanBuilder.and(qIssue.issuDelYn.eq(issuDelYn));

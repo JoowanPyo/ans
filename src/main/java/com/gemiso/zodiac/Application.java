@@ -20,6 +20,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 public class Application extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
+
         ConfigurableApplicationContext applicationContext = SpringApplication.run(Application.class, args);
         /**
          * Dispatcher Servlet이 컨트롤러 못찾았을 때 Exception을 던지도록 처리(ApiErrorResponse 적용을 위해)

@@ -28,6 +28,8 @@ public class ArticleCapDTO {
     private String capCtt;
     @Schema(description = "자막 비고")
     private String capRmk;
+    @Schema(description = "자막 순번")
+    private int lnOrd;
     @Schema(description = "기사 아이디")
     private ArticleSimpleDTO article;
     @Schema(description = "자막 템플릿 아이디")

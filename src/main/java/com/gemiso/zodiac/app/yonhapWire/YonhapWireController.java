@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/yonhapInternational")
+@RequestMapping("/yonhapinternational")
 @Slf4j
 @RequiredArgsConstructor
 //@Tag(name = "User Controllers", description = "User API")

@@ -55,6 +55,7 @@ public class CueSheetItemCreateDTO {
     private String artclTop;
     private String headLn;
     private String artclRef;
+    @NotNull
     private String spareYn;
     private CueSheetSimpleDTO cueSheet;
     private ArticleSimpleDTO article;

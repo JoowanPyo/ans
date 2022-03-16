@@ -72,8 +72,8 @@ dependencies {
     // war 내/외장 서블릿 컨테이너 모두에 사용 가능한 설정
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
-
-
+    //RabbitMq
+    implementation 'com.rabbitmq:amqp-client:5.14.2'
 
 }
 

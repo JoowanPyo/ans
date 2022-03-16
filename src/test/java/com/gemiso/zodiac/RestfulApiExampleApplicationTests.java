@@ -1,6 +1,7 @@
 package com.gemiso.zodiac;
 
 import com.gemiso.zodiac.core.scheduling.BisInterfaceService;
+import com.gemiso.zodiac.core.topic.TopicService;
 import com.mysema.commons.lang.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.io.IOException;
 import java.text.ParseException;
+import java.util.concurrent.TimeoutException;
 
 @SpringBootTest
 class RestfulApiExampleApplicationTests {
@@ -56,6 +59,17 @@ class RestfulApiExampleApplicationTests {
     @Test //Bis 방송길이 와 방송시작시작으로 방송종료시간 구하기
     void getEndTime() throws ParseException {
         String endtime = bisInterfaceService.getEndTime("130","1230");
+    }
+
+    @Test
+    void topicTest() throws IOException, TimeoutException {
+        TopicService topicService = new TopicService();
+
+        while (true)
+        {
+            //topicService.topicTest();
+        }
+
     }
 
 }

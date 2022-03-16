@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.article;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
@@ -45,70 +46,70 @@ public class Article extends BaseEntity {
     @Column(name = "ch_div_cd", length = 50)
     private String chDivCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.EAGER)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = ch_div_cd)")
     private String chDivCdNm;
 
     @Column(name = "artcl_kind_cd", length = 50)
     private String artclKindCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    //@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_kind_cd)")
     private String artclKindCdNm;
 
     @Column(name = "artcl_frm_cd", length = 50)
     private String artclFrmCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    //@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_frm_cd)")
     private String artclFrmCdNm;
 
     @Column(name = "artcl_div_cd", length = 50)
     private String artclDivCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    //@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_div_cd)")
     private String artclDivCdNm;
 
     @Column(name = "artcl_fld_cd", length = 50)
     private String artclFldCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    //@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_fld_cd)")
     private String artclFldCdNm;
 
     @Column(name = "apprv_div_cd", length = 50)
     private String apprvDivCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.EAGER)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = apprv_div_cd)")
     private String apprvDivCdNm;
 
     @Column(name = "prd_div_cd", length = 50)
     private String prdDivCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    //@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = prd_div_cd)")
     private String prdDivCdNm;
 
     @Column(name = "artcl_typ_cd", length = 50)
     private String artclTypCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    //@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_typ_cd)")
     private String artclTypCdNm;
 
     @Column(name = "artcl_typ_dtl_cd", length = 50)
     private String artclTypDtlCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    //@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_typ_dtl_cd)")
     private String artclTypDtlCdNm;
 
     @Column(name = "artcl_cate_cd", length = 50)
     private String artclCateCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    //@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_cate_cd)")
     private String artclCateCdNm;
 
@@ -124,7 +125,7 @@ public class Article extends BaseEntity {
     @Column(name = "anc_ment_ctt", columnDefinition = "TEXT")
     private String ancMentCtt;
 
-    @Basic(fetch = FetchType.LAZY)
+    //@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = rptr_id)")
     @Column(name = "rptr_nm", length = 100)
     private String rptrNm;
@@ -169,7 +170,7 @@ public class Article extends BaseEntity {
     private Date embgDtm;
 
     @Column(name = "inputr_nm", length = 100)
-    @Basic(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.EAGER)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
     private String inputrNm;
 
@@ -240,7 +241,7 @@ public class Article extends BaseEntity {
     @Column(name = "dept_cd", length = 50, nullable = false)
     private String deptCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    //@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = dept_cd)")
     private String deptNm;
 
@@ -258,6 +259,9 @@ public class Article extends BaseEntity {
 
     @Formula("(select a.cd_nm from tb_cd a where a.cd = editor_id)")
     private String editorNm;
+
+    @Column(name = "cue_id", length = 50)
+    private Long cueId;
 
     @ManyToOne
     @JoinColumn(name = "issu_id")

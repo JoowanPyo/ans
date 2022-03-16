@@ -2,21 +2,31 @@ package com.gemiso.zodiac.app.appInterface;
 
 import com.gemiso.zodiac.app.appInterface.codeDTO.TakerCodeDTO;
 import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.prompterCueRefresh.PrompterCueRefreshDTO;
 import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDataDTO;
+import com.gemiso.zodiac.app.appInterface.takerCueRefresh.TakerCueRefreshDTO;
+import com.gemiso.zodiac.app.appInterface.takerCueRefresh.TakerCueRefreshDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
+import com.gemiso.zodiac.app.cueSheet.CueSheetService;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetFindAllDTO;
+import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.helper.SearchDateInterface;
+import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Api(description = "연계 인터페이스 API")
@@ -27,6 +37,8 @@ import java.util.List;
 public class InterfaceController {
 
     private final InterfaceService interfaceService;
+
+    private final CueSheetService cueSheetService;
 
 
     @Operation(summary = "큐시트 일일편성 목록조회[Taker]", description = "큐시트 일일편성 목록조회[Taker]")
@@ -63,7 +75,7 @@ public class InterfaceController {
         String takerCueSheetDTO = "";
 
         //날짜로 조회조건이 들어온 경우
-        if (sdate != null && sdate.trim().isEmpty() ==false && edate != null && edate.trim().isEmpty() == false) {
+        if (sdate != null && sdate.trim().isEmpty() == false && edate != null && edate.trim().isEmpty() == false) {
 
             //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
             SearchDateInterface searchDate = new SearchDateInterface(sdate, edate);
@@ -144,6 +156,21 @@ public class InterfaceController {
         return takerCue;
     }
 
+    @Operation(summary = "테이커 큐시트 아이템 Refresh", description = "테이커 큐시트 아이템 Refresh")
+    @GetMapping(path = "/takerrefresh")
+    public String takerCueItemRefresh(@Parameter(name = "rd_id", description = "프로그램 아이디")
+                                      @RequestParam(value = "rd_id", required = false) Long rd_id,
+                                      @Parameter(name = "rd_seq", description = "큐시트 아이템 순서값")
+                                      @RequestParam(value = "rd_seq", required = false) int rd_seq,
+                                      @RequestHeader(value = "securityKey") String securityKey) {
+
+        TakerCueRefreshDataDTO takerCueSheetDTO = interfaceService.takerCueItemRefresh(rd_id, rd_seq);
+
+        String returnData = interfaceService.takerCueRefresh(takerCueSheetDTO);
+
+        return returnData;
+    }
+
     @Operation(summary = "방송구분코드 조회[Taker]", description = "방송구분코드 조회[Taker]")
     @GetMapping(path = "/code")
     public String codeFindAll(@Parameter(name = "key", description = "키 ??")
@@ -201,7 +228,7 @@ public class InterfaceController {
     }
 
     @Operation(summary = "프롬프터 프로그램 목록조회", description = "프롬프터 프로그램 목록조회")
-    @GetMapping(path = "/getMstListService")
+    @GetMapping(path = "/getmstlistservice")
     public String getMstListService(@Parameter(name = "media_id", description = "미디어 아이디???")
                                     @RequestParam(value = "media_id", required = false) String media_id,
                                     @Parameter(name = "pro_id", description = "프로그램 아이디???")
@@ -218,7 +245,7 @@ public class InterfaceController {
         String prompterProgram = "";
 
         //날짜로 조회조건이 들어온 경우
-        if (sdate != null && sdate.trim().isEmpty() ==false && fdate != null && fdate.trim().isEmpty() == false) {
+        if (sdate != null && sdate.trim().isEmpty() == false && fdate != null && fdate.trim().isEmpty() == false) {
 
             //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
             SearchDateInterface searchDate = new SearchDateInterface(sdate, fdate);
@@ -226,7 +253,7 @@ public class InterfaceController {
             prompterProgramDTOList = interfaceService.getMstListService(pro_id, searchDate.getStartDate(), searchDate.getEndDate());
 
             prompterProgram = interfaceService.prompterProgramToXml(prompterProgramDTOList);
-        }else {
+        } else {
             prompterProgramDTOList = interfaceService.getMstListService(pro_id, null, null);
 
             prompterProgram = interfaceService.prompterProgramToXml(prompterProgramDTOList);
@@ -237,7 +264,7 @@ public class InterfaceController {
     }
 
     @Operation(summary = "프롬프트 큐시트 상세조회", description = "프롬프트 큐시트 상세조회")
-    @GetMapping(path = "/getCuesheetService")
+    @GetMapping(path = "/getcuesheetservice")
     public String getCuesheetService(@Parameter(name = "cs_id", description = "큐시트 아이디???")
                                      @RequestParam(value = "cs_id", required = false) Long cs_id,
                                      @Parameter(name = "usr_id", description = "사용자 아이디???")
@@ -251,5 +278,56 @@ public class InterfaceController {
         String prompterCueSheetXml = interfaceService.prompterCueSheetXml(prompterCueSheetDTOList);
 
         return prompterCueSheetXml;
+    }
+
+    //일단 프롬프터 리플레시 기능은x 테이커 먼저 (2022.03.15)
+    /*@Operation(summary = "프롬프트 큐시트 기사 리플레시", description = "프롬프트 큐시트 기사 리플레시")
+    @GetMapping(path = "/prompter_refresh")
+    public String prompterRefresh(@Parameter(name = "rd_id", description = "큐시트 아이템 아이디")
+                                  @RequestParam(value = "rd_id", required = false) Long rd_id) {
+
+        PrompterCueRefreshDTO prompterCueRefreshDTO = interfaceService.prompterRefresh(rd_id);
+
+    }*/
+
+    @Operation(summary = "큐시트 목록조회[PS TAKER]", description = "큐시트 목록조회[PS TAKER]")
+    @GetMapping(path = "/pstakerlist")
+    public AnsApiResponse<CueSheetFindAllDTO> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
+                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                      @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
+                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                      @Parameter(name = "brdcPgmId", description = "프로그램 아이디")
+                                                      @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
+                                                      @Parameter(name = "brdcPgmNm", description = "프로그램 명")
+                                                      @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
+                                                      @Parameter(name = "searchWord", description = "검색키워드")
+                                                      @RequestParam(value = "searchWord", required = false) String searchWord,
+                                                      @RequestHeader(value = "securityKey") String securityKey) throws Exception {
+
+        CueSheetFindAllDTO cueSheetFindAllDTO = new CueSheetFindAllDTO();
+
+
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
+            //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 24:00:00)
+            SearchDate searchDate = new SearchDate(sdate, edate);
+            cueSheetFindAllDTO = cueSheetService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), brdcPgmId, brdcPgmNm, searchWord);
+
+        } else {
+            cueSheetFindAllDTO = cueSheetService.findAll(null, null, brdcPgmId, brdcPgmNm, searchWord);
+        }
+
+        return new AnsApiResponse<>(cueSheetFindAllDTO);
+    }
+
+    @Operation(summary = "큐시트 상세조회[PS TAKER]", description = "큐시트 상세조회[PS TAKER]")
+    @GetMapping(path = "/pstaker")
+    public AnsApiResponse<CueSheetDTO> find(@Parameter(name = "cueId", description = "큐시트 아이디")
+                                            @RequestParam(value = "cueId", required = false) Long cueId,
+                                            @RequestHeader(value = "securityKey") String securityKey) {
+
+
+        CueSheetDTO cueSheetDTO = cueSheetService.find(cueId);
+
+        return new AnsApiResponse<>(cueSheetDTO);
     }
 }

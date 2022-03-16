@@ -477,6 +477,7 @@ public class YonhapWireService {
                     booleanBuilder.or(qYonhapWire.imprt.eq(imprt));
                 }
             }
+
         }
         return booleanBuilder;
     }

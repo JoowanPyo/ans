@@ -144,9 +144,11 @@ public class CueSheetItemController {
     @PutMapping(path = "/{cueId}/item/change_order")
     public AnsApiResponse<List<CueSheetItemDTO>> ordCdUpdate(@Parameter(name = "cueId", description = "큐시트아이디")
                                                              @PathVariable("cueId") Long cueId,
+                                                             @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
+                                                             @RequestParam(value = "spareYn", required = true) String spareYn,
                                                              @Parameter(description = "필수값<br> ", required = true)
                                                              @RequestBody @Valid List<CueSheetItemOrdUpdateDTO> cueSheetItemOrdUpdateDTOList) {
-        cueSheetItemService.ordCdUpdate(cueId, cueSheetItemOrdUpdateDTOList);
+        cueSheetItemService.ordCdUpdate(cueId, spareYn, cueSheetItemOrdUpdateDTOList);
 
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
 

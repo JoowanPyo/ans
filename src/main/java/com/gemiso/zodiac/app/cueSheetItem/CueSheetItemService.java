@@ -3,15 +3,12 @@ package com.gemiso.zodiac.app.cueSheetItem;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.ArticleRepository;
 import com.gemiso.zodiac.app.article.ArticleService;
-import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
-import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
-import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.*;
@@ -199,7 +196,9 @@ public class CueSheetItemService {
 
         int cueItemOrd = cueSheetItemCreateDTO.getCueItemOrd();
 
-        ordUpdate( cueId,  cueItemId,  cueItemOrd);
+        String spareYn = cueSheetItem.getSpareYn(); //예비여부값 get
+
+        ordUpdate( cueId,  cueItemId,  cueItemOrd, spareYn);
 
         return cueItemId;//return 큐시트 아이템 아이디
     }
@@ -226,7 +225,11 @@ public class CueSheetItemService {
             if (CollectionUtils.isEmpty(cueSheetItemCapDTOList) == false) {
                 createCap(cueSheetItemCapDTOList, cueItemId, userId);//큐시트 아이템 자막 리스트 등록
             }
+
+            //순서변경을 타야하나?
+            //ordUpdate( cueId,  cueItemId,  cueItemOrd, "N");
         }
+
 
     }
 
@@ -350,9 +353,9 @@ public class CueSheetItemService {
 
     }
 
-    public void ordCdUpdate(Long cueId, List<CueSheetItemOrdUpdateDTO> cueSheetItemOrdUpdateDTOList){
+    public void ordCdUpdate(Long cueId, String spareYn, List<CueSheetItemOrdUpdateDTO> cueSheetItemOrdUpdateDTOList){
 
-        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemListSpareYn(cueId, spareYn);
 
         // 조회된 큐시트아이템 리스트와 업데이트할 리스트 size가 같아야 한다.
         if (cueSheetItemList.size() == cueSheetItemOrdUpdateDTOList.size()) { 
@@ -430,7 +433,7 @@ public class CueSheetItemService {
         return booleanBuilder;
     }
 
-    public BooleanBuilder getSearchOrd(Long cueId){
+    public BooleanBuilder getSearchOrd(Long cueId, String spareYn){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -443,13 +446,17 @@ public class CueSheetItemService {
             booleanBuilder.and(qCueSheetItem.cueSheet.cueId.eq(cueId));
         }
 
+        if (spareYn != null && spareYn.trim().isEmpty() == false){
+            booleanBuilder.and(qCueSheetItem.spareYn.eq(spareYn));
+        }
+
         return booleanBuilder;
     }
 
     public void createCueItem(Long cueId, Long artclId, int cueItemOrd, String cueItemDivCd, String spareYn){
 
         //기사 복사[복사된 기사 Id get]
-        Article copyArtcl = copyArticle(artclId);
+        Article copyArtcl = copyArticle(artclId, cueId);
 
         //예비큐시트 값 set
         if (spareYn == null && spareYn.trim().isEmpty() ){
@@ -477,7 +484,7 @@ public class CueSheetItemService {
         Long cueItemId = cueSheetItem.getCueItemId();
 
         //큐시트아이템 순서 update
-        ordUpdateDrop(cueSheetItem, cueId, cueItemOrd);
+        ordUpdateDrop(cueSheetItem, cueId, cueItemOrd, spareYn);
 
 
     }
@@ -495,7 +502,7 @@ public class CueSheetItemService {
             String cueItemDivCd = createListDTO.getCueItemDivCd();
 
             //기사 복사[복사된 기사 Id get]
-            Article copyArtcl = copyArticle(artclId);
+            Article copyArtcl = copyArticle(artclId, cueId);
 
             //토큰 사용자 Id(현재 로그인된 사용자 ID)
             String userId = userAuthService.authUser.getUserId();
@@ -519,15 +526,15 @@ public class CueSheetItemService {
             Long cueItemId = cueSheetItem.getCueItemId();
 
             //큐시트아이템 순서 update
-            ordUpdateDrop(cueSheetItem, cueId, cueItemOrd);
+            ordUpdateDrop(cueSheetItem, cueId, cueItemOrd, spareYn);
         }
 
     }
     
-    public void ordUpdateDrop(CueSheetItem cueSheetItem, Long cueId, int cueItemOrd){
+    public void ordUpdateDrop(CueSheetItem cueSheetItem, Long cueId, int cueItemOrd, String spareYn){
 
         // 쿼리문 만들기
-        BooleanBuilder booleanBuilder = getSearchOrd(cueId);
+        BooleanBuilder booleanBuilder = getSearchOrd(cueId, spareYn);
 
         //큐시트 아이템 순번 재등록
         List<CueSheetItem> cueSheetItemList = (List<CueSheetItem>) cueSheetItemRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "cueItemOrd"));
@@ -538,7 +545,7 @@ public class CueSheetItemService {
 
         Long cueSheetItemId = cueSheetItem.getCueItemId();
         for (int i =  cueSheetItemList.size() - 1; i >= 0 ; i--){ //out of index때문에 역순으로 검사.
-            if (!cueSheetItemId.equals(cueSheetItemList.get(i).getCueItemId())){
+            if (cueSheetItemId.equals(cueSheetItemList.get(i).getCueItemId()) == false){
                 continue;
             }
             cueSheetItemList.remove(i);//신규 등록된 큐시트 아이템 리스트에서 삭제
@@ -559,7 +566,7 @@ public class CueSheetItemService {
         }
     }
 
-    public Article copyArticle(Long artclId){
+    public Article copyArticle(Long artclId, Long cueId){
 
         /*********************/
         /* 기사를 저장하는 부분 */
@@ -577,7 +584,7 @@ public class CueSheetItemService {
         //기사 시퀀스[오리지널 기사 0 = 그밑으로 복사된 기사 + 1 증가]
         int artclOrd = article.getArtclOrd() + 1;
 
-        Article articleEntity = getArticleEntity(article, artclOrd);
+        Article articleEntity = getArticleEntity(article, artclOrd, cueId);
         articleRepository.save(articleEntity);
 
         /*********************/
@@ -618,7 +625,7 @@ public class CueSheetItemService {
     }
 
     // 기사 저장하기 위한 엔터티 만들기 2021-10-27
-    private Article getArticleEntity(Article article, int artclOrd) {
+    private Article getArticleEntity(Article article, int artclOrd, Long cueId) {
 
         Long orgArtclId = article.getOrgArtclId();//원본기사 아이디
 
@@ -673,6 +680,7 @@ public class CueSheetItemService {
                     .deviceCd(article.getDeviceCd())
                     .parentArtlcId(article.getArtclId())//복사한 기사 아이디 set
                     .issue(article.getIssue())
+                    .cueId(cueId)//큐시트 아이디 set
                     .build();
         }else { //원본기사 아이디가 있을시[복사된 기사 다시 복사일시]
 
@@ -725,6 +733,7 @@ public class CueSheetItemService {
                     .deviceCd(article.getDeviceCd())
                     .parentArtlcId(article.getArtclId())//복사한 기사 아이디 set
                     .issue(article.getIssue())
+                    .cueId(cueId)//큐시트 아이디 set
                     .build();
         }
     }
@@ -778,7 +787,7 @@ public class CueSheetItemService {
 
         cueSheetItemRepository.save(cueSheetItem);
 
-        ordUpdate(cueId, cueItemId, cueItemOrd);
+        ordUpdate(cueId, cueItemId, cueItemOrd, spareYn);
 
         CueSheetSimpleDTO cueSheetSimpleDTO = new CueSheetSimpleDTO();
         cueSheetSimpleDTO.setCueId(cueId);
@@ -786,7 +795,7 @@ public class CueSheetItemService {
         return cueSheetSimpleDTO;
     }
 
-    public void ordUpdate( Long cueId, Long cueItemId, int cueItemOrd){
+    public void ordUpdate( Long cueId, Long cueItemId, int cueItemOrd, String spareYn){
 
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
@@ -798,7 +807,7 @@ public class CueSheetItemService {
         cueSheetItemRepository.save(cueSheetItem); //큐시트아이템 등록
 
         //큐시트 아이템 순번 재등록
-        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemListSpareYn(cueId, spareYn);
 
         for (int i =  cueSheetItemList.size() - 1; i >= 0 ; i--){
             if (!cueItemId.equals(cueSheetItemList.get(i).getCueItemId())){

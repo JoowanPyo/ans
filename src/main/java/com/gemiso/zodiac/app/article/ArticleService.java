@@ -1,6 +1,10 @@
 package com.gemiso.zodiac.app.article;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapCreateDTO;
@@ -41,7 +45,9 @@ import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
-import com.gemiso.zodiac.app.user.*;
+import com.gemiso.zodiac.app.user.QUser;
+import com.gemiso.zodiac.app.user.User;
+import com.gemiso.zodiac.app.user.UserService;
 import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuth;
 import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuthRepository;
 import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
@@ -52,6 +58,9 @@ import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.service.ProcessArticleFix;
 import com.gemiso.zodiac.core.service.UserAuthChkService;
 import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.core.topic.TopicService;
+import com.gemiso.zodiac.core.topic.articleTopicDTO.ArticleTopicDTO;
+import com.gemiso.zodiac.core.topic.articleTopicDTO.ArticleTopicDTOSerializer;
 import com.gemiso.zodiac.exception.PasswordFailedException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.gemiso.zodiac.exception.UserFailException;
@@ -65,6 +74,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -112,11 +122,12 @@ public class ArticleService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final TopicService topicService;
 
     //기사 목록조회
     public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
                                                       String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
-                                                      Integer page, Integer limit, String apprvDivCd, String deptCd, String artclCateCd, String artclTypDtlCd) {
+                                                      Integer page, Integer limit, List<String> apprvDivCdList, String deptCd, String artclCateCd, String artclTypDtlCd) {
 
         /*page = Optional.ofNullable(page).orElse(0);
         limit = Optional.ofNullable(limit).orElse(50);
@@ -140,12 +151,13 @@ public class ArticleService {
 
         //검색조건생성 [where생성]
         BooleanBuilder booleanBuilder = getSearch(sdate, edate, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd, artclTypCd,
-                searchDivCd, searchWord, apprvDivCd, deptCd, artclCateCd, artclTypDtlCd);
+                searchDivCd, searchWord, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd);
 
         //전체조회[page type]
         Page<Article> result = articleRepository.findAll(booleanBuilder, pageable);
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
+
 
         return new PageResultDTO<ArticleDTO, Article>(result, fn);
     }
@@ -154,14 +166,14 @@ public class ArticleService {
     public PageResultDTO<ArticleDTO, Article> findAllIsuue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd, String artclTypDtlCd,
                                                            String artclCateCd, String deptCd, String inputrId,
                                                            String brdcPgmId, Long orgArtclId, String delYn,
-                                                           String searchDivCd, String searchWord, Integer page, Integer limit, String apprvDivCd) {
+                                                           String searchDivCd, String searchWord, Integer page, Integer limit, List<String> apprvDivCdList) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
         Pageable pageable = pageHelper.getArticlePageInfo();
 
         BooleanBuilder booleanBuilder = getSearchIssue(sdate, edate, issuKwd, artclDivCd, artclTypCd,
-                artclTypDtlCd, artclCateCd, deptCd, inputrId, brdcPgmId, orgArtclId, delYn, searchDivCd, searchWord, apprvDivCd);
+                artclTypDtlCd, artclCateCd, deptCd, inputrId, brdcPgmId, orgArtclId, delYn, searchDivCd, searchWord, apprvDivCdList);
 
         //전체조회[page type]
         Page<Article> result = articleRepository.findAll(booleanBuilder, pageable);
@@ -279,8 +291,31 @@ public class ArticleService {
         createArticleCap(articleCapDTOS, articleId, articleHistId);//기사자막 create
         createAnchorCap(anchorCapDTOS, articleId, articleHistId);//앵커자막 create.
 
+        ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
+        articleTopicDTO.setEventId("AC");
+        articleTopicDTO.setArtclId(articleId);
+        String json = marshallingJson(articleTopicDTO);
+
+        topicService.topicTest(json);
 
         return articleId;
+    }
+
+    public String marshallingJson(ArticleTopicDTO articleTopicDTO) throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        SimpleModule simpleModule = new SimpleModule();
+
+        // ArticleTopicDTO 클래스는 ArticleTopicDTOSerializer Serialize 하겠다는 의지의 표현.
+        simpleModule.addSerializer(ArticleTopicDTO.class, new ArticleTopicDTOSerializer());
+
+        mapper.registerModule(simpleModule);
+
+        String jsonInString = mapper.writeValueAsString(articleTopicDTO);
+
+        return jsonInString;
+
     }
 
     //기사 액션로그 등록
@@ -364,6 +399,14 @@ public class ArticleService {
         //기사 자막 Update
         articleCapUpdate(article, articleUpdateDTO, articleHistId);
         anchorCapUpdate(article, articleUpdateDTO, articleHistId);
+
+        ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
+        articleTopicDTO.setEventId("AC");
+        articleTopicDTO.setArtclId(artclId);
+        articleTopicDTO.setArticle(articleUpdateDTO);
+        String json = marshallingJson(articleTopicDTO);
+
+        topicService.topicTest(json);
 
     }
 
@@ -865,7 +908,7 @@ public class ArticleService {
     //기사 목록조회시 조건 빌드[일반 목록조회 ]
     public BooleanBuilder getSearch(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
                                     String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
-                                    String apprvDivCd, String deptCd, String artclCateCd, String artclTypDtlCd) {
+                                    List<String> apprvDivCdList, String deptCd, String artclCateCd, String artclTypDtlCd) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -915,19 +958,61 @@ public class ArticleService {
         //검색어로 조회
         if (searchWord != null && searchWord.trim().isEmpty() == false) {
             //검색구분코드 01 일때 기사 제목으로 검색
-            if (searchDivCd.equals("01")) {
+            if ("01".equals(searchDivCd)) {
                 booleanBuilder.and(qArticle.artclTitl.contains(searchWord).or(qArticle.artclTitlEn.contains(searchWord)));
             }
             //검색구분코드 02 일때 기자이름으로 검색
-            if (searchDivCd.equals("02")) {
+            if ("02".equals(searchDivCd)) {
                 booleanBuilder.and(qArticle.rptrId.eq(String.valueOf(qUser.userNm.contains(searchWord))));
+            }
+            //검색구분코드 안들어왔을 경우
+            if (searchDivCd == null || searchDivCd.trim().isEmpty()){
+                booleanBuilder.and(qArticle.artclTitl.contains(searchWord).or(qArticle.artclTitlEn.contains(searchWord))
+                        .or(qArticle.rptrId.eq(String.valueOf(qUser.userNm.contains(searchWord)))));
             }
 
         }
-        //픽스구분코드
-        if (apprvDivCd != null && apprvDivCd.trim().isEmpty() == false){
-            booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCd));
+
+        //픽스구분코드[여러개의 or조건으로 가능]
+        if (CollectionUtils.isEmpty(apprvDivCdList) == false){
+
+            int listSize = apprvDivCdList.size(); //리스트 길이에 맞춰 or조건 set
+
+            if (listSize == 1){
+                booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)));
+            }
+            else if (listSize == 2){
+                booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(1))));
+            }
+            else if (listSize == 3){
+                booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(1)))
+                        .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(2))));
+            }
+            else if (listSize == 4){
+                booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(1)))
+                        .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(2))).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(3))));
+            }
+            else if (listSize == 5){
+                booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(1)))
+                        .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(2))).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(3)))
+                        .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(4))));
+            }
+
         }
+
+        /*int idx = 0;
+        //픽스구분코드
+        for (String apprvDivCd : apprvDivCdList) {
+            if (apprvDivCd != null && apprvDivCd.trim().isEmpty() == false) {
+                if (idx == 0) {
+                    booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCd));
+                    ++idx; //첫번째이후 부터는 or조건으로
+                }else {
+                    booleanBuilder.or(qArticle.apprvDivCd.eq(apprvDivCd));
+                }
+            }
+        }*/
+
         //부서코드
         if (deptCd != null && deptCd.trim().isEmpty() == false){
             booleanBuilder.and(qArticle.deptCd.eq(deptCd));
@@ -953,7 +1038,7 @@ public class ArticleService {
     //기사 목록조회 조회조건 빌드[이슈 기사]
     public BooleanBuilder getSearchIssue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd,
                                          String artclTypDtlCd, String artclCateCd, String deptCd, String inputrId,
-                                         String brdcPgmId, Long orgArtclId, String delYn, String searchDivCd, String searchWord, String apprvDivCd) {
+                                         String brdcPgmId, Long orgArtclId, String delYn, String searchDivCd, String searchWord, List<String> apprvDivCdList) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -1019,9 +1104,31 @@ public class ArticleService {
 
         }
 
-        //픽스구분코드
-        if (apprvDivCd != null && apprvDivCd.trim().isEmpty() == false){
-            booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCd));
+        //픽스구분코드[여러개의 or조건으로 가능]
+        if (CollectionUtils.isEmpty(apprvDivCdList) == false){
+
+            int listSize = apprvDivCdList.size(); //리스트 길이에 맞춰 or조건 set
+
+            if (listSize == 1){
+                booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)));
+            }
+            else if (listSize == 2){
+                booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(1))));
+            }
+            else if (listSize == 3){
+                booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(1)))
+                        .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(2))));
+            }
+            else if (listSize == 4){
+                booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(1)))
+                        .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(2))).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(3))));
+            }
+            else if (listSize == 5){
+                booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(1)))
+                        .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(2))).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(3)))
+                        .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(4))));
+            }
+
         }
 
         return booleanBuilder;
@@ -1120,7 +1227,7 @@ public class ArticleService {
 
         ArticleDTO articleDTO = articleMapper.toDto(article);
 
-        if ("editorfix".equals(apprvDivCd)) {//에디터 픽스일 경우 픽스한 에디터 set
+        if ("editor_fix".equals(apprvDivCd)) {//에디터 픽스일 경우 픽스한 에디터 set
             articleDTO.setEditorId(userId);
         }
         articleDTO.setApprvDivCd(apprvDivCd); //픽스 구분코드 변경.

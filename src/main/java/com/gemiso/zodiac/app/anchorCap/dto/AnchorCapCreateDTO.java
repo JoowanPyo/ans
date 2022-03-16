@@ -26,6 +26,8 @@ public class AnchorCapCreateDTO {
     private String capCtt;
     @Schema(description = "자막 비고")
     private String capRmk;
+    @Schema(description = "자막 순번")
+    private int lnOrd;
     @NotNull
     @Schema(description = "기사 아이디")
     private Long articleId;

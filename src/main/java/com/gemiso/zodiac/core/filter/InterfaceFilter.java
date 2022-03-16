@@ -24,8 +24,8 @@ public class InterfaceFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        String excludePattern = "/interface/dailypgm,/interface/cuesheet,/interface/code,/interface/mediatransrate," +
-                "/interface/getMstListService,/interface/getCuesheetService,/interface";
+        String excludePattern = ",/interface,/interface/dailypgm,/interface/cuesheet,/interface/code,/interface/mediatransrate" +
+                ",/interface/getmstlistservice,/interface/getcuesheetservice,/interface/pstakerlist,/interface/pstaker,/interface/takerrefresh";
         excludedUrls = Arrays.asList(excludePattern.split(","));
     }
 

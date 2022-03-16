@@ -22,7 +22,7 @@ import java.util.List;
 public class TakerCueSheetDTO {
 
     @XmlElement(name="rd_id")
-    private String brdcPgmId;
+    private Long cueItemId;
     @XmlElement(name="rd_seq")
     private int rdSeq;
     @XmlElement(name="ch_div_cd")
@@ -57,6 +57,8 @@ public class TakerCueSheetDTO {
     private String artclFldNm;
     @XmlElement(name = "artcl_titl")
     private String artclTitl;
+    @XmlElement(name = "artcl_titl_en")
+    private String artclTitlEn;
     @XmlElement(name = "rptr_nm")
     private String rptrNm;
     @XmlElement(name = "dept_cd")

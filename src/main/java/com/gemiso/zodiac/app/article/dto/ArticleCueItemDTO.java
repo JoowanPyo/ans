@@ -169,7 +169,7 @@ public class ArticleCueItemDTO {
     private Long parentArtlcId;
     //private List<ArticleHistSimpleDTO> articleHistDTO = new ArrayList<>();
     @Schema(description = "기사자막 리스트")
-    private List<ArticleCapSimpleDTO> articleCapDTO = new ArrayList<>();
+    private List<ArticleCapSimpleDTO> articleCap = new ArrayList<>();
     @Schema(description = "앵커자막 리스트")
     private List<AnchorCapSimpleDTO> anchorCap = new ArrayList<>();
     @Schema(description = "기사영상 리스트")

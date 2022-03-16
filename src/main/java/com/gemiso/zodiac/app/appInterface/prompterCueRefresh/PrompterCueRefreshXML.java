@@ -1,24 +1,24 @@
-package com.gemiso.zodiac.app.appInterface.prompterCue;
+package com.gemiso.zodiac.app.appInterface.prompterCueRefresh;
 
+import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetDataDTO;
+import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetResultDTO;
 import lombok.Data;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @XmlRootElement(name = "response")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PrompterCueSheetXML {
+public class PrompterCueRefreshXML {
 
     @XmlElement(name = "result")
     private PrompterCueSheetResultDTO result;
 
     @XmlElement(name = "data")
-    private PrompterCueSheetDataDTO data;
+    private PrompterCueRefreshDataDTO data;
 
     /*@XmlElement(name = "record")
     private List<PrompterCueRefreshDTO> cueSheetDTO = new ArrayList<>();*/
