@@ -89,6 +89,8 @@ public class FacilityManageService {
 
         QFacilityManage qFacilityManage = QFacilityManage.facilityManage;
 
+        booleanBuilder.and(qFacilityManage.delYn.eq("N"));
+
         if (StringUtils.isEmpty(searchWord) == false){
             booleanBuilder.and(qFacilityManage.fcltyNm.contains(searchWord));
         }

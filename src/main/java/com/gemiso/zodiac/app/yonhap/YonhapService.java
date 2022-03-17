@@ -18,6 +18,7 @@ import com.gemiso.zodiac.app.yonhapPotoAttchFile.YonhapPhotoAttchFileRepository;
 import com.gemiso.zodiac.app.yonhapWire.YonhapWire;
 import com.gemiso.zodiac.app.yonhapWireAttchFile.YonhapWireAttchFile;
 import com.gemiso.zodiac.app.yonhapWireAttchFile.YonhapWireAttchFileRepository;
+import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.util.PropertyUtil;
 import com.gemiso.zodiac.core.util.UploadFileBean;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -51,6 +52,8 @@ public class YonhapService {
     private final YonhapAttachFileMapper yonhapAttachFileMapper;
     private final AttachFileMapper attachFileMapper;
 
+    private final DateChangeHelper dateChangeHelper;
+
     public List<YonhapDTO> findAll(Date sdate, Date edate, List<String> artcl_cate_cds, List<String> region_cds, String search_word) {
 
         BooleanBuilder booleanBuilder = getSearch(sdate, edate, artcl_cate_cds, region_cds, search_word);
@@ -81,7 +84,7 @@ public class YonhapService {
     }
 
     //String To Date
-    public Date stringToDate(String str) throws ParseException {
+    /*public Date stringToDate(String str) throws ParseException {
 
         Date returnDate = new Date();
 
@@ -92,7 +95,7 @@ public class YonhapService {
         }
 
         return returnDate;
-    }
+    }*/
 
     public YonhapExceptionDomain create(YonhapCreateDTO yonhapCreateDTO) throws Exception {
 
@@ -104,9 +107,10 @@ public class YonhapService {
         String getInputDtm = yonhapCreateDTO.getInput_dtm();
         String getTrnsfDtm = yonhapCreateDTO.getTrnsf_dtm();
 
-        Date embgDtm = stringToDate(getEmbgDtm);
-        Date inputDtm = stringToDate(getInputDtm);
-        Date trnsfDtm = stringToDate(getTrnsfDtm);
+        //String데이터 타입을 Date( yyyymmddhhmmss )타입으로 변환
+        Date embgDtm = dateChangeHelper.stringToDateNoComma(getEmbgDtm);
+        Date inputDtm = dateChangeHelper.stringToDateNoComma(getInputDtm);
+        Date trnsfDtm = dateChangeHelper.stringToDateNoComma(getTrnsfDtm);
 
         int artclqnty = Integer.parseInt(yonhapCreateDTO.getArtclqnty());
 
@@ -261,9 +265,9 @@ public class YonhapService {
                 .cmnt(yonhapDTO.getCmnt())
                 .rel_cont_id(yonhapDTO.getRelContId())
                 .ref_cont_info(yonhapDTO.getRefContInfo())
-                .embg_dtm(dateToString(yonhapDTO.getEmbgDtm()))
-                .input_dtm(dateToString(yonhapDTO.getInputDtm()))
-                .trnsf_dtm(dateToString(yonhapDTO.getTrnsfDtm()))
+                .embg_dtm(dateChangeHelper.dateToStringNormal(yonhapDTO.getEmbgDtm()))//Date(yyyy-MM-dd HH:mm:ss)형식의 입력일시를 String으로 변환
+                .input_dtm(dateChangeHelper.dateToStringNormal(yonhapDTO.getInputDtm()))//Date(yyyy-MM-dd HH:mm:ss)형식의 입력일시를 String으로 변환
+                .trnsf_dtm(dateChangeHelper.dateToStringNormal(yonhapDTO.getTrnsfDtm()))//Date(yyyy-MM-dd HH:mm:ss)형식의 입력일시를 String으로 변환
                 .action(yonhapDTO.getAction())
                 .files(attachFileDTOS)
                 .build();
@@ -277,7 +281,7 @@ public class YonhapService {
 
     }*/
 
-    public String dateToString(Date date){
+    /*public String dateToString(Date date){
 
         String returnDate = "";
 
@@ -287,7 +291,7 @@ public class YonhapService {
             returnDate = simpleDateFormat.format(date);
         }
         return returnDate;
-    }
+    }*/
 
     public BooleanBuilder getSearch(Date sdate, Date edate, List<String> artcl_cate_cds, List<String> region_cds, String search_word) {
 

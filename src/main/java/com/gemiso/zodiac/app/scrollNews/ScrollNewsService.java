@@ -1,7 +1,5 @@
 package com.gemiso.zodiac.app.scrollNews;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.scrollNews.dto.ScrollNewsCreateDTO;
 import com.gemiso.zodiac.app.scrollNews.dto.ScrollNewsDTO;
 import com.gemiso.zodiac.app.scrollNews.dto.ScrollNewsSimpleDTO;
@@ -13,6 +11,7 @@ import com.gemiso.zodiac.app.scrollNewsDetail.ScrollNewsDetail;
 import com.gemiso.zodiac.app.scrollNewsDetail.ScrollNewsDetailRepository;
 import com.gemiso.zodiac.app.scrollNewsDetail.dto.ScrollNewsDetailCreateDTO;
 import com.gemiso.zodiac.app.scrollNewsDetail.mapper.ScrollNewsDetailCreateMapper;
+import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -42,6 +41,8 @@ public class ScrollNewsService {
     private final ScrollNewsDetailCreateMapper scrollNewsDetailCreateMapper;
     
     private final UserAuthService userAuthService;
+
+    private final MarshallingJsonHelper marshallingJsonHelper;
 
     //스크롤 뉴스 목록조회
     public List<ScrollNewsDTO> findAll(Date sdate, Date edate, String delYn){
@@ -151,11 +152,12 @@ public class ScrollNewsService {
 
             //내용 Json타입으로 변환
             String ctt = dto.getCttJson();
+            String returnCtt = "";
             if (ctt != null && ctt.trim().isEmpty() == false){
-                ctt = entityToJson(ctt);
+                returnCtt = marshallingJsonHelper.MarshallingJson(ctt);
             }
 
-            dto.setCttJson(ctt);//내용 Json타입으로 변환
+            dto.setCttJson(returnCtt);//내용 Json타입으로 변환
             dto.setScrollNews(scrollNewsSimpleDTO);//스크롤 뉴스 아이디 set
             ScrollNewsDetail scrollNewsDetail = scrollNewsDetailCreateMapper.toEntity(dto);//스크롤 뉴스 상세DTO 엔티티 변환
             scrollNewsDetailRepository.save(scrollNewsDetail);//스크롤 뉴스 상세 등록
@@ -166,14 +168,14 @@ public class ScrollNewsService {
 
     //내용 Json변환
     //기사 액션로그 엔티티 Json변환
-    public String entityToJson(String ctt) throws Exception {
+ /*   public String entityToJson(String ctt) throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();
 
         String jsonInString = mapper.writeValueAsString(ctt);
 
         return jsonInString;
-    }
+    }*/
 
 
     //스크롤뉴스 아이디로 조회 및 존재유무 확인

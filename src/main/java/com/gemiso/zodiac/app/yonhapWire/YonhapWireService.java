@@ -14,6 +14,7 @@ import com.gemiso.zodiac.app.yonhapWireAttchFile.YonhapWireAttchFile;
 import com.gemiso.zodiac.app.yonhapWireAttchFile.YonhapWireAttchFileRepository;
 import com.gemiso.zodiac.app.yonhapWireAttchFile.dto.YonhapWireAttchFileDTO;
 import com.gemiso.zodiac.app.yonhapWireAttchFile.mapper.YonhapWireAttchFileMapper;
+import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,9 @@ public class YonhapWireService {
     private final YonhapWireAttchFileMapper yonhapWireAttchFileMapper;
 
     private final YonhapService yonhapService;
+
+    private final DateChangeHelper dateChangeHelper;
+
 
     public List<YonhapWireDTO> findAll(Date sdate, Date edate, String agcyCd,
                                              String searchWord, List<String> imprtList){
@@ -96,19 +100,19 @@ public class YonhapWireService {
 
     public YonhapWire updateBuildToEntity(YonhapWireCreateDTO yonhapWireCreateDTO) throws Exception {
 
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyymmddhhmmss");
+        //SimpleDateFormat transFormat = new SimpleDateFormat("yyyymmddhhmmss");
 
         Date embgDtm = null;
         Date inputDtm = null;
         Date trnsfDtm = null;
         if(!StringUtils.isEmpty(yonhapWireCreateDTO.getEmbg_dtm())) {
-            embgDtm = transFormat.parse(yonhapWireCreateDTO.getEmbg_dtm());
+            embgDtm = dateChangeHelper.stringToDateNoComma(yonhapWireCreateDTO.getEmbg_dtm());
         }
         if(!StringUtils.isEmpty(yonhapWireCreateDTO.getInput_dtm())) {
-            inputDtm = transFormat.parse(yonhapWireCreateDTO.getInput_dtm());
+            inputDtm = dateChangeHelper.stringToDateNoComma(yonhapWireCreateDTO.getInput_dtm());
         }
         if(!StringUtils.isEmpty(yonhapWireCreateDTO.getTrnsf_dtm())) {
-            trnsfDtm = transFormat.parse(yonhapWireCreateDTO.getTrnsf_dtm());
+            trnsfDtm = dateChangeHelper.stringToDateNoComma(yonhapWireCreateDTO.getTrnsf_dtm());
         }
         int artclqnty = Integer.parseInt(yonhapWireCreateDTO.getArtclqnty());
 
@@ -136,19 +140,19 @@ public class YonhapWireService {
 
     public YonhapWire postBuildToEntity(YonhapWireCreateDTO yonhapWireCreateDTO) throws Exception {
 
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyymmddhhmmss");
+        //SimpleDateFormat transFormat = new SimpleDateFormat("yyyymmddhhmmss");
 
         Date embgDtm = null;
         Date inputDtm = null;
         Date trnsfDtm = null;
         if(!StringUtils.isEmpty(yonhapWireCreateDTO.getEmbg_dtm())) {
-            embgDtm = transFormat.parse(yonhapWireCreateDTO.getEmbg_dtm());
+            embgDtm = dateChangeHelper.stringToDateNoComma(yonhapWireCreateDTO.getEmbg_dtm());
         }
         if(!StringUtils.isEmpty(yonhapWireCreateDTO.getInput_dtm())) {
-            inputDtm = transFormat.parse(yonhapWireCreateDTO.getInput_dtm());
+            inputDtm = dateChangeHelper.stringToDateNoComma(yonhapWireCreateDTO.getInput_dtm());
         }
         if(!StringUtils.isEmpty(yonhapWireCreateDTO.getTrnsf_dtm())) {
-            trnsfDtm = transFormat.parse(yonhapWireCreateDTO.getTrnsf_dtm());
+            trnsfDtm = dateChangeHelper.stringToDateNoComma(yonhapWireCreateDTO.getTrnsf_dtm());
         }
         int artclqnty = Integer.parseInt(yonhapWireCreateDTO.getArtclqnty());
 
@@ -497,14 +501,14 @@ public class YonhapWireService {
                 .agcy_nm(yonhapWireDTO.getAgcyNm())
                 .source(yonhapWireDTO.getSource())
                 .credit(yonhapWireDTO.getCredit())
-                .input_dtm(dateToString(yonhapWireDTO.getInputDtm()))
-                .trnsf_dtm(dateToString(yonhapWireDTO.getTrnsfDtm()))
+                .input_dtm(dateChangeHelper.dateToStringNormal(yonhapWireDTO.getInputDtm()))
+                .trnsf_dtm(dateChangeHelper.dateToStringNormal(yonhapWireDTO.getTrnsfDtm()))
                 .build();
 
         return yonhapWireResponseDTO;
     }
 
-    public String dateToString(Date date){
+    /*public String dateToString(Date date){
 
         String returnDate = "";
 
@@ -515,5 +519,5 @@ public class YonhapWireService {
         }
 
         return returnDate;
-    }
+    }*/
 }

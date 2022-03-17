@@ -4,6 +4,7 @@ import com.gemiso.zodiac.app.scrollNews.ScrollNews;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
@@ -36,6 +37,7 @@ public class ScrollNewsDetail {
     @Column(name = "ctt_ord")
     private int cttOrd;
 
+    @Type(type = "json")
     @Column(name = "ctt_json", columnDefinition = "json")
     private String cttJson;
 

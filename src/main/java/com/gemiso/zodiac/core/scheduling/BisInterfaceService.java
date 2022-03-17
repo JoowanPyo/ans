@@ -10,6 +10,7 @@ import com.gemiso.zodiac.app.dailyProgram.DailyProgramRepository;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.program.ProgramRepository;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
+import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.scheduling.dto.*;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,8 @@ public class BisInterfaceService {
     private final BaseProgramMapper baseProgramMapper;
 
     private final UserAuthService userAuthService;
+
+    private final DateChangeHelper dateChangeHelper;
 
     //Bis에서 프로그램 정보를 가져온다.
     public BisProgramDTO bisProgramfindAll() throws Exception {
@@ -443,37 +446,37 @@ public class BisInterfaceService {
 
                 // 시간만 있을경우
                 if (ObjectUtils.isEmpty(getHour) == false && ObjectUtils.isEmpty(minute)) {
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date dateBroadHm = simpleDateFormat.parse(formatBroadHm);//방송시작시간 date로 변환
+                    //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date dateBroadHm = dateChangeHelper.StringToDateNormal(formatBroadHm);//방송시작시간 date로 변환
                     Calendar cal = Calendar.getInstance(); //시간을 더하기 위해 캘린더 생성
                     cal.setTime(dateBroadHm);//캘린더에 시작시간 셋팅
                     cal.add(Calendar.HOUR, getHour);//시작시에에 방송길이로 들어온 시간 더하기 ->종료시간
-                    String StringBroadHm = simpleDateFormat.format(cal.getTime());//스트링으로 변환하여 저장
+                    String StringBroadHm = dateChangeHelper.dateToStringNormal(cal.getTime());//스트링으로 변환하여 저장
 
                     String endTime = StringBroadHm.substring(11, 15);
                     broadRun = endTime;
                 }
                 // 시,분 둘다 있을경우,
                 if (ObjectUtils.isEmpty(getHour) == false && ObjectUtils.isEmpty(minute) == false) {
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date dateBroadHm = simpleDateFormat.parse(formatBroadHm);//방송시작시간 date로 변환
+                    //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date dateBroadHm = dateChangeHelper.StringToDateNormal(formatBroadHm);//방송시작시간 date로 변환
                     Calendar cal = Calendar.getInstance(); //시간을 더하기 위해 캘린더 생성
                     cal.setTime(dateBroadHm); //캘린더에 시작시간 셋팅
                     cal.add(Calendar.HOUR, getHour); //시작시에에 방송길이로 들어온 시간 더하기 ->종료시간
                     cal.add(Calendar.MINUTE, minute); //시작시간에 방송길이로 들어온 분 더하기 ->종료 분
-                    String StringBroadHm = simpleDateFormat.format(cal.getTime()); //스트링으로 변환하여 저장
+                    String StringBroadHm = dateChangeHelper.dateToStringNormal(cal.getTime()); //스트링으로 변환하여 저장
 
                     String endTime = StringBroadHm.substring(11, 19);
                     broadRun = endTime;
                 }
 
             } else {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Date dateBroadHm = simpleDateFormat.parse(formatBroadHm);//방송시작시간 date로 변환
+                //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date dateBroadHm = dateChangeHelper.StringToDateNormal(formatBroadHm);//방송시작시간 date로 변환
                 Calendar cal = Calendar.getInstance(); //시간을 더하기 위해 캘린더 생성
                 cal.setTime(dateBroadHm);//캘린더에 시작시간 셋팅
                 cal.add(Calendar.MINUTE, chkMinute);//시작시간에 방송길이로 들어온 분 더하기 ->종료 분
-                String StringBroadHm = simpleDateFormat.format(cal.getTime());//스트링으로 변환하여 저장
+                String StringBroadHm = dateChangeHelper.dateToStringNormal(cal.getTime());//스트링으로 변환하여 저장
 
                 String endTime = StringBroadHm.substring(11, 19);
                 broadRun = endTime;

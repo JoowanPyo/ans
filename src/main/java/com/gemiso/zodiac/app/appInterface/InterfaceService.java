@@ -3,13 +3,11 @@ package com.gemiso.zodiac.app.appInterface;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.appInterface.codeDTO.*;
 import com.gemiso.zodiac.app.appInterface.prompterCue.*;
-import com.gemiso.zodiac.app.appInterface.prompterCueRefresh.PrompterCueRefreshDTO;
 import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramDTO;
 import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramDataDTO;
 import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramResultDTO;
 import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramXML;
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.*;
-import com.gemiso.zodiac.app.appInterface.takerCueRefresh.TakerCueRefreshDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueRefresh.TakerCueRefreshDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueRefresh.TakerCueRefreshXML;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
@@ -39,6 +37,7 @@ import com.gemiso.zodiac.app.issue.Issue;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.symbol.Symbol;
+import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,9 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -67,6 +64,8 @@ public class InterfaceService {
 
     private final CueSheetService cueSheetService;
     private final CueSheetItemService cueSheetItemService;
+
+    private final DateChangeHelper dateChangeHelper;
 
 
     public List<ParentProgramDTO> dailyPgmFindAll(Date sdate, Date edate, String brdc_pgm_id, String pgm_nm) throws ParseException {
@@ -397,7 +396,7 @@ public class InterfaceService {
 
                 //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
                 TakerCueSheetSpareDTO takerCueSheetDTO = TakerCueSheetSpareDTO.builder()
-                        .brdcPgmId(brdcPgmId)
+                        .cueItemId(cueSheetItem.getCueItemId())
                         .rdSeq(rdSeq)
                         .chDivCd(cueSheet.getChDivCd()) // 채널구분코드
                         .cueDivCdNm(cueSheet.getCueDivCdNm()) //채널구분코드 명
@@ -432,7 +431,7 @@ public class InterfaceService {
 
                 //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
                 TakerCueSheetSpareDTO takerCueSheetDTO = TakerCueSheetSpareDTO.builder()
-                        .brdcPgmId(brdcPgmId)
+                        .cueItemId(cueSheetItem.getCueItemId())
                         .rdSeq(0)
                         .chDivCd(cueSheet.getChDivCd())// 채널구분코드
                         .cueDivCdNm(cueSheet.getCueDivCdNm())//채널구분코드 명
@@ -480,7 +479,7 @@ public class InterfaceService {
                         .snsYn("")//???
                         .inputrId(article.getInputrId())
                         .inputrNm(article.getInputrNm())
-                        .inputDtm(dateToString(article.getInputDtm())) //Date형식의 입력일시를 String으로 변환
+                        .inputDtm(dateChangeHelper.dateToStringNormal(article.getInputDtm())) //Date(yyyy-MM-dd HH:mm:ss)형식의 입력일시를 String으로 변환
                         .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
                         .build();
 
@@ -672,7 +671,7 @@ public class InterfaceService {
                 .snsYn("")//???
                 .inputrId(article.getInputrId())
                 .inputrNm(article.getInputrNm())
-                .inputDtm(dateToString(article.getInputDtm())) //Date형식의 입력일시를 String으로 변환
+                .inputDtm(dateChangeHelper.dateToStringNormal(article.getInputDtm())) //Date(yyyy-MM-dd HH:mm:ss)형식의 입력일시를 String으로 변환
                 .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
                 .build();
 
@@ -752,15 +751,6 @@ public class InterfaceService {
 
     }
 
-    //Date형식을 String으로 파싱
-    public String dateToString(Date date) {
-
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String stringDate = dateFormat.format(date);
-
-        return stringDate;
-    }
-
     //채널코드 조회
     public TakerCodeDTO codeFindAll(String key, String ch_div_cd, String usr_id, String token, String usr_ip, String format,
                                     String lang, String os_type) {
@@ -833,20 +823,6 @@ public class InterfaceService {
 
         return prompterProgramDTOList;
     }
-
-    //String형식의 데이터를 Date타입으로 변환.
-   /* public Date stringToDate(String date) throws ParseException {
-
-        Date formatDate = null;
-
-        if (date != null && date.trim().isEmpty() == false) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-            formatDate = simpleDateFormat.parse(date);
-        }
-
-        return formatDate;
-    }*/
 
     //일일편성 큐시트목록 유니온 목록조회 목록을 프롬프터 형식의 데이터로 변환
     public List<PrompterProgramDTO> toPrompterDailyPgm(CueSheetFindAllDTO cueSheetFindAllDTO) {

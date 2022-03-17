@@ -75,6 +75,7 @@ dependencies {
     //RabbitMq
     implementation 'com.rabbitmq:amqp-client:5.14.2'
 
+
 }
 
 /*bootWar {

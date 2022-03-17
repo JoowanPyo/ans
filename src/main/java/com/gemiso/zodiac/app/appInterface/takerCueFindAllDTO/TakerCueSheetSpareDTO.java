@@ -22,7 +22,7 @@ import java.util.List;
 public class TakerCueSheetSpareDTO {
 
     @XmlElement(name="rd_id")
-    private String brdcPgmId;
+    private Long cueItemId;
     @XmlElement(name="rd_seq")
     private int rdSeq;
     @XmlElement(name="ch_div_cd")
