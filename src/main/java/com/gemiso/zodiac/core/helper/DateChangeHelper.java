@@ -25,6 +25,34 @@ public class DateChangeHelper {
         return returnDate;
     }
 
+    //String형식을 Date으로 파싱
+    public Date StringToDateNormal(String str) throws ParseException {
+
+        Date returnDate = new Date();
+
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        if (str != null && str.trim().isEmpty() == false){
+            returnDate = transFormat.parse(str);
+        }
+
+        return returnDate;
+    }
+
+    //String형식을 Date으로 파싱
+    public Date StringToDateNoTime(String str) throws ParseException {
+
+        Date returnDate = new Date();
+
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        if (str != null && str.trim().isEmpty() == false){
+            returnDate = transFormat.parse(str);
+        }
+
+        return returnDate;
+    }
+
     //Date형식을 String으로 파싱
     public String dateToStringNormal(Date date) {
 
@@ -38,15 +66,17 @@ public class DateChangeHelper {
         return returnDate;
     }
 
-    //Date형식을 String으로 파싱
-    public Date StringToDateNormal(String str) throws ParseException {
+    //Date To String
+    public String dateToStringNoTime(Date date){
 
-        Date returnDate = new Date();
+        String returnDate = "";
 
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        if (str != null && str.trim().isEmpty() == false){
-            returnDate = transFormat.parse(str);
+        if (ObjectUtils.isEmpty(date) == false) {
+
+            returnDate = dateFormat.format(date);
+
         }
 
         return returnDate;

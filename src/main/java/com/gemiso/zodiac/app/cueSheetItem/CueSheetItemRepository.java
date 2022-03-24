@@ -26,4 +26,7 @@ public interface CueSheetItemRepository extends JpaRepository<CueSheetItem, Long
 
     @Query("select a from CueSheetItem a where a.cueSheet.cueId =:cueId and a.delYn =:del_yn and a.spareYn = 'Y'")
     List<CueSheetItem> findSpareCue(@Param("cueId") Long cueId, @Param("del_yn") String del_yn);
+
+    @Query("select a from CueSheetItem a where a.cueItemId = :cueItemId and a.delYn = 'Y'")
+    Optional<CueSheetItem> findDeletedCueItem(@Param("cueItemId")Long cueItemId);
 }

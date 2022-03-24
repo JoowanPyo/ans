@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheet;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.*;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetCreateMapper;
@@ -28,7 +29,12 @@ import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.core.enumeration.ActionEnum;
+import com.gemiso.zodiac.core.helper.DateChangeHelper;
+import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.core.topic.TopicService;
+import com.gemiso.zodiac.core.topic.articleTopicDTO.ArticleTopicDTO;
+import com.gemiso.zodiac.core.topic.articleTopicDTO.CueSheetTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -72,6 +78,12 @@ public class CueSheetService {
     private final UserAuthService userAuthService;
 
     private final DailyProgramService dailyProgramService;
+
+    private final DateChangeHelper dateChangeHelper;
+
+    private final MarshallingJsonHelper marshallingJsonHelper;
+
+    private final TopicService topicService;
 
 
     //큐시트 목록조회 + 유니온 일일편성 [큐시트 인터페이스+큐시트 아이템추가 목록]
@@ -361,11 +373,13 @@ public class CueSheetService {
 
 
         //큐시트 등록
-    public Long create(CueSheetCreateDTO cueSheetCreateDTO){
+    public Long create(CueSheetCreateDTO cueSheetCreateDTO) throws JsonProcessingException {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
         cueSheetCreateDTO.setInputrId(userId);
+        cueSheetCreateDTO.setCueOderVer(0);
+        cueSheetCreateDTO.setCueVer(0);
 
         CueSheet cueSheet = cueSheetCreateMapper.toEntity(cueSheetCreateDTO);
 
@@ -375,11 +389,14 @@ public class CueSheetService {
 
         cueSheetHistCreate(cueId, cueSheet, userId);
 
+        //큐시트 토픽 메세지 전송
+        sendCueTopic(cueSheet, "CC");
+
         return cueId;
     }
 
     //큐시트 수정
-    public void update(CueSheetUpdateDTO cueSheetUpdateDTO, Long cueId){
+    public void update(CueSheetUpdateDTO cueSheetUpdateDTO, Long cueId) throws JsonProcessingException {
 
         //수정! 잠금여부? 잠금사용자, 잠금일시 도 수정할 때 정보를 넣어주나?
 
@@ -396,6 +413,8 @@ public class CueSheetService {
             }
         }
 
+        cueSheetUpdateDTO.setCueVer(cueSheet.getCueVer() + 1); //버전정보 + 1
+
         cueSheetUpdateMapper.updateFromDto(cueSheetUpdateDTO, cueSheet);
 
         cueSheetRepository.save(cueSheet);
@@ -403,6 +422,8 @@ public class CueSheetService {
         cueSheetHistUpdate(cueId, cueSheet);
 
         //수정! 버전정보 안들어가나요?
+        //큐시트 토픽 메세지 전송
+        sendCueTopic(cueSheet, "CU");
 
     }
 
@@ -424,6 +445,42 @@ public class CueSheetService {
         cueSheetRepository.save(cueSheet);
 
         cueSheetHistDelete( cueId, cueSheet);
+
+    }
+
+    //이미등록된 큐시트가 있는지 체크
+    public int getCueSheetCount(CueSheetCreateDTO cueSheetCreateDTO){
+
+        int cueCnt = 0;
+
+        String brdcDt = cueSheetCreateDTO.getBrdcDt();
+
+        ProgramSimpleDTO program = cueSheetCreateDTO.getProgram();
+
+        if (ObjectUtils.isEmpty(program) == false){
+
+            String brdcPgmId = program.getBrdcPgmId();
+
+            cueCnt = cueSheetRepository.findCueProgram(brdcDt, brdcPgmId);
+
+        }
+
+        return cueCnt;
+
+    }
+
+    //이미등록된 큐시트가 있는지 체크
+    public int getCueSheetCount2(String brdcDt, String brdcPgmId){
+
+        int cueCnt = 0;
+
+        if (brdcPgmId != null && brdcPgmId.trim().isEmpty() == false){
+
+            cueCnt = cueSheetRepository.findCueProgram(brdcDt, brdcPgmId);
+
+        }
+
+        return cueCnt;
 
     }
 
@@ -562,8 +619,8 @@ public class CueSheetService {
         booleanBuilder.and(qCueSheet.delYn.eq("N"));
 
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
-            String StringSdate = dateToString(sdate);
-            String stringEdate = dateToString(edate);
+            String StringSdate = dateChangeHelper.dateToStringNoTime(sdate);//Date To String( yyyy-MM-dd )
+            String stringEdate = dateChangeHelper.dateToStringNoTime(edate);//Date To String( yyyy-MM-dd )
             booleanBuilder.and(qCueSheet.brdcDt.between(StringSdate, stringEdate));
         }
         if(brdcPgmId != null && brdcPgmId.trim().isEmpty() == false){
@@ -578,16 +635,6 @@ public class CueSheetService {
         }
 
         return booleanBuilder;
-    }
-
-    //Date To String
-    public String dateToString(Date date){
-
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        String returnDate = dateFormat.format(date);
-
-        return returnDate;
     }
     
     //큐시트 락
@@ -641,7 +688,9 @@ public class CueSheetService {
 
         String userId = userAuthService.authUser.getUserId(); // 로그인 Id로 입력자 set
         cueSheetCreateDTO.setInputrId(userId);
-        cueSheetCreateDTO.setInputDtm(null); // 원본 큐시트 입력시간 초기화
+        cueSheetCreateDTO.setCueVer(0); //큐시트 버전 리셋
+        cueSheetCreateDTO.setCueOderVer(0); //큐시트 오더버전 리셋
+        getCueSheet.setInputDtm(null); // 원본 큐시트 입력시간 초기화
 
         if (brdcDt != null && brdcDt.trim().isEmpty() == false) { //방송일자를 변경해 큐시트를 복사할 경우
             cueSheetCreateDTO.setBrdcDt(brdcDt); //방송일자 set
@@ -682,6 +731,27 @@ public class CueSheetService {
             CueSheetItem cueSheetItem = cueSheetItemCreateMapper.toEntity(cueItemDTO);
             cueSheetItemRepository.save(cueSheetItem);
         }
+
+    }
+
+    //큐시트 토픽 메세지 전송
+    public void sendCueTopic(CueSheet cueSheet, String eventId) throws JsonProcessingException {
+
+        Long cueId = cueSheet.getCueId();
+
+        //토픽메세지 ArticleTopicDTO Json으로 변환후 send
+        CueSheetTopicDTO cueSheetTopicDTO = new CueSheetTopicDTO();
+        //모델부분은 안넣어줘도 될꺼같음.
+        cueSheetTopicDTO.setEventId(eventId);
+        cueSheetTopicDTO.setCueId(cueId);
+        cueSheetTopicDTO.setCueVer(cueSheet.getCueVer());
+        cueSheetTopicDTO.setCueSheet(cueSheet);
+        String json = marshallingJsonHelper.MarshallingJson(cueSheetTopicDTO);
+
+        //interface에 큐메세지 전송
+        topicService.topicInterface(json);
+        //web에 큐메세지 전송
+        topicService.topicWeb(json);
 
     }
 

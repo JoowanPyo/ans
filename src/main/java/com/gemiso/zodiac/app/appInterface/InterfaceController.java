@@ -1,13 +1,10 @@
 package com.gemiso.zodiac.app.appInterface;
 
 import com.gemiso.zodiac.app.appInterface.codeDTO.TakerCodeDTO;
-import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetDTO;
-import com.gemiso.zodiac.app.appInterface.prompterCueRefresh.PrompterCueRefreshDTO;
-import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramDTO;
-import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.prompterCueDTO.PrompterCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.prompterProgramDTO.PrompterProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDataDTO;
-import com.gemiso.zodiac.app.appInterface.takerCueRefresh.TakerCueRefreshDTO;
-import com.gemiso.zodiac.app.appInterface.takerCueRefresh.TakerCueRefreshDataDTO;
+import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerCueRefreshDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
@@ -24,7 +21,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -161,7 +157,7 @@ public class InterfaceController {
     public String takerCueItemRefresh(@Parameter(name = "rd_id", description = "프로그램 아이디")
                                       @RequestParam(value = "rd_id", required = false) Long rd_id,
                                       @Parameter(name = "rd_seq", description = "큐시트 아이템 순서값")
-                                      @RequestParam(value = "rd_seq", required = false) int rd_seq,
+                                      @RequestParam(value = "rd_seq", required = false) Integer rd_seq,
                                       @RequestHeader(value = "securityKey") String securityKey) {
 
         TakerCueRefreshDataDTO takerCueSheetDTO = interfaceService.takerCueItemRefresh(rd_id, rd_seq);

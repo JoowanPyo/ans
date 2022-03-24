@@ -472,15 +472,7 @@ public class YonhapWireService {
         }
         if (ObjectUtils.isEmpty(imprtList) == false){
 
-            for (int i =0; i < imprtList.size(); i++){
-                String imprt = imprtList.get(i);
-
-                if (i == 0){
-                    booleanBuilder.and(qYonhapWire.imprt.eq(imprt));
-                }else {
-                    booleanBuilder.or(qYonhapWire.imprt.eq(imprt));
-                }
-            }
+            booleanBuilder.and(qYonhapWire.imprt.in(imprtList));
 
         }
         return booleanBuilder;

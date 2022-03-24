@@ -9,9 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ArticleTopicDTO {
+public class CueSheetTopicDTO {
 
     private String eventId;
-    private Long artclId;
-    private Object article;
+    private Long cueId;
+    private int cueVer;
+    private int cueOderVer;
+    private Object cueSheet;
 }

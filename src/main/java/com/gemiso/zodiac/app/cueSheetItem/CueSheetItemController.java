@@ -54,9 +54,9 @@ public class CueSheetItemController {
     @Operation(summary = "큐시트 아이템 템플릿(운영참조) 등록", description = "큐시트 아이템 템플릿(운영참조) 등록")
     @PostMapping(path = "/{cueId}/item/template")
     public AnsApiResponse<List<CueSheetItemDTO>> createTemplate(@Parameter(description = "필수값<br> ", required = true)
-                                                          @RequestBody @Valid List<CueSheetItemCreateDTO> cueSheetItemCreateDTOList,
-                                                          @Parameter(name = "cueId", description = "큐시트아이디")
-                                                          @PathVariable("cueId") Long cueId) {
+                                                                @RequestBody @Valid List<CueSheetItemCreateDTO> cueSheetItemCreateDTOList,
+                                                                @Parameter(name = "cueId", description = "큐시트아이디")
+                                                                @PathVariable("cueId") Long cueId) {
 
         cueSheetItemService.createTemplate(cueSheetItemCreateDTOList, cueId);
 
@@ -197,7 +197,7 @@ public class CueSheetItemController {
 
     @Operation(summary = "예비 큐시트 아이템 수정", description = "예비 큐시트 아이템 수정")
     @PutMapping(path = "/{cueId}/item/{cueItemId}/updatespare")
-    public AnsApiResponse<CueSheetSimpleDTO> updateSpareCueItem(@Parameter(name = "cueId", description = "큐시트아이디")
+    public AnsApiResponse<CueSheetItemSimpleDTO> updateSpareCueItem(@Parameter(name = "cueId", description = "큐시트아이디")
                                                                 @PathVariable("cueId") Long cueId,
                                                                 @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
                                                                 @PathVariable("cueItemId") Long cueItemId,
@@ -206,9 +206,24 @@ public class CueSheetItemController {
                                                                 @Parameter(name = "spareYn", description = "예비여부(Y,N)")
                                                                 @RequestParam(value = "spareYn", required = false) String spareYn) {
 
-        CueSheetSimpleDTO cueSheetSimpleDTO = cueSheetItemService.updateSpareCueItem(cueId, cueItemId, cueItemOrd, spareYn);
+        CueSheetItemSimpleDTO cueSheetItemSimpleDTO = cueSheetItemService.updateSpareCueItem(cueId, cueItemId, cueItemOrd, spareYn);
 
-        return new AnsApiResponse(cueSheetSimpleDTO);
+        return new AnsApiResponse(cueSheetItemSimpleDTO);
     }
+
+    @Operation(summary = "큐시트 아이템 복구", description = "큐시트 아이템 복구")
+    @PutMapping(path = "/{cueId}/item/{cueItemId}/restore")
+    public AnsApiResponse<CueSheetItemSimpleDTO> cueSheetItemRestore(@Parameter(name = "cueId", description = "큐시트아이디")
+                                                                 @PathVariable("cueId") Long cueId,
+                                                                 @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
+                                                                 @PathVariable("cueItemId") Long cueItemId,
+                                                                 @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
+                                                                 @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd) {
+
+        CueSheetItemSimpleDTO cueSheetItemSimpleDTO = cueSheetItemService.cueSheetItemRestore(cueId, cueItemId, cueItemOrd);
+
+        return new AnsApiResponse<>(cueSheetItemSimpleDTO);
+    }
+
 
 }

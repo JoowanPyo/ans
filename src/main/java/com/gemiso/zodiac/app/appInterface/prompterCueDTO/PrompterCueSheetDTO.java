@@ -1,7 +1,5 @@
-package com.gemiso.zodiac.app.appInterface.prompterCueRefresh;
+package com.gemiso.zodiac.app.appInterface.prompterCueDTO;
 
-import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterAnchorCapDTO;
-import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterArticleCapDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,8 +9,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Builder
@@ -20,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @XmlRootElement(name = "record")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PrompterCueRefreshDTO {
+public class PrompterCueSheetDTO {
 
     @XmlElement(name="rd_id")
     private Long cueId;
@@ -88,11 +84,11 @@ public class PrompterCueRefreshDTO {
     @XmlElement(name = "news_acum_time")
     private Integer newsAcumTime;
 
-    @XmlElement(name = "articleCap")
-    private List<PrompterArticleCapDTO> articleCapList = new ArrayList<>();
+    @XmlElement(name = "articleCaps")
+    private PrompterArticleCaps articleCaps;
 
-    @XmlElement(name = "anchorCap")
-    private List<PrompterAnchorCapDTO> anchorCapList = new ArrayList<>();
+    @XmlElement(name = "anchorCaps")
+    private PrompterAnchorCaps anchorCaps;
 
 
 }

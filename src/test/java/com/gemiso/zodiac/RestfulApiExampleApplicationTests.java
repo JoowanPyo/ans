@@ -67,7 +67,7 @@ class RestfulApiExampleApplicationTests {
 
         while (true)
         {
-            //topicService.topicTest();
+
         }
 
     }

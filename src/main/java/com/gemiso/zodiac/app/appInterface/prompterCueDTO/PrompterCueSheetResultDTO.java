@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.appInterface.prompterProgram;
+package com.gemiso.zodiac.app.appInterface.prompterCueDTO;
 
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Data
 @XmlRootElement(name = "result")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PrompterProgramResultDTO {
+public class PrompterCueSheetResultDTO {
 
     @XmlAttribute
     private String success;

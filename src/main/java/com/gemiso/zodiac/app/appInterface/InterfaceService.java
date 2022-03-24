@@ -2,14 +2,14 @@ package com.gemiso.zodiac.app.appInterface;
 
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.appInterface.codeDTO.*;
-import com.gemiso.zodiac.app.appInterface.prompterCue.*;
-import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramDTO;
-import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramDataDTO;
-import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramResultDTO;
-import com.gemiso.zodiac.app.appInterface.prompterProgram.PrompterProgramXML;
+import com.gemiso.zodiac.app.appInterface.prompterCueDTO.*;
+import com.gemiso.zodiac.app.appInterface.prompterProgramDTO.PrompterProgramDTO;
+import com.gemiso.zodiac.app.appInterface.prompterProgramDTO.PrompterProgramDataDTO;
+import com.gemiso.zodiac.app.appInterface.prompterProgramDTO.PrompterProgramResultDTO;
+import com.gemiso.zodiac.app.appInterface.prompterProgramDTO.PrompterProgramXML;
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.*;
-import com.gemiso.zodiac.app.appInterface.takerCueRefresh.TakerCueRefreshDataDTO;
-import com.gemiso.zodiac.app.appInterface.takerCueRefresh.TakerCueRefreshXML;
+import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerCueRefreshDataDTO;
+import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerCueRefreshXML;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDataDTO;
@@ -518,7 +518,7 @@ public class InterfaceService {
             for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
                 Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
 
-                if (ObjectUtils.isEmpty(symbol)){  //심볼이 있을경우
+                if (ObjectUtils.isEmpty(symbol) == false){  //심볼이 있을경우
                     String symbolId = symbol.getSymbolId(); //심볼아이디
                     String symbolNm = symbol.getSymbolNm(); //심볼 명
 
@@ -632,9 +632,9 @@ public class InterfaceService {
                 .rdDtlDivCd(cueSheetItem.getCueItemDivCd()) //큐시트아이템 구분 코드
                 .mcStCd(cueSheetItem.getBrdcStCd()) //방송상태코드
                 .cmDivCd(returnSymbolId)//심볼 아이디 (채널명) ex VNS1, VNS2, VNS3
+                .cmDivNm(returnSymbolNm)//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
                 .rdDtlDivNm(cueSheetItem.getCueItemDivCdNm())//큐시트아이템 구분 코드 명
                 .mcStNm(cueSheetItem.getBrdcStCdNm())//방송상태 명
-                .cmDivNm(returnSymbolNm)//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
                 .artclId(article.getArtclId())
                 .artclFrmCd(article.getArtclTypDtlCd())
                 .artclFrmNm(article.getArtclTypDtlCdNm())
@@ -992,7 +992,7 @@ public class InterfaceService {
         //프롬프터 xml형식으로 변환할
         PrompterProgramXML prompterProgramXML = new PrompterProgramXML();
 
-        //Lsit<prompterProgram>
+        //Lsit<prompterProgramDTO>
         PrompterProgramDataDTO prompterProgramDataDTO = new PrompterProgramDataDTO();
 
         //success="true" msg="ok" 담는DTO
@@ -1221,18 +1221,20 @@ public class InterfaceService {
         return prompterAnchorCaps;
     }
 
-    public TakerCueRefreshDataDTO takerCueItemRefresh(Long rd_id, int rd_seq){
+
+    //테이커 큐시트 아이템 Refresh
+    public TakerCueRefreshDataDTO takerCueItemRefresh(Long rd_id, Integer rd_seq){
 
         TakerCueRefreshDataDTO takerCueRefreshDataDTO = new TakerCueRefreshDataDTO();//리턴DTO
 
-        Optional<CueSheetItem> cueSheetItemEntity = cueSheetItemRepository.findByCueItem(rd_id);
-        
-        //검색된 데이터가 없을경우 빈값DTO 리턴
-        if (cueSheetItemEntity.isPresent() == false){
-            return takerCueRefreshDataDTO;
-        }
-        //검색된 큐시트 아이템 리턴
-        CueSheetItem cueSheetItem = cueSheetItemEntity.get();
+        //조회조건으로 들어온 큐시트 아이템 아이디로 큐시트 엔티티 조회
+        //CueSheet cueSheet = findCueSheet(rd_id);
+
+        //조회조건으로 들어온 큐시트 아이템 아이디로 큐시트 아이템 엔티티 조회
+        CueSheetItem cueSheetItem = cueSheetItemService.cueItemFindOrFail(rd_id);
+
+        //조회된 큐시트 아이템에서 큐시트 정보 get
+        CueSheet cueSheet = cueSheetItem.getCueSheet();
 
         Article article = cueSheetItem.getArticle(); //큐시트 아이템에 기사정보get
 
@@ -1246,7 +1248,7 @@ public class InterfaceService {
         for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
             Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
 
-            if (ObjectUtils.isEmpty(symbol)){  //심볼이 있을경우
+            if (ObjectUtils.isEmpty(symbol) == false){  //심볼이 있을경우
                 String symbolId = symbol.getSymbolId(); //심볼아이디
                 String symbolNm = symbol.getSymbolNm(); //심볼 명
 
@@ -1271,8 +1273,6 @@ public class InterfaceService {
         List<CueSheetMedia> cueSheetMediaList = cueSheetItem.getCueSheetMedia();
 
         List<TakerCueSheetVideoDTO> takerCueSheetVideoDTOList = getVideoDTOList(cueSheetMediaList);
-
-        CueSheet cueSheet = new CueSheet();//메소드 재사용으로 오류안내기 위해 생성.
 
         TakerCueSheetDTO takerCueSheetDTO = new TakerCueSheetDTO(); //데이터 DTO에 담을 DTO
 

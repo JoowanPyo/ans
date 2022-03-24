@@ -39,7 +39,7 @@ public class HomeController {
 
         PageResultDTO<ArticleDTO, Article> pageList = articleService.findAll(null, null, null, rptrId, inputrId,
                 null, null, null, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null, null);
 
         return new AnsApiResponse<>(pageList);
     }

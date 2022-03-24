@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.appInterface.prompterCue;
+package com.gemiso.zodiac.app.appInterface.prompterCueDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

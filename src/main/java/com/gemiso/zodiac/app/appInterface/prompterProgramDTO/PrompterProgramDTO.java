@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.appInterface.prompterProgram;
+package com.gemiso.zodiac.app.appInterface.prompterProgramDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -54,6 +54,7 @@ public class UserAuthChkService {
         return true;//조회된 사용자 권한에 해당 api에 맞는 권한이 없을경우 true리턴 exception 403 FORBIDDEN 발생.
     }
 
+    //권한체크
     public Boolean authChk(String auth1) {
 
         //사용자 토큰 정보에서 사용자 아이디를 get

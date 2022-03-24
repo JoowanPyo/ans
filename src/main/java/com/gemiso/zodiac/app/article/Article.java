@@ -257,7 +257,7 @@ public class Article extends BaseEntity {
     @Column(name = "editor_id", length = 50)
     private String editorId;
 
-    @Formula("(select a.cd_nm from tb_cd a where a.cd = editor_id)")
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = editor_id)")
     private String editorNm;
 
     @Column(name = "cue_id", length = 50)

@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.article;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapCreateDTO;
@@ -124,7 +125,8 @@ public class ArticleService {
     //기사 목록조회
     public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
                                                       String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
-                                                      Integer page, Integer limit, List<String> apprvDivCdList, String deptCd, String artclCateCd, String artclTypDtlCd) {
+                                                      Integer page, Integer limit, List<String> apprvDivCdList, String deptCd,
+                                                      String artclCateCd, String artclTypDtlCd, String delYn) {
 
         /*page = Optional.ofNullable(page).orElse(0);
         limit = Optional.ofNullable(limit).orElse(50);
@@ -148,7 +150,7 @@ public class ArticleService {
 
         //검색조건생성 [where생성]
         BooleanBuilder booleanBuilder = getSearch(sdate, edate, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd, artclTypCd,
-                searchDivCd, searchWord, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd);
+                searchDivCd, searchWord, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd, delYn);
 
         //전체조회[page type]
         Page<Article> result = articleRepository.findAll(booleanBuilder, pageable);
@@ -294,6 +296,7 @@ public class ArticleService {
 
         Long orgArticleId = article.getOrgArtclId();
 
+        //복사된 기사(큐시트에 포함된 기사)인 경우 interface쪽에도 큐메세지 send
         if (ObjectUtils.isEmpty(orgArticleId) == false){
             topicService.topicInterface(json);
         }
@@ -337,6 +340,7 @@ public class ArticleService {
 
         Long orgArticleId = article.getOrgArtclId();
 
+        //복사된 기사(큐시트에 포함된 기사)인 경우 interface쪽에도 큐메세지 send
         if (ObjectUtils.isEmpty(orgArticleId) == false){
             topicService.topicInterface(json);
         }
@@ -810,7 +814,7 @@ public class ArticleService {
     }
 
     // 기사 잠금
-    public void articleLock(Long artclId, ArticleLockDTO articleLockDTO) {
+    public void articleLock(Long artclId, ArticleLockDTO articleLockDTO) throws JsonProcessingException {
 
         Article article = articleFindOrFail(artclId);
 
@@ -833,6 +837,21 @@ public class ArticleService {
         articleLockMapper.updateFromDto(articleLockDTO, article);
 
         articleRepository.save(article);
+
+        //토픽메세지 ArticleTopicDTO Json으로 변환후 send
+        ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
+        articleTopicDTO.setEventId("AL");
+        articleTopicDTO.setArtclId(artclId);
+        //모델부분은 안넣어줘도 될꺼같음.
+        articleTopicDTO.setArticle(articleLockDTO);
+        String json = marshallingJsonHelper.MarshallingJson(articleTopicDTO);
+
+        Long orgArticleId = article.getOrgArtclId();
+
+        if (ObjectUtils.isEmpty(orgArticleId) == false){
+            topicService.topicInterface(json);
+        }
+        topicService.topicWeb(json);
 
 
     }
@@ -882,7 +901,7 @@ public class ArticleService {
     //기사 목록조회시 조건 빌드[일반 목록조회 ]
     public BooleanBuilder getSearch(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
                                     String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
-                                    List<String> apprvDivCdList, String deptCd, String artclCateCd, String artclTypDtlCd) {
+                                    List<String> apprvDivCdList, String deptCd, String artclCateCd, String artclTypDtlCd, String delYn) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -929,6 +948,12 @@ public class ArticleService {
         if (artclTypCd != null && artclTypCd.trim().isEmpty() == false) {
             booleanBuilder.and(qArticle.artclTypCd.eq(artclTypCd));
         }
+        //검색조건 = 삭제 여부
+        if (delYn != null && delYn.trim().isEmpty() == false) {
+            booleanBuilder.and(qArticle.delYn.eq(delYn));
+        } else {
+            booleanBuilder.and(qArticle.delYn.eq("N")); //삭제여부값 안들어 올시 디폴트 'N'
+        }
         //검색어로 조회
         if (searchWord != null && searchWord.trim().isEmpty() == false) {
             //검색구분코드 01 일때 기사 제목으로 검색
@@ -950,7 +975,8 @@ public class ArticleService {
         //픽스구분코드[여러개의 or조건으로 가능]
         if (CollectionUtils.isEmpty(apprvDivCdList) == false){
 
-            int listSize = apprvDivCdList.size(); //리스트 길이에 맞춰 or조건 set
+            booleanBuilder.and(qArticle.apprvDivCd.in(apprvDivCdList));
+            /*int listSize = apprvDivCdList.size(); //리스트 길이에 맞춰 or조건 set
 
             if (listSize == 1){
                 booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)));
@@ -970,22 +996,9 @@ public class ArticleService {
                 booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(1)))
                         .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(2))).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(3)))
                         .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(4))));
-            }
+            }*/
 
         }
-
-        /*int idx = 0;
-        //픽스구분코드
-        for (String apprvDivCd : apprvDivCdList) {
-            if (apprvDivCd != null && apprvDivCd.trim().isEmpty() == false) {
-                if (idx == 0) {
-                    booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCd));
-                    ++idx; //첫번째이후 부터는 or조건으로
-                }else {
-                    booleanBuilder.or(qArticle.apprvDivCd.eq(apprvDivCd));
-                }
-            }
-        }*/
 
         //부서코드
         if (deptCd != null && deptCd.trim().isEmpty() == false){
@@ -1021,7 +1034,7 @@ public class ArticleService {
 
         //이슈 검색일 조건
         if (ObjectUtils.isEmpty(sdate) && ObjectUtils.isEmpty(edate)) {
-            booleanBuilder.and(qArticle.issue.inputDtm.between(sdate, edate));
+            booleanBuilder.and(qArticle.issue.issuDtm.between(sdate, edate));
         }
         //이슈 키워드 검색
         if (issuKwd != null && issuKwd.trim().isEmpty() == false) {

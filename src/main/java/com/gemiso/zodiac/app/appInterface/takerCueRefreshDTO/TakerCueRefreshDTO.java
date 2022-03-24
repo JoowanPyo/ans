@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.appInterface.takerCueRefresh;
+package com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO;
 
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetVideoDTO;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.appInterface.prompterCue;
+package com.gemiso.zodiac.app.appInterface.prompterCueDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,10 +16,10 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@XmlRootElement(name = "anchorCaps")
+@XmlRootElement(name = "articleCaps")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PrompterAnchorCaps {
+public class PrompterArticleCaps {
 
-    @XmlElement(name = "anchorCap")
-    private List<PrompterAnchorCapDTO> anchorCapList = new ArrayList<>();
+    @XmlElement(name = "articleCap")
+    private List<PrompterArticleCapDTO> articleCapList = new ArrayList<>();
 }

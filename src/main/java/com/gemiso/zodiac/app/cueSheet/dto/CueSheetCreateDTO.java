@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -38,6 +39,8 @@ public class CueSheetCreateDTO {
     private String td2Id;
     private String remark;
     private String brdcRunTime;
+    private int cueVer;
+    private int cueOderVer;
     private BaseProgramSimpleDTO baseProgram;
     private ProgramSimpleDTO program;
 }

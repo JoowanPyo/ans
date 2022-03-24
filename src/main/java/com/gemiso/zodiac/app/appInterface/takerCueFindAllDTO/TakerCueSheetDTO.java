@@ -39,12 +39,12 @@ public class TakerCueSheetDTO {
     private String mcStCd;
     @XmlElement(name="cm_div_cd")
     private String cmDivCd;
+    @XmlElement(name="cm_div_nm")
+    private String cmDivNm;
     @XmlElement(name="rd_dtl_div_nm")
     private String rdDtlDivNm;
     @XmlElement(name="mc_st_nm")
     private String mcStNm;
-    @XmlElement(name="cm_div_nm")
-    private String cmDivNm;
     @XmlElement(name = "artcl_id")
     private Long artclId;
     @XmlElement(name = "artcl_frm_cd")

@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -173,25 +174,15 @@ public class CodeService {
         QCode qCode = QCode.code;
 
         booleanBuilder.and(qCode.delYn.eq("N"));
-        if (!StringUtils.isEmpty(searchWord)) {
+        if (searchWord != null && searchWord.trim().isEmpty() == false) {
             booleanBuilder.and(qCode.cdNm.contains(searchWord));
         }
-        if (!StringUtils.isEmpty(useYn)) {
+        if (useYn != null && useYn.trim().isEmpty() == false) {
             booleanBuilder.and(qCode.useYn.eq(useYn));
         }
-        if (!StringUtils.isEmpty(hrnkCdIds)) {
-            /*System.out.println(hrnkCdIds.length);
-            for (Long hrnkCdId : hrnkCdIds){
-                booleanBuilder.and(qCode.hrnkCdId.eq(hrnkCdId)); //이걸 한개는 and 나머지는 or로 처리 해야한다.
-            }*/
-            for (int i = 0; i < hrnkCdIds.size(); i++) {
-                String hrnkCdId = hrnkCdIds.get(i);
-                if (i == 0) {
-                    booleanBuilder.and(qCode.hrnkCdId.eq(hrnkCdId)); //이걸 한개는 and 나머지는 or로 처리 해야한다.
-                } else {
-                    booleanBuilder.or(qCode.hrnkCdId.eq(hrnkCdId));
-                }
-            }
+        if (CollectionUtils.isEmpty(hrnkCdIds) == false) {
+
+            booleanBuilder.and(qCode.hrnkCdId.in(hrnkCdIds)); //이걸 한개는 and 나머지는 or로 처리 해야한다.
 
         }
 

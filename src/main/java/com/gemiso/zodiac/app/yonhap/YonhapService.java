@@ -83,20 +83,6 @@ public class YonhapService {
         return yonhapDTO;
     }
 
-    //String To Date
-    /*public Date stringToDate(String str) throws ParseException {
-
-        Date returnDate = new Date();
-
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyymmddhhmmss");
-
-        if (str != null && str.trim().isEmpty() == false){
-            returnDate = transFormat.parse(str);
-        }
-
-        return returnDate;
-    }*/
-
     public YonhapExceptionDomain create(YonhapCreateDTO yonhapCreateDTO) throws Exception {
 
         log.info("연합DTO 확인             ::"+yonhapCreateDTO);
@@ -275,55 +261,27 @@ public class YonhapService {
         return yonhapResponseDTO;
     }
 
-    /*public YonhapAttachFileResponseDTO formatYonhapFile(List<YonhapAttachFileDTO> yonhapAttachFileDTOList){
-
-
-
-    }*/
-
-    /*public String dateToString(Date date){
-
-        String returnDate = "";
-
-        if (ObjectUtils.isEmpty(date) == false) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-            returnDate = simpleDateFormat.format(date);
-        }
-        return returnDate;
-    }*/
-
     public BooleanBuilder getSearch(Date sdate, Date edate, List<String> artcl_cate_cds, List<String> region_cds, String search_word) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         QYonhap qYonhap = QYonhap.yonhap;
 
-        if (!StringUtils.isEmpty(sdate) && !StringUtils.isEmpty(edate)) {
+        if (ObjectUtils.isEmpty(sdate) ==false && ObjectUtils.isEmpty(edate) == false) {
             booleanBuilder.and(qYonhap.inputDtm.between(sdate, edate));
         }
-        if (!ObjectUtils.isEmpty(artcl_cate_cds)) {
-            for (int i = 0; i < artcl_cate_cds.size(); i++) {
-                String artcleCateCd = artcl_cate_cds.get(i);
 
-                if (i == 0) {
-                    booleanBuilder.and(qYonhap.artclCateCd.eq(artcleCateCd));
-                } else {
-                    booleanBuilder.or(qYonhap.artclCateCd.eq(artcleCateCd));
-                }
-            }
-        }
-        if (!ObjectUtils.isEmpty(region_cds)) {
-            for (int i = 0; i < region_cds.size(); i++) {
-                String regionCd = region_cds.get(i);
+        if (ObjectUtils.isEmpty(artcl_cate_cds) == false) {
 
-                if (i == 0) {
-                    booleanBuilder.and(qYonhap.regionCd.eq(regionCd));
-                } else {
-                    booleanBuilder.or(qYonhap.regionCd.eq(regionCd));
-                }
-            }
+            booleanBuilder.and(qYonhap.artclCateCd.in(artcl_cate_cds));
         }
+
+        if (ObjectUtils.isEmpty(region_cds) == false) {
+
+            booleanBuilder.and(qYonhap.regionCd.in(region_cds));
+
+        }
+
         if (!StringUtils.isEmpty(search_word)) {
             booleanBuilder.and(qYonhap.artclTitl.contains(search_word));
         }

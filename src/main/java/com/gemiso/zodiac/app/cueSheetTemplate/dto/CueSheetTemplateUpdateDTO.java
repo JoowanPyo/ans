@@ -35,7 +35,9 @@ public class CueSheetTemplateUpdateDTO {
     //private String delrId;
     //private String delrNm;
     private String pd1Id;
+    //private String pd1Nm;
     private String pd2Id;
+    //private String pd2Nm;
     private String anc1Id;
     //private String anc1Nm;
     private String anc2Id;

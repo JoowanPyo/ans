@@ -4,6 +4,7 @@ import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramCreateDTO;
 import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
 import com.gemiso.zodiac.app.dailyProgram.mapper.DailyProgramCreateMapper;
 import com.gemiso.zodiac.app.dailyProgram.mapper.DailyProgramMapper;
+import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -33,6 +34,8 @@ public class DailyProgramService {
     private final DailyProgramCreateMapper dailyProgramCreateMapper;
 
     private final UserAuthService userAuthService;
+
+    private final DateChangeHelper dateChangeHelper;
 
 
     public List<DailyProgramDTO> findAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String brdcDivCd, Long stdioId,
@@ -101,8 +104,8 @@ public class DailyProgramService {
 
         //날짜조회시 방송일자 조회
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
-            String StringSdate = dateToString(sdate);
-            String stringEdate = dateToString(edate);
+            String StringSdate = dateChangeHelper.dateToStringNoTime(sdate); //Date To String( yyyy-MM-dd )
+            String stringEdate = dateChangeHelper.dateToStringNoTime(edate); //Date To String( yyyy-MM-dd )
             booleanBuilder.and(qDailyProgram.brdcDt.between(StringSdate, stringEdate));
         }
         //조회조건이 방송구분 코드로 들어온 경우
@@ -129,15 +132,5 @@ public class DailyProgramService {
         }
 
         return booleanBuilder;
-    }
-
-    //Date to String
-    public String dateToString(Date date){
-
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        String returnDate = dateFormat.format(date);
-
-        return returnDate;
     }
 }

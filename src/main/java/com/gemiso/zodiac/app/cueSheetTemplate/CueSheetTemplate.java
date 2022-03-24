@@ -76,8 +76,16 @@ public class CueSheetTemplate extends BaseEntity {
     @Column(name = "pd_1_id", length = 50)
     private String pd1Id;
 
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = pd_1_id)")
+    private String pd1Nm;
+
     @Column(name = "pd_2_id")
     private String pd2Id;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = pd_2_id)")
+    private String pd2Nm;
 
     @Column(name = "anc_1_id")
     private String anc1Id;

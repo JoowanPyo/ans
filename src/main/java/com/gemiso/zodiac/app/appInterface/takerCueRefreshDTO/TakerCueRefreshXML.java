@@ -1,25 +1,21 @@
-package com.gemiso.zodiac.app.appInterface.prompterProgram;
+package com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO;
 
+import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetResultDTO;
 import lombok.Data;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @XmlRootElement(name = "response")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PrompterProgramXML {
+public class TakerCueRefreshXML {
 
     @XmlElement(name = "result")
-    private PrompterProgramResultDTO result;
+    private TakerCueSheetResultDTO result;
 
     @XmlElement(name = "data")
-    private PrompterProgramDataDTO data;
-
-    /*@XmlElement(name = "record")
-    private List<PrompterProgramDTO> prompterProgramDTO = new ArrayList<>();*/
+    private TakerCueRefreshDataDTO data;
 }

@@ -7,6 +7,7 @@ import com.gemiso.zodiac.app.issue.dto.IssueUpdateDTO;
 import com.gemiso.zodiac.app.issue.mapper.IssueCreateMapper;
 import com.gemiso.zodiac.app.issue.mapper.IssueMapper;
 import com.gemiso.zodiac.app.issue.mapper.IssueUpdateMapper;
+import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.service.CodeUpdateService;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -39,6 +40,8 @@ public class IssueService {
 
     private final UserAuthService userAuthService;
     private final CodeUpdateService codeUpdateService;
+
+    private final DateChangeHelper dateChangeHelper;
 
 
     public List<IssueDTO> findAll(Date sdate, Date edate, String issuDelYn){
@@ -223,6 +226,7 @@ public class IssueService {
 
     }
 
+    //순서변경
     public List<IssueDTO> changeOrder(Long issuId, Integer issuOrd) throws Exception {
 
         //이슈 조회후 해당 이슈 오더값 업데이트
@@ -239,8 +243,7 @@ public class IssueService {
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         cal.setTime(issuDtm);
         String tDate = sdf.format(cal.getTime());
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date sdate = transFormat.parse(tDate);
+        Date sdate = dateChangeHelper.StringToDateNoTime(tDate); //String형식을 Date(yyyy-MM-dd)으로 파싱
 
         Date edate = getTargetDate(issuDtm);
 
@@ -281,10 +284,8 @@ public class IssueService {
         cal.add(cal.DATE, +1); //날짜를 하루 더한다.
         String tDate = sdf.format(cal.getTime());
 
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        Date sdate = transFormat.parse(nDate);
-        Date edate = transFormat.parse(tDate);
+        Date sdate = dateChangeHelper.StringToDateNoTime(nDate);//String형식을 Date(yyyy-MM-dd)으로 파싱
+        Date edate = dateChangeHelper.StringToDateNoTime(tDate);//String형식을 Date(yyyy-MM-dd)으로 파싱
 
         Optional<Integer> issuOrd = issueRepositoy.findByOrd(sdate, edate);
 
@@ -307,10 +308,8 @@ public class IssueService {
         cal.add(cal.DATE, +1); //날짜를 하루 더한다.
         String tDate = sdf.format(cal.getTime());
 
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        Date sdate = transFormat.parse(nDate);
-        Date edate = transFormat.parse(tDate);
+        Date sdate = dateChangeHelper.StringToDateNoTime(nDate);//String형식을 Date(yyyy-MM-dd)으로 파싱
+        Date edate = dateChangeHelper.StringToDateNoTime(tDate);//String형식을 Date(yyyy-MM-dd)으로 파싱
 
         Optional<Integer> issuOrd = issueRepositoy.findByOrd(sdate, edate);
 
@@ -330,9 +329,7 @@ public class IssueService {
         cal.add(cal.DATE, +1); //날짜를 하루 더한다.
         String tDate = sdf.format(cal.getTime());
 
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        Date edate = transFormat.parse(tDate);
+        Date edate = dateChangeHelper.StringToDateNoTime(tDate);//String형식을 Date(yyyy-MM-dd)으로 파싱
 
         return edate;
     }

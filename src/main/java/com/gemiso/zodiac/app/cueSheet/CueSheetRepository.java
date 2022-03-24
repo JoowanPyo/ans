@@ -19,6 +19,8 @@ public interface CueSheetRepository extends JpaRepository<CueSheet, Long>, Query
     @Query("select a from CueSheet a where a.cueId =:cueId and a.delYn =:del_yn ")
     Optional<CueSheet> findTakerCue(@Param("cueId") Long cueId, @Param("del_yn") String del_yn);
 
+    @Query("select count(a) from CueSheet a where a.brdcDt =:brdcDt and a.program.brdcPgmId =:brdcPgmId")
+    int findCueProgram(@Param("brdcDt")String brdcDt,@Param("brdcPgmId")String brdcPgmId);
 
 
 }

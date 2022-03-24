@@ -1,7 +1,6 @@
-package com.gemiso.zodiac.app.appInterface.prompterCueRefresh;
+package com.gemiso.zodiac.app.appInterface.prompterCueRefreshDTO;
 
-import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetDataDTO;
-import com.gemiso.zodiac.app.appInterface.prompterCue.PrompterCueSheetResultDTO;
+import com.gemiso.zodiac.app.appInterface.prompterCueDTO.PrompterCueSheetResultDTO;
 import lombok.Data;
 
 import javax.xml.bind.annotation.XmlAccessType;

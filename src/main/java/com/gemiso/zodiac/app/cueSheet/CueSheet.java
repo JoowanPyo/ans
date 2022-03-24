@@ -169,6 +169,12 @@ public class CueSheet {
     @Column(name = "brdc_run_time", length = 8)
     private String brdcRunTime;
 
+    @Column(name = "cue_ver")
+    private int cueVer;
+
+    @Column(name = "cue_oder_ver")
+    private int cueOderVer;
+
     @ManyToOne
     @JoinColumn(name = "brdc_pgm_id")
     private Program program;

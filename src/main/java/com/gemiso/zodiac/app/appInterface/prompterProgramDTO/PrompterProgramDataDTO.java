@@ -1,6 +1,5 @@
-package com.gemiso.zodiac.app.appInterface.prompterCue;
+package com.gemiso.zodiac.app.appInterface.prompterProgramDTO;
 
-import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDTO;
 import lombok.Data;
 
 import javax.xml.bind.annotation.*;
@@ -10,7 +9,7 @@ import java.util.List;
 @Data
 @XmlRootElement(name = "data")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PrompterCueSheetDataDTO {
+public class PrompterProgramDataDTO {
 
     @XmlAttribute
     private Long totalcount;
@@ -22,5 +21,5 @@ public class PrompterCueSheetDataDTO {
     private int rowcount;
 
     @XmlElement(name = "record")
-    private List<PrompterCueSheetDTO> cueSheetDTO = new ArrayList<>();
+    private List<PrompterProgramDTO> prompterProgramDTO = new ArrayList<>();
 }

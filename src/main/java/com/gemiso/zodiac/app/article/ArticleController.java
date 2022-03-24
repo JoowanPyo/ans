@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.article;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.article.dto.*;
 import com.gemiso.zodiac.core.enumeration.AuthEnum;
 import com.gemiso.zodiac.core.helper.SearchDate;
@@ -53,7 +54,8 @@ public class ArticleController {
             @Parameter(name = "apprvDivCdList", description = "픽스구분코드(fix_none,article_fix,editor_fix,anchor_fix,desk_fix)")@RequestParam(value = "apprvDivCdList", required = false)List<String> apprvDivCdList,
             @Parameter(name = "deptCd", description = "부서코드") @RequestParam(value = "deptCd", required = false) String deptCd,
             @Parameter(name = "artclCateCd", description = "기사 카테고리 코드") @RequestParam(value = "artclCateCd", required = false) String artclCateCd,
-            @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd
+            @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
+            @Parameter(name = "delYn", description = "삭제 여부") @RequestParam(value = "delYn", required = false) String delYn
             /*@Parameter(name = "issuId", description = "이슈아이디") @RequestParam(value = "issuId", required = false) Long issuId*/) throws Exception {
 
         PageResultDTO<ArticleDTO, Article> pageList = null;
@@ -71,12 +73,12 @@ public class ArticleController {
             SearchDate searchDate = new SearchDate(sdate, edate);
 
             pageList = articleService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), rcvDt, rptrId, inputrId,
-                    brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd);
+                    brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd, delYn);
             //검색조건 날짜형식이 안들어왔을경우
         } else {
 
             pageList = articleService.findAll(null, null, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd,
-                    artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd);
+                    artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd, delYn);
 
         }
 
@@ -115,7 +117,7 @@ public class ArticleController {
     public AnsApiResponse<?> findAllIssue(
             @Parameter(name = "date", description = "이슈 검색 시작 데이터 날짜(yyyy-MM-dd)", required = true)
             @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
-            @Parameter(name = "issuKwd", description = "이슈 키워드") @RequestParam(value = "issuKwd", required = true) String issuKwd,
+            @Parameter(name = "issuKwd", description = "이슈 키워드") @RequestParam(value = "issuKwd", required = false) String issuKwd,
             @Parameter(name = "artclDivCd", description = "기사 구분 코드") @RequestParam(value = "artclDivCd", required = false) String artclDivCd,
             @Parameter(name = "artclTypCd", description = "기사 유형 코드") @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
             @Parameter(name = "artclTypDtlCd", description = "기상 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
@@ -232,8 +234,9 @@ public class ArticleController {
     public AnsApiResponse<ArticleDTO> articleLock(@Parameter(name = "artclId", required = true, description = "기사 아이디")
                                                   @PathVariable("artclId") Long artclId,
                                                   @Parameter(description = "필수값<br> lckYn ", required = true)
-                                                  @RequestBody @Valid ArticleLockDTO articleLockDTO) {
+                                                  @RequestBody @Valid ArticleLockDTO articleLockDTO) throws JsonProcessingException {
 
+        //권한체크(기사 쓰기)
         if (userAuthService.authChk(AuthEnum.ArticleWrite.getAuth())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
