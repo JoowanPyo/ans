@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheetItem;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.*;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
@@ -56,7 +57,7 @@ public class CueSheetItemController {
     public AnsApiResponse<List<CueSheetItemDTO>> createTemplate(@Parameter(description = "필수값<br> ", required = true)
                                                                 @RequestBody @Valid List<CueSheetItemCreateDTO> cueSheetItemCreateDTOList,
                                                                 @Parameter(name = "cueId", description = "큐시트아이디")
-                                                                @PathVariable("cueId") Long cueId) {
+                                                                @PathVariable("cueId") Long cueId) throws JsonProcessingException {
 
         cueSheetItemService.createTemplate(cueSheetItemCreateDTOList, cueId);
 
@@ -72,7 +73,7 @@ public class CueSheetItemController {
     public AnsApiResponse<CueSheetItemDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                                   @RequestBody @Valid CueSheetItemCreateDTO cueSheetItemCreateDTO,
                                                   @Parameter(name = "cueId", description = "큐시트아이디")
-                                                  @PathVariable("cueId") Long cueId) {
+                                                  @PathVariable("cueId") Long cueId) throws JsonProcessingException {
 
         Long cueItemId = cueSheetItemService.create(cueSheetItemCreateDTO, cueId);
 
@@ -93,14 +94,21 @@ public class CueSheetItemController {
                                                   @PathVariable("cueItemId") Long cueItemId) throws Exception {
 
         if (cueItemDivCd == null || "".equals(cueItemDivCd)) {
+            
             throw new ResourceNotFoundException("큐시트 아이템 구분 코드가 잘못 되었습니다. 구분코드 : " + cueItemDivCd);
-        } else if (cueItemDivCd.equals("cue_item") || cueItemDivCd.equals("cue_template")) {
+            
+            //큐시트 아이템 코드가 cue_item, cue_template일 경우 [큐시트 아이템 수정]
+        } else if ("cue_item".equals(cueItemDivCd) || "cue_template".equals(cueItemDivCd)) {
+            
             //큐시트 템플릿 Update
             cueSheetItemService.update(cueSheetItemUpdateDTO, cueId, cueItemId);
-        } else if (cueItemDivCd.equals("cue_article")) {
+
+            //큐시트 아이템 코드가 cue_article일 경우 [큐시트 아이템 수정 & 기사 수정]
+        } else if ("cue_article".equals(cueItemDivCd)) {
+
             //기사복사본 수정.
             cueSheetItemService.updateCueItemArticle(cueSheetItemUpdateDTO, cueId, cueItemId);
-            /*articleService.update(cueSheetItemUpdateDTO.getArticle(), cueSheetItemUpdateDTO.getArticle().getArtclId());*/
+
         } else {
             throw new ResourceNotFoundException("큐시트 아이템 구분코드를 확인해 주세요. 큐시트 아이템 구분 코드 : " + cueItemDivCd);
         }
@@ -218,7 +226,7 @@ public class CueSheetItemController {
                                                                  @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
                                                                  @PathVariable("cueItemId") Long cueItemId,
                                                                  @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
-                                                                 @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd) {
+                                                                 @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd) throws JsonProcessingException {
 
         CueSheetItemSimpleDTO cueSheetItemSimpleDTO = cueSheetItemService.cueSheetItemRestore(cueId, cueItemId, cueItemOrd);
 

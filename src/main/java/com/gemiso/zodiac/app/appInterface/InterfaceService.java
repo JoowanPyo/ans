@@ -453,7 +453,8 @@ public class InterfaceService {
                         .rptrNm(article.getRptrNm())
                         .deptCd(article.getDeptCd())
                         .deptNm(article.getDeptNm())
-                        .artclReqdSec(Optional.ofNullable(article.getArtclReqdSec()).orElse(0))
+                        .artclReqdSec(article.getArtclCttTime())//기사 소요시간 초
+                        .ancReqdSec(article.getAncMentCttTime())//앵커 소요시간 초
                         .artclSmryCtt(0)//???
                         .artclDivCd(article.getArtclDivCd())
                         .artclDivNm(article.getArtclDivCdNm())
@@ -504,6 +505,7 @@ public class InterfaceService {
         List<TakerCueSheetDTO> takerCueSheetDTOList = new ArrayList<>();//테이커 큐시트 DTO를 담아서 리턴할 리스트
 
         int rdSeq = 1; //순번값 set
+
 
         for (CueSheetItem cueSheetItem : cueSheetItemList) {
             Article article = cueSheetItem.getArticle(); //큐시트 아이템에 기사정보get
@@ -645,7 +647,8 @@ public class InterfaceService {
                 .rptrNm(article.getRptrNm())
                 .deptCd(article.getDeptCd())
                 .deptNm(article.getDeptNm())
-                .artclReqdSec(Optional.ofNullable(article.getArtclReqdSec()).orElse(0))
+                .artclReqdSec(article.getArtclCttTime())//기사 소요시간 초
+                .ancReqdSec(article.getAncMentCttTime())//앵커 소요시간 초
                 .artclSmryCtt(0)//???
                 .artclDivCd(article.getArtclDivCd())
                 .artclDivNm(article.getArtclDivCdNm())
@@ -672,8 +675,11 @@ public class InterfaceService {
                 .inputrId(article.getInputrId())
                 .inputrNm(article.getInputrNm())
                 .inputDtm(dateChangeHelper.dateToStringNormal(article.getInputDtm())) //Date(yyyy-MM-dd HH:mm:ss)형식의 입력일시를 String으로 변환
+                //.newsAcumTime(newsAcumTime)//누적시간
                 .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
                 .build();
+
+
 
         return takerCueSheetDTO;
 
@@ -943,8 +949,6 @@ public class InterfaceService {
             ++articleCount; //기사가 포함되어있으면 +1
         }
 
-
-
         PrompterProgramDTO program = PrompterProgramDTO.builder()
                 .csId(cueSheet.getCueId())
                 .chDivCd(cueSheet.getChDivCd())
@@ -1071,7 +1075,7 @@ public class InterfaceService {
 
         List<PrompterCueSheetDTO> prompterCueSheetDTOList = new ArrayList<>();
 
-        Integer newsAcumTime = 0;
+        //Integer newsAcumTime = 0; //누적시간
         int ord = 1;
 
         for (CueSheetItem cueSheetItem : cueSheetItemList) { //큐시트 아이템 PrompterCueSheetDTO리스트로 변환[기사(article)이 있는 아이템만 변환]
@@ -1091,7 +1095,7 @@ public class InterfaceService {
                         .artclTitl(cueSheetItem.getCueItemTitl()) //국문제목
                         .artclTitlEn(cueSheetItem.getCueItemTitlEn()) // 영문제목
                         .artclCtt(cueSheetItem.getCueItemCtt())
-                        .newsAcumTime(newsAcumTime) //누적시간
+                        //.newsAcumTime(newsAcumTime) //누적시간
                         .build();
 
                 //빌드된 PrompterCueSheetDTO를 PrompterCueRefreshDTO List에 add
@@ -1099,8 +1103,10 @@ public class InterfaceService {
                 
             }else { //기사 아이템인 경우
 
-                Integer articleCttTime = article.getArtclCttTime(); // 기사 소요시간
-                Integer ancCttTime = article.getAncMentCttTime(); // 앵커 소요시간
+                //Integer articleCttTime = article.getArtclCttTime(); // 기사 소요시간
+                //Integer ancCttTime = article.getAncMentCttTime(); // 앵커 소요시간
+
+                //String articleTypDtlCd = article.getArtclTypDtlCd(); // 기상 유형 상세 코드
 
                 //기사&앵커자막 조회데이터 get
                 List<ArticleCap> articleCapList = article.getArticleCap();
@@ -1109,14 +1115,15 @@ public class InterfaceService {
                 PrompterArticleCaps prompterArticleCap = getPrompterArticleCap(articleCapList);
                 PrompterAnchorCaps prompterAnchorCap = getPrompterAnchorCap(anchorCapList);
 
-                if (articleCttTime != null && ancCttTime != null) { //기사,앵커 소요시간이 둘다 Null이 아닌경우
+                //기상 유형 상세 코드 가 apk,pk인 경우 기사 + 앵커 소요시간 add
+                //if ("apk".equals(articleTypDtlCd) || "pk".equals(articleTypDtlCd)) {
                     // 기사 소요시간 + 앵커 소요시간 + 누적시간 = 누적시간
-                    newsAcumTime = articleCttTime + ancCttTime + newsAcumTime;
-                } else if (articleCttTime == null && ancCttTime != null) { // 앵커시간이 Null인경우
-                    newsAcumTime = ancCttTime + newsAcumTime;
-                } else if (articleCttTime != null && ancCttTime == null) { //기사시간이 Null인경우
-                    newsAcumTime = articleCttTime + newsAcumTime;
-                }
+                //    newsAcumTime += articleCttTime + ancCttTime;
+
+                    //기상 유형 상세 코드 가 telphone,smartphone,news_studio,broll,mng 인 경우 기사소요시간만 add
+                //} else { // 앵커시간이 Null인경우
+                //    newsAcumTime += articleCttTime;
+                //}
 
 
                 //조회된 cueSheet정보의 기사정보로 PrompterCueSheetDTO생성
@@ -1140,9 +1147,9 @@ public class InterfaceService {
                         .rptrId(article.getRptrId()) //기자 아이디
                         .rptrNm(article.getRptrNm()) //기자 명
                         .deptCd(article.getDeptCd())
-                        .artclReqdSec(articleCttTime) //기사 소요시간
-                        .ancReqdSec(ancCttTime) //앵커기사 소요시간
-                        .newsAcumTime(newsAcumTime) //누적시간
+                        .artclReqdSec(article.getArtclCttTime()) //기사 소요시간
+                        .ancReqdSec(article.getAncMentCttTime()) //앵커기사 소요시간
+                        //.newsAcumTime(newsAcumTime) //누적시간
                         .anchorCaps(prompterAnchorCap)//앵커자막
                         .articleCaps(prompterArticleCap)//기사자막
                         .build();
@@ -1245,6 +1252,7 @@ public class InterfaceService {
         //cmDivCd, cmDivCd 값 구하기 [채널값으로 심볼에 들어가는 NS-1, NS-2, NS-3 값 구하기]
         String returnSymbolId = "";
         String returnSymbolNm = "";
+
         for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
             Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
 

@@ -144,7 +144,7 @@ public class IssueService {
         issueRepositoy.save(issue);
     }
 
-    private Issue issueFindOrFail(Long issuId) {
+    public Issue issueFindOrFail(Long issuId) {
         /*return issueRepositoy.findById(issuId)
                 .orElseThrow(() -> new ResourceNotFoundException("Issue not found. issueId : " + issuId));*/
 
