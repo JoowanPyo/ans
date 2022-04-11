@@ -175,6 +175,35 @@ public class ArticleDTO {
     private String editorId;
     @Schema(description = "에디터 명")
     private String editorNm;
+
+    @Schema(description = "기사 픽스자 아이디")
+    private String artclFixUser;
+    @Schema(description = "기사 픽스자 명")
+    private String artclFixUserNm;
+    @Schema(description = "에디터 픽스자 아이디")
+    private String editorFixUser;
+    @Schema(description = "에디터 픽스자 명")
+    private String editorFixUserNm;
+    @Schema(description = "앵커 픽스자 아이디")
+    private String anchorFixUser;
+    @Schema(description = "앵커 픽스자 명")
+    private String anchorFixUserNm;
+    @Schema(description = "데스커 픽스자 아이디")
+    private String deskFixUser;
+    @Schema(description = "데스커 픽스자 명")
+    private String deskFixUserNm;
+
+    @Schema(description = "기사픽스 일시")
+    private Date artclFixDtm;
+    @Schema(description = "에디터픽스 일시")
+    private Date editorFixDtm;
+    @Schema(description = "앵커픽스 일시")
+    private Date anchorFixDtm;
+    @Schema(description = "데스커픽스 일시")
+    private Date deskFixDtm;
+    
+    @Schema(description = "큐시트 아이디")
+    private Long cueId;
     //private List<ArticleHistSimpleDTO> articleHist = new ArrayList<>();
     @Schema(description = "기사자막 리스트")
     private List<ArticleCapSimpleDTO> articleCap = new ArrayList<>();

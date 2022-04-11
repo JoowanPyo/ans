@@ -138,7 +138,7 @@ public class DictionaryService {
 
     }
 
-    /*public UserSimpleDTO entityToDtoUser(User user){ //사용자 정보 DTO변환
+    /*public UserSimpleDTO entityToDtoUser(MisUser user){ //사용자 정보 DTO변환
 
         UserSimpleDTO userSimpleDTO = null;
 
@@ -185,11 +185,11 @@ public class DictionaryService {
         return json;
     }*/
 
-   /* public User dtoToUser(UserSimpleDTO userSimpleDTO){//dto로 들어온 유저아이디를 Entity로 변환
+   /* public MisUser dtoToUser(UserSimpleDTO userSimpleDTO){//dto로 들어온 유저아이디를 Entity로 변환
 
         String userId = userSimpleDTO.getUserId();
 
-        User user = User.builder().userId(userId).build();
+        MisUser user = MisUser.builder().userId(userId).build();
 
         return user;
 

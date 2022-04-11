@@ -59,8 +59,8 @@ public class AuthService {
         String userId = authRequestDTO.getUserId();
         String password = authRequestDTO.getPassword();
 
-        /*User userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found. userId : " + userId));*/
+        /*MisUser userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("MisUser not found. userId : " + userId));*/
         User userEntity = userService.userFindOrFail(userId);
 
         UserDTO userDTO = userMapper.toDto(userEntity); //tb_user_login 테이블에 정보를 저장하기위한 DTO생성

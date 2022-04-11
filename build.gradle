@@ -31,6 +31,7 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.4.2.Final'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.oracle.database.jdbc:ojdbc8'
 
     // https://mvnrepository.com/artifact/org.mapstruct/mapstruct
     annotationProcessor "org.mapstruct:mapstruct-processor:1.4.2.Final"

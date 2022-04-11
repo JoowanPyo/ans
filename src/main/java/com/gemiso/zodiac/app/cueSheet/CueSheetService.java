@@ -1,7 +1,12 @@
 package com.gemiso.zodiac.app.cueSheet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
+import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
+import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
+import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
+import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.cueSheet.dto.*;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetCreateMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
@@ -22,6 +27,7 @@ import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolDTO;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.mapper.CueSheetItemSymbolMapper;
+import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgramService;
 import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
 import com.gemiso.zodiac.app.program.ProgramService;
@@ -64,6 +70,7 @@ public class CueSheetService {
     private final CueSheetItemRepository cueSheetItemRepository;
     private final CueSheetHistRepository cueSheetHistRepository;
     private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
+    private final ArticleMediaRepository articleMediaRepository;
 
     private final CueSheetMapper cueSheetMapper;
     private final CueSheetCreateMapper cueSheetCreateMapper;
@@ -73,6 +80,7 @@ public class CueSheetService {
     private final CueSheetItemMapper cueSheetItemMapper;
     private final CueSheetHistCreateMapper cueSheetHistCreateMapper;
     private final CueSheetItemSymbolMapper cueSheetItemSymbolMapper;
+    private final ArticleMediaMapper articleMediaMapper;
 
     private final ProgramService programService;
     private final UserAuthService userAuthService;
@@ -292,7 +300,28 @@ public class CueSheetService {
 
         CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemFindAll(cueId);
+        //기사 미디어 있을경우 set
+        List<CueSheetItem> cueSheetItemList = cueSheetItemFindAll(cueId);
+        List<CueSheetItem> setCueSheetItemList = new ArrayList<>();
+
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
+
+       /* for (CueSheetItemDTO cueSheetItem : cueSheetItemDTOList){
+            ArticleCueItemDTO article = cueSheetItem.getArticle();
+
+            if (ObjectUtils.isEmpty(article) == false){
+                Long articleId = article.getArtclId();
+
+                List<ArticleMedia> articleMedia = articleMediaRepository.findArticleMediaList(articleId);
+                List<ArticleMediaDTO> articleMediaDTOList = articleMediaMapper.toDtoList(articleMedia);
+                article.setArticleMediaDTO(articleMediaDTOList);
+                cueSheetItem.setArticle(article);
+            }
+
+            setCueSheetItemList.add(cueSheetItem);
+        }*/
+
+        cueSheetItemDTOList = setSymbol(cueSheetItemDTOList);
 
         cueSheetDTO.setCueSheetItem(cueSheetItemDTOList);
 
@@ -301,17 +330,13 @@ public class CueSheetService {
     }
     
     //큐시트아이템 목록조회(검색조건 :  큐시트 아이디)
-    public List<CueSheetItemDTO> cueSheetItemFindAll(Long cueId){
+    public List<CueSheetItem> cueSheetItemFindAll(Long cueId){
 
         BooleanBuilder booleanBuilder = getSearchCueItem(cueId);
 
         List<CueSheetItem> cueSheetItemList = (List<CueSheetItem>) cueSheetItemRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "cueItemOrd"));
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
-
-        cueSheetItemDTOList = setSymbol(cueSheetItemDTOList);
-
-        return cueSheetItemDTOList;
+        return cueSheetItemList;
     }
 
     //방송아이콘 url 추가
@@ -390,7 +415,7 @@ public class CueSheetService {
         cueSheetHistCreate(cueId, cueSheet, userId);
 
         //큐시트 토픽 메세지 전송
-        sendCueTopic(cueSheet, "CC");
+        sendCueTopic(cueSheet, "CueSheet Create", cueSheetCreateDTO);
 
         return cueId;
     }
@@ -423,12 +448,12 @@ public class CueSheetService {
 
         //수정! 버전정보 안들어가나요?
         //큐시트 토픽 메세지 전송
-        sendCueTopic(cueSheet, "CU");
+        sendCueTopic(cueSheet, "CuSheet Update", cueSheetUpdateDTO);
 
     }
 
     //큐시트 삭제
-    public void delete(Long cueId){
+    public void delete(Long cueId) throws JsonProcessingException {
 
         CueSheet cueSheet = cueSheetFindOrFail(cueId);
 
@@ -445,6 +470,8 @@ public class CueSheetService {
         cueSheetRepository.save(cueSheet);
 
         cueSheetHistDelete( cueId, cueSheet);
+
+        sendCueTopic(cueSheet, "CuSheet Delete", cueSheetDTO);
 
     }
 
@@ -505,7 +532,7 @@ public class CueSheetService {
         CueSheetSimpleDTO cueSheetSimpleDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
 
         CueSheetHistCreateDTO cueSheetHistBuild = CueSheetHistCreateDTO.builder()
-                .cueVer(0)
+                .cueVer(cueSheet.getCueVer())
                 .cueAction(ActionEnum.CREATE.getAction(ActionEnum.CREATE))
                 .inputrId(userId)
                 .cueSheet(cueSheetSimpleDTO)
@@ -542,7 +569,7 @@ public class CueSheetService {
 
         //큐시트 아이템 이력 DTO 빌드
         CueSheetHistCreateDTO cueSheetHistBuild = CueSheetHistCreateDTO.builder()
-                .cueVer(++getCueVer)
+                .cueVer(cueSheet.getCueVer())
                 .cueAction(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
                 .cueItemData(cueSheetItem)
                 .inputrId(userId)
@@ -581,7 +608,7 @@ public class CueSheetService {
 
         //큐시트 아이템 이력 DTO 빌드
         CueSheetHistCreateDTO cueSheetHistBuild = CueSheetHistCreateDTO.builder()
-                .cueVer(++getCueVer)
+                .cueVer(cueSheet.getCueVer())
                 .cueAction(ActionEnum.DELETE.getAction(ActionEnum.DELETE))
                 .cueItemData(cueSheetItem)
                 .inputrId(userId)
@@ -735,7 +762,7 @@ public class CueSheetService {
     }
 
     //큐시트 토픽 메세지 전송
-    public void sendCueTopic(CueSheet cueSheet, String eventId) throws JsonProcessingException {
+    public void sendCueTopic(CueSheet cueSheet, String eventId, Object object) throws JsonProcessingException {
 
         Long cueId = cueSheet.getCueId();
 
@@ -745,8 +772,9 @@ public class CueSheetService {
         cueSheetTopicDTO.setEventId(eventId);
         cueSheetTopicDTO.setCueId(cueId);
         cueSheetTopicDTO.setCueVer(cueSheet.getCueVer());
-        cueSheetTopicDTO.setCueSheet(cueSheet);
+        cueSheetTopicDTO.setCueSheet(object);
         String json = marshallingJsonHelper.MarshallingJson(cueSheetTopicDTO);
+
 
         //interface에 큐메세지 전송
         topicService.topicInterface(json);

@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.core.topic;
 
-import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -35,6 +34,8 @@ public class TopicService {
         //factory.setVirtualHost("/");
         factory.setUsername("rabbitmq");
         factory.setPassword("rabbitmq");
+
+        log.info("ans.topic : EXCHANGE : "+EXCHANGE_WEB_NAME + " HOST : "+ factory.getHost() +" PORT : "+ factory.getPort() +" USER : "+factory.getUsername());
         try {
             connection = factory.newConnection();
             channel = connection.createChannel();
@@ -46,12 +47,15 @@ public class TopicService {
             //String message = "test ans";
 
             channel.basicPublish(EXCHANGE_WEB_NAME, routingKey, null, msg.getBytes(StandardCharsets.UTF_8));
-            System.out.println("[x] Sent '" + routingKey + "':'" + msg + "'");
+
+            log.info("ans.topic Sent "+"EXCHANGE : " +EXCHANGE_WEB_NAME+" ROUTINGKEY : "+ routingKey +" MESSAGE : "+ msg );
         }
         catch (TimeoutException e) {
             e.printStackTrace();
+            log.error("ans.topic error : " +e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
+            log.error("ans.topic error : " +e.getMessage());
         }
     }
 
@@ -66,6 +70,9 @@ public class TopicService {
         //factory.setVirtualHost("/");
         factory.setUsername("rabbitmq");
         factory.setPassword("rabbitmq");
+
+        log.info("ans.interface : EXCHANGE : "+EXCHANGE_INTERFACE_NAME + " HOST : "+ factory.getHost() +" PORT : "+ factory.getPort() +" USER : "+factory.getUsername());
+
         try {
             connection = factory.newConnection();
             channel = connection.createChannel();
@@ -77,12 +84,15 @@ public class TopicService {
             //String message = "test ans";
 
             channel.basicPublish(EXCHANGE_INTERFACE_NAME, routingKey, null, msg.getBytes(StandardCharsets.UTF_8));
-            System.out.println("[x] Sent '" + routingKey + "':'" + msg + "'");
+
+            log.info("ans.interface Sent "+"EXCHANGE : " +EXCHANGE_INTERFACE_NAME+" ROUTINGKEY : "+ routingKey +" MESSAGE : "+ msg );
         }
         catch (TimeoutException e) {
             e.printStackTrace();
+            log.error("ans.interface error : " +e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
+            log.error("ans.interface error : " +e.getMessage());
         }
     }
 }

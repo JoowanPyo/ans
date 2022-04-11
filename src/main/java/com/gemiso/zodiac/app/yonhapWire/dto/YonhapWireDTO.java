@@ -41,5 +41,5 @@ public class YonhapWireDTO {
     private String action;
 
     private List<AttachFileDTO> files = new ArrayList<AttachFileDTO>();
-    private List<YonhapWireAttchFileDTO> yonhapWireAttchFiles;
+    private List<YonhapWireAttchFileDTO> yonhapWireAttchFiles = new ArrayList<>();
 }

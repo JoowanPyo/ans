@@ -72,18 +72,19 @@ public class CueSheetController {
     @Operation(summary = "큐시트 등록", description = "큐시트 등록")
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public AnsApiResponse<CueSheetDTO> create(@Parameter(description = "필수값<br> ", required = true)
+    public AnsApiResponse<CueSheetSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                               @RequestBody @Valid CueSheetCreateDTO cueSheetCreateDTO,
                                               @Parameter(name = "cueTmpltId", description = "큐시트템플릿아이디", in = ParameterIn.QUERY)
                                               @RequestParam(value = "cueTmpltId", required = false) Long cueTmpltId) throws JsonProcessingException {
 
-        CueSheetDTO cueSheetDTO = new CueSheetDTO(); //리턴시켜줄 큐시트 모델 생성
+        //큐시트 생성 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        CueSheetSimpleDTO cueSheetSimpleDTO = new CueSheetSimpleDTO();
 
         int cueCnt = cueSheetService.getCueSheetCount(cueSheetCreateDTO);
 
         //이미 같은날짜에 같은프로그램으로 큐시트 생성되어 있을시 error ( 409 )
         if (cueCnt != 0){
-            return new AnsApiResponse<>(cueSheetDTO, HttpStatus.CONFLICT);
+            return new AnsApiResponse<>(cueSheetSimpleDTO, HttpStatus.CONFLICT);
         }
 
         Long cueId = cueSheetService.create(cueSheetCreateDTO);
@@ -91,14 +92,14 @@ public class CueSheetController {
         //수정! 큐시트아이템복사.???
 
         //큐시트 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
-        cueSheetDTO.setCueId(cueId);
+        cueSheetSimpleDTO.setCueId(cueId);
 
-        return new AnsApiResponse<>(cueSheetDTO);
+        return new AnsApiResponse<>(cueSheetSimpleDTO);
     }
 
     @Operation(summary = "큐시트 수정", description = "큐시트 수정")
     @PutMapping(path = "/{cueId}")
-    public AnsApiResponse<CueSheetDTO> update(@Parameter(name = "cueSheetUpdateDTO", required = true, description = "필수값<br>")
+    public AnsApiResponse<CueSheetSimpleDTO> update(@Parameter(name = "cueSheetUpdateDTO", required = true, description = "필수값<br>")
                                               @Valid @RequestBody CueSheetUpdateDTO cueSheetUpdateDTO,
                                               @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
                                               @PathVariable("cueId") Long cueId) throws JsonProcessingException {
@@ -109,10 +110,10 @@ public class CueSheetController {
         cueSheetService.update(cueSheetUpdateDTO, cueId);
 
         //큐시트 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
-        CueSheetDTO cueSheetDTO = new CueSheetDTO();
-        cueSheetDTO.setCueId(cueId);
+        CueSheetSimpleDTO cueSheetSimpleDTO = new CueSheetSimpleDTO();
+        cueSheetSimpleDTO.setCueId(cueId);
 
-        return new AnsApiResponse<>(cueSheetDTO);
+        return new AnsApiResponse<>(cueSheetSimpleDTO);
 
     }
 
@@ -120,7 +121,7 @@ public class CueSheetController {
     @DeleteMapping(path = "/{cueId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                    @PathVariable("cueId") Long cueId) {
+                                    @PathVariable("cueId") Long cueId) throws JsonProcessingException {
 
         //사용자 비밀번호 체크
         //토픽메세지

@@ -42,8 +42,10 @@ public class YonhapController {
                                                    @RequestParam(value = "artclCateCds", required = false) List<String> artclCateCds,
                                                    @Parameter(name = "regionCds", description = "통신사코드")
                                                    @RequestParam(value = "regionCds", required = false) List<String> regionCds,
-                                                   @Parameter(name = "searchWord", description = "통신사코드")
-                                                   @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
+                                                   @Parameter(name = "searchWord", description = "검색어")
+                                                   @RequestParam(value = "searchWord", required = false) String searchWord,
+                                                   @Parameter(name = "svcTyp", description = "서비스 유형 ( 국문 AKRO, 영문 AENO )")
+                                                   @RequestParam(value = "svcTyp", required = false) String svcTyp) throws Exception {
 
         List<YonhapDTO> yonhapDTOList = new ArrayList<>();
 
@@ -51,10 +53,10 @@ public class YonhapController {
             //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
             SearchDate searchDate = new SearchDate(sdate, edate);
 
-            yonhapDTOList = yonhapService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), artclCateCds, regionCds, searchWord);
+            yonhapDTOList = yonhapService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), artclCateCds, regionCds, searchWord, svcTyp);
 
         } else {
-            yonhapDTOList = yonhapService.findAll(null, null, artclCateCds, regionCds, searchWord);
+            yonhapDTOList = yonhapService.findAll(null, null, artclCateCds, regionCds, searchWord, svcTyp);
 
         }
         return new AnsApiResponse<>(yonhapDTOList);
@@ -62,7 +64,7 @@ public class YonhapController {
 
     @Operation(summary = "연합 상세조회", description = "연합 상세조회")
     @GetMapping(path = "/{yonhapId}")
-    public AnsApiResponse<YonhapDTO> find(@Parameter(name = "yonhapId", description = "연합 아이디") @PathVariable("yonhapId")Long yonhapId){
+    public AnsApiResponse<YonhapDTO> find(@Parameter(name = "yonhapId", description = "연합 아이디") @PathVariable("yonhapId") Long yonhapId) {
 
         YonhapDTO yonhapDTO = yonhapService.find(yonhapId);
 

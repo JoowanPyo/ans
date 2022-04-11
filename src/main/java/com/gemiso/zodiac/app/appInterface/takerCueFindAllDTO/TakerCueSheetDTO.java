@@ -9,9 +9,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Data
 @Builder
@@ -123,8 +121,12 @@ public class TakerCueSheetDTO {
     private String inputDtm;
     @XmlElement(name = "news_acum_time")
     private Integer newsAcumTime; // 누적시간
+    @XmlElement(name = "video_symbols")
+    private TakerCueSheetVideoSymbolDTO takerCueSheetVideoSymbolDTO;
+    @XmlElement(name = "audio_symbols")
+    private TakerCueSheetAudioSymbolDTO takerCueSheetAudioSymbolDTO;
     @XmlElement(name = "video")
-    private List<TakerCueSheetVideoDTO> takerCueSheetVideoDTO = new ArrayList<>();
+    private TakerCueSheetVideoDTO takerCueSheetVideoDTO;
 
 
 

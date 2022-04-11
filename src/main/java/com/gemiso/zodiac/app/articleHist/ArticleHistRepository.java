@@ -11,4 +11,7 @@ public interface ArticleHistRepository extends JpaRepository<ArticleHist, Long>,
 
     @Query("select a from ArticleHist a where a.artclHistId = :artclHistId")
     Optional<ArticleHist> findByArticleHist(@Param("artclHistId")Long artclHistId);
+
+    @Query("select count(a.ver) from ArticleHist a where a.article.artclId = :artclId")
+    int findArticleHistByArticle(@Param("artclId")Long artclId);
 }

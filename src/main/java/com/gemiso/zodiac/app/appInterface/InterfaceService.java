@@ -17,6 +17,7 @@ import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramResultDTO;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
+import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.code.CodeRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
@@ -353,6 +354,28 @@ public class InterfaceService {
             //큐시트 아이템 방송아이콘 List 조회
             List<CueSheetItemSymbol> cueSheetItemSymbolList = cueSheetItemSymbolRepository.findSymbol(cueItemId);
 
+            TakerCueSheetVideoSymbolDTO takerCueSheetVideoSymbolDTO = new TakerCueSheetVideoSymbolDTO();
+            TakerCueSheetAudioSymbolDTO takerCueSheetAudioSymbolDTO = new TakerCueSheetAudioSymbolDTO();
+            for(CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+                Symbol symbol = cueSheetItemSymbol.getSymbol();
+
+                if(ObjectUtils.isEmpty(symbol)){
+                    continue;
+                }
+
+                String typeCode = symbol.getTypCd();
+
+                if ("audio_icons".equals(typeCode)){
+
+                    takerCueSheetAudioSymbolDTO = getAudioSymbol(cueSheetItemSymbolList);
+
+                }else if("video_icons".equals(typeCode)){
+
+                    takerCueSheetVideoSymbolDTO = getVideoSymbol(cueSheetItemSymbolList);
+                }
+            }
+
+
             //cmDivCd, cmDivCd 값 구하기 [채널값으로 심볼에 들어가는 NS-1, NS-2, NS-3 값 구하기]
             String returnSymbolId = "";
             String returnSymbolNm = "";
@@ -380,12 +403,12 @@ public class InterfaceService {
                 }
             }
 
-            //큐시트 아이템 비디오 정보 get
-            List<CueSheetMedia> cueSheetMediaList = cueSheetItem.getCueSheetMedia();
-
-            List<TakerCueSheetVideoDTO> takerCueSheetVideoDTOList = getVideoDTOList(cueSheetMediaList);
-
             if (ObjectUtils.isEmpty(article)) { //기사가 포함이 안된 큐시트 아이템 일시
+
+                //큐시트 아이템 비디오 정보 get
+                List<CueSheetMedia> cueSheetMediaList = cueSheetItem.getCueSheetMedia();
+                //큐시트 아이템 비디오 정보를 큐시트 테이커 비디오 DTO로 set
+                TakerCueSheetVideoDTO takerCueSheetVideoDTOList = getVideoDTOList(cueSheetMediaList);
 
                 //프로그램 아이디 get null에러 방지
                 Program program = cueSheet.getProgram();
@@ -409,6 +432,8 @@ public class InterfaceService {
                         .mcStNm(cueSheetItem.getBrdcStCdNm())//방송상태코드 명
                         .cmDivNm(returnSymbolNm)//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
                         .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
+                        .takerCueSheetVideoSymbolDTO(takerCueSheetVideoSymbolDTO)
+                        .takerCueSheetAudioSymbolDTO(takerCueSheetAudioSymbolDTO)
                         .build();
 
                 takerCueSheetSpareDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
@@ -416,6 +441,13 @@ public class InterfaceService {
                 ++rdSeq;
 
             } else {
+
+                //기사에서 비디오 정보 get
+                List<ArticleMedia> cueSheetMediaArticleList = article.getArticleMedia();
+                //기사 비디오 정보를 큐시트 테이커 비디오 DTO로 set
+                TakerCueSheetVideoDTO takerArticleVideoDTOList = getArticleVideoDTOList(cueSheetMediaArticleList);
+
+
                 //이슈아이디 get null에러 방지
                 issue = article.getIssue();
                 Long issueId = 0L;
@@ -481,7 +513,9 @@ public class InterfaceService {
                         .inputrId(article.getInputrId())
                         .inputrNm(article.getInputrNm())
                         .inputDtm(dateChangeHelper.dateToStringNormal(article.getInputDtm())) //Date(yyyy-MM-dd HH:mm:ss)형식의 입력일시를 String으로 변환
-                        .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
+                        .takerCueSheetVideoDTO(takerArticleVideoDTOList)//???
+                        .takerCueSheetVideoSymbolDTO(takerCueSheetVideoSymbolDTO)
+                        .takerCueSheetAudioSymbolDTO(takerCueSheetAudioSymbolDTO)
                         .build();
 
                 takerCueSheetSpareDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
@@ -494,6 +528,64 @@ public class InterfaceService {
         return takerCueSheetSpareDTOList;
 
 
+    }
+
+    //비디오 아이콘 정보 테이커 DTO로 set
+    public TakerCueSheetVideoSymbolDTO getVideoSymbol(List<CueSheetItemSymbol> cueSheetItemSymbolList){
+
+        TakerCueSheetVideoSymbolDTO takerCueSheetVideoSymbolDTO = new TakerCueSheetVideoSymbolDTO();
+        List<TakerCueSheetSymbolListDTO> takerCueSheetSymbolListDTOList = new ArrayList<>();
+
+        for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+
+            Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+            if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+
+                String symbolId = symbol.getSymbolId(); //심볼아이디
+
+                // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값을 안넣는다
+                if("VNS1".equals(symbolId) || "VNS2".equals(symbolId) || "VNS3".equals(symbolId)){
+                    continue;
+                }
+
+                TakerCueSheetSymbolListDTO takerCueSheetSymbolListDTO = TakerCueSheetSymbolListDTO.builder()
+                        .symbolId(symbolId).build();
+
+                takerCueSheetSymbolListDTOList.add(takerCueSheetSymbolListDTO);
+            }
+        }
+        takerCueSheetVideoSymbolDTO.setTakerCueSheetSymbolListDTOList(takerCueSheetSymbolListDTOList);
+
+        return takerCueSheetVideoSymbolDTO;
+    }
+
+    //비디오 아이콘 정보 테이커 DTO로 set
+    public TakerCueSheetAudioSymbolDTO getAudioSymbol(List<CueSheetItemSymbol> cueSheetItemSymbolList){
+
+        TakerCueSheetAudioSymbolDTO takerCueSheetAudioSymbolDTO = new TakerCueSheetAudioSymbolDTO();
+        List<TakerCueSheetSymbolListDTO> takerCueSheetSymbolListDTOList = new ArrayList<>();
+
+        for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+
+            Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+            if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+
+                String symbolId = symbol.getSymbolId(); //심볼아이디
+
+                // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값을 안넣는다
+                if("VNS1".equals(symbolId) || "VNS2".equals(symbolId) || "VNS3".equals(symbolId)){
+                    continue;
+                }
+
+                TakerCueSheetSymbolListDTO takerCueSheetSymbolListDTO = TakerCueSheetSymbolListDTO.builder()
+                        .symbolId(symbolId).build();
+
+                takerCueSheetSymbolListDTOList.add(takerCueSheetSymbolListDTO);
+            }
+        }
+        takerCueSheetAudioSymbolDTO.setTakerCueSheetSymbolListDTOList(takerCueSheetSymbolListDTOList);
+
+        return takerCueSheetAudioSymbolDTO;
     }
 
     //큐시티 엔티티로 조회된 큐시트 TakerCueSheetDTO형식으로 빌드
@@ -513,6 +605,27 @@ public class InterfaceService {
             Long cueItemId = cueSheetItem.getCueItemId();
             //큐시트 아이템 방송아이콘 List 조회
             List<CueSheetItemSymbol> cueSheetItemSymbolList = cueSheetItemSymbolRepository.findSymbol(cueItemId);
+
+            TakerCueSheetVideoSymbolDTO takerCueSheetVideoSymbolDTO = new TakerCueSheetVideoSymbolDTO();
+            TakerCueSheetAudioSymbolDTO takerCueSheetAudioSymbolDTO = new TakerCueSheetAudioSymbolDTO();
+            for(CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+                Symbol symbol = cueSheetItemSymbol.getSymbol();
+
+                if(ObjectUtils.isEmpty(symbol)){
+                    continue;
+                }
+
+                String typeCode = symbol.getTypCd();
+
+                if ("audio_icons".equals(typeCode)){
+
+                    takerCueSheetAudioSymbolDTO = getAudioSymbol(cueSheetItemSymbolList);
+
+                }else if("video_icons".equals(typeCode)){
+
+                    takerCueSheetVideoSymbolDTO = getVideoSymbol(cueSheetItemSymbolList);
+                }
+            }
 
             //cmDivCd, cmDivCd 값 구하기 [채널값으로 심볼에 들어가는 NS-1, NS-2, NS-3 값 구하기]
             String returnSymbolId = "";
@@ -540,18 +653,19 @@ public class InterfaceService {
                     }
                 }
             }
-
-            //큐시트 아이템 비디오 정보 get
-            List<CueSheetMedia> cueSheetMediaList = cueSheetItem.getCueSheetMedia();
-
-            List<TakerCueSheetVideoDTO> takerCueSheetVideoDTOList = getVideoDTOList(cueSheetMediaList);
+            
 
             if (ObjectUtils.isEmpty(article)) { //기사가 포함이 안된 큐시트 아이템 일시
+
+                //큐시트 아이템 비디오 정보 get
+                List<CueSheetMedia> cueSheetMediaList = cueSheetItem.getCueSheetMedia();
+                //큐시트 아이템 비디오 정보를 큐시트 테이커 비디오 DTO로 set
+                TakerCueSheetVideoDTO takerCueSheetVideoDTOList = getVideoDTOList(cueSheetMediaList);
 
 
                 //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
                 TakerCueSheetDTO takerCueSheetDTO = buildTakerCue(cueSheet, cueSheetItem, rdSeq, returnSymbolId
-                        , returnSymbolNm, takerCueSheetVideoDTOList);
+                        , returnSymbolNm, takerCueSheetVideoDTOList, takerCueSheetVideoSymbolDTO, takerCueSheetAudioSymbolDTO);
 
                 takerCueSheetDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
 
@@ -559,9 +673,14 @@ public class InterfaceService {
 
             } else { //기사가 포함된 큐시트 아이템 일시
 
+                //기사에서 비디오 정보 get
+                List<ArticleMedia> cueSheetMediaArticleList = article.getArticleMedia();
+                //기사 비디오 정보를 큐시트 테이커 비디오 DTO로 set
+                TakerCueSheetVideoDTO takerArticleVideoDTOList = getArticleVideoDTOList(cueSheetMediaArticleList);
+
                 //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
                 TakerCueSheetDTO takerCueSheetDTO = buildTakerCueArticle(cueSheet, cueSheetItem, rdSeq, returnSymbolId
-                        ,returnSymbolNm,  takerCueSheetVideoDTOList, article);
+                        ,returnSymbolNm,  takerArticleVideoDTOList, article, takerCueSheetVideoSymbolDTO, takerCueSheetAudioSymbolDTO);
 
                 takerCueSheetDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
 
@@ -575,7 +694,8 @@ public class InterfaceService {
 
     //테이커큐시트 정보 큐시트 엔티티 정보로 빌드( 기사 x)
     public TakerCueSheetDTO buildTakerCue(CueSheet cueSheet, CueSheetItem cueSheetItem, int rdSeq
-            , String returnSymbolId, String returnSymbolNm, List<TakerCueSheetVideoDTO> takerCueSheetVideoDTOList){
+            , String returnSymbolId, String returnSymbolNm, TakerCueSheetVideoDTO takerCueSheetVideoDTO
+            , TakerCueSheetVideoSymbolDTO takerCueSheetVideoSymbolDTO, TakerCueSheetAudioSymbolDTO takerCueSheetAudioSymbolDTO){
 
         //프로그램 아이디 get null에러 방지
         Program program = cueSheet.getProgram();
@@ -598,7 +718,9 @@ public class InterfaceService {
                 .rdDtlDivNm(cueSheetItem.getCueItemDivCdNm())//큐시트아이템 구분 코드 명
                 .mcStNm(cueSheetItem.getBrdcStCdNm())//방송상태코드 명
                 .cmDivNm(returnSymbolNm)//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
-                .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
+                .takerCueSheetVideoDTO(takerCueSheetVideoDTO)//???
+                .takerCueSheetVideoSymbolDTO(takerCueSheetVideoSymbolDTO)
+                .takerCueSheetAudioSymbolDTO(takerCueSheetAudioSymbolDTO)
                 //.artclTitl()
                 //.artclTitlEn()
                 .build();
@@ -608,7 +730,8 @@ public class InterfaceService {
 
     //테이커큐시트 정보 큐시트 엔티티 정보로 빌드( 기사 o)
     public TakerCueSheetDTO buildTakerCueArticle(CueSheet cueSheet, CueSheetItem cueSheetItem, int rdSeq
-            , String returnSymbolId, String returnSymbolNm, List<TakerCueSheetVideoDTO> takerCueSheetVideoDTOList, Article article) {
+            , String returnSymbolId, String returnSymbolNm, TakerCueSheetVideoDTO takerCueSheetVideoDTO, Article article
+            , TakerCueSheetVideoSymbolDTO takerCueSheetVideoSymbolDTO, TakerCueSheetAudioSymbolDTO takerCueSheetAudioSymbolDTO) {
 
         //이슈아이디 get null에러 방지
         Issue issue = article.getIssue();
@@ -676,7 +799,9 @@ public class InterfaceService {
                 .inputrNm(article.getInputrNm())
                 .inputDtm(dateChangeHelper.dateToStringNormal(article.getInputDtm())) //Date(yyyy-MM-dd HH:mm:ss)형식의 입력일시를 String으로 변환
                 //.newsAcumTime(newsAcumTime)//누적시간
-                .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
+                .takerCueSheetVideoDTO(takerCueSheetVideoDTO)//???
+                .takerCueSheetVideoSymbolDTO(takerCueSheetVideoSymbolDTO)
+                .takerCueSheetAudioSymbolDTO(takerCueSheetAudioSymbolDTO)
                 .build();
 
 
@@ -685,25 +810,28 @@ public class InterfaceService {
 
     }
     //큐시트 아이템 비디오 정보 get
-    public List<TakerCueSheetVideoDTO> getVideoDTOList(List<CueSheetMedia> cueSheetMediaList){
+    public TakerCueSheetVideoDTO getVideoDTOList(List<CueSheetMedia> cueSheetMediaList){
 
-        List<TakerCueSheetVideoDTO> returnDTOList = new ArrayList<>(); //리턴할 비디오 DTO 리스트
+        TakerCueSheetVideoDTO returnDTO = new TakerCueSheetVideoDTO(); //리턴할 비디오 DTO 리스트
+        List<TakerCueSheetVideoClipDTO> takerCueSheetVideoDTOList = new ArrayList<>();
 
         //Mam되면 수정
-        /*for (CueSheetMedia cueSheetMedia : cueSheetMediaList){//큐시트 아이템에 포함된 큐시트 미디어 정보 get
+        for (CueSheetMedia cueSheetMedia : cueSheetMediaList){//큐시트 아이템에 포함된 큐시트 미디어 정보 get
 
             //테이커 비디오 정보 빌드
-            TakerCueSheetVideoDTO takerCueSheetVideoDTO = TakerCueSheetVideoDTO.builder()
+            TakerCueSheetVideoClipDTO takerCueSheetVideoDTO = TakerCueSheetVideoClipDTO.builder()
                     .title(cueSheetMedia.getCueMediaTitl()) //미디어 제목
                     .playout_id("") // clip Id
                     .duration(cueSheetMedia.getMediaDurtn()) // 미디어 길이
                     .build();
 
-            returnDTOList.add(takerCueSheetVideoDTO);
+            takerCueSheetVideoDTOList.add(takerCueSheetVideoDTO);
 
-        }*/
+        }
+        returnDTO.setTakerCueSheetVideoClipDTO(takerCueSheetVideoDTOList);
 
-        TakerCueSheetVideoClipDTO takerCueSheetVideoClipDTO = TakerCueSheetVideoClipDTO.builder()
+
+       /* TakerCueSheetVideoClipDTO takerCueSheetVideoClipDTO = TakerCueSheetVideoClipDTO.builder()
                 .title("media title") //미디어 제목
                 .playout_id("11") // clip Id
                 .seq("1")
@@ -714,11 +842,55 @@ public class InterfaceService {
         //테이커 비디오 정보 빌드
         TakerCueSheetVideoDTO takerCueSheetVideoDTO = TakerCueSheetVideoDTO.builder()
                 .takerCueSheetVideoClipDTO(takerCueSheetVideoClipDTO)
+                .build();*/
+
+        //returnDTOList.add(takerCueSheetVideoDTO);
+
+        return returnDTO;
+    }
+
+    //큐시트 기사 비디오 정보 get
+    public TakerCueSheetVideoDTO getArticleVideoDTOList(List<ArticleMedia> cueSheetMediaArticleList){
+
+        TakerCueSheetVideoDTO returnDTO = new TakerCueSheetVideoDTO(); //리턴할 비디오 DTO 리스트
+        List<TakerCueSheetVideoClipDTO> takerCueSheetVideoDTOList = new ArrayList<>();
+
+        Integer seq = 1;
+        //Mam되면 수정
+        for (ArticleMedia articleMedia : cueSheetMediaArticleList){//큐시트 아이템에 포함된 큐시트 미디어 정보 get
+
+            //테이커 비디오 정보 빌드
+            TakerCueSheetVideoClipDTO takerCueSheetVideoDTO = TakerCueSheetVideoClipDTO.builder()
+                    .title(articleMedia.getArtclMediaTitl()) //미디어 제목
+                    .playout_id(articleMedia.getVideoId()) // clip Id
+                    .duration(articleMedia.getMediaDurtn()) // 미디어 길이
+                    .seq(seq)
+                    .build();
+
+            takerCueSheetVideoDTOList.add(takerCueSheetVideoDTO);
+
+            seq++;
+
+        }
+        returnDTO.setTakerCueSheetVideoClipDTO(takerCueSheetVideoDTOList);
+
+
+       /* TakerCueSheetVideoClipDTO takerCueSheetVideoClipDTO = TakerCueSheetVideoClipDTO.builder()
+                .title("media title") //미디어 제목
+                .playout_id("11") // clip Id
+                .seq("1")
+                .duration("01:30") // 미디어 길이
                 .build();
 
-        returnDTOList.add(takerCueSheetVideoDTO);
 
-        return returnDTOList;
+        //테이커 비디오 정보 빌드
+        TakerCueSheetVideoDTO takerCueSheetVideoDTO = TakerCueSheetVideoDTO.builder()
+                .takerCueSheetVideoClipDTO(takerCueSheetVideoClipDTO)
+                .build();*/
+
+        //returnDTOList.add(takerCueSheetVideoDTO);
+
+        return returnDTO;
     }
 
     //조회된 큐시트 데이터 리스트를 XML DTO에 set 후 XML형식 String데이터로 파싱
@@ -1249,6 +1421,27 @@ public class InterfaceService {
         //큐시트 아이템 방송아이콘 List 조회
         List<CueSheetItemSymbol> cueSheetItemSymbolList = cueSheetItemSymbolRepository.findSymbol(cueItemId);
 
+        TakerCueSheetVideoSymbolDTO takerCueSheetVideoSymbolDTO = new TakerCueSheetVideoSymbolDTO();
+        TakerCueSheetAudioSymbolDTO takerCueSheetAudioSymbolDTO = new TakerCueSheetAudioSymbolDTO();
+        for(CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+            Symbol symbol = cueSheetItemSymbol.getSymbol();
+
+            if(ObjectUtils.isEmpty(symbol)){
+                continue;
+            }
+
+            String typeCode = symbol.getTypCd();
+
+            if ("audio_icons".equals(typeCode)){
+
+                takerCueSheetAudioSymbolDTO = getAudioSymbol(cueSheetItemSymbolList);
+
+            }else if("video_icons".equals(typeCode)){
+
+                takerCueSheetVideoSymbolDTO = getVideoSymbol(cueSheetItemSymbolList);
+            }
+        }
+
         //cmDivCd, cmDivCd 값 구하기 [채널값으로 심볼에 들어가는 NS-1, NS-2, NS-3 값 구하기]
         String returnSymbolId = "";
         String returnSymbolNm = "";
@@ -1277,28 +1470,41 @@ public class InterfaceService {
             }
         }
 
-        //큐시트 아이템 비디오 정보 get
+       /* //큐시트 아이템 비디오 정보 get
         List<CueSheetMedia> cueSheetMediaList = cueSheetItem.getCueSheetMedia();
+        List<ArticleMedia> cueSheetMediaArticleList = article.getArticleMedia();
 
-        List<TakerCueSheetVideoDTO> takerCueSheetVideoDTOList = getVideoDTOList(cueSheetMediaList);
+        //큐시트 아이템 비디오 정보를 큐시트 테이커 비디오 DTO로 set
+        TakerCueSheetVideoDTO takerCueSheetVideoDTOList = getVideoDTOList(cueSheetMediaList);
+        TakerCueSheetVideoDTO takerArticleVideoDTOList = getArticleVideoDTOList(cueSheetMediaArticleList);*/
 
         TakerCueSheetDTO takerCueSheetDTO = new TakerCueSheetDTO(); //데이터 DTO에 담을 DTO
 
         if (ObjectUtils.isEmpty(article)) { //기사가 포함이 안된 큐시트 아이템 일시
 
+            //큐시트 아이템 비디오 정보 get
+            List<CueSheetMedia> cueSheetMediaList = cueSheetItem.getCueSheetMedia();
+            //큐시트 아이템 비디오 정보를 큐시트 테이커 비디오 DTO로 set
+            TakerCueSheetVideoDTO takerCueSheetVideoDTOList = getVideoDTOList(cueSheetMediaList);
 
             //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
             takerCueSheetDTO = buildTakerCue(cueSheet, cueSheetItem, rd_seq, returnSymbolId
-                    , returnSymbolNm, takerCueSheetVideoDTOList);
+                    , returnSymbolNm, takerCueSheetVideoDTOList, takerCueSheetVideoSymbolDTO, takerCueSheetAudioSymbolDTO);
 
             takerCueRefreshDataDTO.setTakerCueSheetDTO(takerCueSheetDTO);
 
 
         } else { //기사가 포함된 큐시트 아이템 일시
 
+            //기사에서 비디오 정보 get
+            List<ArticleMedia> cueSheetMediaArticleList = article.getArticleMedia();
+            //기사 비디오 정보를 큐시트 테이커 비디오 DTO로 set
+            TakerCueSheetVideoDTO takerArticleVideoDTOList = getArticleVideoDTOList(cueSheetMediaArticleList);
+
+
             //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
             takerCueSheetDTO = buildTakerCueArticle(cueSheet, cueSheetItem, rd_seq, returnSymbolId
-                    ,returnSymbolNm,  takerCueSheetVideoDTOList, article);
+                    ,returnSymbolNm,  takerArticleVideoDTOList, article, takerCueSheetVideoSymbolDTO, takerCueSheetAudioSymbolDTO);
 
             takerCueRefreshDataDTO.setTakerCueSheetDTO(takerCueSheetDTO);
 

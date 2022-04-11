@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public enum FixEnum {
 
-    FIX_NONE(0, "none"),
+    FIX_NONE(0, "fix_none"),
     ARTICLE_FIX(1, "article_fix"),
     EDITOR_FIX(2, "editor_fix"),
     ANCHOR_FIX(3, "anchor_fix"),

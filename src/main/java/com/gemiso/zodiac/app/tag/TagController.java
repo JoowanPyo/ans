@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-//@Tag(name = "User Controllers", description = "User API")
+//@Tag(name = "MisUser Controllers", description = "MisUser API")
 @Api(description = "테그 API")
 @RestController
 @RequestMapping("/tags")

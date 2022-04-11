@@ -54,9 +54,10 @@ public class YonhapService {
 
     private final DateChangeHelper dateChangeHelper;
 
-    public List<YonhapDTO> findAll(Date sdate, Date edate, List<String> artcl_cate_cds, List<String> region_cds, String search_word) {
+    public List<YonhapDTO> findAll(Date sdate, Date edate, List<String> artcl_cate_cds, List<String> region_cds,
+                                   String search_word, String svcTyp) {
 
-        BooleanBuilder booleanBuilder = getSearch(sdate, edate, artcl_cate_cds, region_cds, search_word);
+        BooleanBuilder booleanBuilder = getSearch(sdate, edate, artcl_cate_cds, region_cds, search_word, svcTyp);
 
         List<Yonhap> yonhapList = (List<Yonhap>) yonhapRepository.findAll(booleanBuilder);
 
@@ -261,29 +262,33 @@ public class YonhapService {
         return yonhapResponseDTO;
     }
 
-    public BooleanBuilder getSearch(Date sdate, Date edate, List<String> artcl_cate_cds, List<String> region_cds, String search_word) {
+    public BooleanBuilder getSearch(Date sdate, Date edate, List<String> artcl_cate_cds, List<String> region_cds,
+                                    String search_word, String svcTyp) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         QYonhap qYonhap = QYonhap.yonhap;
 
+        //날짜 조회조건이 들어온 경우
         if (ObjectUtils.isEmpty(sdate) ==false && ObjectUtils.isEmpty(edate) == false) {
             booleanBuilder.and(qYonhap.inputDtm.between(sdate, edate));
         }
-
-        if (ObjectUtils.isEmpty(artcl_cate_cds) == false) {
+        //분류코드
+        if (CollectionUtils.isEmpty(artcl_cate_cds) == false) {
 
             booleanBuilder.and(qYonhap.artclCateCd.in(artcl_cate_cds));
         }
-
-        if (ObjectUtils.isEmpty(region_cds) == false) {
-
+        //통신사코드
+        if (CollectionUtils.isEmpty(region_cds) == false) {
             booleanBuilder.and(qYonhap.regionCd.in(region_cds));
-
         }
-
-        if (!StringUtils.isEmpty(search_word)) {
+        //검색어
+        if (search_word != null & search_word.trim().isEmpty() == false) {
             booleanBuilder.and(qYonhap.artclTitl.contains(search_word));
+        }
+        //서비스 유형 ( 국문 AKRO, 영문 AENO )
+        if (svcTyp != null && svcTyp.trim().isEmpty() == false){
+            booleanBuilder.and(qYonhap.svcTyp.eq(svcTyp));
         }
 
         return booleanBuilder;

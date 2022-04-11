@@ -121,6 +121,10 @@ public class TakerCueSheetSpareDTO {
     private String inputrNm;
     @XmlElement(name = "input_dtm")
     private String inputDtm;
+    @XmlElement(name = "video_symbols")
+    private TakerCueSheetVideoSymbolDTO takerCueSheetVideoSymbolDTO;
+    @XmlElement(name = "audio_symbols")
+    private TakerCueSheetAudioSymbolDTO takerCueSheetAudioSymbolDTO;
     @XmlElement(name = "video")
-    private List<TakerCueSheetVideoDTO> takerCueSheetVideoDTO = new ArrayList<>();
+    private TakerCueSheetVideoDTO takerCueSheetVideoDTO;
 }

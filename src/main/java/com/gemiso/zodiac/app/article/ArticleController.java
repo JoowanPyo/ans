@@ -51,12 +51,13 @@ public class ArticleController {
             @Parameter(name = "searchWord", description = "검색키워드") @RequestParam(value = "searchWord", required = false) String searchWord,
             @Parameter(name = "page", description = "시작페이지") @RequestParam(value = "page", required = false) Integer page,
             @Parameter(name = "limit", description = "한 페이지에 데이터 수") @RequestParam(value = "limit", required = false) Integer limit,
-            @Parameter(name = "apprvDivCdList", description = "픽스구분코드(fix_none,article_fix,editor_fix,anchor_fix,desk_fix)")@RequestParam(value = "apprvDivCdList", required = false)List<String> apprvDivCdList,
+            @Parameter(name = "apprvDivCdList", description = "픽스구분코드(fix_none,article_fix,editor_fix,anchor_fix,desk_fix)") @RequestParam(value = "apprvDivCdList", required = false) List<String> apprvDivCdList,
             @Parameter(name = "deptCd", description = "부서코드") @RequestParam(value = "deptCd", required = false) String deptCd,
             @Parameter(name = "artclCateCd", description = "기사 카테고리 코드") @RequestParam(value = "artclCateCd", required = false) String artclCateCd,
             @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
-            @Parameter(name = "delYn", description = "삭제 여부") @RequestParam(value = "delYn", required = false) String delYn
-            /*@Parameter(name = "issuId", description = "이슈아이디") @RequestParam(value = "issuId", required = false) Long issuId*/) throws Exception {
+            @Parameter(name = "delYn", description = "삭제 여부") @RequestParam(value = "delYn", required = false) String delYn,
+            @Parameter(name = "artclId", description = "기사아이디")@RequestParam(value = "artclId", required = false) Long artclId,
+            @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]")@RequestParam(value = "copyYn", required = false) String copyYn) throws Exception {
 
         PageResultDTO<ArticleDTO, Article> pageList = null;
         //List<ArticleDTO> articleDTOList = new ArrayList<>();
@@ -73,12 +74,14 @@ public class ArticleController {
             SearchDate searchDate = new SearchDate(sdate, edate);
 
             pageList = articleService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), rcvDt, rptrId, inputrId,
-                    brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd, delYn);
+                    brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd,
+                    artclCateCd, artclTypDtlCd, delYn, artclId, copyYn);
             //검색조건 날짜형식이 안들어왔을경우
         } else {
 
             pageList = articleService.findAll(null, null, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd,
-                    artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd, delYn);
+                    artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd, artclCateCd,
+                    artclTypDtlCd, delYn, artclId, copyYn);
 
         }
 
@@ -93,7 +96,7 @@ public class ArticleController {
                                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                                       @Parameter(name = "searchWord", description = "검색키워드")
                                                                       @RequestParam(value = "searchWord", required = false) String searchWord,
-                                                                      @Parameter(name = "cueId", description = "검색키워드", required = true)
+                                                                      @Parameter(name = "cueId", description = "검색키워드", required = false)
                                                                       @RequestParam(value = "cueId") Long cueId,
                                                                       @Parameter(name = "page", description = "시작페이지")
                                                                       @RequestParam(value = "page", required = false) Integer page,
@@ -129,7 +132,7 @@ public class ArticleController {
             @Parameter(name = "delYn", description = "삭제 여부") @RequestParam(value = "delYn", required = false) String delYn,
             @Parameter(name = "searchDivCd", description = "검색구분코드<br>01 - 기사제목<br>02 - 기자명") @RequestParam(value = "searchDivCd", required = false) String searchDivCd,
             @Parameter(name = "searchWord", description = "검색키워드") @RequestParam(value = "searchWord", required = false) String searchWord,
-            @Parameter(name = "apprvDivCdList", description = "픽스구분코드(fix_none,article_fix,editor_fix,anchor_fix,desk_fix)")@RequestParam(value = "apprvDivCdList", required = false)List<String> apprvDivCdList,
+            @Parameter(name = "apprvDivCdList", description = "픽스구분코드(fix_none,article_fix,editor_fix,anchor_fix,desk_fix)") @RequestParam(value = "apprvDivCdList", required = false) List<String> apprvDivCdList,
             @Parameter(name = "page", description = "시작페이지") @RequestParam(value = "page", required = false) Integer page,
             @Parameter(name = "limit", description = "한 페이지에 데이터 수") @RequestParam(value = "limit", required = false) Integer limit) throws Exception {
 
@@ -143,7 +146,7 @@ public class ArticleController {
         SearchDate searchDate = new SearchDate(date, date);
 
         PageResultDTO<ArticleDTO, Article> pageList = articleService.findAllIsuue(searchDate.getStartDate(),
-                searchDate.getEndDate(), issuKwd,artclDivCd, artclTypCd, artclTypDtlCd, artclCateCd, deptCd, inputrId,
+                searchDate.getEndDate(), issuKwd, artclDivCd, artclTypCd, artclTypDtlCd, artclCateCd, deptCd, inputrId,
                 brdcPgmId, orgArtclId, delYn, searchDivCd, searchWord, page, limit, apprvDivCdList);
 
 

@@ -68,8 +68,8 @@ public class UserGroupUserService {
     public UserDTO findUser(String userId) {
 
         User userEntity = userService.userFindOrFail(userId);
-        /*User userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found. userId : " + userId));*/
+        /*MisUser userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("MisUser not found. userId : " + userId));*/
 
         UserDTO userDTO = userMapper.toDto(userEntity);
 
@@ -171,7 +171,7 @@ public class UserGroupUserService {
         Optional<User> userEntity = userRepository.findByUserId(userId);
 
         if (!userEntity.isPresent()) {
-            throw new ResourceNotFoundException("User not found. userId : " + userId);
+            throw new ResourceNotFoundException("MisUser not found. userId : " + userId);
         }
 
         return userEntity.get();

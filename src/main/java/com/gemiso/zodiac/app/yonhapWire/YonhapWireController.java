@@ -25,7 +25,7 @@ import java.util.List;
 @RequestMapping("/yonhapinternational")
 @Slf4j
 @RequiredArgsConstructor
-//@Tag(name = "User Controllers", description = "User API")
+//@Tag(name = "MisUser Controllers", description = "MisUser API")
 @Api(description = "연합 외신 API")
 public class YonhapWireController {
 

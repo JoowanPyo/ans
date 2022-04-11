@@ -25,7 +25,7 @@ public class TakerCueSheetVideoClipDTO {
     private String playout_id;
 
     @XmlAttribute
-    private String seq;
+    private Integer seq;
 
     @XmlAttribute
     private String duration;

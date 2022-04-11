@@ -34,6 +34,9 @@ public class MarshallingJsonHelper {
 
         String jsonInString = mapper.writeValueAsString(object);
 
+
+        System.out.println(jsonInString);
+
         return jsonInString;
     }
 

@@ -18,7 +18,7 @@ import java.util.List;
 public class TakerCueSheetVideoDTO {
 
     @XmlElement(name = "clip")
-    private TakerCueSheetVideoClipDTO takerCueSheetVideoClipDTO;
+    private List<TakerCueSheetVideoClipDTO> takerCueSheetVideoClipDTO;
 
     /*@XmlAttribute
     private String title;

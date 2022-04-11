@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.core.scheduling;
 
+import com.gemiso.zodiac.core.mis.MisDept;
+import com.gemiso.zodiac.core.mis.MisService;
 import com.gemiso.zodiac.core.scheduling.dto.BisBasicScheduleDTO;
 import com.gemiso.zodiac.core.scheduling.dto.BisDailyScheduleDTO;
 import com.gemiso.zodiac.core.scheduling.dto.BisProgramDTO;
@@ -9,6 +11,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -16,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class Scheduling {
 
     private final BisInterfaceService bisInterfaceService;
+    private final MisService misService;
 
     //BIS프로그램 조회 및 등록
     @Scheduled(cron = "* * 3 * * ?")//3시간에 한번씩
@@ -52,4 +57,14 @@ public class Scheduling {
         bisInterfaceService.bisDailyScheduleCreate(bisDailyScheduleDTO);
 
     }
+
+    //Mis 부서 조회 및 등록(수정)
+    //@Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "* * 3 * * ?")//3시간에 한번씩
+    public void misDeptScheduled(){
+
+        misService.findMisDept();
+
+    }
+
 }

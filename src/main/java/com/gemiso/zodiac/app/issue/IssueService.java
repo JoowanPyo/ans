@@ -109,8 +109,8 @@ public class IssueService {
         }
 
         //기존에 등록된 수정자가 있으면 수정자 삭제
-        //수정자가 User 엔티티에 PK값을 사용하기 때문에 delete 후 재등록.
-        User user = issue.getUpdtr();
+        //수정자가 MisUser 엔티티에 PK값을 사용하기 때문에 delete 후 재등록.
+        MisUser user = issue.getUpdtr();
         if (ObjectUtils.isEmpty(user) == false){
             issue.setUpdtr(null);
         }*/

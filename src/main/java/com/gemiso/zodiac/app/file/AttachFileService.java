@@ -367,9 +367,9 @@ public class AttachFileService {
 
     public String getBrowser(HttpServletRequest request) {
 
-        String header = request.getHeader("User-Agent");
+        String header = request.getHeader("MisUser-Agent");
 
-        log.info("User-Agent: " + header);
+        log.info("MisUser-Agent: " + header);
 
         if (header.indexOf("MSIE") > -1) {
             return "MSIE";

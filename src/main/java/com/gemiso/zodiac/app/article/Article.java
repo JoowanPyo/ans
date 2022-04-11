@@ -260,6 +260,42 @@ public class Article extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = editor_id)")
     private String editorNm;
 
+    @Column(name = "artcl_fix_user", length = 50)
+    private String artclFixUser;
+
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = artcl_fix_user)")
+    private String artclFixUserNm;
+
+    @Column(name = "editor_fix_user", length = 50)
+    private String editorFixUser;
+
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = editor_fix_user)")
+    private String editorFixUserNm;
+
+    @Column(name = "anchor_fix_user", length = 50)
+    private String anchorFixUser;
+
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = anchor_fix_user)")
+    private String anchorFixUserNm;
+
+    @Column(name = "desk_fix_user", length = 50)
+    private String deskFixUser;
+
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = desk_fix_user)")
+    private String deskFixUserNm;
+
+    @Column(name = "artcl_fix_dtm")
+    private Date artclFixDtm;
+
+    @Column(name = "editor_fix_dtm")
+    private Date editorFixDtm;
+
+    @Column(name = "anchor_fix_dtm")
+    private Date anchorFixDtm;
+
+    @Column(name = "desk_fix_dtm")
+    private Date deskFixDtm;
+
     @Column(name = "cue_id", length = 50)
     private Long cueId;
 

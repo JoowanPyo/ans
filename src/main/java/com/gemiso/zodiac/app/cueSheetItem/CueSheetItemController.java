@@ -171,12 +171,12 @@ public class CueSheetItemController {
                                                                @PathVariable("cueId") Long cueId,
                                                                @Parameter(name = "artclId", description = "기사 아이디")
                                                                @PathVariable("artclId") Long artclId,
-                                                               @Parameter(name = "cueItemOrd", description = "기사아이디")
+                                                               @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
                                                                @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd,
                                                                @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드")
                                                                @RequestParam(value = "cueItemDivCd", required = false) String cueItemDivCd,
                                                                @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
-                                                               @RequestParam(value = "spareYn", required = false) String spareYn) {
+                                                               @RequestParam(value = "spareYn", required = false) String spareYn) throws Exception {
 
         cueSheetItemService.createCueItem(cueId, artclId, cueItemOrd, cueItemDivCd, spareYn);
 
@@ -194,7 +194,7 @@ public class CueSheetItemController {
                                                                    @Parameter(name = "cueId", description = "큐시트아이디")
                                                                    @PathVariable("cueId") Long cueId,
                                                                    @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
-                                                                   @RequestParam(value = "spareYn", required = false) String spareYn) {
+                                                                   @RequestParam(value = "spareYn", required = false) String spareYn) throws Exception {
 
         cueSheetItemService.createCueItemList(cueSheetItemCreateListDTO, cueId, spareYn);
 

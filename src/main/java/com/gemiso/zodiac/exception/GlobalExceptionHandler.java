@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.exception;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.core.response.ApiErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import java.security.InvalidParameterException;
 import java.time.ZonedDateTime;
@@ -86,6 +88,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
         ApiErrorResponse.Error error =
                 new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.InternalServerError, ex.getMessage());
+        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = {JsonProcessingException.class})
+    public ResponseEntity<Object> handleJsonProcessingException(HttpServletRequest request, JsonProcessingException e) {
+        ApiErrorResponse.Error error =
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.InternalServerError, e.getMessage());
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }

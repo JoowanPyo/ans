@@ -100,6 +100,12 @@ public class ArticleMedia extends BaseEntity {
     @Column(name = "video_edtr_id", length = 50)
     private String videoEdtrId;
 
+    @Column(name = "artcl_media_titl", length = 300)
+    private String artclMediaTitl;
+
+    @Column(name = "video_id", length = 6)
+    private String videoId;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artcl_id")
     @JsonBackReference

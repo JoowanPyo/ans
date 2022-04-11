@@ -84,7 +84,7 @@ public class UserController {
     @Operation(summary = "사용자 정보 수정", description = "사용자 정보 수정")
     @PutMapping(path = "/{userId}")
     public AnsApiResponse<UserDTO> update(@Parameter(name = "userDto", required = true, description = "필수값<br>") @Valid @RequestBody UserUpdateDTO userUpdateDTO,
-                                          @Parameter(name = "userId", required = true) @PathVariable("userId") String userId) {
+                                          @Parameter(name = "userId", required = true) @PathVariable("userId") String userId) throws NoSuchAlgorithmException {
 
 
         userService.update(userUpdateDTO, userId);

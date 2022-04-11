@@ -19,6 +19,7 @@ import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -44,11 +45,9 @@ public class YonhapWireService {
     private final YonhapWireAttchFileRepository yonhapWireAttchFileRepository;
 
     private final YonhapWireMapper yonhapWireMapper;
-    private final YonhapCreateMapper yonhapCreateMapper;
     private final AttachFileMapper attachFileMapper;
     private final YonhapWireAttchFileMapper yonhapWireAttchFileMapper;
 
-    private final YonhapService yonhapService;
 
     private final DateChangeHelper dateChangeHelper;
 
@@ -58,7 +57,7 @@ public class YonhapWireService {
 
         BooleanBuilder booleanBuilder = getSearch(sdate, edate, agcyCd, searchWord, imprtList);
 
-        List<YonhapWire> yonhapWireList = (List<YonhapWire>) yonhapWireRepository.findAll(booleanBuilder);
+        List<YonhapWire> yonhapWireList = (List<YonhapWire>) yonhapWireRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "inputDtm"));
 
         List<YonhapWireDTO> yonhapWireDTOList = yonhapWireMapper.toDtoList(yonhapWireList);
 
@@ -377,8 +376,8 @@ public class YonhapWireService {
                     .contId(contId)
                     .artclTitl(yonhapReuterCreateDTO.getWire_artcl_titl())
                     .artclCtt(yonhapReuterCreateDTO.getWire_artcl_ctt())
-                    .agcyNm("REUTER")//009
-                    .agcyCd("reuter")
+                    .agcyNm("REUTERS")//009
+                    .agcyCd("reuters")
                     .build();
 
             try {

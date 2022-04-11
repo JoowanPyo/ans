@@ -160,7 +160,7 @@ public class UserService {
 
     /*@Override
     public UserDTO getUser(String userId) {
-        User userEntity = userRepository.getUserWithGroup(userId);
+        MisUser userEntity = userRepository.getUserWithGroup(userId);
 
         //List<UserGroupUser> userGroupUserList = userGroupUserRepository.findByUserId(userId);
         List<UserGroupUser> userGroupUserList = userEntity.getUserGroupUsers();
@@ -183,15 +183,28 @@ public class UserService {
         return userDto;
     }*/
 
-    public void update(UserUpdateDTO userUpdateDTO, String userId) {
+    public void update(UserUpdateDTO userUpdateDTO, String userId) throws NoSuchAlgorithmException {
 
         User user = userFindOrFail(userId);
+
+        //패스워드 업데이트 시
+        String getPwd = userUpdateDTO.getPwd();
+
+        if (getPwd != null && getPwd.trim().isEmpty() == false) {
+            //들어온 패스워드 해싱[sha256]
+            EncodingHelper encodingHelper = new EncodingHelper(getPwd);
+            String hexPwd = encodingHelper.getHex();
+
+            //password encoding
+            String password = encodePassword(hexPwd);
+            userUpdateDTO.setPwd(password);
+        }
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String tokenUserId = userAuthService.authUser.getUserId();
         userUpdateDTO.setUpdtrId(tokenUserId);
         userUpdateDTO.setUserId(userId);
-       // User userEntity = userUpdateMapper.toEntity(userUpdateDTO);
+       // MisUser userEntity = userUpdateMapper.toEntity(userUpdateDTO);
        // userEntity.setPwd(user.getPwd());
         userUpdateMapper.updateFromDto(userUpdateDTO, user);
         userRepository.save(user);
@@ -221,7 +234,7 @@ public class UserService {
         Optional<User> userEntity = userRepository.findByUserId(userId);
 
         if (!userEntity.isPresent()){
-            throw new ResourceNotFoundException("User not found. userId : " + userId);
+            throw new ResourceNotFoundException("MisUser not found. userId : " + userId);
         }
 
         return userEntity.get();

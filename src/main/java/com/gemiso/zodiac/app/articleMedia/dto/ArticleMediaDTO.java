@@ -71,6 +71,10 @@ public class ArticleMediaDTO {
     private String delrNm;
     @Schema(description = "영상 편집자 아이디")
     private String videoEdtrId;
+    @Schema(description = "미디어 제목")
+    private String artclMediaTitl;
+    @Schema(description = "비디오 아이디")
+    private String videoId;
     @Schema(description = "기사 아이디")
     private ArticleDTO article;
 }

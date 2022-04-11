@@ -40,7 +40,7 @@ public class ApiErrorResponse extends BaseApiResponse {
         ResourceNotFound("resource_not_found"),
         NoHandler("no_handler"),
         InternalServerError("internal_server_error"),
-        expiredAccesstoken("EXPIRED_ACCESSTOKEN");
+        expiredAccesstoken("Expired_accesstoken");
 
         @JsonValue
         private final String errorCode;

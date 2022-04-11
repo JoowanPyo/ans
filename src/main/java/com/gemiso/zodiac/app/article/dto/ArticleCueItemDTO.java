@@ -173,7 +173,7 @@ public class ArticleCueItemDTO {
     @Schema(description = "앵커자막 리스트")
     private List<AnchorCapSimpleDTO> anchorCap = new ArrayList<>();
     @Schema(description = "기사영상 리스트")
-    private List<ArticleMediaSimpleDTO> articleMediaDTO = new ArrayList<>();
+    private List<ArticleMediaSimpleDTO> articleMedia = new ArrayList<>();
     //@Schema(description = "기사의뢰 리스트")
     //private List<ArticleOrderSimpleDTO> articleOrderDTO = new ArrayList<>();
     //@Schema(description = "기사태그 리스트")
