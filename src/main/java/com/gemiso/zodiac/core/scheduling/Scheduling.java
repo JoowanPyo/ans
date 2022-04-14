@@ -67,4 +67,13 @@ public class Scheduling {
 
     }
 
+    //Mis 부서 조회 및 등록(수정)
+    //@Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "* * 3 * * ?")//3시간에 한번씩
+    public void misUserScheduled(){
+
+        misService.findUser();
+
+    }
+
 }

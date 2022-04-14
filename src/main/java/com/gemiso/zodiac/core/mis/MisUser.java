@@ -2,26 +2,28 @@ package com.gemiso.zodiac.core.mis;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table( name = "VI_TOTAL")
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
 public class MisUser {
 
-    @Id
-    @Column(name = "USER_IDXX", length = 40)
+    /*@Column(name = "USER_IDXX", length = 40)
     private String userIdxx;
 
     @Column(name = "USDN_CODE", length = 2)
     private String usdnCode;
+
+    @Column(name = "EMPL_NUMB", length = 10)
+    private String emplNumb;*/
+
+    @EmbeddedId
+    private MisUserId id;
 
     @Column(name = "EMPL_NUMB", length = 10)
     private String emplNumb;

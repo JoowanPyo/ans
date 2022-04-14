@@ -3,28 +3,32 @@ package com.gemiso.zodiac.core.mis;
 import lombok.*;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table( name = "VI_DEPTXM")
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
 public class MisDept {
 
-    @Id
-    @Column(name = "DEPT_CODE", length = 10, nullable = false)
-    private String deptCode;
+/*    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;*/
 
-    @Column(name = "ORGC_DATE", length = 8, nullable = false)
+    //@Id
+    /*@Column(name = "ORGC_DATE", length = 8, nullable = false)
     private String drgcDate;
 
-    @Column(name = "DEPT_NAME", length = 100)
-    private String deptName;
+    @Column(name = "DEPT_CODE", length = 10, nullable = false)
+    private String deptCode;*/
+
+    @EmbeddedId
+    private MisDeptId id;
 
     @Column(name = "ORGN_CODE")
     private String orgnCode;

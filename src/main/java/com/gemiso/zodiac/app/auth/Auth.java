@@ -34,8 +34,8 @@ public class Auth {
     @Column(name = "user_nm", length = 100)
     private String userNm;
 
-    @Column(name = "dept_id", length = 50)
-    private String deptId;
+    @Column(name = "dept_id")
+    private Long deptId;
 
     @Column(name = "dept_nm", length = 100)
     private String deptNm;

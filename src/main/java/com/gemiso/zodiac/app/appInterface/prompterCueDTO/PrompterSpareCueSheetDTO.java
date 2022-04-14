@@ -14,9 +14,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@XmlRootElement(name = "record")
+@XmlRootElement(name = "spareRecord")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PrompterCueSheetDTO {
+public class PrompterSpareCueSheetDTO {
 
     @XmlElement(name="rd_id")
     private Long cueId;

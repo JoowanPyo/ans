@@ -44,8 +44,8 @@ public class User extends BaseEntity {
     @Column(name = "free_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String freeYn;
 
-    @Column(name = "dept_id", length = 50)
-    private String deptId;
+    @Column(name = "dept_id")
+    private Long deptId;
 
     @Column(name = "duty_cd", length = 50)
     private String dutyCd;
@@ -136,6 +136,9 @@ public class User extends BaseEntity {
 
     @Column(name = "salt", length = 256)
     private String salt;
+
+    @Column(name = "dept_cd", length = 50)
+    private String deptCd;
 
     /*    @JoinTable(
             name = "tb_user_grp_user",

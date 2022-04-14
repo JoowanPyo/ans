@@ -121,6 +121,8 @@ public class TakerCueSheetSpareDTO {
     private String inputrNm;
     @XmlElement(name = "input_dtm")
     private String inputDtm;
+    @XmlElement(name = "news_acum_time")
+    private Integer newsAcumTime; // 누적시간
     @XmlElement(name = "video_symbols")
     private TakerCueSheetVideoSymbolDTO takerCueSheetVideoSymbolDTO;
     @XmlElement(name = "audio_symbols")

@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.appInterface.prompterCueDTO;
 
+import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetSpareDTO;
 import lombok.Data;
 
 import javax.xml.bind.annotation.*;
@@ -22,4 +23,8 @@ public class PrompterCueSheetDataDTO {
 
     @XmlElement(name = "record")
     private List<PrompterCueSheetDTO> cueSheetDTO = new ArrayList<>();
+
+    @XmlElement(name = "spareRecord")
+    private List<PrompterSpareCueSheetDTO> prompterSpareCueSheetDTOS = new ArrayList<>();
+
 }

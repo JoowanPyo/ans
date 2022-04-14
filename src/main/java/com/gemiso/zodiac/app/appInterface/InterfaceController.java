@@ -2,9 +2,11 @@ package com.gemiso.zodiac.app.appInterface;
 
 import com.gemiso.zodiac.app.appInterface.codeDTO.TakerCodeDTO;
 import com.gemiso.zodiac.app.appInterface.prompterCueDTO.PrompterCueSheetDTO;
+import com.gemiso.zodiac.app.appInterface.prompterCueDTO.PrompterCueSheetDataDTO;
 import com.gemiso.zodiac.app.appInterface.prompterProgramDTO.PrompterProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerCueRefreshDataDTO;
+import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerSpareCueRefreshDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
@@ -158,12 +160,25 @@ public class InterfaceController {
                                       @RequestParam(value = "rd_id", required = false) Long rd_id,
                                       @Parameter(name = "rd_seq", description = "큐시트 아이템 순서값")
                                       @RequestParam(value = "rd_seq", required = false) Integer rd_seq,
+                                      @Parameter(name = "spare_yn", description = "스페어 여부값(N, Y)")
+                                      @RequestParam(value = "spare_yn", required = false) String spare_yn,
                                       @RequestHeader(value = "securityKey") String securityKey) {
 
-        TakerCueRefreshDataDTO takerCueSheetDTO = interfaceService.takerCueItemRefresh(rd_id, rd_seq);
+        String returnData = "";
 
-        String returnData = interfaceService.takerCueRefresh(takerCueSheetDTO);
+        if ("N".equals(spare_yn)) {
 
+            TakerCueRefreshDataDTO takerCueSheetDTO = interfaceService.takerCueItemRefresh(rd_id, rd_seq);
+
+            returnData = interfaceService.takerCueRefresh(takerCueSheetDTO);
+
+        }else {
+
+            TakerSpareCueRefreshDataDTO takerSpareCueSheetDTO = interfaceService.takerSpareCueItemRefresh(rd_id, rd_seq);
+
+            returnData = interfaceService.takerSpareCueRefresh(takerSpareCueSheetDTO);
+
+        }
         return returnData;
     }
 
@@ -269,9 +284,10 @@ public class InterfaceController {
                                      @RequestParam(value = "user_ip", required = false) String user_ip,
                                      @RequestHeader(value = "securityKey") String securityKey) {
 
-        List<PrompterCueSheetDTO> prompterCueSheetDTOList = interfaceService.getCuesheetService(cs_id);
+        //set Lsit<PrompterCueRefreshDTO>
+        PrompterCueSheetDataDTO prompterCueSheetDataDTO = interfaceService.getCuesheetService(cs_id);
 
-        String prompterCueSheetXml = interfaceService.prompterCueSheetXml(prompterCueSheetDTOList);
+        String prompterCueSheetXml = interfaceService.prompterCueSheetXml(prompterCueSheetDataDTO);
 
         return prompterCueSheetXml;
     }

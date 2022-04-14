@@ -25,7 +25,7 @@ public class UserCreateDTO {
     private String pwd;
     private String emplNo;
     private String freeYn;
-    private String deptId;
+    private Long deptId;
     private String dutyCd;
     private String dutyCdNm;
     private String chiefYn;
@@ -55,6 +55,7 @@ public class UserCreateDTO {
     //private Date delDtm;
     private String inphonNo;
     private String salt;
+    private String deptCd;
     private List<UserGroupUserDTO> userGroupUserDTO = new ArrayList<>();
 
    /* private String userId;

@@ -22,7 +22,7 @@ public class UserUpdateDTO {
     private String pwd;
     private String emplNo;
     private String freeYn;
-    private String deptId;
+    private Long deptId;
     private String dutyCd;
     private String dutyCdNm;
     private String chiefYn;
@@ -50,7 +50,8 @@ public class UserUpdateDTO {
     //private String delrNm;
     //private Date delDtm;
     private String inphonNo;
-    private String salt;
+    //private String salt;
+    private String deptCd;
     /*private List<UserGroupUserDTO> userGroupUserDTO = new ArrayList<>();*/
 
     /*private String userId;
