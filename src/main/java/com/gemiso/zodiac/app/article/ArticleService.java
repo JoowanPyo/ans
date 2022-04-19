@@ -1264,6 +1264,7 @@ public class ArticleService {
             if ("article_fix".equals(orgApprvDivcd)){
                 article.setEditorFixUser(userId);
                 article.setEditorFixDtm(new Date());
+                article.setEditorId(userId);
 
             }else { // editor_fix 으로 픽스를 풀 경우 등록된 앵커, 데스커 기록 삭제
 

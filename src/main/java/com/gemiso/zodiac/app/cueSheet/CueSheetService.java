@@ -414,10 +414,29 @@ public class CueSheetService {
 
         cueSheetHistCreate(cueId, cueSheet, userId);
 
+        //큐시트 생성시 빈 스페어 큐시트 아이템 생성
+        createSpareCueSheetItem(cueId, userId);
+
         //큐시트 토픽 메세지 전송
         sendCueTopic(cueSheet, "CueSheet Create", cueSheetCreateDTO);
 
         return cueId;
+    }
+
+    //큐시트 생성시 빈 스페어 큐시트 아이템 생성
+    public void createSpareCueSheetItem(Long cueId, String userId){
+
+        CueSheet cueSheet = CueSheet.builder().cueId(cueId).build();
+
+        CueSheetItem cueSheetItem = CueSheetItem.builder()
+                .spareYn("Y")
+                .cueItemDivCd("cue_item")
+                .inputrId(userId)
+                .cueSheet(cueSheet)
+                .build();
+
+        cueSheetItemRepository.save(cueSheetItem);
+
     }
 
     //큐시트 수정

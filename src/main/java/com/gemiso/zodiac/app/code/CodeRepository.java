@@ -26,6 +26,6 @@ public interface CodeRepository extends JpaRepository<Code, Long> , QuerydslPred
     @Query("select a from Code a where a.hrnkCdId IN (:underArtclTypCd)")
     List<Code> findUnderArticleTypeCD(@Param("underArtclTypCd")String[] underArtclTypCd);
 
-    @Query("select a from Code a where a.hrnkCdId = :hrnkCd")
+    @Query("select a from Code a where a.hrnkCdId = :hrnkCd and a.useYn = 'Y'")
     List<Code> findTakerCode(@Param("hrnkCd")String hrnkCd);
 }
