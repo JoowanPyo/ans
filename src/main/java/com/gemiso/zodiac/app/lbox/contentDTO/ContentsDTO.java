@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.lbox.dto;
+package com.gemiso.zodiac.app.lbox.contentDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ public class ContentsDTO {
     private Date created_at;
     private Date updated_at;
     private Date deleted_at;
-    private Date expire_on;
+    private String expire_on;
     private Long view_count;
     private Date locked_at;
     private Boolean in_recycle_bin;
@@ -37,7 +37,8 @@ public class ContentsDTO {
     private Long media_id;
     private String video_time;
     private String video_time_short;
-    //private RegistererDTO registerer;
-    //private MediaInfoDTO media_info;
-    //private ProxyDTO proxy;
+    private RegistererDTO registerer;
+    private MediaInfoDTO media_info;
+    private ProxyDTO proxy;
+    private VideoIdDTO video_id;
 }

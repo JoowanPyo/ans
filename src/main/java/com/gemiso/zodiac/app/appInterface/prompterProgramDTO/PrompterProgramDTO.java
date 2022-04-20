@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class PrompterProgramDTO {
 
     @XmlElement(name="rd_id")
-    private Long csId; // 방송 상태값
+    private Long rdId; // 방송 상태값
 
     @XmlElement(name="brdc_pgm_nm")
     private String proNm; //프로그램 명
@@ -47,6 +47,10 @@ public class PrompterProgramDTO {
 
     @XmlElement(name="PRO_ID")
     private String brdcPgmId; //프로그램 아이디
+
+    @XmlElement(name="cue_id")
+    private Long cueId; // 방송 상태값
+
 
 
     /*@XmlElement(name="CS_SPEND_TIME")

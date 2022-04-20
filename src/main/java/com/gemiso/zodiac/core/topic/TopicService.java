@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.core.topic;
 
+import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -20,7 +21,7 @@ public class TopicService {
     @Value("${topic.routing-key:routiongKey}")
     private String routingKey;
 
-    private static final String EXCHANGE_WEB_NAME = "ans.topic";
+    private static final String EXCHANGE_WEB_NAME = "amq.topic";
     private static final String EXCHANGE_INTERFACE_NAME = "ans.interface";
 
     public void topicWeb(String msg){
@@ -40,11 +41,13 @@ public class TopicService {
             connection = factory.newConnection();
             channel = connection.createChannel();
 
-            //channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.TOPIC);
-            channel.queueDeclare(EXCHANGE_WEB_NAME, false, false, false, null);
+            channel.exchangeDeclare(EXCHANGE_WEB_NAME, BuiltinExchangeType.TOPIC, true);
+            //channel.queueDeclare(EXCHANGE_WEB_NAME, true, false, false, null);
 
             //String routingKey = "ans";
             //String message = "test ans";
+
+            System.out.println(msg);
 
             channel.basicPublish(EXCHANGE_WEB_NAME, routingKey, null, msg.getBytes(StandardCharsets.UTF_8));
 
@@ -77,8 +80,8 @@ public class TopicService {
             connection = factory.newConnection();
             channel = connection.createChannel();
 
-            //channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.TOPIC);
-            channel.queueDeclare(EXCHANGE_INTERFACE_NAME, false, false, false, null);
+            channel.exchangeDeclare(EXCHANGE_WEB_NAME, BuiltinExchangeType.TOPIC, true);
+            //channel.queueDeclare(EXCHANGE_INTERFACE_NAME, false, false, false, null);
 
             //String routingKey = "ans";
             //String message = "test ans";

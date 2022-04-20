@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -167,6 +168,8 @@ public class ArticleCueItemDTO {
     private IssueDTO issue;
     @Schema(description = "복사된 기사 아이디")
     private Long parentArtlcId;
+    @Schema(description = "큐시트")
+    private CueSheetSimpleDTO cueSheet;
     //private List<ArticleHistSimpleDTO> articleHistDTO = new ArrayList<>();
     @Schema(description = "기사자막 리스트")
     private List<ArticleCapSimpleDTO> articleCap = new ArrayList<>();

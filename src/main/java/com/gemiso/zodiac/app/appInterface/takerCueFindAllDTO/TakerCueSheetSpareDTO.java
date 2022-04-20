@@ -17,12 +17,12 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@XmlRootElement(name = "spareRecord")
+@XmlRootElement(name = "spare_record")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TakerCueSheetSpareDTO {
 
     @XmlElement(name="rd_id")
-    private Long cueItemId;
+    private Long rdId;
     @XmlElement(name="rd_seq")
     private int rdSeq;
     @XmlElement(name="ch_div_cd")
@@ -129,4 +129,11 @@ public class TakerCueSheetSpareDTO {
     private TakerCueSheetAudioSymbolDTO takerCueSheetAudioSymbolDTO;
     @XmlElement(name = "video")
     private TakerCueSheetVideoDTO takerCueSheetVideoDTO;
+    @XmlElement(name = "cue_id")
+    private Long cueId;
+    @XmlElement(name = "cue_tmplt_id")
+    private Long cueTmpltId;
+    @XmlElement(name = "cue_item_id")
+    private Long cueItemId;
+
 }

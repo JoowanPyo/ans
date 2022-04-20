@@ -791,7 +791,7 @@ public class CueSheetService {
         cueSheetTopicDTO.setEventId(eventId);
         cueSheetTopicDTO.setCueId(cueId);
         cueSheetTopicDTO.setCueVer(cueSheet.getCueVer());
-        cueSheetTopicDTO.setCueSheet(object);
+        //cueSheetTopicDTO.setCueSheet(object);
         String json = marshallingJsonHelper.MarshallingJson(cueSheetTopicDTO);
 
 

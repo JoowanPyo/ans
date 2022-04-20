@@ -31,6 +31,8 @@ import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolDTO;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.mapper.CueSheetItemSymbolMapper;
+import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
+import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
@@ -90,6 +92,7 @@ public class CueSheetItemService {
     private final MarshallingJsonHelper marshallingJsonHelper;
     private final TopicService topicService;
 
+
     public List<CueSheetItemDTO> findAll(Long artclId, Long cueId, String delYn, String spareYn){
 
         BooleanBuilder booleanBuilder = getSearch(artclId, cueId, delYn, spareYn);
@@ -103,6 +106,224 @@ public class CueSheetItemService {
         return cueSheetItemDTOList;
     }
 
+    //큐시트 아이템 상세 조회
+    public CueSheetItemDTO find(Long cueItemId){
+
+        //큐시트 아이템 조회
+        CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
+        //큐시트 아이템 방송아이콘 List 조회
+        List<CueSheetItemSymbol> cueSheetItemSymbol = cueSheetItemSymbolRepository.findSymbol(cueItemId);
+
+        List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTO = cueSheetItemSymbolMapper.toDtoList(cueSheetItemSymbol);
+
+        cueSheetItemSymbolDTO = createUrl(cueSheetItemSymbolDTO);//방송아이콘 url 추가
+
+        CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
+
+        cueSheetItemDTO.setCueSheetItemSymbolDTO(cueSheetItemSymbolDTO);
+
+        return cueSheetItemDTO;
+
+    }
+
+    //큐시트 아이템 등록
+    public Long create(CueSheetItemCreateDTO cueSheetItemCreateDTO, Long cueId) throws JsonProcessingException {
+
+
+        //큐시트 아이디 등록
+        CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
+        cueSheetItemCreateDTO.setCueSheet(cueSheetDTO);
+        //토큰 사용자 Id(현재 로그인된 사용자 ID)
+        String userId = userAuthService.authUser.getUserId();
+        cueSheetItemCreateDTO.setInputrId(userId);
+
+        CueSheetItem cueSheetItem = cueSheetItemCreateMapper.toEntity(cueSheetItemCreateDTO);
+        cueSheetItemRepository.save(cueSheetItem); //큐시트아이템 등록
+
+        Long cueItemId = cueSheetItem.getCueItemId();
+
+        //큐시트 아이템 자막 리스트 get
+        List<CueSheetItemCapCreateDTO> cueSheetItemCapDTOList = cueSheetItemCreateDTO.getCueSheetItemCap();
+        //큐시트 아이템 자막 리스트가 있으면 등록
+        if (CollectionUtils.isEmpty(cueSheetItemCapDTOList) == false){
+            createCap(cueSheetItemCapDTOList, cueItemId, userId);//큐시트 아이템 자막 리스트 등록
+        }
+
+        //큐시트 버전업
+        String spareYn = cueSheetItem.getSpareYn(); //예비여부값 get
+        int cueItemOrd = cueSheetItemCreateDTO.getCueItemOrd();
+        ordUpdate( cueId,  cueItemId,  cueItemOrd, spareYn); //큐시트 순번 정렬
+        CueSheet cueSheet = addCueVer(cueId); // 큐시트 버전 정보 업데이트
+
+        //String cueItemDivCd = cueSheetItem.getCueItemDivCd();
+        /************ MQ messages *************/
+        //기사, 템플릿 이 포함되어 있는 경우 아이디를 TOPIC전송
+        Article article = cueSheetItem.getArticle();
+        CueSheetTemplate cueSheetTemplate = cueSheetItem.getCueSheetTemplate();
+        Long artclId = null;
+        Long cueTmpltId = null;
+        if (ObjectUtils.isEmpty(article) == false){
+            artclId = article.getArtclId();
+        }
+        if (ObjectUtils.isEmpty(cueSheetTemplate) == false){
+            cueItemId = cueSheetTemplate.getCueTmpltId();
+        }
+
+        sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Create CueSheetItem",
+                spareYn, "Y", "Y");
+
+        return cueItemId;//return 큐시트 아이템 아이디
+    }
+
+    //큐시트 아이템 수정 [기사 x]
+    public void update(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId) throws JsonProcessingException {
+
+        CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
+
+        /*CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
+        cueSheetItemUpdateDTO.setCueSheet(cueSheetDTO);
+        cueSheetItemUpdateDTO.setCueItemId(cueItemId);*/
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        cueSheetItemUpdateDTO.setUpdtrId(userId);
+
+        cueSheetItemUpdateMapper.updateFromDto(cueSheetItemUpdateDTO, cueSheetItem);
+
+        cueSheetItemRepository.save(cueSheetItem);
+
+        //큐시트 아이템 자막 리스트 get
+        List<CueSheetItemCapCreateDTO> cueSheetItemCapDTOList = cueSheetItemUpdateDTO.getCueSheetItemCap();
+        //큐시트 아이템 자막 리스트가 있으면 등록
+        if (CollectionUtils.isEmpty(cueSheetItemCapDTOList) == false){
+            updateCap(cueSheetItemCapDTOList, cueItemId, userId);//큐시트 아이템 자막 리스트 등록
+        }
+
+        /************ MQ messages *************/
+        //기사, 템플릿 이 포함되어 있는 경우 아이디를 TOPIC전송
+        Article article = cueSheetItem.getArticle();
+        CueSheetTemplate cueSheetTemplate = cueSheetItem.getCueSheetTemplate();
+        Long artclId = null;
+        Long cueTmpltId = null;
+        if (ObjectUtils.isEmpty(article) == false){
+            artclId = article.getArtclId();
+        }
+        if (ObjectUtils.isEmpty(cueSheetTemplate) == false){
+            cueItemId = cueSheetTemplate.getCueTmpltId();
+        }
+
+        String spareYn = cueSheetItem.getSpareYn();
+
+        CueSheet cueSheet = addCueVer(cueId);
+
+        sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Update CueSheetItem-NonArticle",
+                spareYn, "Y", "N");
+    }
+
+    //큐시트 아이템 기사 수정시
+    public void updateCueItemArticle(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId) throws Exception {
+
+        CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
+
+        //CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
+        //cueSheetItemUpdateDTO.setCueSheet(cueSheetDTO);
+        //cueSheetItemUpdateDTO.setCueItemId(cueItemId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        cueSheetItemUpdateDTO.setUpdtrId(userId);
+
+        cueSheetItemUpdateMapper.updateFromDto(cueSheetItemUpdateDTO, cueSheetItem);
+
+        cueSheetItemRepository.save(cueSheetItem);
+
+        ArticleUpdateDTO articleUpdateDTO = cueSheetItemUpdateDTO.getArticle(); //큐시트 아이템의 수정기사를 불러온다
+
+        if (ObjectUtils.isEmpty(articleUpdateDTO) == false) {//기사내용 수정이 들어왔을경우.
+            Long artclId = articleUpdateDTO.getArtclId(); //수정기사의 아이디를 불러온다.
+
+            String newCueItemTypCd = cueSheetItemUpdateDTO.getCueItemTypCd();//새로 들어온 큐시트 아이템 유형 코드
+
+            if (newCueItemTypCd != null && newCueItemTypCd.trim().isEmpty() == false){//새로 들어온 큐시트 아이템 유형 코드가 있을경우
+                articleUpdateDTO.setArtclTypDtlCd(newCueItemTypCd);
+            }
+
+            articleService.update(articleUpdateDTO, artclId); //기사 수정.
+        }
+
+        /************ MQ messages *************/
+        //기사, 템플릿 이 포함되어 있는 경우 아이디를 TOPIC전송
+        Article article = cueSheetItem.getArticle();
+        CueSheetTemplate cueSheetTemplate = cueSheetItem.getCueSheetTemplate();
+        Long artclId = null;
+        Long cueTmpltId = null;
+        if (ObjectUtils.isEmpty(article) == false){
+            artclId = article.getArtclId();
+        }
+        if (ObjectUtils.isEmpty(cueSheetTemplate) == false){
+            cueItemId = cueSheetTemplate.getCueTmpltId();
+        }
+
+        String spareYn = cueSheetItem.getSpareYn();
+
+        CueSheet cueSheet = addCueVer(cueId);
+
+        sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Update CueSheetItem-Article",
+                spareYn, "Y", "N");
+    }
+
+    //큐시트 아이템 삭제
+    public void delete(Long cueId, Long cueItemId) throws Exception {
+
+        CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
+
+        CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
+
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        cueSheetItemDTO.setDelrId(userId);
+        cueSheetItemDTO.setDelYn("Y");
+        cueSheetItemDTO.setDelDtm(new Date());
+
+        cueSheetItemMapper.updateFromDto(cueSheetItemDTO, cueSheetItem);
+
+        //큐시트 아이템 삭제시 포함된 기사(복사된 기사)도 삭제
+        Article article = cueSheetItem.getArticle();
+        if (ObjectUtils.isEmpty(article) == false){
+            Long artclId = article.getArtclId();
+            Article chkArticle = articleService.articleFindOrFailCueItem(artclId);
+
+            if (ObjectUtils.isEmpty(chkArticle) == false){
+
+                ArticleDTO articleDTO = articleMapper.toDto(chkArticle);
+                articleDTO.setDelYn("Y");
+                articleDTO.setDelrId(userId);
+
+                articleMapper.updateFromDto(articleDTO, chkArticle);
+
+                articleRepository.save(chkArticle);
+            }
+        }
+        cueSheetItemRepository.save(cueSheetItem);
+
+        /************ MQ messages *************/
+        //기사, 템플릿 이 포함되어 있는 경우 아이디를 TOPIC전송
+        Article articleEntity = cueSheetItem.getArticle();
+        CueSheetTemplate cueSheetTemplate = cueSheetItem.getCueSheetTemplate();
+        Long artclId = null;
+        Long cueTmpltId = null;
+        if (ObjectUtils.isEmpty(articleEntity) == false){
+            artclId = articleEntity.getArtclId();
+        }
+        if (ObjectUtils.isEmpty(cueSheetTemplate) == false){
+            cueItemId = cueSheetTemplate.getCueTmpltId();
+        }
+
+        String spareYn = cueSheetItem.getSpareYn();
+
+        CueSheet cueSheet = addCueVer(cueId);
+
+        sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Update CueSheetItem-Article",
+                spareYn, "Y", "Y");
+    }
 
     //방송아이콘 url 추가
     public List<CueSheetItemDTO> setSymbol(List<CueSheetItemDTO> cueSheetItemDTOList){
@@ -140,31 +361,11 @@ public class CueSheetItemService {
 
     }
 
-    //큐시트 아이템 상세 조회
-    public CueSheetItemDTO find(Long cueItemId){
-
-        //큐시트 아이템 조회
-        CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
-        //큐시트 아이템 방송아이콘 List 조회
-        List<CueSheetItemSymbol> cueSheetItemSymbol = cueSheetItemSymbolRepository.findSymbol(cueItemId);
-
-        List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTO = cueSheetItemSymbolMapper.toDtoList(cueSheetItemSymbol);
-
-        cueSheetItemSymbolDTO = createUrl(cueSheetItemSymbolDTO);//방송아이콘 url 추가
-
-        CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
-
-        cueSheetItemDTO.setCueSheetItemSymbolDTO(cueSheetItemSymbolDTO);
-
-        return cueSheetItemDTO;
-
-    }
-
     //방송아이콘 url 추가
     public List<CueSheetItemSymbolDTO> createUrl(List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTOList){
 
         //큐시트 아이템 방송아이콘 리스트를 Url을 추가해서 리턴해줄 DTO 리스트 생성
-         List<CueSheetItemSymbolDTO> returnCueSheetItemSymbolDTOList = new ArrayList<>();
+        List<CueSheetItemSymbolDTO> returnCueSheetItemSymbolDTOList = new ArrayList<>();
 
         if (CollectionUtils.isEmpty(cueSheetItemSymbolDTOList) == false){
 
@@ -187,42 +388,6 @@ public class CueSheetItemService {
             }
         }
         return returnCueSheetItemSymbolDTOList;
-    }
-
-    //큐시트 아이템 등록
-    public Long create(CueSheetItemCreateDTO cueSheetItemCreateDTO, Long cueId) throws JsonProcessingException {
-
-
-        //큐시트 아이디 등록
-        CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
-        cueSheetItemCreateDTO.setCueSheet(cueSheetDTO);
-        //토큰 사용자 Id(현재 로그인된 사용자 ID)
-        String userId = userAuthService.authUser.getUserId();
-        cueSheetItemCreateDTO.setInputrId(userId);
-
-        CueSheetItem cueSheetItem = cueSheetItemCreateMapper.toEntity(cueSheetItemCreateDTO);
-        cueSheetItemRepository.save(cueSheetItem); //큐시트아이템 등록
-
-        Long cueItemId = cueSheetItem.getCueItemId();
-
-        //큐시트 아이템 자막 리스트 get
-        List<CueSheetItemCapCreateDTO> cueSheetItemCapDTOList = cueSheetItemCreateDTO.getCueSheetItemCap();
-        //큐시트 아이템 자막 리스트가 있으면 등록
-        if (CollectionUtils.isEmpty(cueSheetItemCapDTOList) == false){
-            createCap(cueSheetItemCapDTOList, cueItemId, userId);//큐시트 아이템 자막 리스트 등록
-        }
-
-        int cueItemOrd = cueSheetItemCreateDTO.getCueItemOrd();
-
-        String spareYn = cueSheetItem.getSpareYn(); //예비여부값 get
-
-        ordUpdate( cueId,  cueItemId,  cueItemOrd, spareYn); //큐시트 순번 정렬
-
-        addCueVer(cueId, "Create CueSheetItem", cueSheetItemCreateDTO); // 큐시트 버전 정보 업데이트
-
-
-
-        return cueItemId;//return 큐시트 아이템 아이디
     }
 
     //큐시트 아이템 등록( 템플릿 ) : 운영참조
@@ -252,9 +417,6 @@ public class CueSheetItemService {
             //순서변경을 타야하나?
             //ordUpdate( cueId,  cueItemId,  cueItemOrd, "N");
         }
-
-        addCueVer(cueId, "Create CueSheetItem Template", cueSheetItemCreateDTOList);//큐시트 버전업 && 토픽메세지 전송
-
     }
 
     //큐시트 아이템 자막 등록
@@ -275,32 +437,6 @@ public class CueSheetItemService {
         }
     }
 
-    //큐시트 아이템 수정
-    public void update(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId) throws JsonProcessingException {
-
-        CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
-
-        /*CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
-        cueSheetItemUpdateDTO.setCueSheet(cueSheetDTO);
-        cueSheetItemUpdateDTO.setCueItemId(cueItemId);*/
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
-        cueSheetItemUpdateDTO.setUpdtrId(userId);
-
-        cueSheetItemUpdateMapper.updateFromDto(cueSheetItemUpdateDTO, cueSheetItem);
-
-        cueSheetItemRepository.save(cueSheetItem);
-
-        //큐시트 아이템 자막 리스트 get
-        List<CueSheetItemCapCreateDTO> cueSheetItemCapDTOList = cueSheetItemUpdateDTO.getCueSheetItemCap();
-        //큐시트 아이템 자막 리스트가 있으면 등록
-        if (CollectionUtils.isEmpty(cueSheetItemCapDTOList) == false){
-            updateCap(cueSheetItemCapDTOList, cueItemId, userId);//큐시트 아이템 자막 리스트 등록
-        }
-
-        addCueVer(cueId, "Update CueSheetItem", cueSheetItemUpdateDTO);
-    }
-
     //업데이트 큐시트 아이템 자막
     public void updateCap(List<CueSheetItemCapCreateDTO> cueSheetItemCapDTOList, Long cueItemId, String userId){
 
@@ -317,75 +453,6 @@ public class CueSheetItemService {
 
         //큐시트 아이템 자막 재등록
         createCap(cueSheetItemCapDTOList, cueItemId, userId);
-    }
-
-    public void updateCueItemArticle(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId) throws Exception {
-
-        CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
-
-        //CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
-        //cueSheetItemUpdateDTO.setCueSheet(cueSheetDTO);
-        //cueSheetItemUpdateDTO.setCueItemId(cueItemId);
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
-        cueSheetItemUpdateDTO.setUpdtrId(userId);
-
-        cueSheetItemUpdateMapper.updateFromDto(cueSheetItemUpdateDTO, cueSheetItem);
-
-        cueSheetItemRepository.save(cueSheetItem);
-
-        ArticleUpdateDTO articleUpdateDTO = cueSheetItemUpdateDTO.getArticle(); //큐시트 아이템의 수정기사를 불러온다
-
-        if (ObjectUtils.isEmpty(articleUpdateDTO) == false) {//기사내용 수정이 들어왔을경우.
-            Long artclId = articleUpdateDTO.getArtclId(); //수정기사의 아이디를 불러온다.
-
-            String newCueItemTypCd = cueSheetItemUpdateDTO.getCueItemTypCd();//새로 들어온 큐시트 아이템 유형 코드
-
-            if (newCueItemTypCd != null && newCueItemTypCd.trim().isEmpty() == false){//새로 들어온 큐시트 아이템 유형 코드가 있을경우
-                articleUpdateDTO.setArtclTypDtlCd(newCueItemTypCd);
-            }
-
-            articleService.update(articleUpdateDTO, artclId); //기사 수정.
-        }
-
-        addCueVer(cueId, "Update CueSheetItem-Article", cueSheetItemUpdateDTO);
-    }
-
-    public void delete(Long cueId, Long cueItemId) throws Exception {
-
-        CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
-
-        CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
-
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
-        cueSheetItemDTO.setDelrId(userId);
-        cueSheetItemDTO.setDelYn("Y");
-        cueSheetItemDTO.setDelDtm(new Date());
-
-        cueSheetItemMapper.updateFromDto(cueSheetItemDTO, cueSheetItem);
-
-        //큐시트 아이템 삭제시 포함된 기사(복사된 기사)도 삭제
-        Article article = cueSheetItem.getArticle();
-        if (ObjectUtils.isEmpty(article) == false){
-            Long artclId = article.getArtclId();
-            Article chkArticle = articleService.articleFindOrFailCueItem(artclId);
-
-            if (ObjectUtils.isEmpty(chkArticle) == false){
-
-                ArticleDTO articleDTO = articleMapper.toDto(chkArticle);
-                articleDTO.setDelYn("Y");
-                articleDTO.setDelrId(userId);
-
-                articleMapper.updateFromDto(articleDTO, chkArticle);
-
-                articleRepository.save(chkArticle);
-            }
-        }
-
-        cueSheetItemRepository.save(cueSheetItem);
-
-
     }
 
     public void ordCdUpdate(Long cueId, String spareYn, List<CueSheetItemOrdUpdateDTO> cueSheetItemOrdUpdateDTOList){
@@ -625,7 +692,7 @@ public class CueSheetItemService {
         //기사 시퀀스[오리지널 기사 0 = 그밑으로 복사된 기사 + 1 증가]
         int artclOrd = article.getArtclOrd() + 1;
 
-        Article articleEntity = getArticleEntity(article, artclOrd, cueId, cueSheet);
+        Article articleEntity = getArticleEntity(article, artclOrd, cueSheet);
         articleRepository.save(articleEntity);
 
         List<ArticleCap> articleCapList = article.getArticleCap(); //기사자막 리스트 get
@@ -687,7 +754,7 @@ public class CueSheetItemService {
     }
 
     // 기사 저장하기 위한 엔터티 만들기 2021-10-27
-    private Article getArticleEntity(Article article, int artclOrd, Long cueId, CueSheet cueSheet) {
+    private Article getArticleEntity(Article article, int artclOrd, CueSheet cueSheet) {
 
         Program program = cueSheet.getProgram();
         String brdcPgmId = "";
@@ -753,7 +820,7 @@ public class CueSheetItemService {
                     .deviceCd(article.getDeviceCd())
                     .parentArtlcId(article.getArtclId())//복사한 기사 아이디 set
                     .issue(article.getIssue())
-                    .cueId(cueId)//큐시트 아이디 set
+                    .cueSheet(cueSheet)//큐시트 아이디 set
                     .build();
         }else { //원본기사 아이디가 있을시[복사된 기사 다시 복사일시]
 
@@ -806,7 +873,7 @@ public class CueSheetItemService {
                     .deviceCd(article.getDeviceCd())
                     .parentArtlcId(article.getArtclId())//복사한 기사 아이디 set
                     .issue(article.getIssue())
-                    .cueId(cueId)//큐시트 아이디 set
+                    .cueSheet(cueSheet)//큐시트 아이디 set
                     .build();
         }
     }
@@ -921,7 +988,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 버전 카운트 증가
-    public void addCueVer(Long cueId, String eventCd, Object object) throws JsonProcessingException {
+    public CueSheet addCueVer(Long cueId) throws JsonProcessingException {
 
         Optional<CueSheet> optionalCueSheet = cueSheetRepository.findByCue(cueId);
 
@@ -938,7 +1005,8 @@ public class CueSheetItemService {
 
         cueSheetRepository.save(cueSheet); //큐시트 버전업 수정
 
-        sendCueTopic(cueSheet, eventCd, object);
+        return cueSheet;
+        //sendCueTopic(cueSheet, eventCd, object);
 
     }
 
@@ -976,7 +1044,7 @@ public class CueSheetItemService {
         cueSheetItemMapper.updateFromDto(cueSheetItemDTO, cueSheetItem);
         cueSheetItemRepository.save(cueSheetItem);
 
-        addCueVer(cueId, "Restore CueSheetItem", cueSheetItemDTO); //큐시트 버전업
+        //addCueVer(cueId, "Restore CueSheetItem", cueSheetItemDTO); //큐시트 버전업
 
         CueSheetItemSimpleDTO cueSheetItemSimpleDTO = new CueSheetItemSimpleDTO();
         cueSheetItemSimpleDTO.setCueItemId(cueItemId);
@@ -998,9 +1066,8 @@ public class CueSheetItemService {
     }
 
     //큐시트 토픽 메세지 전송
-    public void sendCueTopic(CueSheet cueSheet, String eventId, Object object) throws JsonProcessingException {
-
-        Long cueId = cueSheet.getCueId();
+    public void sendCueTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
+                                   String spareYn, String prompterFlag, String videoTakerFlag) throws JsonProcessingException {
 
         //토픽메세지 ArticleTopicDTO Json으로 변환후 send
         CueSheetTopicDTO cueSheetTopicDTO = new CueSheetTopicDTO();
@@ -1009,7 +1076,12 @@ public class CueSheetItemService {
         cueSheetTopicDTO.setCueId(cueId);
         cueSheetTopicDTO.setCueVer(cueSheet.getCueVer());
         cueSheetTopicDTO.setCueOderVer(cueSheet.getCueOderVer());
-        cueSheetTopicDTO.setCueSheet(object); //변경된 내용 추가
+        cueSheetTopicDTO.setCueItemId(cueItemId); //변경된 내용 추가
+        cueSheetTopicDTO.setArtclId(artclId);
+        cueSheetTopicDTO.setCueTmpltId(cueTmpltId);
+        cueSheetTopicDTO.setSpareYn(spareYn);
+        cueSheetTopicDTO.setPrompter(prompterFlag);
+        cueSheetTopicDTO.setVideoTaker(videoTakerFlag);
         String json = marshallingJsonHelper.MarshallingJson(cueSheetTopicDTO);
 
         //interface에 큐메세지 전송

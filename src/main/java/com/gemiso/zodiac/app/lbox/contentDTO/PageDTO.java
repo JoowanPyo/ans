@@ -1,7 +1,6 @@
-package com.gemiso.zodiac.app.lbox.dto;
+package com.gemiso.zodiac.app.lbox.contentDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,4 +18,5 @@ public class PageDTO {
     private Integer perPage;
     private Integer currentPage;
     private Integer totalPages;
+    private LinkDTO links;
 }

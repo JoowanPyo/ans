@@ -14,12 +14,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@XmlRootElement(name = "spareRecord")
+@XmlRootElement(name = "spare_record")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PrompterSpareCueSheetDTO {
 
     @XmlElement(name="rd_id")
-    private Long cueId;
+    private Long rdId;
 
     @XmlElement(name = "rd_seq")
     private int rdSeq; //???
@@ -84,11 +84,18 @@ public class PrompterSpareCueSheetDTO {
     @XmlElement(name = "news_acum_time")
     private Integer newsAcumTime;
 
-    @XmlElement(name = "articleCaps")
+    @XmlElement(name = "article_caps")
     private PrompterArticleCaps articleCaps;
 
-    @XmlElement(name = "anchorCaps")
+    @XmlElement(name = "anchor_caps")
     private PrompterAnchorCaps anchorCaps;
+
+    @XmlElement(name = "cue_id")
+    private Long cueId;
+    @XmlElement(name = "cue_tmplt_id")
+    private Long cueTmpltId;
+    @XmlElement(name = "cue_item_id")
+    private Long cueItemId;
 
 
 }

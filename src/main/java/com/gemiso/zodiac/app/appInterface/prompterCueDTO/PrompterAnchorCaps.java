@@ -16,10 +16,10 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@XmlRootElement(name = "anchorCaps")
+@XmlRootElement(name = "anchor_caps")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PrompterAnchorCaps {
 
-    @XmlElement(name = "anchorCap")
+    @XmlElement(name = "anchor_cap")
     private List<PrompterAnchorCapDTO> anchorCapList = new ArrayList<>();
 }

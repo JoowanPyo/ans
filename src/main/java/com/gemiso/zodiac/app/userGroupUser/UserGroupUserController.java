@@ -36,8 +36,8 @@ public class UserGroupUserController {
 
     @Operation(summary = "그룹 사용자 조회", description = "그룹에 등록되어 있는 사용자 목록 조회")
     @GetMapping(path = "")
-    public AnsApiResponse<List<UserGroupUserDTO>> findAll(@Parameter(name = "userId", required = true)
-                                                       @RequestParam(value = "userId", required = true) Long userGrpId) {
+    public AnsApiResponse<List<UserGroupUserDTO>> findAll(@Parameter(name = "userGrpId", required = true)
+                                                       @RequestParam(value = "userGrpId", required = true) Long userGrpId) {
 
         List<UserGroupUserDTO> userDTOList = userGroupUserService.findAll(userGrpId);
 

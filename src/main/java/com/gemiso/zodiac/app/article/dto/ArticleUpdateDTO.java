@@ -4,7 +4,9 @@ import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapCreateDTO;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapCreateDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -87,6 +89,8 @@ public class ArticleUpdateDTO {
     private String memo;
     private IssueDTO issue;
     private Long parentArtlcId;
+    //@Schema(description = "큐시트")
+    private CueSheetSimpleDTO cueSheet;
     //private List<ArticleMediaDTO> articleMedia;
     private List<ArticleCapCreateDTO> articleCap = new ArrayList<>();
     private List<AnchorCapCreateDTO> anchorCap = new ArrayList<>();

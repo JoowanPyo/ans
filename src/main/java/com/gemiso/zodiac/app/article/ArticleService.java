@@ -300,9 +300,9 @@ public class ArticleService {
         Long orgArticleId = article.getOrgArtclId();
 
         //복사된 기사(큐시트에 포함된 기사)인 경우 interface쪽에도 큐메세지 send
-        if (ObjectUtils.isEmpty(orgArticleId) == false){
+        /*if (ObjectUtils.isEmpty(orgArticleId) == false){
             topicService.topicInterface(json);
-        }
+        }*/
         topicService.topicWeb(json);
 
     }
@@ -347,9 +347,9 @@ public class ArticleService {
         Long orgArticleId = article.getOrgArtclId();
 
         //복사된 기사(큐시트에 포함된 기사)인 경우 interface쪽에도 큐메세지 send
-        if (ObjectUtils.isEmpty(orgArticleId) == false){
+        /*if (ObjectUtils.isEmpty(orgArticleId) == false){
             topicService.topicInterface(json);
-        }
+        }*/
         topicService.topicWeb(json);
     }
 

@@ -5,6 +5,7 @@ import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import com.gemiso.zodiac.app.tagArticle.dto.ArticleTagDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -202,8 +203,8 @@ public class ArticleDTO {
     @Schema(description = "데스커픽스 일시")
     private Date deskFixDtm;
     
-    @Schema(description = "큐시트 아이디")
-    private Long cueId;
+    @Schema(description = "큐시트")
+    private CueSheetSimpleDTO cueSheet;
     //private List<ArticleHistSimpleDTO> articleHist = new ArrayList<>();
     @Schema(description = "기사자막 리스트")
     private List<ArticleCapSimpleDTO> articleCap = new ArrayList<>();

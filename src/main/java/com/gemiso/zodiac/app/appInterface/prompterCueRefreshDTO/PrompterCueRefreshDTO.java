@@ -88,10 +88,10 @@ public class PrompterCueRefreshDTO {
     @XmlElement(name = "news_acum_time")
     private Integer newsAcumTime;
 
-    @XmlElement(name = "articleCap")
+    @XmlElement(name = "article_cap")
     private List<PrompterArticleCapDTO> articleCapList = new ArrayList<>();
 
-    @XmlElement(name = "anchorCap")
+    @XmlElement(name = "anchor_cap")
     private List<PrompterAnchorCapDTO> anchorCapList = new ArrayList<>();
 
 

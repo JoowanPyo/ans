@@ -20,7 +20,7 @@ import java.util.Date;
 public class TakerCueSheetDTO {
 
     @XmlElement(name="rd_id")
-    private Long cueItemId;
+    private Long rdId;
     @XmlElement(name="rd_seq")
     private int rdSeq;
     @XmlElement(name="ch_div_cd")
@@ -127,6 +127,13 @@ public class TakerCueSheetDTO {
     private TakerCueSheetAudioSymbolDTO takerCueSheetAudioSymbolDTO;
     @XmlElement(name = "video")
     private TakerCueSheetVideoDTO takerCueSheetVideoDTO;
+    @XmlElement(name = "cue_id")
+    private Long cueId;
+    @XmlElement(name = "cue_tmplt_id")
+    private Long cueTmpltId;
+    @XmlElement(name = "cue_item_id")
+    private Long cueItemId;
+
 
 
 

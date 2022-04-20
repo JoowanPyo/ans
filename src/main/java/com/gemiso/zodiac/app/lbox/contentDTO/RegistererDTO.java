@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.lbox.dto;
+package com.gemiso.zodiac.app.lbox.contentDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -15,6 +15,6 @@ public class RegistererDTO {
 
     private Long id;
     private String name;
-    private String saea;
+    private String account_id;
 
 }

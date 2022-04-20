@@ -7,6 +7,7 @@ import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
+import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.issue.Issue;
 import com.gemiso.zodiac.app.articleOrder.ArticleOrder;
 import com.gemiso.zodiac.app.tagArticle.ArticleTag;
@@ -296,8 +297,12 @@ public class Article extends BaseEntity {
     @Column(name = "desk_fix_dtm")
     private Date deskFixDtm;
 
-    @Column(name = "cue_id", length = 50)
-    private Long cueId;
+    /*@Column(name = "cue_id", length = 50)
+    private Long cueId;*/
+
+    @ManyToOne
+    @JoinColumn(name = "cue_id")
+    private CueSheet cueSheet;
 
     @ManyToOne
     @JoinColumn(name = "issu_id")

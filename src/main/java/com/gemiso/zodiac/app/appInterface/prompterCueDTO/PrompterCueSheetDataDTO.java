@@ -24,7 +24,7 @@ public class PrompterCueSheetDataDTO {
     @XmlElement(name = "record")
     private List<PrompterCueSheetDTO> cueSheetDTO = new ArrayList<>();
 
-    @XmlElement(name = "spareRecord")
+    @XmlElement(name = "spare_record")
     private List<PrompterSpareCueSheetDTO> prompterSpareCueSheetDTOS = new ArrayList<>();
 
 }

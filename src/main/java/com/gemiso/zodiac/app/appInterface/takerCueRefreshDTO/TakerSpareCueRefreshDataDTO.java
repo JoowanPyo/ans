@@ -19,7 +19,7 @@ public class TakerSpareCueRefreshDataDTO {
     @XmlAttribute
     private int rowcount;
 
-    @XmlElement(name = "spareRecord")
+    @XmlElement(name = "spare_record")
     private TakerCueSheetDTO takerCueSheetDTO;
 
    /* @XmlElement(name = "record")

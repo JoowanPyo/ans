@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class CueSheetSimpleDTO {
 
     private Long cueId;
+    private String brdcPgmNm;
 /*    private String cueDivCd;
     private String cueDivCdNm;
     private String chDivCd;

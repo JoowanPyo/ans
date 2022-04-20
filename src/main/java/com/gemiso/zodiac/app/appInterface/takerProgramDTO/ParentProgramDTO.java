@@ -20,7 +20,7 @@ import java.util.Date;
 public class ParentProgramDTO {
 
     @XmlElement(name="rd_id")
-    private Long cueId; //큐시트 아이디
+    private Long rdId; //큐시트 아이디
     @XmlElement(name = "rd_st_nm")
     private String rdStNm; //방송상태
     @XmlElement(name="ch_div_cd")
@@ -95,5 +95,7 @@ public class ParentProgramDTO {
     private String rdEdtYn; // new 몬지모름.
     @XmlElement(name = "endpgm_yn")
     private String endpgmYn; // new 몬지모름.
+    @XmlElement(name="cue_id")
+    private Long cueId; //큐시트 아이디
 
 }

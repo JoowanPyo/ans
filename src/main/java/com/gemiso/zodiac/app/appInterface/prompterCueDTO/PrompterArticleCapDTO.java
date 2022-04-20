@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@XmlRootElement(name = "articleCap")
+@XmlRootElement(name = "article_cap")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PrompterArticleCapDTO {
 

@@ -16,10 +16,10 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@XmlRootElement(name = "articleCaps")
+@XmlRootElement(name = "article_caps")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PrompterArticleCaps {
 
-    @XmlElement(name = "articleCap")
+    @XmlElement(name = "article_cap")
     private List<PrompterArticleCapDTO> articleCapList = new ArrayList<>();
 }

@@ -23,7 +23,7 @@ public class TakerCueSheetDataDTO {
     @XmlElement(name = "record")
     private List<TakerCueSheetDTO> takerCueSheetDTO = new ArrayList<>();
 
-    @XmlElement(name = "spareRecord")
+    @XmlElement(name = "spare_record")
     private List<TakerCueSheetSpareDTO> takerCueSheetSpareDTO = new ArrayList<>();
 
    /* @XmlElement(name = "record")
