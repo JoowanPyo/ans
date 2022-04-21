@@ -17,7 +17,7 @@ public class CueSheetTopicDTO {
     private int cueOderVer;
     private Long artclId;
     private Long cueItemId;
-    private Long cueTmpltId;
+    private Long cueTmpltid;
     private String spareYn;
     private String prompter;
     private String videoTaker;

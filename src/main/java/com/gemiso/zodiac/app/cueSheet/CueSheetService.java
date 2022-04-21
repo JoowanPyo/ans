@@ -1,11 +1,8 @@
 package com.gemiso.zodiac.app.cueSheet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
-import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
-import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.cueSheet.dto.*;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetCreateMapper;
@@ -27,7 +24,6 @@ import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolDTO;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.mapper.CueSheetItemSymbolMapper;
-import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgramService;
 import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
 import com.gemiso.zodiac.app.program.ProgramService;
@@ -39,8 +35,8 @@ import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.core.topic.TopicService;
-import com.gemiso.zodiac.core.topic.articleTopicDTO.ArticleTopicDTO;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.CueSheetTopicDTO;
+import com.gemiso.zodiac.core.topic.articleTopicDTO.TakerCueSheetTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -52,8 +48,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -791,7 +785,7 @@ public class CueSheetService {
         cueSheetTopicDTO.setEventId(eventId);
         cueSheetTopicDTO.setCueId(cueId);
         cueSheetTopicDTO.setCueVer(cueSheet.getCueVer());
-        //cueSheetTopicDTO.setCueSheet(object);
+        //takerCueSheetTopicDTO.setCueSheet(object);
         String json = marshallingJsonHelper.MarshallingJson(cueSheetTopicDTO);
 
 

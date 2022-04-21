@@ -204,12 +204,12 @@ public class CueSheetItem extends BaseEntity {
     @JsonBackReference
     private CueSheet cueSheet;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artcl_id")
     @JsonBackReference
     private Article article;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cue_tmplt_id")
     private CueSheetTemplate cueSheetTemplate;
 
