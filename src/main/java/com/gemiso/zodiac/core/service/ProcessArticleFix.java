@@ -102,10 +102,10 @@ public class ProcessArticleFix {
             return anchorFix(DbApprove, newApprove,  anchorFixUser,  userId);
         else if (auth.equals(AuthEnum.DeskFix))
             return deskFix(DbApprove, newApprove);
-        else if (auth.equals(AuthEnum.PD))
-            return pdFix(DbApprove, newApprove);
-        else if (auth.equals(AuthEnum.AdminWrite))
-            return adminFix(DbApprove, newApprove);
+        //else if (auth.equals(AuthEnum.PD)) //수정.
+        //    return pdFix(DbApprove, newApprove);
+        //else if (auth.equals(AuthEnum.AdminMode))
+        //    return adminFix(DbApprove, newApprove);
         //return editorFix(DbApprove, newApprove);
 
         return false;
@@ -143,10 +143,7 @@ public class ProcessArticleFix {
 
         if (IsUnfix( DbApprove, newApprove) )
         {
-            if (userId.equals(editorFixUser)== false) {
-                return false;
-            }
-            confirmList.add(FixEnum.ARTICLE_FIX);
+                confirmList.add(FixEnum.ARTICLE_FIX);
         }
         else
         {

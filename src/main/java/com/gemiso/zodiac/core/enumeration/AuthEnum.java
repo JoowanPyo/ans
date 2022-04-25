@@ -14,19 +14,21 @@ public enum AuthEnum {
     DeskFix("article.deskfix"),
     ArticleWrite("article.write"),
     ArticleRead("article.read"),
-    CueSheetWrite("cuesheet.write"),
-    CueSheetRead("cuesheet.read"),
-    CueSheetOrder("cuesheet.order"),
-    AdminWrite("admin.write"),
-    AdminRead("admin.read"),
-    PD("pd"),
+    CueShhetCopy("cuesheet.copy"),
+    CueSheetCreate("cuesheet.create"),
+    CueSheetDelete("cuesheet.delete"),
+    CueSheetEdit("cuesheet.edit"),
+    CheSheetTemplate("cuesheet.templete"),
+    CheSheetView("cuesheet.view"),
+    CueSheetDetailOrder("cuesheetDetail.order"),
+    AdminMode("admin.mode"),
     Empty(""),;
 
     private static String ArticleFix_cd = "article.articlefix";
     private static String EditorFix_cd = "article.editorfix";
     private static String AnchorFix_cd = "article.anchorfix";
     private static String DeskFix_cd = "article.deskfix";
-    private static String AdminWrite_cd = "admin.write";
+    private static String Admin_cd = "admin.mode";
     private static String PD_cd = "Pd";
 
     private String auth;
@@ -42,8 +44,8 @@ public enum AuthEnum {
 
     public static AuthEnum certity(List<String> certityList){
 
-        if (certityList.contains(AdminWrite_cd))
-            return AdminWrite;
+        //if (certityList.contains(Admin_cd))
+            //return AdminMode;
         if (certityList.contains(DeskFix_cd))
             return DeskFix;
         if (certityList.contains(AnchorFix_cd))
@@ -52,8 +54,8 @@ public enum AuthEnum {
             return EditorFix;
         if (certityList.contains(ArticleFix_cd))
             return ArticleFix;
-        if (certityList.contains(PD))
-            return PD;
+       // if (certityList.contains(PD))
+       //     return PD;
 
         return AuthEnum.Empty;
 

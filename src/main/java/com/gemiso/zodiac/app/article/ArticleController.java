@@ -64,7 +64,7 @@ public class ArticleController {
 
         //기사읽기 권한이 없는 사용자 error.forbidden
         //List<String> userAuth = userAuthService.authChk(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth());
-        if (userAuthService.authChks(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth())) { //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
+        if (userAuthService.authChks(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminMode.getAuth())) { //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -139,9 +139,9 @@ public class ArticleController {
 
         //기사읽기 권한이 없는 사용자 error.forbidden
         //List<String> userAuth = userAuthService.authChk(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth());
-        if (userAuthService.authChks(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth())) { //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
+        //if (userAuthService.authChks(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminMode.getAuth())) { //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
+        //    throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        //}
 
         SearchDate searchDate = new SearchDate(date, date);
 
@@ -242,7 +242,7 @@ public class ArticleController {
         //권한체크(기사 쓰기)
         if (userAuthService.authChk(AuthEnum.ArticleWrite.getAuth())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
+         }
 
         articleService.articleLock(artclId, articleLockDTO);
 

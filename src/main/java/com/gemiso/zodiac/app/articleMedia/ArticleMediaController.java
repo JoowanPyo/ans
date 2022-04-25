@@ -38,7 +38,9 @@ public class ArticleMediaController {
                                                          @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
                                                          @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                          @Parameter(name = "trnsfFileNm", description = "전송 파일 명")
-                                                         @RequestParam(value = "trnsfFileNm", required = false) String trnsfFileNm) throws Exception {
+                                                         @RequestParam(value = "trnsfFileNm", required = false) String trnsfFileNm,
+                                                         @Parameter(name = "artclId", description = "기사 아이디")
+                                                         @RequestParam(value = "artclId", required = false) Long artclId) throws Exception {
 
         List<ArticleMediaDTO> articleMediaDTOList = new ArrayList<>();
 
@@ -46,10 +48,10 @@ public class ArticleMediaController {
             //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
             SearchDate searchDate = new SearchDate(sdate, edate);
 
-            articleMediaDTOList = articleMediaService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), trnsfFileNm);
+            articleMediaDTOList = articleMediaService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), trnsfFileNm, artclId);
 
         } else {
-            articleMediaDTOList = articleMediaService.findAll(null, null, trnsfFileNm);
+            articleMediaDTOList = articleMediaService.findAll(null, null, trnsfFileNm, artclId);
         }
         return new AnsApiResponse<>(articleMediaDTOList);
     }

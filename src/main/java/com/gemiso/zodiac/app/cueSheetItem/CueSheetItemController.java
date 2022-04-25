@@ -212,7 +212,7 @@ public class CueSheetItemController {
                                                                 @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
                                                                 @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd,
                                                                 @Parameter(name = "spareYn", description = "예비여부(Y,N)")
-                                                                @RequestParam(value = "spareYn", required = false) String spareYn) {
+                                                                @RequestParam(value = "spareYn", required = false) String spareYn) throws JsonProcessingException {
 
         CueSheetItemSimpleDTO cueSheetItemSimpleDTO = cueSheetItemService.updateSpareCueItem(cueId, cueItemId, cueItemOrd, spareYn);
 

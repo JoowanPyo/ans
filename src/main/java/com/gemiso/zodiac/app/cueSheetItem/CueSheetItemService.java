@@ -417,7 +417,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 방송완료 후 예비큐시트 추가수정.
-    public CueSheetItemSimpleDTO updateSpareCueItem(Long cueId, Long cueItemId, int cueItemOrd, String spareYn){
+    public CueSheetItemSimpleDTO updateSpareCueItem(Long cueId, Long cueItemId, int cueItemOrd, String spareYn) throws JsonProcessingException {
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
 
@@ -436,7 +436,29 @@ public class CueSheetItemService {
         CueSheetItemSimpleDTO cueSheetItemSimpleDTO = new CueSheetItemSimpleDTO();
         cueSheetItemSimpleDTO.setCueItemId(cueItemId);
 
+        /************ MQ messages *************/
+        //기사, 템플릿 이 포함되어 있는 경우 아이디를 TOPIC전송
+        Article article = cueSheetItem.getArticle();
+        CueSheetTemplate cueSheetTemplate = cueSheetItem.getCueSheetTemplate();
+        Long artclId = null;
+        Long cueTmpltId = null;
+        if (ObjectUtils.isEmpty(article) == false){
+            artclId = article.getArtclId();
+        }
+        if (ObjectUtils.isEmpty(cueSheetTemplate) == false){
+            cueItemId = cueSheetTemplate.getCueTmpltId();
+        }
+
+        //String spareYn = cueSheetItem.getSpareYn();
+
+        CueSheet cueSheetVerUpEntity = addCueVer(cueId);
+
+        sendCueTopicCreate(cueSheetVerUpEntity, cueId, cueItemId, artclId, cueTmpltId, "Update SpareCueSheetItem",
+                spareYn, "Y", "N");
+
         return cueSheetItemSimpleDTO;
+
+
     }
 
     //큐시트 아이템 생성[Drag and Drop] List

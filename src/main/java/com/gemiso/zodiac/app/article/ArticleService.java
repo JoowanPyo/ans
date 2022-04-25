@@ -213,7 +213,7 @@ public class ArticleService {
         String userId = userAuthService.authUser.getUserId();
 
         //PD가 기사 작성시 기사픽스상태로 등록된다.
-        if (userAuthChkService.authChk(AuthEnum.PD.getAuth())) {
+        if (userAuthChkService.authChk(AuthEnum.AnchorFix.getAuth())) { //수정.
             articleCreateDTO.setApprvDivCd(FixEnum.ARTICLE_FIX.getFixeum(FixEnum.ARTICLE_FIX));
         }
 
@@ -297,7 +297,7 @@ public class ArticleService {
         articleTopicDTO.setArticle(articleUpdateDTO);
         String json = marshallingJsonHelper.MarshallingJson(articleTopicDTO);
 
-        Long orgArticleId = article.getOrgArtclId();
+        //Long orgArticleId = article.getOrgArtclId();
 
         //복사된 기사(큐시트에 포함된 기사)인 경우 interface쪽에도 큐메세지 send
         /*if (ObjectUtils.isEmpty(orgArticleId) == false){
@@ -1409,9 +1409,9 @@ public class ArticleService {
         List<String> fixAuthList = getAppAuth(userId);
 
         //픽스 권한 리스트로 들어온 파라미터 중 최상위 권한 get
-        AuthEnum fixAuth = AuthEnum.certity(fixAuthList);
+        //AuthEnum fixAuth = AuthEnum.certity(fixAuthList);
         //권한이 PD인경우 기사 수정이 불가.
-        if (fixAuth.equals(AuthEnum.PD)){
+        /*if (fixAuth.equals(AuthEnum.PD)){ //수정.
 
             ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
                     .artclId(article.getArtclId())
@@ -1421,7 +1421,7 @@ public class ArticleService {
                     .build();
 
             return articleAuthConfirmDTO;//작상자만 기사를 수정가능
-        }
+        }*/
 
         //ProcessArticleFix에 fix구분할 date값 set
         ProcessArticleFix paf = new ProcessArticleFix();

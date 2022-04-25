@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
@@ -35,9 +36,9 @@ public class ArticleMediaService {
     private final UserAuthService userAuthService;
 
 
-    public List<ArticleMediaDTO> findAll(Date sdate, Date edate, String trnsfFileNm) {
+    public List<ArticleMediaDTO> findAll(Date sdate, Date edate, String trnsfFileNm, Long artclId) {
 
-        BooleanBuilder booleanBuilder = getSearch(sdate, edate, trnsfFileNm);
+        BooleanBuilder booleanBuilder = getSearch(sdate, edate, trnsfFileNm, artclId);
 
         List<ArticleMedia> articleMediaList = (List<ArticleMedia>) articleMediaRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "mediaOrd"));
 
@@ -114,7 +115,7 @@ public class ArticleMediaService {
         return articleMedia.get();
     }
 
-    public BooleanBuilder getSearch(Date sdate, Date edate, String trnsfFileNm) {
+    public BooleanBuilder getSearch(Date sdate, Date edate, String trnsfFileNm, Long artclId) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -122,12 +123,16 @@ public class ArticleMediaService {
 
         booleanBuilder.and(qArticleMedia.delYn.eq("N"));
 
-        if (!StringUtils.isEmpty(sdate) && !StringUtils.isEmpty(edate)) {
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
             booleanBuilder.and(qArticleMedia.inputDtm.between(sdate, edate));
         }
-        if (!StringUtils.isEmpty(trnsfFileNm)) {
+        if (trnsfFileNm != null && trnsfFileNm.trim().isEmpty() == false) {
             booleanBuilder.and(qArticleMedia.trnsfFileNm.contains(trnsfFileNm));
         }
+        if (ObjectUtils.isEmpty(artclId) == false){
+            booleanBuilder.and(qArticleMedia.article.artclId.eq(artclId));
+        }
+
 
         return booleanBuilder;
     }

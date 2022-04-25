@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.articleMedia.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -76,5 +77,5 @@ public class ArticleMediaDTO {
     @Schema(description = "비디오 아이디")
     private String videoId;
     @Schema(description = "기사 아이디")
-    private ArticleDTO article;
+    private ArticleSimpleDTO article;
 }

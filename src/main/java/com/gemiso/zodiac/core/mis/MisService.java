@@ -8,6 +8,9 @@ import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserRepository;
 import com.gemiso.zodiac.app.user.dto.UserDTO;
 import com.gemiso.zodiac.app.user.mapper.UserMapper;
+import com.gemiso.zodiac.app.userGroup.UserGroup;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUserRepository;
 import com.gemiso.zodiac.exception.PasswordFailedException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +37,7 @@ public class MisService {
 
     private final DeptsRepository deptsRepository;
     private final UserRepository userRepository;
+    private final UserGroupUserRepository userGroupUserRepository;
 
     private final DeptsMapper deptsMapper;
     private final UserMapper userMapper;
@@ -203,10 +207,19 @@ public class MisService {
                 //.inputrId() //등록자
                 //.inphonNo() //사내번호
                 .deptCd(misDeptCode) //부서코드
-                .userGroupUser(null) //기본그룹설정
+                //.userGroupUser(userGroup) //기본그룹설정
                 .build();
 
         userRepository.save(user);
+
+        //Mis에서 불러온 사용자 최초 저장시 일반그룹 초기화.
+        UserGroup userGroup = UserGroup.builder().userGrpId(2L).build();
+
+        UserGroupUser userGroupUser = UserGroupUser.builder().user(user).userGroup(userGroup).build();
+
+        userGroupUserRepository.save(userGroupUser);
+
+
     }
 
     //사용자 부서정보 업데이트
