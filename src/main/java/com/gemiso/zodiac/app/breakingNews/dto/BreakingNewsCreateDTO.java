@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.breakingNews.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.breakingNewsDetail.dto.BreakingNewsDtlCreateDTO;
 import com.gemiso.zodiac.app.breakingNewsDetail.dto.BreakingNewsDtlDTO;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ public class BreakingNewsCreateDTO {
 
     //private Long breakingNewsId;
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date brdcDtm;
     @NotNull
     private String titl;

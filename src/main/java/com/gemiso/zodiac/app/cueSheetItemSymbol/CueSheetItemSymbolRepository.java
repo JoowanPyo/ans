@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CueSheetItemSymbolRepository extends JpaRepository<CueSheetItemSymbol, Long> {
 
-    @Query("select a from CueSheetItemSymbol a where a.cueSheetItem.cueItemId = :cueItemId")
+    @Query("select a from CueSheetItemSymbol a where a.cueSheetItem.cueItemId = :cueItemId order by a.ord asc ")
     List<CueSheetItemSymbol> findSymbol(@Param("cueItemId")Long cueItemId);
 
 }

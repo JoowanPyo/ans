@@ -90,4 +90,13 @@ public class BreakingNews extends BaseEntity {
     @JsonManagedReference
     private List<BreakingNewsDtl> breakingNewsDtls = new ArrayList<>();
 
+    @PrePersist
+    public void prePersist() {
+
+        if (this.delYn == null || this.delYn == "") {
+            this.delYn = "N";
+        }
+
+    }
+
 }

@@ -18,7 +18,7 @@ import java.util.List;
 public class ScrollNewsCreateDTO {
 
     //private Long scrlNewsId;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private Date brdcDtm;
     private String scrlDivCd;
     //private String scrlDivCdNm;

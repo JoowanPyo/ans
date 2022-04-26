@@ -21,6 +21,7 @@ import java.util.List;
 public class BreakingNewsDTO {
 
     private Long breakingNewsId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date brdcDtm;
     private String titl;
     private String breakingNewsDiv;

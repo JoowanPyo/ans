@@ -6,7 +6,6 @@ import com.gemiso.zodiac.core.enumeration.AuthEnum;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
-import com.gemiso.zodiac.core.response.ApiCollectionResponse;
 import com.gemiso.zodiac.core.service.UserAuthChkService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
