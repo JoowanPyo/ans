@@ -19,9 +19,9 @@ public class SearchDateInterface {
         Calendar cal = Calendar.getInstance();
 
         cal.setTime(edate);
-        cal.add(Calendar.HOUR, 24);
-        cal.add(Calendar.MINUTE, 00);
-        cal.add(Calendar.SECOND, 00);
+        cal.add(Calendar.HOUR, 23);
+        cal.add(Calendar.MINUTE, 59);
+        cal.add(Calendar.SECOND, 59);
 
        /* String formatSdate = hourFormat.format(sdate);
         String formatEdate = hourFormat.format(cal.getTime());*/

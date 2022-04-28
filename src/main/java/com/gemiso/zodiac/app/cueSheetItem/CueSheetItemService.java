@@ -792,6 +792,7 @@ public class CueSheetItemService {
             throw new ResourceNotFoundException(String.format("기사아이디에 해당하는 기사가 없습니다. {%ld}", artclId));
         }
 
+        //큐시트 아이디로 큐시트 조회 및 존재유무 확인.
         CueSheet cueSheet = cueSheetService.cueSheetFindOrFail(cueId);
 
         //조회된 기사 get
@@ -800,8 +801,9 @@ public class CueSheetItemService {
         //기사 시퀀스[오리지널 기사 0 = 그밑으로 복사된 기사 + 1 증가]
         int artclOrd = article.getArtclOrd() + 1;
 
+        // 기사 저장하기 위한 기사복사 엔터티 생성
         Article articleEntity = getArticleEntity(article, artclOrd, cueSheet);
-        articleRepository.save(articleEntity);
+        articleRepository.save(articleEntity); //복사된 기사 등록
 
         List<ArticleCap> articleCapList = article.getArticleCap(); //기사자막 리스트 get
         List<AnchorCap> anchorCapList = article.getAnchorCap(); //앵커자막 리스트 get
@@ -929,6 +931,14 @@ public class CueSheetItemService {
                     .parentArtlcId(article.getArtclId())//복사한 기사 아이디 set
                     .issue(article.getIssue())
                     .cueSheet(cueSheet)//큐시트 아이디 set
+                    .artclFixUser(article.getArtclFixUser())
+                    .editorFixUser(article.getEditorFixUser())
+                    .anchorFixUser(article.getAnchorFixUser())
+                    .deskFixUser(article.getDeskFixUser())
+                    .artclFixDtm(article.getArtclFixDtm())
+                    .editorFixDtm(article.getEditorFixDtm())
+                    .anchorFixDtm(article.getAnchorFixDtm())
+                    .deskFixDtm(article.getDeskFixDtm())
                     .build();
         }else { //원본기사 아이디가 있을시[복사된 기사 다시 복사일시]
 
@@ -982,6 +992,14 @@ public class CueSheetItemService {
                     .parentArtlcId(article.getArtclId())//복사한 기사 아이디 set
                     .issue(article.getIssue())
                     .cueSheet(cueSheet)//큐시트 아이디 set
+                    .artclFixUser(article.getArtclFixUser())
+                    .editorFixUser(article.getEditorFixUser())
+                    .anchorFixUser(article.getAnchorFixUser())
+                    .deskFixUser(article.getDeskFixUser())
+                    .artclFixDtm(article.getArtclFixDtm())
+                    .editorFixDtm(article.getEditorFixDtm())
+                    .anchorFixDtm(article.getAnchorFixDtm())
+                    .deskFixDtm(article.getDeskFixDtm())
                     .build();
         }
     }

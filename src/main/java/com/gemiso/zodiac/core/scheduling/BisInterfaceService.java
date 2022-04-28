@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.core.scheduling;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gemiso.zodiac.app.baseProgram.BaseProgram;
 import com.gemiso.zodiac.app.baseProgram.BaseProgramRepository;
@@ -25,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -81,7 +83,7 @@ public class BisInterfaceService {
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> responseEntity =
-                restTemplate.exchange("http://121.134.111.62:8060/api/v1/bis/listProgramV3.do", HttpMethod.POST,
+                restTemplate.exchange("https://bis.arirang.com/api/v1/bis/listProgramV3.do", HttpMethod.POST,
                         entity, String.class);
 
         String results = responseEntity.getBody();
@@ -258,6 +260,64 @@ public class BisInterfaceService {
         return bisBasicScheduleDTO;
     }
 
+    //Bis에서 주간편성 7일치를 가져온다(금요일 새벽 5시마다)
+    public List<BisDailyScheduleDTO> bisDailyScheduleFindAllFri() throws JsonProcessingException {
+
+        List<BisDailyScheduleDTO> bisDailyScheduleDTOList = new ArrayList<>();
+
+        //헤더 설정
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        httpHeaders.add("Session_user_id", "ans");
+
+        for (int i = 1; i < 8; i++) {
+            Calendar cal = Calendar.getInstance();
+            //현재 날짜 구하기
+            Date now = new Date();
+
+            cal.setTime(now);
+            cal.add(Calendar.DATE, i);
+            Date nowFormat = cal.getTime();
+            //Date to String (yyyymmdd)
+            String nowDate = dateChangeHelper.dateToStringNoTimeStraight(nowFormat);
+
+            //Object Mapper를 통한 Json바인딩할 dmParam생성
+            Map<String, Object> dmParam = new HashMap<>();
+            dmParam.put("chanId", "CH_K");
+            dmParam.put("broadYmd", nowDate);
+            dmParam.put("planNo", "1");
+
+            //Object Mapper를 통한 Json바인딩할 data생성
+            Map<String, Object> data = new HashMap<>();
+            data.put("dmParam", dmParam);
+
+            //Object Mapper를 통한 Json바인딩
+            Map<String, Object> map = new HashMap<>();
+            map.put("data", data);
+            ObjectMapper objectMapper = new ObjectMapper();
+            String params = objectMapper.writeValueAsString(map);
+
+            //httpEntity에 헤더 및 params 설정
+            HttpEntity entity = new HttpEntity(params, httpHeaders);
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> responseEntity =
+                    restTemplate.exchange("https://bis.arirang.com/api/v1/bis/listScheduleV3.do", HttpMethod.POST,
+                            entity, String.class);
+
+
+            String results = responseEntity.getBody();
+
+            bisDailyScheduleDTOList.add(objectMapper.readValue(results, BisDailyScheduleDTO.class));
+
+        }
+
+        //bisDailyScheduleDTO = objectMapper.readValue(results, BisDailyScheduleDTO.class);
+
+
+        return bisDailyScheduleDTOList;
+    }
+
     //Bis에서 주간편성 정보를 가져온다.
     public BisDailyScheduleDTO bisDailyScheduleFindAll() throws Exception {
 
@@ -266,10 +326,17 @@ public class BisInterfaceService {
         httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
         httpHeaders.add("Session_user_id", "ans");
 
+        Calendar cal = Calendar.getInstance();
+        //현재 날짜 구하기
+        Date now = new Date();
+
+        //Date to String (yyyymmdd)
+        String nowDate = dateChangeHelper.dateToStringNoTimeStraight(now);
+
         //Object Mapper를 통한 Json바인딩할 dmParam생성
         Map<String, Object> dmParam = new HashMap<>();
         dmParam.put("chanId", "CH_K");
-        dmParam.put("broadYmd", "20211207");
+        dmParam.put("broadYmd", nowDate);
         dmParam.put("planNo", "1");
 
         //Object Mapper를 통한 Json바인딩할 data생성
@@ -287,7 +354,7 @@ public class BisInterfaceService {
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> responseEntity =
-                restTemplate.exchange("http://121.134.111.62:8060/api/v1/bis/listScheduleV3.do", HttpMethod.POST,
+                restTemplate.exchange("https://bis.arirang.com/api/v1/bis/listScheduleV3.do", HttpMethod.POST,
                         entity, String.class);
 
 
@@ -298,6 +365,21 @@ public class BisInterfaceService {
 
 
         return bisDailyScheduleDTO;
+
+    }
+
+    public void bisDailyScheduleCreateFri(List<BisDailyScheduleDTO> bisDailyScheduleDTOList) throws ParseException {
+
+
+        for (BisDailyScheduleDTO bisDailyScheduleDTO : bisDailyScheduleDTOList) {
+
+            //Bis에서 조회하여 담아온 DTO에서 데이터 주간편성 데이터 리스트를 가져온다.
+            List<DschWeekDTO> dschWeekDTOList = bisDailyScheduleDTO.getDsSchWeek();
+
+
+            createDailyProgram(dschWeekDTOList);
+
+        }
 
     }
 
@@ -318,7 +400,7 @@ public class BisInterfaceService {
         }
 
         int dschWeekDTOListSize = dschWeekDTOList.size();//BIS 에서 조회된 리스트 사이즈를 가져온다.
-        int dailyProgramListSize = dailyProgramList.size();//ANS에 등록되어있는 리스트 사이즈를 가져온다.\
+        int dailyProgramListSize = dailyProgramList.size();//ANS에 등록되어있는 리스트 사이즈를 가져온다.
         //BIS와 ANS리스트 사이즈가 다르면 기존데이터 삭재후 BIS에서 조회한 데이터 재등록.
         if (dschWeekDTOListSize != dailyProgramListSize) {
 

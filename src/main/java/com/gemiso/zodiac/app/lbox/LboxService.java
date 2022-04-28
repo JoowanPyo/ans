@@ -1,23 +1,31 @@
 package com.gemiso.zodiac.app.lbox;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gemiso.zodiac.app.lbox.categoriesDTO.CategoriesDataDTO;
-import com.gemiso.zodiac.app.lbox.contentDTO.DataDTO;
-import com.gemiso.zodiac.app.lbox.userInfoDTO.UserInfoDataDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
+import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
+import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
+import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
+import com.gemiso.zodiac.app.lbox.mediaTransportDTO.ClipInfoDTO;
+import com.gemiso.zodiac.app.lbox.mediaTransportDTO.MediaTransportDataDTO;
+import com.gemiso.zodiac.app.lbox.mediaTransportDTO.ResponsMediaTransportDTO;
+import com.gemiso.zodiac.app.lbox.mediaTransportDTO.TasksDTO;
+import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import springfox.documentation.spring.web.json.Json;
 
 import java.nio.charset.Charset;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -28,18 +36,34 @@ public class LboxService {
     @Value("${nam.url.key:url}")
     private String namUrl;
 
+    private final ArticleMediaRepository articleMediaRepository;
+
+    private final ArticleMediaMapper articleMediaMapper;
+
     private static final String CONTENTS_URL = "api/ans/v2/contents";
-    private static final String  CATEGORIES_URL= "api/ans/v2/categories";
-    private static final String  USER_INFO_URL= "api/ans/v2/users";
+    private static final String CATEGORIES_URL = "api/ans/v2/categories";
+    private static final String USER_INFO_URL = "api/ans/v2/users";
+
+    private final UserAuthService userAuthService;
 
 
     //엘박스 영상정보 조회 [anm]
-    public JSONObject findAll(String sdate, String edate) throws JsonProcessingException {
+    public JSONObject findAll(String sdate, String edate, String userId, String keyword, String videoId,
+                              Integer categoryId, Integer isForever, Integer page, Integer limit, String sort) throws JsonProcessingException {
+
 
         //get parameter 담아주기
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(namUrl+CONTENTS_URL)
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(namUrl + CONTENTS_URL)
                 .queryParam("start_date", sdate) //검색 시작일
-                .queryParam("end_date", edate); //검색 종료일
+                .queryParam("end_date", edate) //검색 종료일
+                .queryParam("user_id", userId)
+                .queryParam("keyword", keyword)
+                .queryParam("video_id", videoId)
+                .queryParam("category_id", categoryId)
+                .queryParam("is_forever", isForever)
+                .queryParam("page", page)
+                .queryParam("limit", limit)
+                .queryParam("sort", sort);
 
         System.out.println(builder.toUriString());
 
@@ -68,10 +92,10 @@ public class LboxService {
     }
 
     //엘박스 카테고리 조회 [anm]
-    public JSONObject findCategories(Integer parentId){
+    public JSONObject findCategories(Integer parentId) {
 
         //get parameter 담아주기
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(namUrl+CATEGORIES_URL)
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(namUrl + CATEGORIES_URL)
                 .queryParam("parent_id", parentId); //parentId
 
         HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
@@ -87,13 +111,13 @@ public class LboxService {
         ResponseEntity<JSONObject> responseEntity = restTpl.exchange(builder.toUriString(), HttpMethod.GET, entity, JSONObject.class);
 
         return responseEntity.getBody();
-        
+
     }
 
-    public JSONObject findUserInfo(){
+    public JSONObject findUserInfo() {
 
         //get parameter 담아주기
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(namUrl+USER_INFO_URL); //parentId
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(namUrl + USER_INFO_URL); //parentId
 
         HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
         httpRequestFactory.setConnectionRequestTimeout(30000); // 연결시간 초과
@@ -108,6 +132,167 @@ public class LboxService {
         ResponseEntity<JSONObject> responseEntity = restTpl.exchange(builder.toUriString(), HttpMethod.GET, entity, JSONObject.class);
 
         return responseEntity.getBody();
+
+
+    }
+
+    //부조 전송
+    public ArticleMediaDTO mediaTransfer(Long mediaId, Integer contentId, String subrmNm, String destination, Boolean isUrgent, Boolean isRetry) throws JsonProcessingException {
+
+        String userId = userAuthService.authUser.getUserId();
+
+        //헤더 설정
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+
+        int tasksCount = 0;
+        ClipInfoDTO clipInfoDTO = new ClipInfoDTO();
+
+        List<String> destinations = new ArrayList<>();
+
+        switch (destination) { // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+            case "T":
+                //test 용으로 클라우트 콘피그 구현시 교체
+                if ("A".equals(subrmNm)){
+                    destinations.add("NS");
+                    destinations.add("PS_A");
+                    destinations.add("PS_B");
+
+                }else if("B".equals(subrmNm)) {
+                    destinations.add("NS");
+                    destinations.add("PS_A");
+                    destinations.add("PS_B");
+                    destinations.add("PS_C");
+                }
+                break;
+            case "P":
+                if ("A".equals(subrmNm)){
+                    //destinations.add("NS");
+                    destinations.add("PS_A");
+                    destinations.add("PS_B");
+
+                }else if("B".equals(subrmNm)) {
+                    //destinations.add("NS");
+                    destinations.add("PS_A");
+                    destinations.add("PS_B");
+                    destinations.add("PS_C");
+                }
+                break;
+            case "N":
+                if ("A".equals(subrmNm)){
+                    destinations.add("NS");
+                    //destinations.add("PS_A");
+                    //destinations.add("PS_B");
+
+                }else if("B".equals(subrmNm)) {
+                    destinations.add("NS");
+                    //destinations.add("PS_A");
+                    //destinations.add("PS_B");
+                    //destinations.add("PS_C");
+                }
+                break;
+        }
+
+
+
+        for (String dest : destinations) {
+
+
+            //Object Mapper를 통한 Json바인딩할 dmParam생성
+            Map<String, Object> params = new HashMap<>();
+            params.put("content_id", contentId); //콘텐츠 아이디
+            params.put("scr", subrmNm); //부조값 ( A, B )
+            params.put("destination", dest);
+            params.put("user_account_id", userId); //사용자 아이디
+            params.put("is_urgent", isUrgent); //긴급여부
+            params.put("is_retry", isRetry); //재전송 여부
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String param = objectMapper.writeValueAsString(params);
+
+            //httpEntity에 헤더 및 params 설정
+            HttpEntity entity = new HttpEntity(param, httpHeaders);
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<ResponsMediaTransportDTO> responseEntity =
+                    restTemplate.exchange(namUrl + "api/ans/v2/transfer-scr", HttpMethod.POST,
+                            entity, ResponsMediaTransportDTO.class);
+
+            ResponsMediaTransportDTO responsBody = responseEntity.getBody();
+
+            log.info("Destination : "+ destination + "Response Data : "+ responsBody);
+
+            MediaTransportDataDTO data = responsBody.getData();
+            clipInfoDTO = data.getClip_info(); //이미 전송된 영상이거나 전송완료인 영상 데이터DTO
+            List<TasksDTO> tasksDTO = data.getTasks(); //전송시작시 데이터
+
+            if (CollectionUtils.isEmpty(tasksDTO) == false) {
+
+                ++tasksCount; //전송중이 한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
+
+            }
+        }
+
+
+        ArticleMedia articleMedia = findArticleMedia(mediaId);
+        ArticleMediaDTO articleMediaDTO = articleMediaMapper.toDto(articleMedia);
+
+        //전송중 값이 1개라도 체크가 되어있는 경우
+        if (tasksCount > 0) {
+
+            //기사 미디어 부조 전송 시작.
+
+            articleMediaDTO.setMediaTypCd("match_ready"); //전송시작 코드
+            articleMediaMapper.updateFromDto(articleMediaDTO, articleMedia); //기존 기사미디어 정보에 업데이트 정보 업데이트
+            articleMediaRepository.save(articleMedia); //수정
+
+        }else {
+
+            //기사 미디어 부조 전송 완료(이미 전송된 영상)
+            articleMediaDTO.setTrnsfFileNm(clipInfoDTO.getFilename()); //전송완료된 파일네임(0001 ~ 9999 + .mxf)
+            articleMediaDTO.setMediaTypCd("match_completed"); //전송완료 코드
+            articleMediaMapper.updateFromDto(articleMediaDTO, articleMedia); //기존 기사미디어 정보에 업데이트 정보 업데이트
+            articleMediaRepository.save(articleMedia); //수정
+        }
+
+        log.info("Destination : "+ destination + "변경된 미디어 정보 : " + articleMedia);
+
+
+        return articleMediaDTO;
+
+    }
+
+    //기사 미디어 정보 조회 및 존재유무 확인
+    public ArticleMedia findArticleMedia(Long mediaId) {
+
+        Optional<ArticleMedia> articleMediaEntity = articleMediaRepository.findByArticleMedia(mediaId);
+
+        if (articleMediaEntity.isPresent() == false) {
+            throw new ResourceNotFoundException("기사 미디어를 찾을 수 없습니다. MediaId : " + mediaId);
+        }
+
+        return articleMediaEntity.get();
+    }
+
+
+    //전송상태 업데이트
+    public void stateChange(Integer contentId, String videoId,String trnsfFileNm, String mediaTypCd){
+
+        //콘텐츠아이디 + 비디오아이디 로 기사 미디어 검색.
+        List<ArticleMedia> articleMediaList = articleMediaRepository.findArticleMediaListByContentId(contentId, videoId);
+
+        //검색된 기사 미디어 값 업데이트
+        for (ArticleMedia articleMedia : articleMediaList){
+
+            ArticleMediaDTO articleMediaDTO = articleMediaMapper.toDto(articleMedia);
+            articleMediaDTO.setMediaTypCd(mediaTypCd); //변경코드 업데이트
+            articleMediaDTO.setTrnsfFileNm(trnsfFileNm); //전송파일명 업데이트
+
+            articleMediaMapper.updateFromDto(articleMediaDTO, articleMedia);
+
+            articleMediaRepository.save(articleMedia);
+
+        }
 
 
     }

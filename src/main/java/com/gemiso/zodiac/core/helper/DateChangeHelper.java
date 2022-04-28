@@ -81,4 +81,20 @@ public class DateChangeHelper {
 
         return returnDate;
     }
+
+    //Date To String
+    public String dateToStringNoTimeStraight(Date date){
+
+        String returnDate = "";
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+
+        if (ObjectUtils.isEmpty(date) == false) {
+
+            returnDate = dateFormat.format(date);
+
+        }
+
+        return returnDate;
+    }
 }

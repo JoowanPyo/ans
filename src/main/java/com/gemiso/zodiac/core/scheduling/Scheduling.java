@@ -23,8 +23,8 @@ public class Scheduling {
     private final MisService misService;
 
     //BIS프로그램 조회 및 등록
-    @Scheduled(cron = "* * 3 * * ?")//3시간에 한번씩
-    /*@Scheduled(cron = "0 * * * * *")*/
+    //@Scheduled(cron = "0 0 5 * * ?")//매일 새벽 5시에 한번씩
+    //@Scheduled(cron = "0 * * * * *")
     public void bisProgramCreate() throws Exception {
 
         //bis에서 프로그램 정보를 가져온다.
@@ -37,7 +37,7 @@ public class Scheduling {
 
     //BIS기본편성 조회 및 등록
     /*@Scheduled(cron = "0 * * * * *")*/
-    @Scheduled(cron = "* * 3 * * ?") //3시간에 한번씩
+    @Scheduled(cron = "0 0 5 * * ?")//매일 새벽 5시에 한번씩
     public void bisBasicScheduleCreate() throws Exception {
 
         //Bis에서 기본편성 조회
@@ -48,13 +48,25 @@ public class Scheduling {
     }
 
     //Bis주간편성 조회 및 등록
-    /*@Scheduled(cron = "0 * * * * *")*/
-    @Scheduled(cron = "* * 3 * * ?")//3시간에 한번씩
+    //@Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 5 * * ?")//매일 새벽 5시에 한번씩
+    //@Scheduled(cron = "* * 3 * * ?")//3시간에 한번씩
     public void bisDailyScheduleCreate() throws Exception {
 
         BisDailyScheduleDTO bisDailyScheduleDTO = bisInterfaceService.bisDailyScheduleFindAll();
 
         bisInterfaceService.bisDailyScheduleCreate(bisDailyScheduleDTO);
+
+    }
+
+    //주간편성 금요일 새벽 5시마다 업데이트
+    @Scheduled(cron = "0 0 5 * * FRI")//매주 금요일 새벽 5시에 한번씩
+    //@Scheduled(cron = "0 * * * * *")
+    public void bisDailyScheduleCreateFri() throws Exception {
+
+        List<BisDailyScheduleDTO> bisDailyScheduleDTOList = bisInterfaceService.bisDailyScheduleFindAllFri();
+
+        bisInterfaceService.bisDailyScheduleCreateFri(bisDailyScheduleDTOList);
 
     }
 

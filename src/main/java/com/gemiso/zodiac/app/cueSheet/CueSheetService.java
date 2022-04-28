@@ -36,7 +36,6 @@ import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.core.topic.TopicService;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.CueSheetTopicDTO;
-import com.gemiso.zodiac.core.topic.articleTopicDTO.TakerCueSheetTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -95,7 +94,7 @@ public class CueSheetService {
 
         //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
         List<Sort.Order> orders = new ArrayList<>();
-        Sort.Order order1 = new Sort.Order(Sort.Direction.DESC, "brdcDt");
+        Sort.Order order1 = new Sort.Order(Sort.Direction.ASC, "brdcDt");
         orders.add(order1);
         Sort.Order order2 = new Sort.Order(Sort.Direction.ASC, "brdcStartTime");
         orders.add(order2);

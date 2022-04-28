@@ -94,71 +94,64 @@ public class InterfaceService {
         List<CueSheetDTO> cueSheetDTOList = cueSheetFindAllDTO.getCueSheetDTO();
         List<DailyProgramDTO> dailyProgramDTOList = cueSheetFindAllDTO.getDailyProgramDTO();
 
-        for (CueSheetDTO cueSheet : cueSheetDTOList) {
+        if (CollectionUtils.isEmpty(dailyProgramDTOList)) {
 
-            String date = cueSheet.getBrdcDt(); //방송일자
-            int cueBrdcDt = 0;
-            if (date != null && date.trim().isEmpty() == false) { //방송일자 데이터가 있을경우
-                //int변환을 위해 -빼기[yyyy-MM-dd -> yyyyMMdd]
-                //String getTime = date.substring(0, 4) + date.substring(5, 7) + date.substring(8, 10);
-                //큐시트 방송일시 비교를 위해 int로 변환
-                cueBrdcDt = dateToint(date);
+            for (CueSheetDTO cueSheet : cueSheetDTOList) {
+
+                //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+                parentProgramDTOList.add(cueToTaker(cueSheet));
+
             }
+        } else {
 
-            String time = cueSheet.getBrdcStartTime();
-            int cueStartTime = 0;
-            if (time != null && time.trim().isEmpty() == false) { //방송시작시간이 있을경우
-
-                //방송시작시작 Int변환을 위해 00:00:00 -> 000000으로 변환
-                //String getCueStime = time.substring(0,2)+time.substring(3,5)+time.substring(6,8);
-                //큐시트 방송시작시간 비교를 위해 int로 변환
-                cueStartTime = timeToInt(time);
-            }
-
-            //ConcurrentModificationException에러가 나서 이터레이터로 수정.
-            Iterator<DailyProgramDTO> iter = dailyProgramDTOList.listIterator();
-            while (iter.hasNext()) {
-                DailyProgramDTO dailyProgram = iter.next();
+            for (DailyProgramDTO dailyProgramDTO : dailyProgramDTOList) {
 
                 //일일편성 방송일시 비교를 위해 int로 변환
-                int dailyBrdcDt = dateToint(dailyProgram.getBrdcDt());
+                int dailyBrdcDt = dateToint(dailyProgramDTO.getBrdcDt());
 
                 //일일편성 방송시작시간 비교를 위해 int로 변환
-                int dailyStartTime = timeToInt(dailyProgram.getBrdcStartTime());
+                int dailyStartTime = timeToInt(dailyProgramDTO.getBrdcStartTime());
 
-                /*//큐시트 방송일시가 일일편성 방송일시보다 크면.
-                if (cueBrdcDt > dailyBrdcDt){
-                    //프롬프터 큐시트목록 xml변환[ 큐시트 ]
-                    prompterProgramDTOList.add(cueToPrompter(cueSheet));
-                    break;
-                }*/
-                //일일편성 방송일시가 큐시트 방송일시보다 크면.
-                if (cueBrdcDt < dailyBrdcDt) {
-                    parentProgramDTOList.add(dailyToTaker(dailyProgram));
-                    iter.remove();
-                }
-                //큐시트 방송일시와 일일편성 방송일시와 같으면
-                if (cueBrdcDt != 0 && dailyBrdcDt != 0 && cueBrdcDt == dailyBrdcDt) {
-                    if (cueStartTime > dailyStartTime) {//큐시트 시작시간이 크면 일일편성출력
-                        //프롬프터 큐시트목록 xml변환[ 일일편성 ]
-                        parentProgramDTOList.add(dailyToTaker(dailyProgram));
-                        iter.remove();
+                Iterator<CueSheetDTO> iter = cueSheetDTOList.listIterator();
+                while (iter.hasNext()) {
+
+                    CueSheetDTO cueSheet = iter.next();
+
+                    String date = cueSheet.getBrdcDt(); //방송일자
+                    int cueBrdcDt = 0;
+                    if (date != null && date.trim().isEmpty() == false) { //방송일자 데이터가 있을경우
+                        cueBrdcDt = dateToint(date);
                     }
-                    /*if (cueStartTime < dailyStartTime){//일일편성 시작시간이 크면 큐시트출력
-                        //프롬프터 큐시트목록 xml변환[ 큐시트 ]
-                        prompterProgramDTOList.add(cueToPrompter(cueSheet));
-                    }*/
-                    if (cueStartTime == dailyStartTime) {//같으면 큐시트,일일편성 둘다 출력하되 큐시트 먼저
-                        /*//프롬프터 큐시트목록 xml변환[ 큐시트 ]
-                        prompterProgramDTOList.add(cueToPrompter(cueSheet));*/
-                        //프롬프터 큐시트목록 xml변환[ 일일편성 ]
-                        parentProgramDTOList.add(dailyToTaker(dailyProgram));
-                        iter.remove();
+                    String time = cueSheet.getBrdcStartTime(); //방송 시작 시간
+                    int cueStartTime = 0;
+                    if (time != null && time.trim().isEmpty() == false) { //방송시작시간이 있을경우
+                        cueStartTime = timeToInt(time);
+                    }
+
+                    //큐시트 방송일시가 일일편성 방송일시보다 크면.
+                    if (cueBrdcDt < dailyBrdcDt) {
+
+                        if (parentProgramDTOList.contains(cueToTaker(cueSheet)) == false) { //최초한번만
+                            //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+                            parentProgramDTOList.add(cueToTaker(cueSheet));
+                        }
+                    } else if (cueBrdcDt == dailyBrdcDt) {//큐시트 방송일시가 일일편성 방송일시와 같은경우.
+
+                        if (cueStartTime < dailyStartTime) {//큐시트 시작시간이 크면 일일편성출력
+                            if (parentProgramDTOList.contains(cueToTaker(cueSheet)) == false) { //최초한번만
+                                //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+                                parentProgramDTOList.add(cueToTaker(cueSheet));
+                            }
+                        }
+
                     }
                 }
+
+                //프롬프터 큐시트목록 xml변환[ 일일편성 ]
+                parentProgramDTOList.add(dailyToTaker(dailyProgramDTO));
+
             }
-            //프롬프터 큐시트목록 xml변환[ 큐시트 ]
-            parentProgramDTOList.add(cueToTaker(cueSheet));
+
         }
         return parentProgramDTOList;
     }
@@ -306,7 +299,7 @@ public class InterfaceService {
     }
 
     //큐시트 조회
-    public CueSheet findCueSheet(Long cueId, String del_yn){
+    public CueSheet findCueSheet(Long cueId, String del_yn) {
 
         //조회된 큐시트값없을경우 에러를 안내기 위해 빈 모델 리턴
         CueSheet cueSheet = new CueSheet();
@@ -323,15 +316,15 @@ public class InterfaceService {
 
     //테이커 큐시트 조회
     public TakerCueSheetDataDTO cuefindAll(String rd_id, String play_seq, String cued_seq, String vplay_seq, String vcued_seq,
-                                             String del_yn, String ch_div_cd, String usr_id, String token, String usr_ip,
-                                             String format, String lang, String os_type) {
+                                           String del_yn, String ch_div_cd, String usr_id, String token, String usr_ip,
+                                           String format, String lang, String os_type) {
 
         TakerCueSheetDataDTO takerCueSheetDataDTO = new TakerCueSheetDataDTO();
 
         //큐시트 아이티와 삭제여부값 예외 처리[아이디가 String 타입으로 들어오기 때문에 Long값으로 변환.]
         //Long cueId = 60L;
         Long cueId = null;
-        if (rd_id != null && rd_id.trim().isEmpty() ==false) {
+        if (rd_id != null && rd_id.trim().isEmpty() == false) {
             cueId = Long.parseLong(rd_id);
         }
         //큐시트 아이티와 삭제여부값 예외 처리[여부값이 안들어 올시, N값 설정]
@@ -354,7 +347,7 @@ public class InterfaceService {
     }
 
     //테이커 큐시트 예비 큐시트 조회
-    public List<TakerCueSheetSpareDTO> findSpareCueSheet(Long cueId, String del_yn, CueSheet cueSheet){
+    public List<TakerCueSheetSpareDTO> findSpareCueSheet(Long cueId, String del_yn, CueSheet cueSheet) {
 
         List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findSpareCue(cueId, del_yn);
 
@@ -379,16 +372,16 @@ public class InterfaceService {
             List<TakerCueSheetSymbolListDTO> audioSymbolList = new ArrayList<>();
 
 
-            for(CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+            for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
                 Symbol symbol = cueSheetItemSymbol.getSymbol();
 
-                if(ObjectUtils.isEmpty(symbol)){
+                if (ObjectUtils.isEmpty(symbol)) {
                     continue;
                 }
 
                 String typeCode = symbol.getTypCd();
 
-                if ("audio_icons".equals(typeCode)){
+                if ("audio_icons".equals(typeCode)) {
 
                     String symbolId = symbol.getSymbolId();
                     TakerCueSheetSymbolListDTO takerCueSheetSymbolListDTO = TakerCueSheetSymbolListDTO.builder()
@@ -396,7 +389,7 @@ public class InterfaceService {
 
                     audioSymbolList.add(takerCueSheetSymbolListDTO);
 
-                }else if ("video_icons".equals(typeCode)){
+                } else if ("video_icons".equals(typeCode)) {
 
                     String symbolId = symbol.getSymbolId();
                     TakerCueSheetSymbolListDTO takerCueSheetSymbolListDTO = TakerCueSheetSymbolListDTO.builder()
@@ -414,14 +407,14 @@ public class InterfaceService {
             //cmDivCd, cmDivCd 값 구하기 [채널값으로 심볼에 들어가는 NS-1, NS-2, NS-3 값 구하기]
             String returnSymbolId = "";
             String returnSymbolNm = "";
-            for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+            for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
                 Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
 
-                if (ObjectUtils.isEmpty(symbol)){  //심볼이 있을경우
+                if (ObjectUtils.isEmpty(symbol)) {  //심볼이 있을경우
                     String symbolId = symbol.getSymbolId(); //심볼아이디
                     String symbolNm = symbol.getSymbolNm(); //심볼 명
 
-                    switch(symbolId){ // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                    switch (symbolId) { // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
                         case "VNS1":
                             returnSymbolId = symbolId;
                             returnSymbolNm = symbolNm;
@@ -455,7 +448,7 @@ public class InterfaceService {
                 //템플릿이 있을경우 템플릿아이디 추가
                 CueSheetTemplate cueSheetTemplate = cueSheetItem.getCueSheetTemplate();
                 Long cueTmpltId = null;
-                if (ObjectUtils.isEmpty(cueSheetTemplate) == false){
+                if (ObjectUtils.isEmpty(cueSheetTemplate) == false) {
                     cueTmpltId = cueSheetTemplate.getCueTmpltId();
                 }
 
@@ -601,16 +594,16 @@ public class InterfaceService {
 
             List<TakerCueSheetSymbolListDTO> videoSymbolList = new ArrayList<>();
             List<TakerCueSheetSymbolListDTO> audioSymbolList = new ArrayList<>();
-            for(CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+            for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
                 Symbol symbol = cueSheetItemSymbol.getSymbol();
 
-                if(ObjectUtils.isEmpty(symbol)){
+                if (ObjectUtils.isEmpty(symbol)) {
                     continue;
                 }
 
                 String typeCode = symbol.getTypCd();
 
-                if ("audio_icons".equals(typeCode)){
+                if ("audio_icons".equals(typeCode)) {
 
                     String symbolId = symbol.getSymbolId();
                     TakerCueSheetSymbolListDTO takerCueSheetSymbolListDTO = TakerCueSheetSymbolListDTO.builder()
@@ -618,7 +611,7 @@ public class InterfaceService {
 
                     audioSymbolList.add(takerCueSheetSymbolListDTO);
 
-                }else if ("video_icons".equals(typeCode)){
+                } else if ("video_icons".equals(typeCode)) {
 
                     String symbolId = symbol.getSymbolId();
                     TakerCueSheetSymbolListDTO takerCueSheetSymbolListDTO = TakerCueSheetSymbolListDTO.builder()
@@ -636,14 +629,14 @@ public class InterfaceService {
             //cmDivCd, cmDivCd 값 구하기 [채널값으로 심볼에 들어가는 NS-1, NS-2, NS-3 값 구하기]
             String returnSymbolId = "";
             String returnSymbolNm = "";
-            for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+            for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
                 Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
 
-                if (ObjectUtils.isEmpty(symbol) == false){  //심볼이 있을경우
+                if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
                     String symbolId = symbol.getSymbolId(); //심볼아이디
                     String symbolNm = symbol.getSymbolNm(); //심볼 명
 
-                    switch(symbolId){ // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                    switch (symbolId) { // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
                         case "VNS1":
                             returnSymbolId = symbolId;
                             returnSymbolNm = symbolNm;
@@ -659,7 +652,7 @@ public class InterfaceService {
                     }
                 }
             }
-            
+
 
             if (ObjectUtils.isEmpty(article)) { //기사가 포함이 안된 큐시트 아이템 일시
 
@@ -686,7 +679,7 @@ public class InterfaceService {
 
                 //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
                 TakerCueSheetDTO takerCueSheetDTO = buildTakerCueArticle(cueSheet, cueSheetItem, rdSeq, returnSymbolId
-                        ,returnSymbolNm,  takerArticleVideoDTOList, article, takerCueSheetVideoSymbolDTO, takerCueSheetAudioSymbolDTO);
+                        , returnSymbolNm, takerArticleVideoDTOList, article, takerCueSheetVideoSymbolDTO, takerCueSheetAudioSymbolDTO);
 
                 takerCueSheetDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
 
@@ -701,7 +694,7 @@ public class InterfaceService {
     //테이커큐시트 정보 큐시트 엔티티 정보로 빌드( 기사 x)
     public TakerCueSheetDTO buildTakerCue(CueSheet cueSheet, CueSheetItem cueSheetItem, int rdSeq
             , String returnSymbolId, String returnSymbolNm, TakerCueSheetVideoDTO takerCueSheetVideoDTO
-            , TakerCueSheetVideoSymbolDTO takerCueSheetVideoSymbolDTO, TakerCueSheetAudioSymbolDTO takerCueSheetAudioSymbolDTO){
+            , TakerCueSheetVideoSymbolDTO takerCueSheetVideoSymbolDTO, TakerCueSheetAudioSymbolDTO takerCueSheetAudioSymbolDTO) {
 
         //프로그램 아이디 get null에러 방지
         Program program = cueSheet.getProgram();
@@ -713,7 +706,7 @@ public class InterfaceService {
         //템플릿이 있을경우 템플릿아이디 추가
         CueSheetTemplate cueSheetTemplate = cueSheetItem.getCueSheetTemplate();
         Long cueTmpltId = null;
-        if (ObjectUtils.isEmpty(cueSheetTemplate) == false){
+        if (ObjectUtils.isEmpty(cueSheetTemplate) == false) {
             cueTmpltId = cueSheetTemplate.getCueTmpltId();
         }
 
@@ -826,18 +819,18 @@ public class InterfaceService {
                 .build();
 
 
-
         return takerCueSheetDTO;
 
     }
+
     //큐시트 아이템 비디오 정보 get
-    public TakerCueSheetVideoDTO getVideoDTOList(List<CueSheetMedia> cueSheetMediaList){
+    public TakerCueSheetVideoDTO getVideoDTOList(List<CueSheetMedia> cueSheetMediaList) {
 
         TakerCueSheetVideoDTO returnDTO = new TakerCueSheetVideoDTO(); //리턴할 비디오 DTO 리스트
         List<TakerCueSheetVideoClipDTO> takerCueSheetVideoDTOList = new ArrayList<>();
 
         //Mam되면 수정
-        for (CueSheetMedia cueSheetMedia : cueSheetMediaList){//큐시트 아이템에 포함된 큐시트 미디어 정보 get
+        for (CueSheetMedia cueSheetMedia : cueSheetMediaList) {//큐시트 아이템에 포함된 큐시트 미디어 정보 get
 
             //테이커 비디오 정보 빌드
             TakerCueSheetVideoClipDTO takerCueSheetVideoDTO = TakerCueSheetVideoClipDTO.builder()
@@ -871,14 +864,14 @@ public class InterfaceService {
     }
 
     //큐시트 기사 비디오 정보 get
-    public TakerCueSheetVideoDTO getArticleVideoDTOList(List<ArticleMedia> cueSheetMediaArticleList){
+    public TakerCueSheetVideoDTO getArticleVideoDTOList(List<ArticleMedia> cueSheetMediaArticleList) {
 
         TakerCueSheetVideoDTO returnDTO = new TakerCueSheetVideoDTO(); //리턴할 비디오 DTO 리스트
         List<TakerCueSheetVideoClipDTO> takerCueSheetVideoDTOList = new ArrayList<>();
 
         Integer seq = 1;
         //Mam되면 수정
-        for (ArticleMedia articleMedia : cueSheetMediaArticleList){//큐시트 아이템에 포함된 큐시트 미디어 정보 get
+        for (ArticleMedia articleMedia : cueSheetMediaArticleList) {//큐시트 아이템에 포함된 큐시트 미디어 정보 get
 
             //테이커 비디오 정보 빌드
             TakerCueSheetVideoClipDTO takerCueSheetVideoDTO = TakerCueSheetVideoClipDTO.builder()
@@ -1028,76 +1021,71 @@ public class InterfaceService {
 
         List<PrompterProgramDTO> prompterProgramDTOList = new ArrayList<>(); //리턴시켜줄 프롬프터 프로그램 리스트 생성
 
-        List<CueSheetDTO> cueSheetDTOList = cueSheetFindAllDTO.getCueSheetDTO(); //큐시트목록 조회 리스트
-        List<DailyProgramDTO> dailyProgramDTOList = cueSheetFindAllDTO.getDailyProgramDTO(); //알알편성목록 조회 리스트
+        List<CueSheetDTO> cueSheetDTOList = cueSheetFindAllDTO.getCueSheetDTO();
+        List<DailyProgramDTO> dailyProgramDTOList = cueSheetFindAllDTO.getDailyProgramDTO();
 
-        for (CueSheetDTO cueSheet : cueSheetDTOList) {
+        if (CollectionUtils.isEmpty(dailyProgramDTOList)) {
 
-            String date = cueSheet.getBrdcDt(); //방송일자
-            int cueBrdcDt = 0;
-            if (date != null && date.trim().isEmpty() == false) { //방송일자 데이터가 있을경우
-                //int변환을 위해 -빼기[yyyy-MM-dd -> yyyyMMdd]
-                //String getTime = date.substring(0, 4) + date.substring(5, 7) + date.substring(8, 10);
-                //큐시트 방송일시 비교를 위해 int로 변환
-                cueBrdcDt = dateToint(date);
+            for (CueSheetDTO cueSheet : cueSheetDTOList) {
+
+                //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+                prompterProgramDTOList.add(cueToPrompter(cueSheet));
+
             }
+        } else {
 
-            String time = cueSheet.getBrdcStartTime();
-            int cueStartTime = 0;
-            if (time != null && time.trim().isEmpty() == false) { //방송시작시간이 있을경우
-
-                //방송시작시작 Int변환을 위해 00:00:00 -> 000000으로 변환
-                //String getCueStime = time.substring(0,2)+time.substring(3,5)+time.substring(6,8);
-                //큐시트 방송시작시간 비교를 위해 int로 변환
-                cueStartTime = timeToInt(time);
-            }
-
-            //ConcurrentModificationException에러가 나서 이터레이터로 수정.
-            Iterator<DailyProgramDTO> iter = dailyProgramDTOList.listIterator();
-            while (iter.hasNext()) {
-                DailyProgramDTO dailyProgram = iter.next();
+            for (DailyProgramDTO dailyProgramDTO : dailyProgramDTOList) {
 
                 //일일편성 방송일시 비교를 위해 int로 변환
-                int dailyBrdcDt = dateToint(dailyProgram.getBrdcDt());
+                int dailyBrdcDt = dateToint(dailyProgramDTO.getBrdcDt());
 
                 //일일편성 방송시작시간 비교를 위해 int로 변환
-                int dailyStartTime = timeToInt(dailyProgram.getBrdcStartTime());
+                int dailyStartTime = timeToInt(dailyProgramDTO.getBrdcStartTime());
 
-                /*//큐시트 방송일시가 일일편성 방송일시보다 크면.
-                if (cueBrdcDt > dailyBrdcDt){
-                    //프롬프터 큐시트목록 xml변환[ 큐시트 ]
-                    prompterProgramDTOList.add(cueToPrompter(cueSheet));
-                    break;
-                }*/
-                //일일편성 방송일시가 큐시트 방송일시보다 크면.
-                if (cueBrdcDt < dailyBrdcDt) {
-                    prompterProgramDTOList.add(dailyToPrompter(dailyProgram));
-                    iter.remove();
-                }
-                //큐시트 방송일시와 일일편성 방송일시와 같으면
-                if (cueBrdcDt != 0 && dailyBrdcDt != 0 && cueBrdcDt == dailyBrdcDt) {
-                    if (cueStartTime > dailyStartTime) {//큐시트 시작시간이 크면 일일편성출력
-                        //프롬프터 큐시트목록 xml변환[ 일일편성 ]
-                        prompterProgramDTOList.add(dailyToPrompter(dailyProgram));
-                        iter.remove();
+                Iterator<CueSheetDTO> iter = cueSheetDTOList.listIterator();
+                while (iter.hasNext()) {
+
+                    CueSheetDTO cueSheet = iter.next();
+
+                    String date = cueSheet.getBrdcDt(); //방송일자
+                    int cueBrdcDt = 0;
+                    if (date != null && date.trim().isEmpty() == false) { //방송일자 데이터가 있을경우
+                        cueBrdcDt = dateToint(date);
                     }
-                    /*if (cueStartTime < dailyStartTime){//일일편성 시작시간이 크면 큐시트출력
-                        //프롬프터 큐시트목록 xml변환[ 큐시트 ]
-                        prompterProgramDTOList.add(cueToPrompter(cueSheet));
-                    }*/
-                    if (cueStartTime == dailyStartTime) {//같으면 큐시트,일일편성 둘다 출력하되 큐시트 먼저
-                        /*//프롬프터 큐시트목록 xml변환[ 큐시트 ]
-                        prompterProgramDTOList.add(cueToPrompter(cueSheet));*/
-                        //프롬프터 큐시트목록 xml변환[ 일일편성 ]
-                        prompterProgramDTOList.add(dailyToPrompter(dailyProgram));
-                        iter.remove();
+                    String time = cueSheet.getBrdcStartTime(); //방송 시작 시간
+                    int cueStartTime = 0;
+                    if (time != null && time.trim().isEmpty() == false) { //방송시작시간이 있을경우
+                        cueStartTime = timeToInt(time);
+                    }
+
+                    //큐시트 방송일시가 일일편성 방송일시보다 크면.
+                    if (cueBrdcDt < dailyBrdcDt) {
+
+                        if (prompterProgramDTOList.contains(cueToPrompter(cueSheet)) == false) { //최초한번만
+                            //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+                            prompterProgramDTOList.add(cueToPrompter(cueSheet));
+                        }
+                    } else if (cueBrdcDt == dailyBrdcDt) {//큐시트 방송일시가 일일편성 방송일시와 같은경우.
+
+                        if (cueStartTime < dailyStartTime) {//큐시트 시작시간이 크면 일일편성출력
+                            if (prompterProgramDTOList.contains(cueToPrompter(cueSheet)) == false) { //최초한번만
+                                //프롬프터 큐시트목록 xml변환[ 큐시트 ]
+                                prompterProgramDTOList.add(cueToPrompter(cueSheet));
+                            }
+                        }
+
                     }
                 }
+
+                //프롬프터 큐시트목록 xml변환[ 일일편성 ]
+                prompterProgramDTOList.add(dailyToPrompter(dailyProgramDTO));
+
             }
-            //프롬프터 큐시트목록 xml변환[ 큐시트 ]
-            prompterProgramDTOList.add(cueToPrompter(cueSheet));
+
         }
         return prompterProgramDTOList;
+
+
     }
 
     //프롬프터 큐시트목록 xml변환[ 일일편성 ]
@@ -1131,7 +1119,7 @@ public class InterfaceService {
             brdcPgmId = programDTO.getBrdcPgmId();
         }
 
-                //기사수 get
+        //기사수 get
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheet.getCueSheetItem();
         int articleCount = 0;
         for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList) {
@@ -1208,7 +1196,7 @@ public class InterfaceService {
         prompterProgramXML.setData(prompterProgramDataDTO);
         prompterProgramXML.setResult(prompterProgramResultDTO);
 
-       /* prompterProgramXML.setPrompterProgramDTO(prompterProgramDTOList);*/
+        /* prompterProgramXML.setPrompterProgramDTO(prompterProgramDTOList);*/
 
         //DTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(prompterProgramXML, PrompterProgramXML.class);
@@ -1296,7 +1284,7 @@ public class InterfaceService {
                 //템플릿이 있을경우 템플릿아이디 추가
                 CueSheetTemplate cueSheetTemplate = cueSheetItem.getCueSheetTemplate();
                 Long cueTmpltId = null;
-                if (ObjectUtils.isEmpty(cueSheetTemplate) == false){
+                if (ObjectUtils.isEmpty(cueSheetTemplate) == false) {
                     cueTmpltId = cueSheetTemplate.getCueTmpltId();
                 }
 
@@ -1321,7 +1309,7 @@ public class InterfaceService {
                 prompterCueSheetDTOList.add(prompterCueSheetDTO);
 
                 seq++;
-            }else { //기사 아이템인 경우
+            } else { //기사 아이템인 경우
 
                 //Integer articleCttTime = article.getArtclCttTime(); // 기사 소요시간
                 //Integer ancCttTime = article.getAncMentCttTime(); // 앵커 소요시간
@@ -1337,10 +1325,10 @@ public class InterfaceService {
 
                 //기상 유형 상세 코드 가 apk,pk인 경우 기사 + 앵커 소요시간 add
                 //if ("apk".equals(articleTypDtlCd) || "pk".equals(articleTypDtlCd)) {
-                    // 기사 소요시간 + 앵커 소요시간 + 누적시간 = 누적시간
+                // 기사 소요시간 + 앵커 소요시간 + 누적시간 = 누적시간
                 //    newsAcumTime += articleCttTime + ancCttTime;
 
-                    //기상 유형 상세 코드 가 telphone,smartphone,news_studio,broll,mng 인 경우 기사소요시간만 add
+                //기상 유형 상세 코드 가 telphone,smartphone,news_studio,broll,mng 인 경우 기사소요시간만 add
                 //} else { // 앵커시간이 Null인경우
                 //    newsAcumTime += articleCttTime;
                 //}
@@ -1409,7 +1397,7 @@ public class InterfaceService {
                 //템플릿이 있을경우 템플릿아이디 추가
                 CueSheetTemplate cueSheetTemplate = cueSheetItem.getCueSheetTemplate();
                 Long cueTmpltId = null;
-                if (ObjectUtils.isEmpty(cueSheetTemplate) == false){
+                if (ObjectUtils.isEmpty(cueSheetTemplate) == false) {
                     cueTmpltId = cueSheetTemplate.getCueTmpltId();
                 }
 
@@ -1433,7 +1421,7 @@ public class InterfaceService {
                 prompterSpareCueSheetDTOList.add(prompterSpareCueSheetDTO);
 
                 seq++;
-            }else { //기사 아이템인 경우
+            } else { //기사 아이템인 경우
 
                 //기사&앵커자막 조회데이터 get
                 List<ArticleCap> articleCapList = article.getArticleCap();
@@ -1487,18 +1475,18 @@ public class InterfaceService {
     }
 
     //프롬프터 기사 자막정보 빌드후 리턴 
-    public PrompterArticleCaps getPrompterArticleCap(List<ArticleCap> articleCapList){
+    public PrompterArticleCaps getPrompterArticleCap(List<ArticleCap> articleCapList) {
 
         PrompterArticleCaps prompterArticleCaps = new PrompterArticleCaps();
         List<PrompterArticleCapDTO> prompterArticleCapDTOList = new ArrayList<>();
 
         //들어온 리스트가 비어있으면 빈 어레이 리스트 리턴.
-        if (CollectionUtils.isEmpty(articleCapList)){
+        if (CollectionUtils.isEmpty(articleCapList)) {
             return prompterArticleCaps;
         }
 
         //기사자막&방송아이콘 정보로 프롬프터에 사용되는 자막정보 빌드
-        for (ArticleCap articleCap: articleCapList){
+        for (ArticleCap articleCap : articleCapList) {
 
             Symbol symbol = articleCap.getSymbol();
 
@@ -1519,18 +1507,18 @@ public class InterfaceService {
     }
 
     //프롬프터 앵커 자막정보 빌드후 리턴
-    public PrompterAnchorCaps getPrompterAnchorCap(List<AnchorCap> anchorCapList){
+    public PrompterAnchorCaps getPrompterAnchorCap(List<AnchorCap> anchorCapList) {
 
         PrompterAnchorCaps prompterAnchorCaps = new PrompterAnchorCaps();
         List<PrompterAnchorCapDTO> prompterAnchorCapDTOList = new ArrayList<>();
 
         //들어온 리스트가 비어있으면 빈 어레이 리스트 리턴.
-        if (CollectionUtils.isEmpty(anchorCapList)){
+        if (CollectionUtils.isEmpty(anchorCapList)) {
             return prompterAnchorCaps;
         }
 
         //앵커자막&방송아이콘 정보로 프롬프터에 사용되는 자막정보 빌드
-        for (AnchorCap anchorCap : anchorCapList){
+        for (AnchorCap anchorCap : anchorCapList) {
 
             Symbol symbol = anchorCap.getSymbol();
 
@@ -1551,7 +1539,7 @@ public class InterfaceService {
 
 
     //테이커 큐시트 아이템 Refresh
-    public TakerCueRefreshDataDTO takerCueItemRefresh(Long rd_id, Integer rd_seq){
+    public TakerCueRefreshDataDTO takerCueItemRefresh(Long rd_id, Integer rd_seq) {
 
         TakerCueRefreshDataDTO takerCueRefreshDataDTO = new TakerCueRefreshDataDTO();//리턴DTO
 
@@ -1577,16 +1565,16 @@ public class InterfaceService {
 
         List<TakerCueSheetSymbolListDTO> videoSymbolList = new ArrayList<>();
         List<TakerCueSheetSymbolListDTO> audioSymbolList = new ArrayList<>();
-        for(CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+        for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
             Symbol symbol = cueSheetItemSymbol.getSymbol();
 
-            if(ObjectUtils.isEmpty(symbol)){
+            if (ObjectUtils.isEmpty(symbol)) {
                 continue;
             }
 
             String typeCode = symbol.getTypCd();
 
-            if ("audio_icons".equals(typeCode)){
+            if ("audio_icons".equals(typeCode)) {
 
                 String symbolId = symbol.getSymbolId();
                 TakerCueSheetSymbolListDTO takerCueSheetSymbolListDTO = TakerCueSheetSymbolListDTO.builder()
@@ -1594,7 +1582,7 @@ public class InterfaceService {
 
                 audioSymbolList.add(takerCueSheetSymbolListDTO);
 
-            }else if ("video_icons".equals(typeCode)){
+            } else if ("video_icons".equals(typeCode)) {
 
                 String symbolId = symbol.getSymbolId();
                 TakerCueSheetSymbolListDTO takerCueSheetSymbolListDTO = TakerCueSheetSymbolListDTO.builder()
@@ -1613,14 +1601,14 @@ public class InterfaceService {
         String returnSymbolId = "";
         String returnSymbolNm = "";
 
-        for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+        for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
             Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
 
-            if (ObjectUtils.isEmpty(symbol) == false){  //심볼이 있을경우
+            if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
                 String symbolId = symbol.getSymbolId(); //심볼아이디
                 String symbolNm = symbol.getSymbolNm(); //심볼 명
 
-                switch(symbolId){ // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                switch (symbolId) { // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
                     case "VNS1":
                         returnSymbolId = symbolId;
                         returnSymbolNm = symbolNm;
@@ -1663,7 +1651,7 @@ public class InterfaceService {
 
             //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
             takerCueSheetDTO = buildTakerCueArticle(cueSheet, cueSheetItem, rd_seq, returnSymbolId
-                    ,returnSymbolNm,  takerArticleVideoDTOList, article, takerCueSheetVideoSymbolDTO, takerCueSheetAudioSymbolDTO);
+                    , returnSymbolNm, takerArticleVideoDTOList, article, takerCueSheetVideoSymbolDTO, takerCueSheetAudioSymbolDTO);
 
             takerCueRefreshDataDTO.setTakerCueSheetDTO(takerCueSheetDTO);
 
@@ -1674,7 +1662,7 @@ public class InterfaceService {
     }
 
     //테이커 큐시트 스페어 아이템 Refresh
-    public TakerSpareCueRefreshDataDTO takerSpareCueItemRefresh(Long rd_id, Integer rd_seq){
+    public TakerSpareCueRefreshDataDTO takerSpareCueItemRefresh(Long rd_id, Integer rd_seq) {
 
         TakerSpareCueRefreshDataDTO takerSpareCueRefreshDataDTO = new TakerSpareCueRefreshDataDTO();//리턴DTO
 
@@ -1700,16 +1688,16 @@ public class InterfaceService {
 
         List<TakerCueSheetSymbolListDTO> videoSymbolList = new ArrayList<>();
         List<TakerCueSheetSymbolListDTO> audioSymbolList = new ArrayList<>();
-        for(CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+        for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
             Symbol symbol = cueSheetItemSymbol.getSymbol();
 
-            if(ObjectUtils.isEmpty(symbol)){
+            if (ObjectUtils.isEmpty(symbol)) {
                 continue;
             }
 
             String typeCode = symbol.getTypCd();
 
-            if ("audio_icons".equals(typeCode)){
+            if ("audio_icons".equals(typeCode)) {
 
                 String symbolId = symbol.getSymbolId();
                 TakerCueSheetSymbolListDTO takerCueSheetSymbolListDTO = TakerCueSheetSymbolListDTO.builder()
@@ -1717,7 +1705,7 @@ public class InterfaceService {
 
                 audioSymbolList.add(takerCueSheetSymbolListDTO);
 
-            }else if ("video_icons".equals(typeCode)){
+            } else if ("video_icons".equals(typeCode)) {
 
                 String symbolId = symbol.getSymbolId();
                 TakerCueSheetSymbolListDTO takerCueSheetSymbolListDTO = TakerCueSheetSymbolListDTO.builder()
@@ -1736,14 +1724,14 @@ public class InterfaceService {
         String returnSymbolId = "";
         String returnSymbolNm = "";
 
-        for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList){
+        for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
             Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
 
-            if (ObjectUtils.isEmpty(symbol) == false){  //심볼이 있을경우
+            if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
                 String symbolId = symbol.getSymbolId(); //심볼아이디
                 String symbolNm = symbol.getSymbolNm(); //심볼 명
 
-                switch(symbolId){ // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                switch (symbolId) { // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
                     case "VNS1":
                         returnSymbolId = symbolId;
                         returnSymbolNm = symbolNm;
@@ -1786,7 +1774,7 @@ public class InterfaceService {
 
             //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
             takerCueSheetDTO = buildTakerCueArticle(cueSheet, cueSheetItem, rd_seq, returnSymbolId
-                    ,returnSymbolNm,  takerArticleVideoDTOList, article, takerCueSheetVideoSymbolDTO, takerCueSheetAudioSymbolDTO);
+                    , returnSymbolNm, takerArticleVideoDTOList, article, takerCueSheetVideoSymbolDTO, takerCueSheetAudioSymbolDTO);
 
             takerSpareCueRefreshDataDTO.setTakerCueSheetDTO(takerCueSheetDTO);
 
@@ -1797,7 +1785,7 @@ public class InterfaceService {
     }
 
     //테이커 큐시트 리플레시 DTO TO XML
-    public String takerCueRefresh(TakerCueRefreshDataDTO takerCueSheetDTO){
+    public String takerCueRefresh(TakerCueRefreshDataDTO takerCueSheetDTO) {
         //큐시트목록 xml을 담는 DTO
         TakerCueRefreshXML takerCueSheetXML = new TakerCueRefreshXML();
         //success="true" msg="ok" 담는DTO
@@ -1827,7 +1815,7 @@ public class InterfaceService {
     }
 
     //테이커 큐시트 리플레시 DTO TO XML
-    public String takerSpareCueRefresh(TakerSpareCueRefreshDataDTO takerSpareCueSheetDTO){
+    public String takerSpareCueRefresh(TakerSpareCueRefreshDataDTO takerSpareCueSheetDTO) {
         //큐시트목록 xml을 담는 DTO
         TakerSpareCueRefreshXML takerSpareCueRefreshXML = new TakerSpareCueRefreshXML();
         //success="true" msg="ok" 담는DTO

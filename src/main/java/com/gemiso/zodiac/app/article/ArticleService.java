@@ -836,7 +836,7 @@ public class ArticleService {
 
         //토픽메세지 ArticleTopicDTO Json으로 변환후 send
         ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
-        articleTopicDTO.setEventId("AL");
+        articleTopicDTO.setEventId("Article Lock");
         articleTopicDTO.setArtclId(artclId);
         //모델부분은 안넣어줘도 될꺼같음.
         articleTopicDTO.setArticle(articleLockDTO);
