@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.articleMedia;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaCreateDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaUpdateDTO;
@@ -40,7 +41,9 @@ public class ArticleMediaController {
                                                          @Parameter(name = "trnsfFileNm", description = "전송 파일 명")
                                                          @RequestParam(value = "trnsfFileNm", required = false) String trnsfFileNm,
                                                          @Parameter(name = "artclId", description = "기사 아이디")
-                                                         @RequestParam(value = "artclId", required = false) Long artclId) throws Exception {
+                                                         @RequestParam(value = "artclId", required = false) Long artclId,
+                                                         @Parameter(name = "mediaTypCd", description = "미디어 유형 코드[media_typ_001 : 영상, media_typ_002 : 백드롭]")
+                                                         @RequestParam(value = "mediaTypCd", required = false) String mediaTypCd) throws Exception {
 
         List<ArticleMediaDTO> articleMediaDTOList = new ArrayList<>();
 
@@ -48,10 +51,10 @@ public class ArticleMediaController {
             //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
             SearchDate searchDate = new SearchDate(sdate, edate);
 
-            articleMediaDTOList = articleMediaService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), trnsfFileNm, artclId);
+            articleMediaDTOList = articleMediaService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), trnsfFileNm, artclId, mediaTypCd);
 
         } else {
-            articleMediaDTOList = articleMediaService.findAll(null, null, trnsfFileNm, artclId);
+            articleMediaDTOList = articleMediaService.findAll(null, null, trnsfFileNm, artclId, mediaTypCd);
         }
         return new AnsApiResponse<>(articleMediaDTOList);
     }
@@ -70,7 +73,7 @@ public class ArticleMediaController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<ArticleMediaDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                  @RequestBody @Valid ArticleMediaCreateDTO articleMediaCreateDTO) {
+                                                  @RequestBody @Valid ArticleMediaCreateDTO articleMediaCreateDTO) throws JsonProcessingException {
 
         Long artclMediaId = articleMediaService.create(articleMediaCreateDTO);
 

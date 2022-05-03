@@ -23,7 +23,7 @@ public class CueSheetMediaCreateDTO {
     private int mediaOrd;
     private int contId;
     private String trnsfFileNm;
-    private String mediaDurtn;
+    private Integer mediaDurtn;
     private Date mediaMtchDtm;
     private String trnsfStCd;
     private String assnStCd;
@@ -31,6 +31,8 @@ public class CueSheetMediaCreateDTO {
     private String videoEdtrId;
     private String inputrId;
     private String cueMediaTitl;
+    private String videoId;
+    private Integer trnasfVal;
     @NotNull
     private CueSheetItemSimpleDTO cueSheetItem;
 }

@@ -33,7 +33,7 @@ public class ArticleMediaDTO {
     @Schema(description = "전송 파일 명")
     private String trnsfFileNm;
     @Schema(description = "미디어 길이")
-    private String mediaDurtn;
+    private Integer mediaDurtn;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "미디어 매칭 일시")
     private Date mediaMtchDtm;
@@ -76,6 +76,8 @@ public class ArticleMediaDTO {
     private String artclMediaTitl;
     @Schema(description = "비디오 아이디")
     private String videoId;
+    @Schema(description = "전송률")
+    private Integer trnasfVal;
     @Schema(description = "기사 아이디")
     private ArticleSimpleDTO article;
 }

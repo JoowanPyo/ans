@@ -169,7 +169,7 @@ public class CueSheetController {
                                                           @Parameter(name = "brdcPgmId", description = "프로그램 아이디")
                                                           @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
                                                           @Parameter(name = "brdcDt", description = "방송일자")
-                                                          @RequestParam(value = "brdcDt", required = false) String brdcDt) {
+                                                          @RequestParam(value = "brdcDt", required = false) String brdcDt) throws Exception {
 
         //오더버전?
         //토픽메세지

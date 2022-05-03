@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.dailyProgram;
 
+import com.gemiso.zodiac.app.baseProgram.BaseProgram;
 import com.gemiso.zodiac.app.program.Program;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -94,5 +95,9 @@ public class DailyProgram{
     @ManyToOne
     @JoinColumn(name = "brdc_pgm_id")
     private Program program;
+
+    @ManyToOne
+    @JoinColumn(name = "bas_pgmsch_id")
+    private BaseProgram baseProgram;
 
 }

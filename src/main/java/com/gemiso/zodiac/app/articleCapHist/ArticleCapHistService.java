@@ -42,7 +42,7 @@ public class ArticleCapHistService {
 
         QArticleCapHist qArticleCapHist = QArticleCapHist.articleCapHist;
 
-        if (ObjectUtils.isEmpty(artclHistId)){
+        if (ObjectUtils.isEmpty(artclHistId) == false){
             booleanBuilder.and(qArticleCapHist.articleHist.artclHistId.eq(artclHistId));
         }
 

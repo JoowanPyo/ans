@@ -23,7 +23,7 @@ public class CueSheetMediaUpdateDTO {
     private int mediaOrd;
     private int contId;
     private String trnsfFileNm;
-    private String mediaDurtn;
+    private Integer mediaDurtn;
     private Date mediaMtchDtm;
     private String trnsfStCd;
     //private String trnsfStCdNm;
@@ -42,5 +42,7 @@ public class CueSheetMediaUpdateDTO {
     //private String updtrNm;
     //private String delrNm;
     private String cueMediaTitl;
+    private String videoId;
+    private Integer trnasfVal;
     private CueSheetItemSimpleDTO cueSheetItem;
 }

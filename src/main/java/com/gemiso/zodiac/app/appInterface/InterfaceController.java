@@ -8,6 +8,7 @@ import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDataDT
 import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerCueRefreshDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerSpareCueRefreshDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
+import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetFindAllDTO;
@@ -172,7 +173,7 @@ public class InterfaceController {
 
             returnData = interfaceService.takerCueRefresh(takerCueSheetDTO);
 
-        }else {
+        } else {
 
             TakerSpareCueRefreshDataDTO takerSpareCueSheetDTO = interfaceService.takerSpareCueItemRefresh(rd_id, rd_seq);
 
@@ -341,5 +342,37 @@ public class InterfaceController {
         CueSheetDTO cueSheetDTO = cueSheetService.find(cueId);
 
         return new AnsApiResponse<>(cueSheetDTO);
+    }
+
+    @Operation(summary = "테이커 방송중 상태 업데이트[ on_air ]", description = "테이커 방송중 상태 업데이트[ on_air ]")
+    @PutMapping(path = "/cuestcdupdate")
+    public String cueStCdUpdate(@Parameter(name = "cueId", description = "큐시트 아이디")
+                                                     @RequestParam(value = "cueId", required = false) Long cueId,
+                                                     @Parameter(name = "cueStCd", description = "방송상태 코드 [ on_air : 방송중]")
+                                                     @RequestParam(value = "cueStCd", required = false) String cueStCd,
+                                                     @RequestHeader(value = "securityKey") String securityKey) {
+
+
+        ParentProgramDTO parentProgramDTO = interfaceService.cueStCdUpdate(cueId, cueStCd);
+
+        String takerCueSheetDTO = interfaceService.takerPgmToXmlOne(parentProgramDTO);
+
+        return takerCueSheetDTO;
+    }
+
+    @Operation(summary = "영상 전송 상태 업데이트", description = "영상 전송 상태 업데이트")
+    @PutMapping(path = "/mediatransfer/updatestate")
+    public AnsApiResponse<?> stateChange(@Parameter(name = "contentId", description = "콘텐츠 아이디.")
+                                         @RequestParam(value = "contentId", required = false) Integer contentId,
+                                         @Parameter(name = "trnasfVal", description = "전송률.")
+                                         @RequestParam(value = "trnasfVal", required = false) Integer trnasfVal,
+                                         @Parameter(name = "mediaTypCd", description = "match_ready:준비됨, match_inprocess : 시작됨,<br> " +
+                                                 "match_failed : 실패, match_completed : 완료")
+                                         @RequestParam(value = "mediaTypCd", required = false) String mediaTypCd,
+                                         @RequestHeader(value = "securityKey") String securityKey) {
+
+
+        interfaceService.stateChange(contentId, mediaTypCd, trnasfVal);
+        return new AnsApiResponse<>("complete");
     }
 }

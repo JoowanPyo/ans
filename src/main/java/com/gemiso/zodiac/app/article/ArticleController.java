@@ -168,12 +168,15 @@ public class ArticleController {
     public AnsApiResponse<ArticleSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                                    @RequestBody @Valid ArticleCreateDTO articleCreateDTO) throws Exception {
 
+        log.info( "Article Create DTO : " + articleCreateDTO);
+
         Long artclId = articleService.create(articleCreateDTO);
 
         //기사 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
         articleDTO.setArtclId(artclId);
 
+        log.info( "Article Create ID : " + articleDTO);
 
         return new AnsApiResponse<>(articleDTO);
     }
@@ -184,6 +187,8 @@ public class ArticleController {
                                                    @RequestBody @Valid ArticleUpdateDTO articleUpdateDTO,
                                                    @Parameter(name = "artclId", required = true, description = "기사 아이디")
                                                    @PathVariable("artclId") Long artclId) throws Exception {
+
+        log.info( "Article Update DTO : " + articleUpdateDTO);
 
         //수정. 잠금사용자확인
         if (articleService.chkOrderLock(artclId)) {
@@ -197,6 +202,8 @@ public class ArticleController {
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
         articleDTO.setArtclId(artclId);
 
+        log.info( "Article Update Create : " + articleDTO);
+
         return new AnsApiResponse<>(articleDTO);
 
     }
@@ -206,6 +213,8 @@ public class ArticleController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "artclId", required = true, description = "기사 아이디")
                                     @PathVariable("artclId") Long artclId) throws Exception {
+
+        log.info( "Article Delete Id : " + artclId);
 
         articleService.delete(artclId);
 

@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.article.dto;
 
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,6 +32,12 @@ public class ArticleSimpleDTO {
     private String artclTitl;
     @Schema(description = "영문 기사 제목")
     private String artclTitlEn;
+    @Schema(description = "원본 기사 아이디")
+    private Long orgArtclId;
+    @Schema(description = "기사 순번")
+    private Integer artclOrd;
+    @Schema(description = "큐시트")
+    private CueSheetSimpleDTO cueSheet;
     /*private String artclCtt;
     private String ancMentCtt;
     private String rptrNm;
@@ -40,9 +47,9 @@ public class ArticleSimpleDTO {
     private String lckYn;
     private Date lckDtm;
     private Date apprvDtm;
-    private Integer artclOrd;
+
     private Integer brdcCnt;
-    private Long orgArtclId;
+
     private String urgYn;
     private String frnotiYn;
     private String embgYn;

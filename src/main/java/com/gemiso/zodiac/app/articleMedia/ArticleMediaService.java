@@ -1,12 +1,18 @@
 package com.gemiso.zodiac.app.articleMedia;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaCreateDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaUpdateDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaCreateMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaUpdateMapper;
+import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.core.topic.TopicService;
+import com.gemiso.zodiac.core.topic.articleTopicDTO.TakerCueSheetTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -35,10 +41,14 @@ public class ArticleMediaService {
 
     private final UserAuthService userAuthService;
 
+    private final TopicService topicService;
 
-    public List<ArticleMediaDTO> findAll(Date sdate, Date edate, String trnsfFileNm, Long artclId) {
+    private final MarshallingJsonHelper marshallingJsonHelper;
 
-        BooleanBuilder booleanBuilder = getSearch(sdate, edate, trnsfFileNm, artclId);
+
+    public List<ArticleMediaDTO> findAll(Date sdate, Date edate, String trnsfFileNm, Long artclId, String mediaTypCd) {
+
+        BooleanBuilder booleanBuilder = getSearch(sdate, edate, trnsfFileNm, artclId, mediaTypCd);
 
         List<ArticleMedia> articleMediaList = (List<ArticleMedia>) articleMediaRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "mediaOrd"));
 
@@ -57,7 +67,7 @@ public class ArticleMediaService {
 
     }
 
-    public Long create(ArticleMediaCreateDTO articleMediaCreateDTO) {
+    public Long create(ArticleMediaCreateDTO articleMediaCreateDTO) throws JsonProcessingException {
 
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
@@ -68,7 +78,52 @@ public class ArticleMediaService {
 
         articleMediaRepository.save(articleMedia);
 
+        /********** MQ [TOPIC] ************/
+        Article article = articleMedia.getArticle();
+        Long articleId = null;
+        if (ObjectUtils.isEmpty(article) == false){
+            articleId = article.getArtclId();
+        }
+
+        sendCueTopicCreate(null, null, null , articleId, null, "Article Media Create",
+                null, "Y", "Y");
+
         return articleMedia.getArtclMediaId();
+
+    }
+
+    //큐시트 토픽 메세지 전송
+    public void sendCueTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
+                                   String spareYn, String prompterFlag, String videoTakerFlag) throws JsonProcessingException {
+
+        Integer cueVer = 0;
+        Integer cueOderVer = 0;
+        if (ObjectUtils.isEmpty(cueSheet) == false){
+
+            cueVer = cueSheet.getCueVer();
+            cueOderVer = cueSheet.getCueOderVer();
+
+        }
+
+        //토픽메세지 ArticleTopicDTO Json으로 변환후 send
+        TakerCueSheetTopicDTO takerCueSheetTopicDTO = new TakerCueSheetTopicDTO();
+        //모델부분은 안넣어줘도 될꺼같음.
+        takerCueSheetTopicDTO.setEvent_id(eventId);
+        takerCueSheetTopicDTO.setCue_id(cueId);
+        takerCueSheetTopicDTO.setCue_ver(cueVer);
+        takerCueSheetTopicDTO.setCue_oder_ver(cueOderVer);
+        takerCueSheetTopicDTO.setCue_item_id(cueItemId); //변경된 내용 추가
+        takerCueSheetTopicDTO.setArtcl_id(artclId);
+        takerCueSheetTopicDTO.setCue_tmplt_id(cueTmpltId);
+        takerCueSheetTopicDTO.setSpare_yn(spareYn);
+        takerCueSheetTopicDTO.setPrompter(prompterFlag);
+        takerCueSheetTopicDTO.setVideo_taker(videoTakerFlag);
+        String json = marshallingJsonHelper.MarshallingJson(takerCueSheetTopicDTO);
+
+        //interface에 큐메세지 전송
+        topicService.topicInterface(json);
+        //web에 큐메세지 전송
+        topicService.topicWeb(json);
 
     }
 
@@ -115,7 +170,7 @@ public class ArticleMediaService {
         return articleMedia.get();
     }
 
-    public BooleanBuilder getSearch(Date sdate, Date edate, String trnsfFileNm, Long artclId) {
+    public BooleanBuilder getSearch(Date sdate, Date edate, String trnsfFileNm, Long artclId, String mediaTypCd) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -131,6 +186,10 @@ public class ArticleMediaService {
         }
         if (ObjectUtils.isEmpty(artclId) == false){
             booleanBuilder.and(qArticleMedia.article.artclId.eq(artclId));
+        }
+
+        if (mediaTypCd != null && mediaTypCd.trim().isEmpty() == false){
+            booleanBuilder.and(qArticleMedia.mediaTypCd.eq(mediaTypCd));
         }
 
 

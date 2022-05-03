@@ -6,10 +6,7 @@ import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
-import com.gemiso.zodiac.app.lbox.mediaTransportDTO.ClipInfoDTO;
-import com.gemiso.zodiac.app.lbox.mediaTransportDTO.MediaTransportDataDTO;
-import com.gemiso.zodiac.app.lbox.mediaTransportDTO.ResponsMediaTransportDTO;
-import com.gemiso.zodiac.app.lbox.mediaTransportDTO.TasksDTO;
+import com.gemiso.zodiac.app.lbox.mediaTransportDTO.*;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +18,11 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -137,7 +136,10 @@ public class LboxService {
     }
 
     //부조 전송
-    public ArticleMediaDTO mediaTransfer(Long mediaId, Integer contentId, String subrmNm, String destination, Boolean isUrgent, Boolean isRetry) throws JsonProcessingException {
+    public TransportResponseDTO mediaTransfer(Long mediaId, Integer contentId, String subrmNm, String destination, Boolean isUrgent, Boolean isRetry) throws JsonProcessingException {
+
+        TransportResponseDTO transportResponseDTO = new TransportResponseDTO(); //리턴해줄 미디어정보, 오류내용 [전송 오류가 있을시.]
+        List<TransportFaildDTO> transportFaildDTOList = new ArrayList<>(); //부조전송시 오류가 있을시 오류내용 Respons
 
         String userId = userAuthService.authUser.getUserId();
 
@@ -146,19 +148,19 @@ public class LboxService {
         httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
         int tasksCount = 0;
+        int clipInfoCount = 0;
         ClipInfoDTO clipInfoDTO = new ClipInfoDTO();
-
         List<String> destinations = new ArrayList<>();
 
-        switch (destination) { // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+        switch (destination) {
             case "T":
                 //test 용으로 클라우트 콘피그 구현시 교체
-                if ("A".equals(subrmNm)){
+                if ("A".equals(subrmNm)) {
                     destinations.add("NS");
                     destinations.add("PS_A");
                     destinations.add("PS_B");
 
-                }else if("B".equals(subrmNm)) {
+                } else if ("B".equals(subrmNm)) {
                     destinations.add("NS");
                     destinations.add("PS_A");
                     destinations.add("PS_B");
@@ -166,12 +168,12 @@ public class LboxService {
                 }
                 break;
             case "P":
-                if ("A".equals(subrmNm)){
+                if ("A".equals(subrmNm)) {
                     //destinations.add("NS");
                     destinations.add("PS_A");
                     destinations.add("PS_B");
 
-                }else if("B".equals(subrmNm)) {
+                } else if ("B".equals(subrmNm)) {
                     //destinations.add("NS");
                     destinations.add("PS_A");
                     destinations.add("PS_B");
@@ -179,12 +181,12 @@ public class LboxService {
                 }
                 break;
             case "N":
-                if ("A".equals(subrmNm)){
+                if ("A".equals(subrmNm)) {
                     destinations.add("NS");
                     //destinations.add("PS_A");
                     //destinations.add("PS_B");
 
-                }else if("B".equals(subrmNm)) {
+                } else if ("B".equals(subrmNm)) {
                     destinations.add("NS");
                     //destinations.add("PS_A");
                     //destinations.add("PS_B");
@@ -193,10 +195,15 @@ public class LboxService {
                 break;
         }
 
+        String faildDest = ""; //실패된 전송대상명
 
+        if (CollectionUtils.isEmpty(destinations)){
+            throw new ResourceNotFoundException(subrmNm +"부조에 대한 전송대상이 없습니다. ");
+        }
 
         for (String dest : destinations) {
 
+            faildDest = dest;
 
             //Object Mapper를 통한 Json바인딩할 dmParam생성
             Map<String, Object> params = new HashMap<>();
@@ -213,52 +220,71 @@ public class LboxService {
             //httpEntity에 헤더 및 params 설정
             HttpEntity entity = new HttpEntity(param, httpHeaders);
 
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<ResponsMediaTransportDTO> responseEntity =
-                    restTemplate.exchange(namUrl + "api/ans/v2/transfer-scr", HttpMethod.POST,
-                            entity, ResponsMediaTransportDTO.class);
+            ResponsMediaTransportDTO responsBody = new ResponsMediaTransportDTO();
 
-            ResponsMediaTransportDTO responsBody = responseEntity.getBody();
+            try {
 
-            log.info("Destination : "+ destination + "Response Data : "+ responsBody);
+                RestTemplate restTemplate = new RestTemplate();
+                ResponseEntity<ResponsMediaTransportDTO> responseEntity =
+                        restTemplate.exchange(namUrl + "api/ans/v2/transfer-scr", HttpMethod.POST,
+                                entity, ResponsMediaTransportDTO.class);
 
-            MediaTransportDataDTO data = responsBody.getData();
-            clipInfoDTO = data.getClip_info(); //이미 전송된 영상이거나 전송완료인 영상 데이터DTO
-            List<TasksDTO> tasksDTO = data.getTasks(); //전송시작시 데이터
+                responsBody = responseEntity.getBody();
 
-            if (CollectionUtils.isEmpty(tasksDTO) == false) {
+                log.info("Destination : " + destination + "Response Data : " + responsBody);
 
-                ++tasksCount; //전송중이 한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
+                MediaTransportDataDTO data = responsBody.getData();
+                clipInfoDTO = data.getClip_info(); //이미 전송된 영상이거나 전송완료인 영상 데이터DTO
+                List<TasksDTO> tasksDTO = data.getTasks(); //전송시작시 데이터
 
+                if (CollectionUtils.isEmpty(tasksDTO) == false) {
+                    ++tasksCount; //전송중이 한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
+                }
+                if (ObjectUtils.isEmpty(clipInfoDTO) == false){
+                    ++clipInfoCount;//이미전송된 파일이  한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
+                }
+
+            } catch (Exception e) { //부조 전송오류가 있을시,
+
+                TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
+                transportFaildDTO.setMessage(e.getMessage()); //오류 메시지
+                transportFaildDTO.setSubrmNm(subrmNm); //부조 명
+                transportFaildDTO.setDestination(faildDest); // 전송대상
+
+                transportFaildDTOList.add(transportFaildDTO);
             }
         }
-
 
         ArticleMedia articleMedia = findArticleMedia(mediaId);
         ArticleMediaDTO articleMediaDTO = articleMediaMapper.toDto(articleMedia);
 
         //전송중 값이 1개라도 체크가 되어있는 경우
-        if (tasksCount > 0) {
+        if (tasksCount > 0 ) {
 
             //기사 미디어 부조 전송 시작.
 
-            articleMediaDTO.setMediaTypCd("match_ready"); //전송시작 코드
+            articleMediaDTO.setTrnsfStCd("match_ready"); //전송시작 코드
             articleMediaMapper.updateFromDto(articleMediaDTO, articleMedia); //기존 기사미디어 정보에 업데이트 정보 업데이트
             articleMediaRepository.save(articleMedia); //수정
 
-        }else {
+            transportResponseDTO.setArticleMediaDTO(articleMediaDTO);// 셋팅된 미디어정보
+
+        } else if (clipInfoCount > 0 && tasksCount == 0){ //전송중 값이 0개이고 전송완료값이 0보다 크면 전송완료값으로 셋팅
 
             //기사 미디어 부조 전송 완료(이미 전송된 영상)
             articleMediaDTO.setTrnsfFileNm(clipInfoDTO.getFilename()); //전송완료된 파일네임(0001 ~ 9999 + .mxf)
-            articleMediaDTO.setMediaTypCd("match_completed"); //전송완료 코드
+            articleMediaDTO.setTrnsfStCd("match_completed"); //전송완료 코드
             articleMediaMapper.updateFromDto(articleMediaDTO, articleMedia); //기존 기사미디어 정보에 업데이트 정보 업데이트
             articleMediaRepository.save(articleMedia); //수정
+
+            transportResponseDTO.setArticleMediaDTO(articleMediaDTO); // 셋팅된 미디어정보
         }
 
-        log.info("Destination : "+ destination + "변경된 미디어 정보 : " + articleMedia);
+        transportResponseDTO.setTransportFaild(transportFaildDTOList);
 
+        log.info("Destination : " + destination + "변경된 미디어 정보 : " + articleMedia + " 에러정보 : "+ transportFaildDTOList);
 
-        return articleMediaDTO;
+        return transportResponseDTO;
 
     }
 
@@ -275,7 +301,7 @@ public class LboxService {
     }
 
 
-    //전송상태 업데이트
+  /*  //전송상태 업데이트
     public void stateChange(Integer contentId, String videoId,String trnsfFileNm, String mediaTypCd){
 
         //콘텐츠아이디 + 비디오아이디 로 기사 미디어 검색.
@@ -295,7 +321,7 @@ public class LboxService {
         }
 
 
-    }
+    }*/
 }
 
 

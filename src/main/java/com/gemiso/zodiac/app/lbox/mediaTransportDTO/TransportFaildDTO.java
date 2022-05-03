@@ -5,15 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponsMediaTransportDTO {
+public class TransportFaildDTO {
 
-    private Integer status;
-    private String success;
-    private MediaTransportDataDTO data;
+    private String message;
+    private String subrmNm;
+    private String destination;
 }

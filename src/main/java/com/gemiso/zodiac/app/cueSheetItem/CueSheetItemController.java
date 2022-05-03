@@ -178,6 +178,8 @@ public class CueSheetItemController {
                                                                @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
                                                                @RequestParam(value = "spareYn", required = false) String spareYn) throws Exception {
 
+        log.info("Drag and Drop Request : " +"cueId : "+cueId+" ");
+
         cueSheetItemService.createCueItem(cueId, artclId, cueItemOrd, cueItemDivCd, spareYn);
 
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);

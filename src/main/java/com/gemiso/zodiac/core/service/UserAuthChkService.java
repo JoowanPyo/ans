@@ -5,6 +5,7 @@ import com.gemiso.zodiac.app.userGroupUser.UserGroupUserRepository;
 import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuth;
 import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuthRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserAuthChkService {
 
     private final UserGroupUserRepository userGroupUserRepository;
@@ -25,6 +27,8 @@ public class UserAuthChkService {
 
         //사용자 토큰 정보에서 사용자 아이디를 get
         String userId = userAuthService.authUser.getUserId();
+
+        log.info( "User Auth Check : UserId : "+userId );
 
         // 사용자에 대한 그룹 정보
         List<UserGroupUser> userGroupUserList = userGroupUserRepository.findByUserId(userId);
@@ -62,6 +66,8 @@ public class UserAuthChkService {
 
         // 사용자에 대한 그룹 정보
         List<UserGroupUser> userGroupUserList = userGroupUserRepository.findByUserId(userId);
+
+        log.info( "User Auth Check : UserId : "+userId );
 
         List<String> appAuthList = new ArrayList<>();//리턴할 권한 List
         Long[] appAuthArr = new Long[userGroupUserList.size()]; //inquery로 조회할 유저그룹아이디 LongArray

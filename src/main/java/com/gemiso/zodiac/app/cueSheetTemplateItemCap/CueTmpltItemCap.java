@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItemCap;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
 import com.gemiso.zodiac.app.symbol.Symbol;
@@ -23,6 +24,7 @@ import java.util.Date;
 @ToString(exclude = {"capTemplate","cueTmpltItem"})
 @Setter
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CueTmpltItemCap extends BaseEntity {
 
     @Id

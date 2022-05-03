@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.dailyProgram.dto;
 
+import com.gemiso.zodiac.app.baseProgram.dto.BaseProgramSimpleDTO;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
@@ -38,4 +39,5 @@ public class DailyProgramUpdateDTO {
     //private String updtrNm;
     private String brdcRunTime;
     private ProgramDTO program;
+    private BaseProgramSimpleDTO baseProgram;
 }

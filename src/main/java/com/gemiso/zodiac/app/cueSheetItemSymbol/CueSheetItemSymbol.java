@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.app.cueSheetItemSymbol;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.user.User;
@@ -17,6 +19,7 @@ import javax.persistence.*;
 @Setter
 @ToString(exclude ={"cueSheetItem", "symbol"})
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CueSheetItemSymbol {
 
     @Id
@@ -28,6 +31,7 @@ public class CueSheetItemSymbol {
            action = NotFoundAction.IGNORE)*/
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cue_item_id")
+    @JsonBackReference
     private CueSheetItem cueSheetItem;
 
     /*@NotFound(

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.article.dto.ArticleAuthConfirmDTO;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
+import com.gemiso.zodiac.app.lbox.mediaTransportDTO.TransportResponseDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,12 +77,12 @@ public class LboxController {
 
     @Operation(summary = "부조 전송", description = "부조 전송")
     @PutMapping(path = "/mediatransfer/{mediaId}")
-    public AnsApiResponse<ArticleMediaDTO> mediaTransfer(@Parameter(name = "mediaId", required = true, description = "미디어 아이디")
+    public AnsApiResponse<TransportResponseDTO> mediaTransfer(@Parameter(name = "mediaId", required = true, description = "미디어 아이디")
                                                          @PathVariable("mediaId") Long mediaId,
                                                          @Parameter(name = "contentId", description = "콘텐츠 아이디")
-                                                         @RequestParam(value = "contentId", required = false) Integer contentId,
+                                                         @RequestParam(value = "contentId", required = true) Integer contentId,
                                                          @Parameter(name = "subrmNm", description = "부조명")
-                                                         @RequestParam(value = "subrmNm", required = false) String subrmNm,
+                                                         @RequestParam(value = "subrmNm", required = true) String subrmNm,
                                                                 /*@Parameter(name = "destinations", description = "전송대상(NS, PS_A, PS_B, PS_C) required.")
                                                                 @RequestParam(value = "destinations", required = false) List<String> destinations,*/
                                                          @Parameter(name = "isUrgent", description = "긴급 여부")
@@ -93,20 +94,20 @@ public class LboxController {
                 " 부조명 : "+subrmNm+" 긴급 여부 : "+isUrgent+" 재전송 여부 : "+isRetry);
 
         String destinations = "T";
-        ArticleMediaDTO articleMediaDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
+        TransportResponseDTO transportResponseDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
 
 
-        return new AnsApiResponse<>(articleMediaDTO);
+        return new AnsApiResponse<>(transportResponseDTO);
     }
 
     @Operation(summary = "PS 긴급전송", description = "PS 긴급전송")
     @PutMapping(path = "/mediatransfer/{mediaId}/psemergency")
-    public AnsApiResponse<ArticleMediaDTO> PsEmergencyTransfer(@Parameter(name = "mediaId", required = true, description = "미디어 아이디")
+    public AnsApiResponse<TransportResponseDTO> PsEmergencyTransfer(@Parameter(name = "mediaId", required = true, description = "미디어 아이디")
                                                                @PathVariable("mediaId") Long mediaId,
                                                                @Parameter(name = "contentId", description = "콘텐츠 아이디")
-                                                               @RequestParam(value = "contentId", required = false) Integer contentId,
+                                                               @RequestParam(value = "contentId", required = true) Integer contentId,
                                                                @Parameter(name = "subrmNm", description = "부조명")
-                                                               @RequestParam(value = "subrmNm", required = false) String subrmNm,
+                                                               @RequestParam(value = "subrmNm", required = true) String subrmNm,
                                                                 /*@Parameter(name = "destinations", description = "전송대상(NS, PS_A, PS_B, PS_C) required.")
                                                                 @RequestParam(value = "destinations", required = false) List<String> destinations,*/
                                                                @Parameter(name = "isUrgent", description = "긴급 여부")
@@ -118,20 +119,20 @@ public class LboxController {
                 " 부조명 : "+subrmNm+" 긴급 여부 : "+isUrgent+" 재전송 여부 : "+isRetry);
 
         String destinations = "P";
-        ArticleMediaDTO articleMediaDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
+        TransportResponseDTO transportResponseDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
 
 
-        return new AnsApiResponse<>(articleMediaDTO);
+        return new AnsApiResponse<>(transportResponseDTO);
     }
 
     @Operation(summary = "NS 긴급전송", description = "NS 긴급전송")
     @PutMapping(path = "/mediatransfer/{mediaId}/nsemergency")
-    public AnsApiResponse<ArticleMediaDTO> NsEmergencyTransfer(@Parameter(name = "mediaId", required = true, description = "미디어 아이디")
+    public AnsApiResponse<TransportResponseDTO> NsEmergencyTransfer(@Parameter(name = "mediaId", required = true, description = "미디어 아이디")
                                                                @PathVariable("mediaId") Long mediaId,
                                                                @Parameter(name = "contentId", description = "콘텐츠 아이디")
-                                                               @RequestParam(value = "contentId", required = false) Integer contentId,
+                                                               @RequestParam(value = "contentId", required = true) Integer contentId,
                                                                @Parameter(name = "subrmNm", description = "부조명")
-                                                               @RequestParam(value = "subrmNm", required = false) String subrmNm,
+                                                               @RequestParam(value = "subrmNm", required = true) String subrmNm,
                                                                 /*@Parameter(name = "destinations", description = "전송대상(NS, PS_A, PS_B, PS_C) required.")
                                                                 @RequestParam(value = "destinations", required = false) List<String> destinations,*/
                                                                @Parameter(name = "isUrgent", description = "긴급 여부")
@@ -143,13 +144,14 @@ public class LboxController {
                 " 부조명 : "+subrmNm+" 긴급 여부 : "+isUrgent+" 재전송 여부 : "+isRetry);
 
         String destinations = "N";
-        ArticleMediaDTO articleMediaDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
+        TransportResponseDTO transportResponseDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
 
 
-        return new AnsApiResponse<>(articleMediaDTO);
+        return new AnsApiResponse<>(transportResponseDTO);
     }
 
-    @Operation(summary = "영상 전송 상태 업데이트", description = "영상 전송 상태 업데이트")
+    //외부연동으로 외부연동 클래스로 이동[InterfaceController]
+   /* @Operation(summary = "영상 전송 상태 업데이트", description = "영상 전송 상태 업데이트")
     @PutMapping(path = "/mediatransfer/updatestate")
     public AnsApiResponse<?> stateChange(@Parameter(name = "contentId", description = "콘텐츠 아이디.")
                                          @RequestParam(value = "contentId", required = false) Integer contentId,
@@ -164,7 +166,7 @@ public class LboxController {
 
         lboxService.stateChange(contentId, videoId, trnsfFileNm, mediaTypCd);
         return null;
-    }
+    }*/
 
 
 }

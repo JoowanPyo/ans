@@ -111,7 +111,8 @@ public class CueSheetItemService {
         //큐시트 아이템 조회
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
         //큐시트 아이템 방송아이콘 List 조회
-        List<CueSheetItemSymbol> cueSheetItemSymbol = cueSheetItemSymbolRepository.findSymbol(cueItemId);
+        List<CueSheetItemSymbol> cueSheetItemSymbol = cueSheetItem.getCueSheetItemSymbol();
+        //List<CueSheetItemSymbol> cueSheetItemSymbol = cueSheetItemSymbolRepository.findSymbol(cueItemId);
 
         List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTO = cueSheetItemSymbolMapper.toDtoList(cueSheetItemSymbol);
 
@@ -879,6 +880,23 @@ public class CueSheetItemService {
 
         Long orgArtclId = article.getOrgArtclId();//원본기사 아이디
 
+        String getOrgApprvDivCd = article.getApprvDivCd(); //원본 픽스구분 코드를 가져온다.
+        String artclFixUser = article.getArtclFixUser(); // 원본 기사 픽스자를 가져온다
+        String editorFixUser = article.getEditorFixUser(); // 원본 에디터 픽스자를 가져온다
+        String newApprvDivCd = ""; //복사본에 대입해줄 픽스구분코드
+
+        //원본 픽스구분값이 앵커픽스,데이커 픽스일 경우 article_fix, editor_fix 로변경
+        //에디터 픽스자가 있을경우 에디터픽스로, 아닐경우 기사픽스로 셋팅
+        if ("anchor_fix".equals(getOrgApprvDivCd) || "desk_fix".equals(getOrgApprvDivCd)){
+
+            if (editorFixUser != null && editorFixUser.trim().isEmpty() == false){
+                newApprvDivCd = "editor_fix";
+            }else {
+                newApprvDivCd = "article_fix";
+            }
+
+        }
+
         if (ObjectUtils.isEmpty(orgArtclId)) { //원본기사가 아이디가없고 최초 복사일시
 
             return Article.builder()
@@ -887,7 +905,7 @@ public class CueSheetItemService {
                     .artclFrmCd(article.getArtclFrmCd())
                     .artclDivCd(article.getArtclDivCd())
                     .artclFldCd(article.getArtclFldCd())
-                    .apprvDivCd(article.getApprvDivCd())
+                    .apprvDivCd(newApprvDivCd)//픽스구분코트
                     .prdDivCd(article.getPrdDivCd())
                     .artclTypCd(article.getArtclTypCd())
                     .artclTypDtlCd(article.getArtclTypDtlCd())
@@ -948,7 +966,7 @@ public class CueSheetItemService {
                     .artclFrmCd(article.getArtclFrmCd())
                     .artclDivCd(article.getArtclDivCd())
                     .artclFldCd(article.getArtclFldCd())
-                    .apprvDivCd(article.getApprvDivCd())
+                    .apprvDivCd(newApprvDivCd) //픽스구분코트
                     .prdDivCd(article.getPrdDivCd())
                     .artclTypCd(article.getArtclTypCd())
                     .artclTypDtlCd(article.getArtclTypDtlCd())
@@ -1050,6 +1068,8 @@ public class CueSheetItemService {
                 .updtrId(articleMedia.getUpdtrId())
                 .delrId(articleMedia.getDelrId())
                 .videoEdtrId(articleMedia.getVideoEdtrId())
+                .videoId(articleMedia.getVideoId())
+                .artclMediaTitl(articleMedia.getArtclMediaTitl())
                 .article(articleEntity)
                 .build();
     }

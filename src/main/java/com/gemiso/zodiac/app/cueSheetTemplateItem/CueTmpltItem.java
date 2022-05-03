@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItem;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
@@ -26,6 +27,7 @@ import java.util.List;
 @ToString(exclude = {"cueSheetTemplate"})
 @Setter
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CueTmpltItem extends BaseEntity {
 
     @Id

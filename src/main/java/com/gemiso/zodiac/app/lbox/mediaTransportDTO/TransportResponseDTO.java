@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.lbox.mediaTransportDTO;
 
+import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,9 +12,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponsMediaTransportDTO {
+public class TransportResponseDTO {
 
-    private Integer status;
-    private String success;
-    private MediaTransportDataDTO data;
+
+    private ArticleMediaDTO articleMediaDTO;
+    private List<TransportFaildDTO> transportFaild;
 }

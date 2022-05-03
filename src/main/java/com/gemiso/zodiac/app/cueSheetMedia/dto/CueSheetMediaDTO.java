@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import java.util.Date;
 
 @Data
@@ -27,7 +28,7 @@ public class CueSheetMediaDTO {
     private int mediaOrd;
     private int contId;
     private String trnsfFileNm;
-    private String mediaDurtn;
+    private Integer mediaDurtn;
     private Date mediaMtchDtm;
     private String trnsfStCd;
     private String trnsfStCdNm;
@@ -49,6 +50,8 @@ public class CueSheetMediaDTO {
     private String updtrNm;
     private String delrNm;
     private String cueMediaTitl;
+    private String videoId;
+    private Integer trnasfVal;
     private CueSheetItemSimpleDTO cueSheetItem;
 
 }

@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheet;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.baseProgram.BaseProgram;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
@@ -27,6 +28,7 @@ import java.util.List;
 @Setter
 @DynamicUpdate
 @EntityListeners(value = {AuditingEntityListener.class})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CueSheet {
 
     @Id

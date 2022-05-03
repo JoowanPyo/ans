@@ -68,8 +68,8 @@ public class CueSheetDTO {
     private String td2Nm;
     private String remark;
     private String brdcRunTime;
-    private int cueVer;
-    private int cueOderVer;
+    private Integer cueVer;
+    private Integer cueOderVer;
     private ProgramDTO program;
     private BaseProgramSimpleDTO baseProgram;
     private List<CueSheetItemDTO> cueSheetItem = new ArrayList<>();

@@ -49,8 +49,8 @@ public class ArticleMedia extends BaseEntity {
     @Column(name = "trnsf_file_nm", length = 255)
     private String trnsfFileNm;
 
-    @Column(name = "media_durtn", length = 20)
-    private String mediaDurtn;
+    @Column(name = "media_durtn")
+    private Integer mediaDurtn;
 
     @Column(name = "media_mtch_dtm")
     private Date mediaMtchDtm;
@@ -105,6 +105,9 @@ public class ArticleMedia extends BaseEntity {
 
     @Column(name = "video_id", length = 6)
     private String videoId;
+
+    @Column(name = "trnasf_val")
+    private Integer trnasfVal;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artcl_id")

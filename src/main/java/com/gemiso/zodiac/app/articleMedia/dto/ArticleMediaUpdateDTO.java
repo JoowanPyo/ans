@@ -29,7 +29,7 @@ public class ArticleMediaUpdateDTO {
     @Schema(description = "전송 파일 명")
     private String trnsfFileNm;
     @Schema(description = "미디어 길이")
-    private String mediaDurtn;
+    private Integer mediaDurtn;
     @Schema(description = "미디어 매칭 일시")
     private Date mediaMtchDtm;
     @Schema(description = "전송 상태 코드")
@@ -68,32 +68,9 @@ public class ArticleMediaUpdateDTO {
     private String artclMediaTitl;
     @Schema(description = "비디오 아이디")
     private String videoId;
+    @Schema(description = "전송률")
+    private Integer trnasfVal;
     @Schema(description = "기사 아이디")
     private ArticleSimpleDTO article;
 
-    /*private Long artclMediaId;
-    private String mediaTypCd;
-    //private String mediaTypCdNm;
-    private int mediaOrd;
-    private int contId;
-    private String trnsfFileNm;
-    private String mediaDurtn;
-    private Date mediaMtchDtm;
-    private String trnsfStCd;
-    //private String trnsfStCdNm;
-    private String assnStCd;
-    //private String assnStCdNm;
-    private String videoEdtrNm;
-    //private String delYn;
-    //private Date delDtm;
-    //private Date inputDtm;
-    private Date updtDtm;
-    //private String inputrId;
-    //private String inputrNm;
-    private String updtrId;
-    private String updtrNm;
-    //private String delrId;
-    //private String delrNm;
-    private String videoEdtrId;
-    private ArticleSimpleDTO article;*/
 }

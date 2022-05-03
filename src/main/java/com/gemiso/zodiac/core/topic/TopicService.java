@@ -47,8 +47,6 @@ public class TopicService {
             //String routingKey = "ans";
             //String message = "test ans";
 
-            System.out.println(msg);
-
             channel.basicPublish(EXCHANGE_WEB_NAME, routingKey, null, msg.getBytes(StandardCharsets.UTF_8));
 
             log.info("ans.topic Sent "+"EXCHANGE : " +EXCHANGE_WEB_NAME+" ROUTINGKEY : "+ routingKey +" MESSAGE : "+ msg );

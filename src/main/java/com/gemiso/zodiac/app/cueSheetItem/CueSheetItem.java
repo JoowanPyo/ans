@@ -1,10 +1,12 @@
 package com.gemiso.zodiac.app.cueSheetItem;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheetItemCap.CueSheetItemCap;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
 import com.gemiso.zodiac.core.entity.BaseEntity;
@@ -26,6 +28,7 @@ import java.util.List;
 @Setter
 @ToString(exclude = {"cueSheet","article","cueSheetTemplate","cueSheetMedia"})
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CueSheetItem extends BaseEntity {
 
     @Id
@@ -224,9 +227,9 @@ public class CueSheetItem extends BaseEntity {
       /*@Column(name = "artcl_id", length = 21)
     private String artclId;*/
 
-   /* @OneToMany(mappedBy = "cueSheetItem")
+    @OneToMany(mappedBy = "cueSheetItem")
     @JsonManagedReference
-    private List<CueSheetItemSymbol> cueSheetItemSymbol = new ArrayList<>();*/
+    private List<CueSheetItemSymbol> cueSheetItemSymbol = new ArrayList<>();
 
 
     @PrePersist

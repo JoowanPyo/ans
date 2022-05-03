@@ -35,17 +35,18 @@ public class Scheduling {
 
     }
 
+    /**************** BIS에서 사용하는 기본편성이 관리가 되지않아 ANS에서 주간편성으로 기본편성 생성 *********/
     //BIS기본편성 조회 및 등록
     /*@Scheduled(cron = "0 * * * * *")*/
-    @Scheduled(cron = "0 0 5 * * ?")//매일 새벽 5시에 한번씩
-    public void bisBasicScheduleCreate() throws Exception {
+    //@Scheduled(cron = "0 0 5 * * ?")//매일 새벽 5시에 한번씩
+    /*public void bisBasicScheduleCreate() throws Exception {
 
         //Bis에서 기본편성 조회
         BisBasicScheduleDTO bisBasicScheduleDTO = bisInterfaceService.bisBasicSchedulefindAll();
 
         bisInterfaceService.matchBasicScheduleCreate(bisBasicScheduleDTO);
 
-    }
+    }*/
 
     //Bis주간편성 조회 및 등록
     //@Scheduled(cron = "0 * * * * *")
@@ -79,9 +80,9 @@ public class Scheduling {
 
     }
 
-    //Mis 부서 조회 및 등록(수정)
+    //Mis 사용자 조회 및 등록(수정)
     //@Scheduled(cron = "0 * * * * *")
-    @Scheduled(cron = "* * 3 * * ?")//3시간에 한번씩
+    @Scheduled(cron = "0 0 5 * * ?")//매일 새벽 5시에 한번씩
     public void misUserScheduled(){
 
         misService.findUser();

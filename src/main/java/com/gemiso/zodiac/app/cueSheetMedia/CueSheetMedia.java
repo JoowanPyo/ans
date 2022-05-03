@@ -51,7 +51,7 @@ public class CueSheetMedia extends BaseEntity {
     private String trnsfFileNm;
 
     @Column(name = "media_durtn", length = 20)
-    private String mediaDurtn;
+    private Integer mediaDurtn;
 
     @Column(name = "media_mtch_dtm")
     private Date mediaMtchDtm;
@@ -105,6 +105,12 @@ public class CueSheetMedia extends BaseEntity {
 
     @Column(name = "cue_media_titl", length = 300)
     private String cueMediaTitl;
+
+    @Column(name = "video_id", length = 6)
+    private String videoId;
+
+    @Column(name = "trnasf_val")
+    private Integer trnasfVal;
 
     /*@Column(name = "cue_item_id", nullable = false)
     private Long cueItemId;*/

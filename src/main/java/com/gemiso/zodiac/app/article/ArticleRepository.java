@@ -17,6 +17,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Queryds
             "left outer join ArticleMedia d on d.article.artclId = a.artclId " +
             "left outer join ArticleOrder e on e.article.artclId = a.artclId " +
             "left outer join ArticleTag b on b.article.artclId = a.artclId " +
+            "left outer join CueSheet g on g.cueId = a.cueSheet.cueId " +
             "where a.artclId =:articleId and a.delYn = 'N'")
     Optional<Article> findArticle(@Param("articleId")Long articleId);
 
@@ -24,6 +25,11 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Queryds
     @Query("select a from Article a where a.inputrId = :userId and a.delYn = 'N'")
     List<Article> findMyArticle(@Param("userId")String userId);
 
+    @Query("select a from Article a where a.orgArtclId =:orgArtclId and a.delYn = 'N'")
+    List<Article> findCopyArticle(@Param("orgArtclId")Long orgArtclId);
+
+    @Query("select count(a.artclOrd) from Article a where a.orgArtclId =:orgArtclId")
+    Integer findArticleOrd(@Param("orgArtclId")Long orgArtclId);
 
 /*
     @Query("insert \n" +
