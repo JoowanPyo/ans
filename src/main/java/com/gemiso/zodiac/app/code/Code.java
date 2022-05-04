@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.code;
 
-import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -12,7 +11,9 @@ import java.util.Date;
 
 @Entity
 @Table(
-        name = "tb_cd"
+        name = "tb_cd",
+        indexes = {@Index(name = "index_cd_nm", columnList = "cd_nm")
+                , @Index(name = "index_cd_hrnk_cd_id", columnList = "hrnk_cd_id")}
 )
 @Builder
 @AllArgsConstructor

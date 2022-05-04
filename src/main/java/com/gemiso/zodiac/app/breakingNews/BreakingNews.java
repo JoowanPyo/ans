@@ -14,7 +14,8 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_breaking_news")
+@Table(name = "tb_breaking_news",
+        indexes = { @Index(name = "index_breaking_news_input_dtm", columnList = "input_dtm")})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

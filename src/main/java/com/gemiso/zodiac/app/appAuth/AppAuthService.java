@@ -140,16 +140,16 @@ public class AppAuthService{
 
         QAppAuth qAppAuth = QAppAuth.appAuth;
 
-        if(!StringUtils.isEmpty(useYn)){
+        if(useYn != null && useYn.trim().isEmpty() == false){
             booleanBuilder.and(qAppAuth.useYn.eq(useYn));
         }
-        if(!StringUtils.isEmpty(delYn)){
+        if(delYn != null && delYn.trim().isEmpty() == false){
             booleanBuilder.and(qAppAuth.delYn.eq(delYn));
         }
-        if(!StringUtils.isEmpty(hrnkAppAuthCd)){
+        if(hrnkAppAuthCd != null && hrnkAppAuthCd.trim().isEmpty() == false){
             booleanBuilder.and(qAppAuth.hrnkAppAuthCd.eq(hrnkAppAuthCd));
         }
-        if(!StringUtils.isEmpty(searchWord)){
+        if(searchWord != null && searchWord.trim().isEmpty() == false){
             booleanBuilder.and(qAppAuth.appAuthNm.contains(searchWord));
         }
 

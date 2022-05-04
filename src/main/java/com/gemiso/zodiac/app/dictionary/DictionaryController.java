@@ -32,11 +32,11 @@ public class DictionaryController {
     @Operation(summary = "단어사전 목록조회", description = "단어사전 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<DictionaryDTO>> findAll(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
-                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                        @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
-                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                        @Parameter(name = "searchWord", description = "검색키워드")
-                                                    @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
+                                                       @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
 
         List<DictionaryDTO> dictionaryDTOList = new ArrayList<>();
 
@@ -56,7 +56,7 @@ public class DictionaryController {
     @Operation(summary = "단어사전 상세조회", description = "단어사전 상세조회")
     @GetMapping(path = "/{id}")
     public AnsApiResponse<DictionaryDTO> find(@Parameter(name = "id", required = true, description = "단어사전 아이디")
-                                           @PathVariable("id") long id) {
+                                              @PathVariable("id") long id) {
 
         DictionaryDTO dictionaryDTO = dictionaryService.find(id);
 
@@ -67,7 +67,7 @@ public class DictionaryController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<DictionaryDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                             @RequestBody @Valid DictionaryCreateDTO dictionaryCreateDTO) {
+                                                @RequestBody @Valid DictionaryCreateDTO dictionaryCreateDTO) {
 
         Long id = dictionaryService.create(dictionaryCreateDTO);
 
@@ -79,9 +79,9 @@ public class DictionaryController {
     @Operation(summary = "단어사전 수정", description = "단어사전 수정")
     @PutMapping(path = "/{id}")
     public AnsApiResponse<DictionaryDTO> update(@Parameter(description = "필수값<br> ", required = true)
-                                             @RequestBody @Valid DictionaryUpdateDTO dictionaryUpdateDTO,
+                                                @RequestBody @Valid DictionaryUpdateDTO dictionaryUpdateDTO,
                                                 @Parameter(name = "id", required = true, description = "단어사전 아이디")
-                                             @PathVariable("id") long id) {
+                                                @PathVariable("id") long id) {
 
         dictionaryService.update(dictionaryUpdateDTO, id);
 
@@ -95,7 +95,7 @@ public class DictionaryController {
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "id", required = true, description = "단어사전 아이디")
-                                 @PathVariable("id") long id) {
+                                    @PathVariable("id") long id) {
 
         dictionaryService.delete(id);
 

@@ -11,7 +11,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "tb_cue_tmplt_symbol"
-       )
+)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

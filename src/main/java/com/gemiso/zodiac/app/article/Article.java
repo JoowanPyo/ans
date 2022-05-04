@@ -22,7 +22,12 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_artcl")
+@Table(name = "tb_artcl",
+indexes = { @Index(name = "index_article_input_dtm", columnList = "input_dtm")
+        ,@Index(name = "index_article_title", columnList = "artcl_titl")
+        ,@Index(name = "index_article_title_en", columnList = "artcl_titl_en")
+        ,@Index(name = "index_article_retrid", columnList = "rptr_id")
+})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,6 +36,8 @@ import java.util.List;
 @ToString(exclude = {"issue","articleMedia","articleOrder","articleHist","articleCap","anchorCap","articleTag"})
 @DynamicUpdate
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+/*@Table(indexes = @Index(name = "ans_article", columnList = "inputDtm"),
+@Index(name = "ans_article", columnList = ""))*/
 public class Article extends BaseEntity {
 
     @Id

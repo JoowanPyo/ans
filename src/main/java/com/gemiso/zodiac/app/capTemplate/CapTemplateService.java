@@ -204,7 +204,7 @@ public class CapTemplateService {
 
     }
 
-    private BooleanBuilder getSearch(Long brdc_pgm_id, String cap_class_cd, String use_yn, String search_word) {
+    private BooleanBuilder getSearch(Long brdcPgmId, String capClassCd, String useYn, String searchWord) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -214,14 +214,14 @@ public class CapTemplateService {
         /*if(!ObjectUtils.isEmpty(brdc_pgm_id)){
             booleanBuilder.and(qCap.brdcPgmId.eq(brdc_pgm_id));
         }*/
-        if(!StringUtils.isEmpty(cap_class_cd)){
-            booleanBuilder.and(qCap.capClassCd.eq(cap_class_cd));
+        if(capClassCd != null && capClassCd.trim().isEmpty() == false){
+            booleanBuilder.and(qCap.capClassCd.eq(capClassCd));
         }
-        if(!StringUtils.isEmpty(use_yn)){
-            booleanBuilder.and(qCap.useYn.eq(use_yn));
+        if(useYn != null && useYn.trim().isEmpty() == false){
+            booleanBuilder.and(qCap.useYn.eq(useYn));
         }
-        if(!StringUtils.isEmpty(search_word)){
-            booleanBuilder.and(qCap.capTmpltNm.contains(search_word));
+        if(searchWord != null && searchWord.trim().isEmpty() == false){
+            booleanBuilder.and(qCap.capTmpltNm.contains(searchWord));
         }
 
         return booleanBuilder;

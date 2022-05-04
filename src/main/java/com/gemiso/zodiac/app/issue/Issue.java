@@ -10,7 +10,9 @@ import java.util.Date;
 
 
 @Entity
-@Table(name = "tb_issu"/*,
+@Table(name = "tb_issu",
+        indexes = { @Index(name = "index_issu_dtm", columnList = "issu_dtm")}
+/*,
         uniqueConstraints = {
                 @UniqueConstraint(name = "issu_issuId_unique", columnNames = "issu_id")
         }*/)

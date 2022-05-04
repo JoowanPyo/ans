@@ -40,6 +40,7 @@ import com.gemiso.zodiac.core.topic.TopicService;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.TakerCueSheetTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
+import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -141,6 +142,12 @@ public class CueSheetItemService {
         cueSheetItemRepository.save(cueSheetItem); //큐시트아이템 등록
 
         Long cueItemId = cueSheetItem.getCueItemId();
+        
+        Integer cueItemOrd = cueSheetItem.getCueItemOrd();//순번
+        String spareYn = cueSheetItem.getSpareYn();//스페어 여부
+
+        //신규 등록후 순서정렬
+        ordUpdate(cueId, cueItemId, cueItemOrd, spareYn);
 
         //큐시트 아이템 자막 리스트 get
         List<CueSheetItemCapCreateDTO> cueSheetItemCapDTOList = cueSheetItemCreateDTO.getCueSheetItemCap();
@@ -149,8 +156,6 @@ public class CueSheetItemService {
             createCap(cueSheetItemCapDTOList, cueItemId, userId);//큐시트 아이템 자막 리스트 등록
         }
 
-        String spareYn = cueSheetItem.getSpareYn(); //예비여부값 get
-        int cueItemOrd = cueSheetItemCreateDTO.getCueItemOrd();
         ordUpdate( cueId,  cueItemId,  cueItemOrd, spareYn); //큐시트 순번 정렬
 
         /************ ORDERVER UP *************/
@@ -305,6 +310,11 @@ public class CueSheetItemService {
         }
         cueSheetItemRepository.save(cueSheetItem);
 
+        String spareYn = cueSheetItem.getSpareYn();//스페어 여부값
+
+        //삭제시 삭제된 데이터 배제하고 순서변경
+        deleteOrdUpdate( cueId,  cueItemId,  spareYn);
+
         /************ MQ messages *************/
         //기사, 템플릿 이 포함되어 있는 경우 아이디를 TOPIC전송
         Article articleEntity = cueSheetItem.getArticle();
@@ -318,7 +328,7 @@ public class CueSheetItemService {
             cueItemId = cueSheetTemplate.getCueTmpltId();
         }
 
-        String spareYn = cueSheetItem.getSpareYn();
+        //String spareYn = cueSheetItem.getSpareYn();
 
         CueSheet cueSheet = addCueVer(cueId);
 
@@ -632,6 +642,7 @@ public class CueSheetItemService {
             cueSheetItemRepository.save(cueSheetItem); //큐시트아이템 등록
 
             Long cueItemId = cueSheetItem.getCueItemId();
+            Integer cueItemOrd = cueSheetItem.getCueItemOrd();
 
             //큐시트 아이템 자막 리스트 get
             List<CueSheetItemCapCreateDTO> cueSheetItemCapDTOList = cueSheetItemCreateDTO.getCueSheetItemCap();
@@ -641,7 +652,7 @@ public class CueSheetItemService {
             }
 
             //순서변경을 타야하나?
-            //ordUpdate( cueId,  cueItemId,  cueItemOrd, "N");
+            ordUpdate( cueId,  cueItemId,  cueItemOrd, "N");
         }
     }
 
@@ -895,6 +906,8 @@ public class CueSheetItemService {
                 newApprvDivCd = "article_fix";
             }
 
+        }else {
+            newApprvDivCd = getOrgApprvDivCd; //앵커픽스나, 데스커 픽스가 아닐경우엔 원본 픽스값 그래도 대입
         }
 
         if (ObjectUtils.isEmpty(orgArtclId)) { //원본기사가 아이디가없고 최초 복사일시
@@ -1074,7 +1087,7 @@ public class CueSheetItemService {
                 .build();
     }
 
-    public void ordUpdate( Long cueId, Long cueItemId, int cueItemOrd, String spareYn){
+    public void ordUpdate( Long cueId, Long cueItemId, Integer cueItemOrd, String spareYn){
 
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
@@ -1096,6 +1109,42 @@ public class CueSheetItemService {
         }
 
         cueSheetItemList.add(cueItemOrd, cueSheetItem); //신규등록하려는 큐시트 아이템 원하는 순번에 리스트 추가
+
+        //조회된 큐시트 아이템 Ord 업데이트
+        int index = 0;
+        for (CueSheetItem cueSheetItems : cueSheetItemList){
+
+            CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItems);
+            cueSheetItemDTO.setCueItemOrd(index);//순번 재등록
+            CueSheetItem setCueSheetItem = cueSheetItemMapper.toEntity(cueSheetItemDTO);
+            cueSheetItemRepository.save(setCueSheetItem);//순번 업데이트
+            index++;//순번 + 1
+        }
+
+    }
+
+    public void deleteOrdUpdate( Long cueId, Long cueItemId, String spareYn){
+
+
+        /*CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
+
+        CueSheetItemDTO updateCueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
+        updateCueSheetItemDTO.setCueItemOrd(cueItemOrd);
+
+        cueSheetItemMapper.updateFromDto(updateCueSheetItemDTO, cueSheetItem);
+        cueSheetItemRepository.save(cueSheetItem); //큐시트아이템 등록*/
+
+        //큐시트 아이템 순번 재등록
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemListSpareYn(cueId, spareYn);
+
+        for (int i =  cueSheetItemList.size() - 1; i >= 0 ; i--){
+            if (!cueItemId.equals(cueSheetItemList.get(i).getCueItemId())){
+                continue;
+            }
+            cueSheetItemList.remove(i);//신규 등록된 큐시트 아이템 리스트에서 삭제
+        }
+
+        //cueSheetItemList.add(cueItemOrd, cueSheetItem); //신규등록하려는 큐시트 아이템 원하는 순번에 리스트 추가
 
         //조회된 큐시트 아이템 Ord 업데이트
         int index = 0;

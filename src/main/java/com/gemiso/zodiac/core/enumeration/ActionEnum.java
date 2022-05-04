@@ -8,6 +8,9 @@ public enum ActionEnum {
     DELETE("delete"),
     OPEN("open"),
     CLOSE("close"),
+    LOCK("lock"),
+    UNLOCK("unlock"),
+    FORCEDLOCK("forced lock"),
     FIX("fix");
 
     String action;

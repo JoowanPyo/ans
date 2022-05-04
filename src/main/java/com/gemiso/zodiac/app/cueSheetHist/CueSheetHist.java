@@ -12,7 +12,8 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "tb_cue_hist")
+@Table(name = "tb_cue_hist",
+        indexes = { @Index(name = "index_cue_hist_action", columnList = "cue_action")})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

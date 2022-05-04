@@ -134,7 +134,7 @@ public class CueSheetItemCapService {
 
          booleanBuilder.and(qCueItemCap.cueSheetItem.cueItemId.eq(cueItemId));
 
-        if(!StringUtils.isEmpty(cueItemCapDivCd)){
+        if(cueItemCapDivCd != null && cueItemCapDivCd.trim().isEmpty() == false){
             booleanBuilder.and(qCueItemCap.cueItemCapDivCd.eq(cueItemCapDivCd));
         }
 

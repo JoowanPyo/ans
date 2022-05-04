@@ -247,15 +247,15 @@ public class UserService {
 
         QUser quser = QUser.user;
 
-        if(!StringUtils.isEmpty(delYn)){
+        if(delYn != null && delYn.trim().isEmpty() == false){
             booleanBuilder.and(quser.delYn.eq(delYn));
         }else {
             booleanBuilder.and(quser.delYn.eq("N"));
         }
-        if(!StringUtils.isEmpty(userNm)){
+        if(userNm != null && userNm.trim().isEmpty() == false){
             booleanBuilder.and(quser.userNm.contains(userNm));
         }
-        if(!StringUtils.isEmpty(userId)){
+        if(userId != null && userId.trim().isEmpty() == false){
             booleanBuilder.and(quser.userId.eq(userId));
         }
         return booleanBuilder;

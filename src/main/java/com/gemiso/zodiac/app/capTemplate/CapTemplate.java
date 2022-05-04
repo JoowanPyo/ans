@@ -16,7 +16,8 @@ import java.util.List;
 
 @Entity
 @Table(
-        name = "tb_cap_tmplt"
+        name = "tb_cap_tmplt",
+        indexes = { @Index(name = "index_cap_template_nm", columnList = "cap_tmplt_nm")}
     /*    uniqueConstraints = {
                 @UniqueConstraint(name = "user_userId_unique", columnNames = "user_id")
         }*/

@@ -94,12 +94,12 @@ public class CueSheetItemController {
                                                   @PathVariable("cueItemId") Long cueItemId) throws Exception {
 
         if (cueItemDivCd == null || "".equals(cueItemDivCd)) {
-            
+
             throw new ResourceNotFoundException("큐시트 아이템 구분 코드가 잘못 되었습니다. 구분코드 : " + cueItemDivCd);
-            
+
             //큐시트 아이템 코드가 cue_item, cue_template일 경우 [큐시트 아이템 수정]
         } else if ("cue_item".equals(cueItemDivCd) || "cue_template".equals(cueItemDivCd)) {
-            
+
             //큐시트 템플릿 Update
             cueSheetItemService.update(cueSheetItemUpdateDTO, cueId, cueItemId);
 
@@ -131,24 +131,27 @@ public class CueSheetItemController {
         return AnsApiResponse.noContent();
     }
 
-    /*@Operation(summary = "큐시트 아이템 순서변경", description = "큐시트 아이템 순서변경")
+    @Operation(summary = "큐시트 아이템 순서변경", description = "큐시트 아이템 순서변경")
     @PutMapping(path = "/{cueId}/item/{cueItemId}/ord")
     public AnsApiResponse<List<CueSheetItemDTO>> ordUpdate(@Parameter(name = "cueId", description = "큐시트아이디")
                                                            @PathVariable("cueId") Long cueId,
                                                            @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
                                                            @PathVariable("cueItemId") Long cueItemId,
                                                            @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
-                                                           @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd) {
+                                                           @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd,
+                                                           @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
+                                                           @RequestParam(value = "spareYn", required = true) String spareYn
+    ) {
 
-        cueSheetItemService.ordUpdate(cueId, cueItemId, cueItemOrd);
+        cueSheetItemService.ordUpdate(cueId, cueItemId, cueItemOrd, spareYn);
 
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
 
-    }*/
+    }
 
-    @Operation(summary = "큐시트 아이템 순서변경", description = "큐시트 아이템 순서변경")
+    /*@Operation(summary = "큐시트 아이템 순서변경", description = "큐시트 아이템 순서변경")
     @PutMapping(path = "/{cueId}/item/change_order")
     public AnsApiResponse<List<CueSheetItemDTO>> ordCdUpdate(@Parameter(name = "cueId", description = "큐시트아이디")
                                                              @PathVariable("cueId") Long cueId,
@@ -162,7 +165,7 @@ public class CueSheetItemController {
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
 
-    }
+    }*/
 
     @Operation(summary = "큐시트 아이템 생성[Drag and Drop]", description = "큐시트 아이템 생성[Drag and Drop]")
     @PostMapping(path = "/{cueId}/item/{artclId}")
@@ -178,7 +181,7 @@ public class CueSheetItemController {
                                                                @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
                                                                @RequestParam(value = "spareYn", required = false) String spareYn) throws Exception {
 
-        log.info("Drag and Drop Request : " +"cueId : "+cueId+" ");
+        log.info("Drag and Drop Request : " + "cueId : " + cueId + " ");
 
         cueSheetItemService.createCueItem(cueId, artclId, cueItemOrd, cueItemDivCd, spareYn);
 
@@ -208,13 +211,13 @@ public class CueSheetItemController {
     @Operation(summary = "예비 큐시트 아이템 수정", description = "예비 큐시트 아이템 수정")
     @PutMapping(path = "/{cueId}/item/{cueItemId}/updatespare")
     public AnsApiResponse<CueSheetItemSimpleDTO> updateSpareCueItem(@Parameter(name = "cueId", description = "큐시트아이디")
-                                                                @PathVariable("cueId") Long cueId,
-                                                                @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
-                                                                @PathVariable("cueItemId") Long cueItemId,
-                                                                @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
-                                                                @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd,
-                                                                @Parameter(name = "spareYn", description = "예비여부(Y,N)")
-                                                                @RequestParam(value = "spareYn", required = false) String spareYn) throws JsonProcessingException {
+                                                                    @PathVariable("cueId") Long cueId,
+                                                                    @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
+                                                                    @PathVariable("cueItemId") Long cueItemId,
+                                                                    @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
+                                                                    @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd,
+                                                                    @Parameter(name = "spareYn", description = "예비여부(Y,N)")
+                                                                    @RequestParam(value = "spareYn", required = false) String spareYn) throws JsonProcessingException {
 
         CueSheetItemSimpleDTO cueSheetItemSimpleDTO = cueSheetItemService.updateSpareCueItem(cueId, cueItemId, cueItemOrd, spareYn);
 
@@ -224,11 +227,11 @@ public class CueSheetItemController {
     @Operation(summary = "큐시트 아이템 복구", description = "큐시트 아이템 복구")
     @PutMapping(path = "/{cueId}/item/{cueItemId}/restore")
     public AnsApiResponse<CueSheetItemSimpleDTO> cueSheetItemRestore(@Parameter(name = "cueId", description = "큐시트아이디")
-                                                                 @PathVariable("cueId") Long cueId,
-                                                                 @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
-                                                                 @PathVariable("cueItemId") Long cueItemId,
-                                                                 @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
-                                                                 @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd) throws JsonProcessingException {
+                                                                     @PathVariable("cueId") Long cueId,
+                                                                     @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
+                                                                     @PathVariable("cueItemId") Long cueItemId,
+                                                                     @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
+                                                                     @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd) throws JsonProcessingException {
 
         CueSheetItemSimpleDTO cueSheetItemSimpleDTO = cueSheetItemService.cueSheetItemRestore(cueId, cueItemId, cueItemOrd);
 

@@ -55,7 +55,7 @@ public class YonhapAssignService {
 
         QYonhapAssign qYonhapAssign = QYonhapAssign.yonhapAssign;
 
-        if (StringUtils.isEmpty(sdate) == false && !StringUtils.isEmpty(edate) == false){
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
             booleanBuilder.and(qYonhapAssign.inputDtm.between(sdate, edate));
         }
         if(ObjectUtils.isEmpty(yonhapId) == false){
@@ -65,10 +65,10 @@ public class YonhapAssignService {
             booleanBuilder.and(qYonhapAssign.yonhapWire.wireId.eq(wireId));
         }
 
-        if(StringUtils.isEmpty(designatorId) == false){
+        if(designatorId != null && designatorId.trim().isEmpty() == false){
             booleanBuilder.and(qYonhapAssign.designatorId.eq(designatorId));
         }
-        if(StringUtils.isEmpty(assignerId) == false){
+        if(assignerId != null && assignerId.trim().isEmpty() == false){
             booleanBuilder.and(qYonhapAssign.assignerId.eq(assignerId));
         }
         return booleanBuilder;

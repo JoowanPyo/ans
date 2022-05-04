@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
@@ -118,7 +119,7 @@ public class DictionaryService {
         booleanBuilder.and(qDictionary.delYn.eq("N"));
 
         //등록날짜 기준으로 조회
-        if (!StringUtils.isEmpty(sdate) && !StringUtils.isEmpty(edate)) {
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
             booleanBuilder.and(qDictionary.inputDtm.between(sdate, edate));
         }
 

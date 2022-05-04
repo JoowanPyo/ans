@@ -11,6 +11,9 @@ public enum ActionMesg {
     anchorMM("anchor ment contents modify"),
     articleOPEN("the article open"),
     articleCLOSE("the article close"),
+    articleLOCK("article Lock"),
+    articleUNLOCK("article UnLock"),
+    articleForcedLock("article forced Lock"),
     fixM("the news fix staus changed");
 
     String mesg;

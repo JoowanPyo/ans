@@ -8,7 +8,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(
-        name = "tb_tags"
+        name = "tb_tags",
+        indexes = { @Index(name = "index_tags_tag", columnList = "tag")}
 )
 @Builder
 @AllArgsConstructor

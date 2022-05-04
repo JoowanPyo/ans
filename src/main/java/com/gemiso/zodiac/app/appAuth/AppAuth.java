@@ -12,7 +12,9 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_app_auth")
+@Table(name = "tb_app_auth",
+indexes = {@Index(name = "index_app_auth_hrnk_cd", columnList = "hrnk_app_auth_cd"),
+        @Index(name = "index_app_auth_app_auth_nm", columnList = "app_auth_nm")})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,34 +26,34 @@ public class AppAuth extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "APP_AUTH_ID", nullable = false)
+    @Column(name = "app_auth_id", nullable = false)
     private Long appAuthId;
 
-    @Column(name = "APP_AUTH_NM", length = 100)
+    @Column(name = "app_auth_nm", length = 100)
     private String appAuthNm;
 
     @Column(name = "app_auth_cd", length = 50)
     private String appAuthCd;
 
-    @Column(name = "ORD", length = 4)
+    @Column(name = "ord", length = 4)
     private int ord;
 
-    @Column(name = "EXPL", length = 2000)
+    @Column(name = "expl", length = 2000)
     private String expl;
 
-    @Column(name = "MEMO", length = 1000)
+    @Column(name = "memo", length = 1000)
     private String memo;
 
-    @Column(name = "HRNK_APP_AUTH_CD", length = 21)
+    @Column(name = "hrnk_app_auth_cd", length = 21)
     private String hrnkAppAuthCd;
 
-    @Column(name = "USE_YN", columnDefinition = "bpchar(1) default 'Y'", nullable = false)
+    @Column(name = "use_yn", columnDefinition = "bpchar(1) default 'Y'", nullable = false)
     private String useYn;
 
-    @Column(name = "DEL_YN", columnDefinition = "bpchar(1) default 'N'", nullable = false)
+    @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
 
-    @Column(name = "DEL_DTM")
+    @Column(name = "del_dtm")
     private Date delDtm;
 
     @Column(name = "inputr_id", length = 50)

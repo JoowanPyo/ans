@@ -13,7 +13,8 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_scrl_news")
+@Table(name = "tb_scrl_news",
+        indexes = { @Index(name = "index_scrl_news_input_dtm", columnList = "input_dtm")})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -66,13 +67,13 @@ public class ArticleHistService {
 
         QArticleHist qArticleHist = QArticleHist.articleHist;
 
-        if (!StringUtils.isEmpty(artclId)){
+        if (ObjectUtils.isEmpty(artclId) == false){
             booleanBuilder.and(qArticleHist.article.artclId.eq(artclId));
         }
-        if (!StringUtils.isEmpty(orgArtclId)){
+        if (ObjectUtils.isEmpty(orgArtclId) == false){
             booleanBuilder.and(qArticleHist.orgArtclId.eq(orgArtclId));
         }
-        if (!StringUtils.isEmpty(searchWord)){
+        if (searchWord != null && searchWord.trim().isEmpty() == false){
             booleanBuilder.and(qArticleHist.artclTitl.contains(searchWord).or(qArticleHist.artclTitlEn.contains(searchWord)));
         }
 

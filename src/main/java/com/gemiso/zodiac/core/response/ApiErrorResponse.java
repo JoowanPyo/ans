@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.core.response;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.gemiso.zodiac.exception.UserFailException;
 import lombok.Getter;
@@ -142,6 +143,25 @@ public class ApiErrorResponse extends BaseApiResponse {
         Error error = new Error(ErrorCodes.InternalServerError, exception.getLocalizedMessage(), null);
 
         return new ApiErrorResponse(error, HttpStatus.FORBIDDEN);
+    }
+
+    public static ApiErrorResponse makeJonsFailResponse(JsonProcessingException exception) {
+
+        Error error = new Error(ErrorCodes.InternalServerError, exception.getLocalizedMessage(), null);
+
+        return new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    public static ApiErrorResponse makeExceptionHandlerErrorResponse(Exception exception) {
+
+        String bindingResult = exception.getMessage();
+
+        //HashMap<String, List<String>> errors = exception.hashCode();
+        //Error error = new Error(ErrorCodes.InvalidArguments, "입력 값이 유효하지 않습니다.", errors);
+
+        Error error = new Error(ErrorCodes.InternalServerError, exception.getLocalizedMessage(), null);
+
+        return new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     protected static HashMap<String, List<String>> getValidationErrors(List<FieldError> fieldErrors) {

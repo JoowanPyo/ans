@@ -30,6 +30,7 @@ public class YonhapAptnDTO {
     private String credit;
     private String input_dtm;
     private String trnsf_dtm;
+    private Long mamContId;
 
     private List<AttachFileDTO> files = new ArrayList<AttachFileDTO>();
     private List<YonhapAttachFileDTO> yonhapAttchFiles;

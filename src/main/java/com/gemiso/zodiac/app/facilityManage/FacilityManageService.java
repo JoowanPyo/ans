@@ -91,10 +91,10 @@ public class FacilityManageService {
 
         booleanBuilder.and(qFacilityManage.delYn.eq("N"));
 
-        if (StringUtils.isEmpty(searchWord) == false){
+        if (searchWord != null && searchWord.trim().isEmpty() == false){
             booleanBuilder.and(qFacilityManage.fcltyNm.contains(searchWord));
         }
-        if (StringUtils.isEmpty(fcltyDivCd) == false){
+        if (fcltyDivCd != null && fcltyDivCd.trim().isEmpty() == false){
             booleanBuilder.and(qFacilityManage.fcltyDivCd.eq(fcltyDivCd));
         }
 

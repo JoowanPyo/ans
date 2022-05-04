@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -163,7 +164,7 @@ public class IssueService {
 
         QIssue qIssue = QIssue.issue;
 
-        if (!StringUtils.isEmpty(sdate) && !StringUtils.isEmpty(edate)){
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
             booleanBuilder.and(qIssue.issuDtm.between(sdate, edate));
         }
         if (!StringUtils.isEmpty(issuDelYn)){

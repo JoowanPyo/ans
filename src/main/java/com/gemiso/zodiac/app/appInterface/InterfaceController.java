@@ -346,14 +346,15 @@ public class InterfaceController {
 
     @Operation(summary = "테이커 방송중 상태 업데이트[ on_air ]", description = "테이커 방송중 상태 업데이트[ on_air ]")
     @PutMapping(path = "/cuestcdupdate")
-    public String cueStCdUpdate(@Parameter(name = "cueId", description = "큐시트 아이디")
-                                                     @RequestParam(value = "cueId", required = false) Long cueId,
-                                                     @Parameter(name = "cueStCd", description = "방송상태 코드 [ on_air : 방송중]")
-                                                     @RequestParam(value = "cueStCd", required = false) String cueStCd,
-                                                     @RequestHeader(value = "securityKey") String securityKey) {
+    public String cueStCdUpdate(@Parameter(name = "rd_id", description = "프로그램 아이디")
+                                @RequestParam(value = "rd_id", required = false) Long rd_id,
+                                @Parameter(name = "cue_st_cd", description = "방송상태 코드 [ on_air : 방송중]")
+                                @RequestParam(value = "cue_st_cd", required = false) String cue_st_cd,
+                                @RequestHeader(value = "securityKey") String securityKey) {
 
+        log.info("Taker CueSheet State Code Update : rd_id - "+rd_id+" cue_st_cd : "+cue_st_cd);
 
-        ParentProgramDTO parentProgramDTO = interfaceService.cueStCdUpdate(cueId, cueStCd);
+        ParentProgramDTO parentProgramDTO = interfaceService.cueStCdUpdate(rd_id, cue_st_cd);
 
         String takerCueSheetDTO = interfaceService.takerPgmToXmlOne(parentProgramDTO);
 
@@ -366,13 +367,12 @@ public class InterfaceController {
                                          @RequestParam(value = "contentId", required = false) Integer contentId,
                                          @Parameter(name = "trnasfVal", description = "전송률.")
                                          @RequestParam(value = "trnasfVal", required = false) Integer trnasfVal,
-                                         @Parameter(name = "mediaTypCd", description = "match_ready:준비됨, match_inprocess : 시작됨,<br> " +
+                                         @Parameter(name = "trnsfStCd", description = "match_ready:준비됨, match_inprocess : 시작됨,<br> " +
                                                  "match_failed : 실패, match_completed : 완료")
-                                         @RequestParam(value = "mediaTypCd", required = false) String mediaTypCd,
+                                         @RequestParam(value = "trnsfStCd", required = false) String trnsfStCd,
                                          @RequestHeader(value = "securityKey") String securityKey) {
 
-
-        interfaceService.stateChange(contentId, mediaTypCd, trnasfVal);
+        interfaceService.stateChange(contentId, trnsfStCd, trnasfVal);
         return new AnsApiResponse<>("complete");
     }
 }

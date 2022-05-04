@@ -119,7 +119,7 @@ public class ProgramService {
 
         booleanBuilder.and(qProgram.delYn.eq("N"));
 
-        if (!StringUtils.isEmpty(brdcPgmNm)) {
+        if (brdcPgmNm != null && brdcPgmNm.trim().isEmpty() == false) {
             booleanBuilder.and(qProgram.brdcPgmNm.contains(brdcPgmNm));
         }
 

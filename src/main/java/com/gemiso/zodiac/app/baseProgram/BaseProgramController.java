@@ -36,10 +36,12 @@ public class BaseProgramController {
                                                         @Parameter(name = "brdcStartClk", description = "방송시각")
                                                         @RequestParam(value = "brdcStartClk", required = false) String brdcStartClk,
                                                         @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디")
-                                                        @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId) {
+                                                        @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
+                                                        @Parameter(name = "basDt", description = "방송 요일")
+                                                            @RequestParam(value = "basDt", required = false) String basDt) {
 
         List<BaseProgramDTO> baseProgramDTOList = baseProgramService.findAll(basPgmschId, brdcStartDt,
-                brdcEndDt, brdcStartClk, brdcPgmId);
+                brdcEndDt, brdcStartClk, brdcPgmId, basDt);
 
         return new AnsApiResponse<>(baseProgramDTOList);
     }

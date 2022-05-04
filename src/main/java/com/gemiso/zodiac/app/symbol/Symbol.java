@@ -13,6 +13,7 @@ import java.util.Date;
 @Entity
 @Table(
         name = "tb_symbol",
+        indexes = { @Index(name = "index_symbol_nm", columnList = "symbol_nm")},
         uniqueConstraints = {
                 @UniqueConstraint(name = "symbol_symbolId_unique", columnNames = "symbol_id")
         }

@@ -9,7 +9,8 @@ import org.hibernate.annotations.Formula;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "tb_daily_pgmsch"
+@Table(name = "tb_daily_pgmsch",
+        indexes = { @Index(name = "index_daily_pgmsch_brdc_dt", columnList = "brdc_dt")}
         /*uniqueConstraints = {
                 @UniqueConstraint(name = "file_fileId_unique", columnNames = "file_id")
         }*/)

@@ -28,4 +28,6 @@ public class YonhapCreateDTO {
     private String trnsf_dtm;
     private String input_dtm;
     private String action;
+    private Long mamContId;
+
 }

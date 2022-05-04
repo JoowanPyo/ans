@@ -13,7 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_order"/*,
+@Table(name = "tb_order",
+        indexes = {@Index(name = "index_article_order_input_dtm", columnList = "input_dtm")
+                , @Index(name = "index_article_order_workr_id", columnList = "workr_id")
+                , @Index(name = "index_article_order_inputr_id", columnList = "inputr_id")}
+
+/*,
         uniqueConstraints = {
                 @UniqueConstraint(name = "file_fileId_unique", columnNames = "file_id")
         }*/)
@@ -22,7 +27,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"article","articleOrderFile"})
+@ToString(exclude = {"article", "articleOrderFile"})
 @DynamicUpdate
 public class ArticleOrder extends BaseEntity {
 
@@ -31,7 +36,7 @@ public class ArticleOrder extends BaseEntity {
     @Column(name = "order_id", nullable = false)
     private Long orderId;
 
-    @Column(name ="order_ctt", columnDefinition = "text")
+    @Column(name = "order_ctt", columnDefinition = "text")
     private String orderCtt;
 
     @Column(name = "order_div_cd", length = 50)
@@ -85,10 +90,8 @@ public class ArticleOrder extends BaseEntity {
     @JsonBackReference
     private Article article;
 
-    @OneToMany(mappedBy="articleOrder")//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제?
+    @OneToMany(mappedBy = "articleOrder")//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제?
     private List<ArticleOrderFile> articleOrderFile = new ArrayList<>();
-
-
 
 
 }

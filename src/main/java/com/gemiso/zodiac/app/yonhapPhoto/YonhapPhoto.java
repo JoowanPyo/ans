@@ -110,6 +110,9 @@ public class YonhapPhoto {
     @Column(name = "action", columnDefinition = "bpchar(1)")
     private String action;
 
+    @Column(name = "mam_cont_id")
+    private Long mamContId;
+
     @OneToMany(mappedBy="yonhapPhoto")//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제
     private List<YonhapPhotoAttchFile> yonhapPhotoAttchFiles = new ArrayList<>();
 }

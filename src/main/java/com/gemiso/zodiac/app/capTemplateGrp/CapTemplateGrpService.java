@@ -117,7 +117,7 @@ public class CapTemplateGrpService {
 
         booleanBuilder.and(qCapTemplateGrp.delYn.eq("N"));
 
-        if(!StringUtils.isEmpty(searchWord)){
+        if(searchWord != null && searchWord.trim().isEmpty() == false){
             booleanBuilder.and(qCapTemplateGrp.tmpltGrpNm.contains(searchWord));
         }
 

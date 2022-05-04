@@ -16,7 +16,9 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_cue_tmplt")
+@Table(name = "tb_cue_tmplt",
+        indexes = { @Index(name = "index_cue_template_brdc_pgm_nm", columnList = "brdc_pgm_nm"),
+                @Index(name = "index_cue_template_cue_tmplt_nm", columnList = "cue_tmplt_nm")})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

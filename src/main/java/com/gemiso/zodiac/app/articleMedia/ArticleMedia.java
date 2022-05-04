@@ -13,7 +13,10 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "tb_artcl_media"/*,
+@Table(name = "tb_artcl_media",
+        indexes = {@Index(name = "index_article_media_input_dtm", columnList = "input_dtm")
+                ,@Index(name = "index_article_media_trnsf_file_nm", columnList = "trnsf_file_nm")}
+/*,
         uniqueConstraints = {
                 @UniqueConstraint(name = "file_fileId_unique", columnNames = "file_id")
         }*/)
@@ -117,7 +120,7 @@ public class ArticleMedia extends BaseEntity {
     @PrePersist
     public void prePersist() {
 
-        if (this.delYn == null || this.delYn == ""){
+        if (this.delYn == null || this.delYn == "") {
             this.delYn = "N";
         }
     }

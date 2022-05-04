@@ -15,6 +15,7 @@ import java.util.List;
 @Entity
 @Table(
         name = "tb_user_mng",
+        indexes = {@Index(name = "index_user_mng_user_nm", columnList = "user_nm")},
         uniqueConstraints = {
                 @UniqueConstraint(name = "user_userId_unique", columnNames = "user_id")
         }
@@ -103,7 +104,7 @@ public class User extends BaseEntity {
     @Column(name = "use_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String useYn;
 
-    @Column(name = "del_yn",columnDefinition = "bpchar(1) default 'N'", nullable = false)
+    @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
 
     @Column(name = "inputr_id", length = 50)
@@ -152,45 +153,46 @@ public class User extends BaseEntity {
             )
     )*/
 
-    @OneToMany(mappedBy="user")//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제
+    @OneToMany(mappedBy = "user")//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제
     private List<UserGroupUser> userGroupUser = new ArrayList<>();
 
 
     @PrePersist
     public void prePersist() {
 
-        if (this.freeYn == null || this.freeYn == ""){
+        if (this.freeYn == null || this.freeYn == "") {
             this.freeYn = "N";
         }
-        if (this.chiefYn == null || this.freeYn == ""){
+        if (this.chiefYn == null || this.freeYn == "") {
             this.chiefYn = "N";
         }
-        if (this.telPubYn == null || this.telPubYn == ""){
+        if (this.telPubYn == null || this.telPubYn == "") {
             this.telPubYn = "N";
         }
-        if (this.useYn == null || this.useYn == ""){
+        if (this.useYn == null || this.useYn == "") {
             this.useYn = "N";
         }
-        if (this.delYn == null || this.delYn == ""){
+        if (this.delYn == null || this.delYn == "") {
             this.delYn = "N";
         }
     }
-    @PreUpdate //사실이건 필요없음
-    public void preUpdate(){
 
-        if (this.freeYn == null || this.freeYn == ""){
+    @PreUpdate //사실이건 필요없음
+    public void preUpdate() {
+
+        if (this.freeYn == null || this.freeYn == "") {
             this.freeYn = "N";
         }
-        if (this.chiefYn == null || this.freeYn == ""){
+        if (this.chiefYn == null || this.freeYn == "") {
             this.chiefYn = "N";
         }
-        if (this.telPubYn == null || this.telPubYn == ""){
+        if (this.telPubYn == null || this.telPubYn == "") {
             this.telPubYn = "N";
         }
-        if (this.useYn == null || this.useYn == ""){
+        if (this.useYn == null || this.useYn == "") {
             this.useYn = "N";
         }
-        if (this.delYn == null || this.delYn == ""){
+        if (this.delYn == null || this.delYn == "") {
             this.delYn = "N";
         }
 

@@ -133,10 +133,10 @@ public class UserGroupService {
 
         QUserGroup qUserGroup = QUserGroup.userGroup;
 
-        if(!StringUtils.isEmpty(useYn)){
+        if(useYn != null && useYn.trim().isEmpty() == false){
             booleanBuilder.and(qUserGroup.useYn.eq(useYn));
         }
-        if(!StringUtils.isEmpty(userGrpNm)){
+        if(userGrpNm != null && userGrpNm.trim().isEmpty() == false){
             booleanBuilder.and(qUserGroup.userGrpNm.contains(userGrpNm));
         }
 

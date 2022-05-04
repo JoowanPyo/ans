@@ -45,6 +45,8 @@ public class YonhapPhotoDTO {
     private Date embgDtm;
     private String action;
 
+    private Long mamContId;
+
     private List<AttachFileDTO> files = new ArrayList<AttachFileDTO>();
     private List<YonhapPhotoAttchFileDTO> yonhapPhotoAttchFiles = new ArrayList<>();
 }

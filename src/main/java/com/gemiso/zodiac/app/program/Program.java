@@ -8,7 +8,8 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "tb_brdc_pgm")
+@Table(name = "tb_brdc_pgm",
+        indexes = { @Index(name = "index_brdc_pgm_nm", columnList = "brdc_pgm_nm")})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

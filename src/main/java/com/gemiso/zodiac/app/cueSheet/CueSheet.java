@@ -18,7 +18,9 @@ import java.util.List;
 
 @Entity
 @Table(
-        name = "tb_cue"
+        name = "tb_cue",
+        indexes = { @Index(name = "index_cue_brdc_dt", columnList = "brdc_dt")
+                ,@Index(name = "index_cue_brdc_pgm_nm", columnList = "brdc_pgm_nm")}
 )
 @Builder
 @AllArgsConstructor
@@ -172,10 +174,10 @@ public class CueSheet {
     private String brdcRunTime;
 
     @Column(name = "cue_ver")
-    private int cueVer;
+    private Integer cueVer;
 
     @Column(name = "cue_oder_ver")
-    private int cueOderVer;
+    private Integer cueOderVer;
 
     @ManyToOne
     @JoinColumn(name = "brdc_pgm_id")

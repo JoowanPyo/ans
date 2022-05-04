@@ -18,7 +18,9 @@ import java.util.List;
 
 @Entity
 @Table(
-        name = "tb_cue_tmplt_item"
+        name = "tb_cue_tmplt_item",
+        indexes = { @Index(name = "index_cue_tmplt_cue_item_titl", columnList = "cue_item_titl")
+                ,@Index(name = "index_cue_tmplt_cue_item_titl_en", columnList = "cue_item_titl_en")}
 )
 @Builder
 @AllArgsConstructor

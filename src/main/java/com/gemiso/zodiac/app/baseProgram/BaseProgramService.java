@@ -37,9 +37,9 @@ public class BaseProgramService {
 
     //기본편성 목록조회
     public List<BaseProgramDTO> findAll(Long basPgmschId, String brdcStartDt,
-                                        String brdcEndDt, String brdcStartClk, String brdcPgmId){
+                                        String brdcEndDt, String brdcStartClk, String brdcPgmId, String basDt){
 
-        BooleanBuilder booleanBuilder = getSearch(basPgmschId, brdcStartDt, brdcEndDt, brdcStartClk, brdcPgmId);
+        BooleanBuilder booleanBuilder = getSearch(basPgmschId, brdcStartDt, brdcEndDt, brdcStartClk, brdcPgmId, basDt);
 
         List<BaseProgram> baseProgramList =
                 (List<BaseProgram>) baseProgramRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "brdcStartDt"));
@@ -131,7 +131,7 @@ public class BaseProgramService {
 
     //기본편성 목록조회 조회조건 빌드
     public BooleanBuilder getSearch(Long basPgmschId, String brdcStartDt,
-                                    String brdcEndDt, String brdcStartClk, String brdcPgmId){
+                                    String brdcEndDt, String brdcStartClk, String brdcPgmId, String basDt){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -140,6 +140,11 @@ public class BaseProgramService {
         //기본편성 아이디로 조회
         if (ObjectUtils.isEmpty(basPgmschId) == false){
             booleanBuilder.and(qBaseProgram.basePgmschId.eq(basPgmschId));
+        }
+
+        //방송 요일로 검색
+        if (basDt != null && basDt.trim().isEmpty() == false){
+            booleanBuilder.and(qBaseProgram.basDt.eq(basDt));
         }
 
         // 방송시작일자로 검색

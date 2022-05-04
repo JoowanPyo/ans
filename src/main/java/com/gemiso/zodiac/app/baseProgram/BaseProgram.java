@@ -10,7 +10,9 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "tb_brdc_pgm_basepgmsch")
+@Table(name = "tb_brdc_pgm_basepgmsch",
+        indexes = { @Index(name = "index_bas_pgmsch_bas_dt", columnList = "bas_dt")
+                ,@Index(name = "index_bas_pgmsch_brdc_start_clk", columnList = "brdc_start_clk")})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

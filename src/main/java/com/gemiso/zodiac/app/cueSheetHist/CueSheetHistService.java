@@ -50,7 +50,7 @@ public class CueSheetHistService {
         if (ObjectUtils.isEmpty(cueId) == false){
             booleanBuilder.and(qCueSheetHist.cueSheet.cueId.eq(cueId));
         }
-        if (StringUtils.isEmpty(cueAction) == false){
+        if (cueAction != null && cueAction.trim().isEmpty() == false){
             booleanBuilder.and(qCueSheetHist.cueAction.eq(cueAction));
         }
 

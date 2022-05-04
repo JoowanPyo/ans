@@ -9,7 +9,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(
-        name = "tb_fclty_manage"
+        name = "tb_fclty_manage",
+        indexes = { @Index(name = "index_fclty_manage_nm", columnList = "fclty_nm")}
 )
 @Builder
 @AllArgsConstructor

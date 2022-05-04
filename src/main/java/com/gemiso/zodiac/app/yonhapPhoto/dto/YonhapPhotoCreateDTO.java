@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +62,8 @@ public class YonhapPhotoCreateDTO {
 
     private String 	yh_photo_div_cd;
     private String yh_publ_no;
+
+    private Long mamContId;
 
     private List<AttachFileDTO> files = new ArrayList<AttachFileDTO>();
     private List<YonhapAttachFileCreateDTO> upload_files;

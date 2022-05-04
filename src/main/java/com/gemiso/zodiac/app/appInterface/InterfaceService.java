@@ -1884,16 +1884,20 @@ public class InterfaceService {
     }
 
     //전송상태 업데이트
-    public void stateChange(Integer contentId, String mediaTypCd, Integer trnasfVal){
+    public void stateChange(Integer contentId, String trnsfStCd, Integer trnasfVal){
 
+        //검색조건으로 부조전송날짜 mediaMtchDtm 에 당일로? 아니면 그냥 오늘당일콘텐츠만 조회하여 업데이트
         //콘텐츠아이디 + 비디오아이디 로 기사 미디어 검색.
         List<ArticleMedia> articleMediaList = articleMediaRepository.findArticleMediaListByContentId(contentId);
 
+        //콘텐츠 아이디로 찾은 정보가 있으면 처리 [ 무조건 성공으로 넘어간다. ]
+        
+        
         //검색된 기사 미디어 값 업데이트
         for (ArticleMedia articleMedia : articleMediaList){
 
             ArticleMediaDTO articleMediaDTO = articleMediaMapper.toDto(articleMedia);
-            articleMediaDTO.setMediaTypCd(mediaTypCd); //변경코드 업데이트
+            articleMediaDTO.setTrnsfStCd(trnsfStCd); //변경코드 업데이트
             articleMediaDTO.setMediaMtchDtm(new Date());
             articleMediaDTO.setTrnasfVal(trnasfVal);
             //articleMediaDTO.setTrnsfFileNm(trnsfFileNm); //전송파일명 업데이트
@@ -1917,9 +1921,6 @@ public class InterfaceService {
             cueSheetMapper.updateFromDto(cueSheetDTO, cueSheet);
             cueSheetRepository.save(cueSheet);
         }
-
-
-        String rdId = String.valueOf(cueId);
 
         ParentProgramDTO parentProgramDTO = cueToTaker(cueSheetDTO);
 

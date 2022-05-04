@@ -12,7 +12,8 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_cap_tmplt_grp")
+@Table(name = "tb_cap_tmplt_grp",
+        indexes = { @Index(name = "index_cap_template_grp_nm", columnList = "tmplt_grp_nm")})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

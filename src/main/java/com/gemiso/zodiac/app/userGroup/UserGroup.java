@@ -12,7 +12,9 @@ import javax.persistence.*;
 import java.util.*;
 
 @Entity
-@Table(name = "tb_user_grp")
+@Table(name = "tb_user_grp",
+        indexes = { @Index(name = "index_user_grp_nm", columnList = "user_grp_nm")}
+)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

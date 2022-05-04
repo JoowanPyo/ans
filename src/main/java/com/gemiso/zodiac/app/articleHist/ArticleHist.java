@@ -11,10 +11,10 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "tb_artcl_hist"/*,
-        uniqueConstraints = {
-                @UniqueConstraint(name = "file_fileId_unique", columnNames = "file_id")
-        }*/)
+@Table(name = "tb_artcl_hist",
+        indexes = {@Index(name = "index_article_hist_org_artcl_id", columnList = "org_artcl_id")
+                , @Index(name = "index_article_hist_artcl_titl", columnList = "artcl_titl")
+                , @Index(name = "index_article_hist_artcl_titl_en", columnList = "artcl_titl_en")})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

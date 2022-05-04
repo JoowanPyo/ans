@@ -164,10 +164,10 @@ public class SymbolService {
 
         booleanBuilder.and(qSymbol.delYn.eq("N"));
 
-        if(!StringUtils.isEmpty(useYn)){
+        if(useYn != null && useYn.trim().isEmpty() == false){
             booleanBuilder.and(qSymbol.useYn.eq(useYn));
         }
-        if(!StringUtils.isEmpty(symbolNm)){
+        if(symbolNm != null && symbolNm.trim().isEmpty() == false){
             booleanBuilder.and(qSymbol.symbolNm.contains(symbolNm));
         }
 

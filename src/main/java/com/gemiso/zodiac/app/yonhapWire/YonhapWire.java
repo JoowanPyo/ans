@@ -78,7 +78,13 @@ public class YonhapWire {
     @Column(name = "action", columnDefinition = "bpchar(1)")
     private String action;
 
-    @OneToMany(mappedBy="yonhapWire")//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제
-    private List<YonhapWireAttchFile> yonhapWireAttchFiles = new ArrayList<>();
+    @Column(name = "mam_cont_id")
+    private Long mamContId;
+
+    @Column(name = "media_no", length = 10)
+    private String mediaNo;
+
+   /* @OneToMany(mappedBy="yonhapWire")//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제
+    private List<YonhapWireAttchFile> yonhapWireAttchFiles = new ArrayList<>();*/
 
 }

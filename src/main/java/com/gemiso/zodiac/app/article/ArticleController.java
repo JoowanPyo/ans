@@ -63,9 +63,9 @@ public class ArticleController {
 
         //기사읽기 권한이 없는 사용자 error.forbidden
         //List<String> userAuth = userAuthService.authChk(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth());
-        if (userAuthService.authChks(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminMode.getAuth())) { //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
+       // if (userAuthService.authChks(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminMode.getAuth())) { //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
+       //     throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+       // }
 
         //검색조건 날짜형식이 들어왔을경우
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
@@ -245,7 +245,9 @@ public class ArticleController {
     public AnsApiResponse<ArticleDTO> articleLock(@Parameter(name = "artclId", required = true, description = "기사 아이디")
                                                   @PathVariable("artclId") Long artclId,
                                                   @Parameter(description = "필수값<br> lckYn ", required = true)
-                                                  @RequestBody @Valid ArticleLockDTO articleLockDTO) throws JsonProcessingException {
+                                                  @RequestBody @Valid ArticleLockDTO articleLockDTO) throws Exception {
+
+        log.info( "Article Lock : ArticleId : "+artclId +" Lock Info : " + articleLockDTO);
 
         //권한체크(기사 쓰기)
         if (userAuthService.authChk(AuthEnum.ArticleWrite.getAuth())) {
@@ -264,10 +266,9 @@ public class ArticleController {
     public AnsApiResponse<ArticleDTO> articleUnlock(@Parameter(name = "artclId", required = true, description = "기사 아이디")
                                                     @PathVariable("artclId") Long artclId,
                                                     @Parameter(description = "필수값<br> lckYn ", required = true)
-                                                    @RequestBody @Valid ArticleLockDTO articleLockDTO) {
+                                                    @RequestBody @Valid ArticleLockDTO articleLockDTO) throws Exception {
 
         //권한, 작성자 확인
-
         articleService.articleUnlock(artclId, articleLockDTO);
 
         ArticleDTO articleDTO = articleService.find(artclId);

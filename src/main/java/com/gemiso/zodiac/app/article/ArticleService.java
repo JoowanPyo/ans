@@ -538,6 +538,29 @@ public class ArticleService {
 
     }
 
+    //기사 액션로그 등록
+    public void articleActionLogLock(Article article, String userId, String locMessage, String locAction) throws Exception {
+
+        //List<ArticleCap> articleCapList = article.getArticleCap();
+        //List<AnchorCap> anchorCapList = article.getAnchorCap();
+        //article.setArticleCap(null);
+        //article.setAnchorCap(null);
+
+        //기사 액션로그 빌드
+        ArticleActionLog articleActionLog = ArticleActionLog.builder()
+                .article(article)
+                .message(locMessage)
+                .action(locAction)
+                .inputrId(userId)
+                //.artclCapInfo(marshallingJsonHelper.MarshallingJson(articleCapList))
+                //.anchorCapInfo(marshallingJsonHelper.MarshallingJson(anchorCapList))
+                .artclInfo(marshallingJsonHelper.MarshallingJson(article)) //Json으로 기사내용저장
+                .build();
+        //기사 액션로그 등록
+        articleActionLogRepository.save(articleActionLog);
+
+    }
+
     //기사 수정 로그
     public void copyArticleActionLogUpdate(Article article, Article updateArticle, String userId) throws Exception {
 
@@ -1082,29 +1105,45 @@ public class ArticleService {
     }
 
     // 기사 잠금
-    public void articleLock(Long artclId, ArticleLockDTO articleLockDTO) throws JsonProcessingException {
+    public void articleLock(Long artclId, ArticleLockDTO articleLockDTO) throws Exception {
 
         Article article = articleFindOrFail(artclId);
 
         String lockYn = article.getLckYn();//잠금여부값 get
+        String lckrId = article.getLckrId();
         String userId = userAuthService.authUser.getUserId();
 
-        if (lockYn.equals("Y")) {
+        if ("Y".equals(lockYn) && userId.equals(lckrId) == false) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN); // 잠금 사용자가 다르다.
         }
+
+        String locMessage = "";
+        String locAction = "";
 
         if (articleLockDTO.getLckYn().equals("Y")) {
             articleLockDTO.setLckDtm(new Date());
             // 토큰 인증된 사용자 아이디를 입력자로 등록
             articleLockDTO.setLckrId(userId);
+
+            locMessage = ActionMesg.articleLOCK.getActionMesg(ActionMesg.articleLOCK);
+            locAction = ActionEnum.LOCK.getAction(ActionEnum.LOCK);
         } else {
             article.setLckDtm(null);
             article.setLckrId(null);
+
+            locMessage = ActionMesg.articleUNLOCK.getActionMesg(ActionMesg.articleUNLOCK);
+            locAction = ActionEnum.UNLOCK.getAction(ActionEnum.UNLOCK);
         }
 
         articleLockMapper.updateFromDto(articleLockDTO, article);
 
         articleRepository.save(article);
+
+
+        articleActionLogLock(article, userId, locMessage, locAction);//기사 액션 로그 등록
+
+        //기사 이력 create
+        //Long articleHistId = createArticleHist(article);
 
         //토픽메세지 ArticleTopicDTO Json으로 변환후 send
         ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
@@ -1126,17 +1165,26 @@ public class ArticleService {
     }
 
     //기사 잠금 해제
-    public void articleUnlock(Long artclId, ArticleLockDTO articleLockDTO) {
+    public void articleUnlock(Long artclId, ArticleLockDTO articleLockDTO) throws Exception {
 
         Article article = articleFindOrFail(artclId); //기사아이디로 기사정보조회 및 기사유무 확인.
+
+        String locMessage = "";
+        String locAction = "";
+        String userId = userAuthService.authUser.getUserId();
 
         if (articleLockDTO.getLckYn().equals("N")) {
             article.setLckDtm(null);
             article.setLckrId(null);
+
+            locMessage = ActionMesg.articleForcedLock.getActionMesg(ActionMesg.articleForcedLock);
+            locAction = ActionEnum.FORCEDLOCK.getAction(ActionEnum.FORCEDLOCK);
         }
 
         articleLockMapper.updateFromDto(articleLockDTO, article);
         articleRepository.save(article);
+
+        articleActionLogLock(article, userId, locMessage, locAction);//기사 액션 로그 등록
 
     }
 

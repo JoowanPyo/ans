@@ -11,7 +11,8 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "tb_dic")
+@Table(name = "tb_dic",
+        indexes = { @Index(name = "index_dictionary_input_dtm", columnList = "input_dtm")})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

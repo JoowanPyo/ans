@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,6 +77,8 @@ public class YonhapPhotoDomainDTO {
     private String media_typ;
     private String embg_dtm;
     private String cmnt;
+
+    private Long mamContId;
 
     //"파일"
     private List<AttachFileDTO> files = new ArrayList<AttachFileDTO>();

@@ -193,6 +193,19 @@ public class LboxService {
                     //destinations.add("PS_C");
                 }
                 break;
+            case "B":
+                if ("A".equals(subrmNm)) {
+                    //destinations.add("NS");
+                    destinations.add("PS_A");
+                    destinations.add("PS_B");
+
+                } else if ("B".equals(subrmNm)) {
+                    //destinations.add("NS");
+                    destinations.add("PS_A");
+                    destinations.add("PS_B");
+                    destinations.add("PS_C");
+                }
+                break;
         }
 
         String faildDest = ""; //실패된 전송대상명
