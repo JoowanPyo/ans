@@ -120,7 +120,7 @@ public class ArticleService {
     private final ArticleCapHistCreateMapper articleCapHistCreateMapper;
     private final AnchorCapHistCreateMapper anchorCapHistCreateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
     private final UserAuthChkService userAuthChkService;
     private final UserService userService;
     private final IssueService issueService;
@@ -210,9 +210,7 @@ public class ArticleService {
     }
 
     // 기사등록[기사 이력, 자막]
-    public Long create(ArticleCreateDTO articleCreateDTO) throws Exception {
-
-        String userId = userAuthService.authUser.getUserId();
+    public Long create(ArticleCreateDTO articleCreateDTO, String userId) throws Exception {
 
         //PD가 기사 작성시 기사픽스상태로 등록된다.
         if (userAuthChkService.authChk(AuthEnum.AnchorFix.getAuth())) { //수정.
@@ -255,7 +253,8 @@ public class ArticleService {
     }
 
     //기사 수정
-    public void update(ArticleUpdateDTO articleUpdateDTO, Long artclId) throws Exception {
+    public void update(ArticleUpdateDTO articleUpdateDTO, Long artclId, String userId) throws Exception {
+
 
         Article article = articleFindOrFail(artclId);
 
@@ -275,7 +274,6 @@ public class ArticleService {
             article.setEmbgDtm(null);
         }
 
-        String userId = userAuthService.authUser.getUserId();
         articleUpdateDTO.setUpdtrId(userId);
 
         articleUpdateMapper.updateFromDto(articleUpdateDTO, article);
@@ -425,7 +423,8 @@ public class ArticleService {
     }
 
     //기사 삭제
-    public void delete(Long artclId) throws Exception {
+    public void delete(Long artclId, String userId) throws Exception {
+
 
         Article article = articleFindOrFail(artclId);
 
@@ -439,7 +438,6 @@ public class ArticleService {
 
         //삭제정보 등록
         articleDTO.setDelDtm(new Date());
-        String userId = userAuthService.authUser.getUserId();
         articleDTO.setDelrId(userId);
         articleDTO.setDelYn("Y");
 
@@ -744,8 +742,8 @@ public class ArticleService {
 
         //삭제정보 등록
         articleDTO.setDelDtm(new Date());
-        String userId = userAuthService.authUser.getUserId();
-        articleDTO.setDelrId(userId);
+        //String userId = userAuthService.authUser.getUserId();
+        //articleDTO.setDelrId(userId);
         articleDTO.setDelYn("Y");
 
         articleMapper.updateFromDto(articleDTO, article);
@@ -753,7 +751,7 @@ public class ArticleService {
         articleRepository.save(article);
 
         //기사 액션 로그 등록
-        articleActionLogDelete(article, userId);
+        //articleActionLogDelete(article, userId);
     }
 
     // 기사 삭제 액션로그 등록
@@ -966,13 +964,13 @@ public class ArticleService {
     }
 
     //기사 오더락 체크[다른 사용자가 기사 수정중일 경우 수정 불가.]
-    public Boolean chkOrderLock(Long artclId) {
+    public Boolean chkOrderLock(Long artclId, String userId) {
 
         Article article = articleFindOrFail(artclId); //해당 기사 조회.
 
         String lckYn = article.getLckYn(); //기사잠금 여부가 Y일 경우 return true[다른 사용자가 기사 잠금 중.]
         String lckrId = article.getLckrId();
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
 
         if (lckYn.equals("Y") && userId.equals(lckrId) == false) {
             return true;
@@ -1105,13 +1103,12 @@ public class ArticleService {
     }
 
     // 기사 잠금
-    public void articleLock(Long artclId, ArticleLockDTO articleLockDTO) throws Exception {
+    public void articleLock(Long artclId, ArticleLockDTO articleLockDTO, String userId) throws Exception {
 
         Article article = articleFindOrFail(artclId);
 
         String lockYn = article.getLckYn();//잠금여부값 get
         String lckrId = article.getLckrId();
-        String userId = userAuthService.authUser.getUserId();
 
         if ("Y".equals(lockYn) && userId.equals(lckrId) == false) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN); // 잠금 사용자가 다르다.
@@ -1165,13 +1162,12 @@ public class ArticleService {
     }
 
     //기사 잠금 해제
-    public void articleUnlock(Long artclId, ArticleLockDTO articleLockDTO) throws Exception {
+    public void articleUnlock(Long artclId, ArticleLockDTO articleLockDTO, String userId) throws Exception {
 
         Article article = articleFindOrFail(artclId); //기사아이디로 기사정보조회 및 기사유무 확인.
 
         String locMessage = "";
         String locAction = "";
-        String userId = userAuthService.authUser.getUserId();
 
         if (articleLockDTO.getLckYn().equals("N")) {
             article.setLckDtm(null);
@@ -1505,7 +1501,7 @@ public class ArticleService {
     }
 
     //기사 픽스
-    public void vaildFixStaus(Long artclId, String apprvDivCd) throws Exception {
+    public void vaildFixStaus(Long artclId, String apprvDivCd, String userId) throws Exception {
 
         //기사 조회.
         Article article = articleFindOrFail(artclId);
@@ -1516,9 +1512,6 @@ public class ArticleService {
         if (apprvDivCd.equals(orgApprvDivcd)) {
             return;
         }
-
-        // 사용자 정보
-        String userId = userAuthService.authUser.getUserId();
 
         //현재접속자 그룹정보를 그룹이넘 리스트로 불러온다.
         List<String> fixAuthList = getAppAuth(userId);
@@ -1688,10 +1681,9 @@ public class ArticleService {
     }
 
     //사용자 확인
-    public void confirmUser(ArticleDeleteConfirmDTO articleDeleteConfirmDTO, Long artclId) {
+    public void confirmUser(ArticleDeleteConfirmDTO articleDeleteConfirmDTO, Long artclId, String userId) {
 
         String pwd = articleDeleteConfirmDTO.getPassword();//파라미터로 들어온 비밀번호
-        String userId = userAuthService.authUser.getUserId(); //토큰에서 유저 아이디를 가져온다.
         User userEntity = userService.userFindOrFail(userId); //사용자 아이디로 사용자 유무 확인 및 사용자 정보조회.
 
         if (passwordEncoder.matches(pwd, userEntity.getPwd()) == false) { //현재 들어온 비밀번호와 등록되어 있는 비밀번호 확인
@@ -1717,7 +1709,7 @@ public class ArticleService {
     }
 
     //기사 잠금여부 및 권한 확인.
-    public ArticleAuthConfirmDTO articleConfirm(Long artclId) {
+    public ArticleAuthConfirmDTO articleConfirm(Long artclId, String userId) {
 
         Article article = articleFindOrFail(artclId); //기사아이디로 기사정보조회 및 기사유무 확인.
 
@@ -1725,9 +1717,6 @@ public class ArticleService {
         String orgLckYn = article.getLckYn(); //잠금 여부값 확인
         String inputr = article.getInputrId(); //기사 작성자 get
         String lckrId = article.getLckrId();// 잠금 사용자 확인
-
-        // 사용자 정보
-        String userId = userAuthService.authUser.getUserId();//토큰에서 유저 아이디를 가져온다.
 
 
         if ("Y".equals(orgLckYn) && userId.equals(lckrId) == false) { //이미 lckYn 값이 Y이면 잠긴상태이므로 리턴 true로 예외처리로 넘어간다.
@@ -1770,8 +1759,6 @@ public class ArticleService {
 
         if (FixEnum.FIX_NONE.getFixeum(FixEnum.FIX_NONE).equals(orgApprDivCd)) { //픽스 권한이 none일경우
 
-            log.info( "Article Confirm : Article Id" + artclId+ "Article FixCode : " +orgApprDivCd+" User Id: "+userId);
-
             if (inputr.equals(userId) == false) {
 
                 ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
@@ -1802,7 +1789,6 @@ public class ArticleService {
 
         if (FixEnum.ARTICLE_FIX.getFixeum(FixEnum.ARTICLE_FIX).equals(orgApprDivCd)) { //픽스 권한이 articlefix일 경우
 
-            log.info( "Article Confirm : Article Id" + artclId+ "Article FixCode : " +orgApprDivCd+" User Id: "+userId);
             // ARTICLE_FIX 상태일 경우 에디터 픽스 권한이상이 있는경우만 수정가능.
             paf.setApproveCode(FixEnum.EDITOR_FIX.getFixeum(FixEnum.EDITOR_FIX));
 
@@ -1821,7 +1807,6 @@ public class ArticleService {
 
         if (FixEnum.EDITOR_FIX.getFixeum(FixEnum.EDITOR_FIX).equals(orgApprDivCd)) {//픽스 권한이 editorfix 경우
 
-            log.info( "Article Confirm : Article Id" + artclId+ "Article FixCode : " +orgApprDivCd+" User Id: "+userId);
             // EDITOR_FIX 상태일 경우 할 ANCHOR_FIX 권한이상이 있는경우만 수정가능.
             paf.setApproveCode(FixEnum.ANCHOR_FIX.getFixeum(FixEnum.ANCHOR_FIX));
 
@@ -1840,8 +1825,6 @@ public class ArticleService {
 
         if (FixEnum.ANCHOR_FIX.getFixeum(FixEnum.ANCHOR_FIX).equals(orgApprDivCd)) {//픽스 권한이 anchorfix 경우
 
-            log.info( "Article Confirm : Article Id" + artclId+ "Article FixCode : " +orgApprDivCd+" User Id: "+userId);
-
             // ANCHOR_FIX 상태일 경우 할 DESK_FIX 권한이상이 있는경우만 수정가능.
             paf.setApproveCode(FixEnum.DESK_FIX.getFixeum(FixEnum.DESK_FIX));
 
@@ -1859,8 +1842,6 @@ public class ArticleService {
         }
 
         if (FixEnum.DESK_FIX.getFixeum(FixEnum.DESK_FIX).equals(orgApprDivCd)) {//픽스 권한이 deskfix 경우
-
-            log.info( "Article Confirm : Article Id" + artclId+ "Article FixCode : " +orgApprDivCd+" User Id: "+userId);
 
             // DESK_FIX 상태일 경우 할 DESK_FIX 권한이상이 있는경우만 수정가능.
             paf.setApproveCode(FixEnum.DESK_FIX.getFixeum(FixEnum.DESK_FIX));

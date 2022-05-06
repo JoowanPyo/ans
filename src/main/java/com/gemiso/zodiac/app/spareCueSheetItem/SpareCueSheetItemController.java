@@ -7,6 +7,7 @@ import com.gemiso.zodiac.app.spareCueSheetItem.dto.SpareCueSheetItemDTO;
 import com.gemiso.zodiac.app.spareCueSheetItem.dto.SpareCueSheetItemSimpleDTO;
 import com.gemiso.zodiac.app.spareCueSheetItem.dto.SpareCueSheetItemUpdateDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +29,7 @@ public class SpareCueSheetItemController {
 
     private final SpareCueSheetItemService spareCueSheetItemService;
     private final ArticleService articleService;
+    private final UserAuthService userAuthService;
 
 
     @Operation(summary = "예비 큐시트 아이템 목록조회", description = "예비 큐시트 아이템 목록조회")
@@ -74,6 +76,9 @@ public class SpareCueSheetItemController {
                                                              @Parameter(name = "spareCueItemId", description = "예비 큐시트아이템 아이디")
                                                              @PathVariable("spareCueItemId") Long spareCueItemId) throws Exception {
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+
         if (cueItemDivCd == null || "".equals(cueItemDivCd)) {
             throw new ResourceNotFoundException("큐시트 아이템 구분 코드가 잘못 되었습니다. 구분코드 : " + cueItemDivCd);
         } else if (cueItemDivCd.equals("cueitem") || cueItemDivCd.equals("cuetemplate")) {
@@ -81,7 +86,7 @@ public class SpareCueSheetItemController {
             throw new ResourceNotFoundException("큐시트 아이템 구분 코드가 잘못 되었습니다. 구분코드 : " + cueItemDivCd);
         } else if (cueItemDivCd.equals("cuearticle")) {
             //기사복사본 수정.
-            articleService.update(spareCueSheetItemUpdateDTO.getArticle(), spareCueSheetItemUpdateDTO.getArticle().getArtclId());
+            articleService.update(spareCueSheetItemUpdateDTO.getArticle(), spareCueSheetItemUpdateDTO.getArticle().getArtclId(), userId);
         }
 
         //받은 예비 큐시트아이템 아이디 다시 리턴.

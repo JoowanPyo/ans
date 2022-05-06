@@ -39,7 +39,7 @@ public class ArticleMediaService {
     private final ArticleMediaCreateMapper articleMediaCreateMapper;
     private final ArticleMediaUpdateMapper articleMediaUpdateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
     private final TopicService topicService;
 
@@ -67,11 +67,9 @@ public class ArticleMediaService {
 
     }
 
-    public Long create(ArticleMediaCreateDTO articleMediaCreateDTO) throws JsonProcessingException {
+    public Long create(ArticleMediaCreateDTO articleMediaCreateDTO, String userId) throws JsonProcessingException {
 
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
         articleMediaCreateDTO.setInputrId(userId);
 
         ArticleMedia articleMedia = articleMediaCreateMapper.toEntity(articleMediaCreateDTO);
@@ -127,12 +125,10 @@ public class ArticleMediaService {
 
     }
 
-    public void update(ArticleMediaUpdateDTO articleMediaUpdateDTO, Long artclMediaId) {
+    public void update(ArticleMediaUpdateDTO articleMediaUpdateDTO, Long artclMediaId, String userId) {
 
         ArticleMedia articleMedia = articleMediaFindOrFail(artclMediaId);
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
         articleMediaUpdateDTO.setUpdtrId(userId);
 
         articleMediaUpdateMapper.updateFromDto(articleMediaUpdateDTO, articleMedia);
@@ -141,14 +137,12 @@ public class ArticleMediaService {
 
     }
 
-    public void delete(Long artclMediaId) {
+    public void delete(Long artclMediaId, String userId) {
 
         ArticleMedia articleMedia = articleMediaFindOrFail(artclMediaId);
 
         ArticleMediaDTO articleMediaDTO = articleMediaMapper.toDto(articleMedia);
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
         articleMediaDTO.setDelrId(userId);
         articleMediaDTO.setDelDtm(new Date());
         articleMediaDTO.setDelYn("Y");

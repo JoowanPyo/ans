@@ -7,6 +7,7 @@ import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,6 +31,8 @@ import java.util.List;
 public class ArticleMediaController {
 
     private final ArticleMediaService articleMediaService;
+
+    private final UserAuthService userAuthService;
 
 
     @Operation(summary = "기사 미디어 목록조회", description = "기사 미디어 목록조회")
@@ -75,7 +78,12 @@ public class ArticleMediaController {
     public AnsApiResponse<ArticleMediaDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                                   @RequestBody @Valid ArticleMediaCreateDTO articleMediaCreateDTO) throws JsonProcessingException {
 
-        Long artclMediaId = articleMediaService.create(articleMediaCreateDTO);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+
+        log.info(" Create Article Media : User Id - "+userId+" Media Model -"+articleMediaCreateDTO.toString());
+
+        Long artclMediaId = articleMediaService.create(articleMediaCreateDTO, userId);
 
         //기사영상 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleMediaDTO articleMediaDTO = new ArticleMediaDTO();
@@ -91,7 +99,11 @@ public class ArticleMediaController {
                                                   @Parameter(name = "artclMediaId", description = "기사미디어 아이디")
                                                   @PathVariable("artclMediaId") Long artclMediaId) {
 
-        articleMediaService.update(articleMediaUpdateDTO, artclMediaId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info(" Update Article Media : User Id - "+userId+" Media Model -"+articleMediaUpdateDTO.toString());
+
+        articleMediaService.update(articleMediaUpdateDTO, artclMediaId, userId);
 
         //기사영상 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleMediaDTO articleMediaDTO = new ArticleMediaDTO();
@@ -107,7 +119,12 @@ public class ArticleMediaController {
     public AnsApiResponse<?> delete(@Parameter(name = "artclMediaId", description = "기사미디어 아이디")
                                     @PathVariable("artclMediaId") Long artclMediaId) {
 
-        articleMediaService.delete(artclMediaId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info(" Delete Article Media : User Id - "+userId+" Media Id -"+artclMediaId);
+
+
+        articleMediaService.delete(artclMediaId, userId);
 
         return AnsApiResponse.noContent();
     }

@@ -59,7 +59,6 @@ public class CueTmpltItemService {
     private final CueTmpltItemCapCreateMapper cueTmpltItemCapCreateMapper;
     private final CueTmplSymbolMapper cueTmplSymbolMapper;
 
-    private final UserAuthService userAuthService;
 
     //큐시트 템플릿 아이템 목록조회
     public List<CueTmpltItemDTO> findAll(Long cueTmpltId, String searchWord){
@@ -125,11 +124,10 @@ public class CueTmpltItemService {
     }
 
     //큐시트 템플릿 아이템 등록
-    public CueTmpltItemSimpleDTO create(CueTmpltItemCreateDTO cueTmpltItemCreateDTO, Long cueTmpltId){
+    public CueTmpltItemSimpleDTO create(CueTmpltItemCreateDTO cueTmpltItemCreateDTO, Long cueTmpltId, String userId){
 
         //큐시트 템플릿 아이디 빌드
         CueSheetTemplateSimpleDTO cueSheetTemplateSimpleDTO = CueSheetTemplateSimpleDTO.builder().cueTmpltId(cueTmpltId).build();
-        String userId = userAuthService.authUser.getUserId(); //토큰에서 사장자 아이디 get
         cueTmpltItemCreateDTO.setInputrId(userId); //입력자아이디  set
         cueTmpltItemCreateDTO.setCueSheetTemplate(cueSheetTemplateSimpleDTO);//큐시트 템플릿 아이디  set
 
@@ -175,11 +173,10 @@ public class CueTmpltItemService {
     }
 
     //큐시트 템플릿 아이템 업데이트
-    public CueTmpltItemSimpleDTO update(CueTmpltItemUpdateDTO cueTmpltItemUpdateDTO, Long cueTmpltItemId){
+    public CueTmpltItemSimpleDTO update(CueTmpltItemUpdateDTO cueTmpltItemUpdateDTO, Long cueTmpltItemId, String userId){
 
         CueTmpltItem cueTmpltItem = findCueTmplItem(cueTmpltItemId); //큐시트 템플릿 아이템 조회 및 존재유무 확인
 
-        String userId = userAuthService.authUser.getUserId(); //토큰에서 사장자 아이디 get
         cueTmpltItemUpdateDTO.setUpdtrId(userId);//수정자 등록
 
         cueTmpltItemUpdateMapper.updateFromDto(cueTmpltItemUpdateDTO, cueTmpltItem);
@@ -219,13 +216,12 @@ public class CueTmpltItemService {
     }
 
     //큐시트 템플릿 아이템 삭제
-    public void delete(Long cueTmpltItemId){
+    public void delete(Long cueTmpltItemId, String userId){
 
         CueTmpltItem cueTmpltItem = findCueTmplItem(cueTmpltItemId); //큐시트 템플릿 아이템 조회 및 존재유무 확인
 
         CueTmpltItemDTO cueTmpltItemDTO = cueTmpltItemMapper.toDto(cueTmpltItem);
 
-        String userId = userAuthService.authUser.getUserId(); //토큰에서 사장자 아이디 get
         cueTmpltItemDTO.setDelrId(userId); // 삭제자 등록
         cueTmpltItemDTO.setDelDtm(new Date()); //삭제일시 등록
         cueTmpltItemDTO.setDelYn("Y"); //삭제여부 Y

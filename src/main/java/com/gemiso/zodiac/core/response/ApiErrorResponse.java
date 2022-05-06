@@ -13,6 +13,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -151,13 +152,23 @@ public class ApiErrorResponse extends BaseApiResponse {
 
         return new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
     public static ApiErrorResponse makeExceptionHandlerErrorResponse(Exception exception) {
 
         String bindingResult = exception.getMessage();
 
         //HashMap<String, List<String>> errors = exception.hashCode();
         //Error error = new Error(ErrorCodes.InvalidArguments, "입력 값이 유효하지 않습니다.", errors);
+
+        Error error = new Error(ErrorCodes.InternalServerError, exception.getLocalizedMessage(), null);
+
+        return new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    public static ApiErrorResponse makeExceptionHandlerErrorResponse(ParseException exception) {
+
+        /*String bindingResult = exception.getMessage();
+
+        HashMap<String, List<String>> errors = exception.getErr
+        Error error = new Error(ErrorCodes.InvalidArguments, "입력 값이 유효하지 않습니다.", errors);*/
 
         Error error = new Error(ErrorCodes.InternalServerError, exception.getLocalizedMessage(), null);
 

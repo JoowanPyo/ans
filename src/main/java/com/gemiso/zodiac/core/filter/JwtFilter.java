@@ -137,7 +137,7 @@ public class JwtFilter implements Filter {
 
                     logMessage.append(" [RESPONSE STATUS:").append(httpServletResponse.getStatus()).append("]"); //코드를 넘겨줌
 
-                    log.info(String.valueOf(logMessage));
+                    //log.info(String.valueOf(logMessage));
 
 
                 } catch (ExpiredJwtException ex) {

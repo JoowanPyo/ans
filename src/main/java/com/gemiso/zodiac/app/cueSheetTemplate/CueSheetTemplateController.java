@@ -4,6 +4,7 @@ import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateCreateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateUpdateDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,6 +24,8 @@ import java.util.List;
 public class CueSheetTemplateController {
 
     private final CueSheetTemplateService cueSheetTemplateService;
+
+    private final UserAuthService userAuthService;
 
 
     @Operation(summary = "큐시트 템플릿 목록조회", description = "큐시트 템플릿 목록조회")
@@ -58,7 +61,12 @@ public class CueSheetTemplateController {
     public AnsApiResponse<CueSheetTemplateDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                                       @RequestBody @Valid CueSheetTemplateCreateDTO cueSheetTemplateCreateDTO) {
 
-        Long cueTmpltId = cueSheetTemplateService.create(cueSheetTemplateCreateDTO);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록.
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Template Create : userId - "+userId+"<br>"
+                +" CueSheet Template Model - "+cueSheetTemplateCreateDTO.toString());
+
+        Long cueTmpltId = cueSheetTemplateService.create(cueSheetTemplateCreateDTO, userId);
 
         CueSheetTemplateDTO cueSheetTemplateDTO = cueSheetTemplateService.find(cueTmpltId);
 
@@ -72,7 +80,12 @@ public class CueSheetTemplateController {
                                                       @Parameter(description = "필수값<br> ", required = true)
                                                       @RequestBody @Valid CueSheetTemplateUpdateDTO cueSheetTemplateUpdateDTO) {
 
-        cueSheetTemplateService.update(cueTmpltId, cueSheetTemplateUpdateDTO);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록.
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Template Update : userId - "+userId+" cueTmpltId - "+ cueTmpltId +"<br>"
+                +" CueSheet Template Model - "+cueSheetTemplateUpdateDTO.toString());
+
+        cueSheetTemplateService.update(cueTmpltId, cueSheetTemplateUpdateDTO, userId);
 
         CueSheetTemplateDTO cueSheetTemplateDTO = cueSheetTemplateService.find(cueTmpltId);
 
@@ -86,7 +99,11 @@ public class CueSheetTemplateController {
     public AnsApiResponse<?> delete(@Parameter(name = "cueTmpltId", required = true, description = "큐시트 템플릿 아이디")
                                     @PathVariable("cueTmpltId") Long cueTmpltId) {
 
-        cueSheetTemplateService.delete(cueTmpltId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록.
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Template Delete : userId - "+userId+" cueTmpltId - "+ cueTmpltId);
+
+        cueSheetTemplateService.delete(cueTmpltId, userId);
 
         return AnsApiResponse.noContent();
     }

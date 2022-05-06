@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderResponseDTO;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +30,8 @@ import java.util.List;
 public class ArticleOrderController {
 
     private final ArticleOrderService articleOrderService;
+
+    private final UserAuthService userAuthService;
 
 
     @Operation(summary = "기사의뢰 목록조회", description = "기사의뢰 목록조회")
@@ -82,9 +85,13 @@ public class ArticleOrderController {
     public AnsApiResponse<ArticleOrderResponseDTO> create(@Parameter(description = "필수값<br>", required = true)
                                                           @RequestBody @Valid ArticleOrderCreateDTO articleOrderCreateDTO) {
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info(" Update Article Order : User Id - "+userId+" Order Id -"+articleOrderCreateDTO.toString());
+
         ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();
 
-        Long orderId = articleOrderService.create(articleOrderCreateDTO);
+        Long orderId = articleOrderService.create(articleOrderCreateDTO, userId);
 
         responseDTO.setOrderId(orderId); //Id set[ response =  id]
 
@@ -98,9 +105,13 @@ public class ArticleOrderController {
                                                           @Parameter(name = "orderId", required = true, description = "의뢰 아이디")
                                                           @PathVariable("orderId") long orderId) {
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info(" Update Article Order : User Id - "+userId+" Order Id -"+articleOrderUpdateDTO.toString());
+
         ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();
 
-        articleOrderService.update(articleOrderUpdateDTO, orderId);
+        articleOrderService.update(articleOrderUpdateDTO, orderId, userId);
 
         responseDTO.setOrderId(orderId); //Id set[ response =  id]
 
@@ -113,6 +124,10 @@ public class ArticleOrderController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "orderId", required = true, description = "의뢰 아이디")
                                     @PathVariable("orderId") long orderId) {
+
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info(" Delete Article Order : User Id - "+userId+" Order Id -"+orderId);
 
         articleOrderService.delete(orderId);
 

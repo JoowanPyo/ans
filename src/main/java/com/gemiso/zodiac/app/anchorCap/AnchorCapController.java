@@ -50,11 +50,15 @@ public class AnchorCapController {
     public AnsApiResponse<AnchorCapDTO> create(@Parameter(description = "필수값<br>, ", required = true)
                                                @RequestBody AnchorCapCreateDTO anchorCapCreateDTO) {
 
+        log.info(" Create AnchorCap : "+anchorCapCreateDTO.toString());
+
         Long anchorCapId = anchorCapService.create(anchorCapCreateDTO);
 
         //앵커 자막 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         AnchorCapDTO anchorCapDTO = new AnchorCapDTO();
         anchorCapDTO.setAnchorCapId(anchorCapId);
+
+        log.info(" Create AnchorCap success : ID = "+anchorCapId);
 
         return new AnsApiResponse<>(anchorCapDTO);
     }
@@ -66,11 +70,15 @@ public class AnchorCapController {
                                                @Parameter(name = "anchorCapId", required = true, description = "앵커자막 아이디")
                                                @PathVariable("anchorCapId") Long anchorCapId) {
 
+        log.info(" Update AnchorCap : ID - "+anchorCapId +" Update Model - "+anchorCapUpdateDTO.toString());
+
         anchorCapService.update(anchorCapUpdateDTO, anchorCapId);
 
         //앵커 자막 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         AnchorCapDTO anchorCapDTO = new AnchorCapDTO();
         anchorCapDTO.setAnchorCapId(anchorCapId);
+
+        log.info(" Update AnchorCap success : ID - "+anchorCapId );
 
         return new AnsApiResponse<>(anchorCapDTO);
 
@@ -81,6 +89,8 @@ public class AnchorCapController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "anchorCapId", required = true, description = "앵커자막 아이디")
                                     @PathVariable("anchorCapId") Long anchorCapId) {
+
+        log.info(" Delete AnchorCap : ID - "+anchorCapId );
 
         anchorCapService.delete(anchorCapId);
 

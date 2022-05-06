@@ -37,7 +37,7 @@ public class ArticleOrderService {
     private final ArticleOrderCreateMapper articleOrderCreateMapper;
     private final ArticleOrderUpdateMapper articleOrderUpdateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
 
 
@@ -110,10 +110,9 @@ public class ArticleOrderService {
         return articleOrderDTO;
     }
 
-    public Long create(ArticleOrderCreateDTO articleOrderCreateDTO){
+    public Long create(ArticleOrderCreateDTO articleOrderCreateDTO, String userId){
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+
         articleOrderCreateDTO.setInputrId(userId);
 
         ArticleOrder articleOrder = articleOrderCreateMapper.toEntity(articleOrderCreateDTO);
@@ -123,12 +122,10 @@ public class ArticleOrderService {
         return articleOrder.getOrderId();
     }
 
-    public void update(ArticleOrderUpdateDTO articleOrderUpdateDTO, Long orderId){
+    public void update(ArticleOrderUpdateDTO articleOrderUpdateDTO, Long orderId, String userId){
 
         ArticleOrder articleOrder = articleOrderFindOrFail(orderId);
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
         articleOrderUpdateDTO.setUpdtrId(userId);
 
         articleOrderUpdateMapper.updateFromDto(articleOrderUpdateDTO, articleOrder);

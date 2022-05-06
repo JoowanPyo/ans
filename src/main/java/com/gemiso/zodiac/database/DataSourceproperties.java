@@ -18,14 +18,14 @@ public class DataSourceproperties {
     @Bean(name = "mainDataSource")
     @Qualifier("mainDataSource")
     @Primary
-    @ConfigurationProperties(prefix = "spring.datasource.hikari.main")
+    @ConfigurationProperties(prefix = "spring.datasource.main")
     public DataSource masterDataSource(){
         return DataSourceBuilder.create().type(HikariDataSource.class).build();
     }
 
     @Bean(name = "subDataSource")
     @Qualifier("subDataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.hikari.sub")
+    @ConfigurationProperties(prefix = "spring.datasource.sub")
     public DataSource secondDataSource(){
         return DataSourceBuilder.create().type(HikariDataSource.class).build();
     }

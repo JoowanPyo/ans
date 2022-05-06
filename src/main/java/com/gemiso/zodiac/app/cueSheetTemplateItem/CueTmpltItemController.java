@@ -5,6 +5,7 @@ import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemUpdateDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +25,8 @@ import java.util.List;
 public class CueTmpltItemController {
 
     private final CueTmpltItemService cueTmpltItemService;
+
+    private final UserAuthService userAuthService;
 
 
     @Operation(summary = "큐시트 템플릿 아이템 목록조회", description = "큐시트 템플릿 아이템 목록조회")
@@ -56,7 +59,11 @@ public class CueTmpltItemController {
                                                         @Parameter(name = "cueTmpltId", description = "큐시트 템플릿 아이디")
                                                         @PathVariable("cueTmpltId") Long cueTmpltId) {
 
-        CueTmpltItemSimpleDTO cueTmpltItemSimpleDTO = cueTmpltItemService.create(cueTmpltItemCreateDTO, cueTmpltId);
+        String userId = userAuthService.authUser.getUserId(); //토큰에서 사장자 아이디 get
+        log.info("CueSheet Template Item Create : userId - "+userId+" cueTmpltId - "+cueTmpltId+"<br>"+
+                "CueSheet Template Model - "+cueTmpltItemCreateDTO.toString());
+
+        CueTmpltItemSimpleDTO cueTmpltItemSimpleDTO = cueTmpltItemService.create(cueTmpltItemCreateDTO, cueTmpltId, userId);
 
         return new AnsApiResponse<>(cueTmpltItemSimpleDTO);
     }
@@ -68,7 +75,11 @@ public class CueTmpltItemController {
                                                         @Parameter(name = "cueTmpltItemId", description = "큐시트 템플릿 아이템 아이디")
                                                         @PathVariable("cueTmpltItemId") Long cueTmpltItemId) {
 
-        CueTmpltItemSimpleDTO cueTmpltItemSimpleDTO = cueTmpltItemService.update(cueTmpltItemUpdateDTO, cueTmpltItemId);
+        String userId = userAuthService.authUser.getUserId(); //토큰에서 사장자 아이디 get
+        log.info("CueSheet Template Item Update : userId - "+userId+" cueTmpltItemId - "+cueTmpltItemId+"<br>"+
+                "CueSheet Template Model - "+cueTmpltItemUpdateDTO.toString());
+
+        CueTmpltItemSimpleDTO cueTmpltItemSimpleDTO = cueTmpltItemService.update(cueTmpltItemUpdateDTO, cueTmpltItemId, userId);
 
         return new AnsApiResponse<>(cueTmpltItemSimpleDTO);
     }
@@ -78,7 +89,10 @@ public class CueTmpltItemController {
     public AnsApiResponse<?> delete(@Parameter(name = "cueTmpltItemId", description = "큐시트 템플릿 아이템 아이디")
                                     @PathVariable("cueTmpltItemId") Long cueTmpltItemId) {
 
-        cueTmpltItemService.delete(cueTmpltItemId);
+        String userId = userAuthService.authUser.getUserId(); //토큰에서 사장자 아이디 get
+        log.info("CueSheet Template Item Delete : userId - "+userId+" cueTmpltItemId - "+cueTmpltItemId);
+
+        cueTmpltItemService.delete(cueTmpltItemId, userId);
 
         return AnsApiResponse.noContent();
     }
@@ -91,6 +105,10 @@ public class CueTmpltItemController {
                                                            @PathVariable("cueTmpltId") Long cueTmpltId,
                                                            @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
                                                            @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd) {
+
+        String userId = userAuthService.authUser.getUserId(); //토큰에서 사장자 아이디 get
+        log.info("CueSheet Template Item Order Update : userId - "+userId+" cueTmpltItemId - "+cueTmpltItemId+ " cueTmpltId - "
+                +cueTmpltId+" Order - "+cueItemOrd);
 
         cueTmpltItemService.ordUpdate(cueTmpltItemId, cueTmpltId, cueItemOrd);
 

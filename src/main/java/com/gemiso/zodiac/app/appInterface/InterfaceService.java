@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.appInterface;
 
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.appInterface.codeDTO.*;
+import com.gemiso.zodiac.app.appInterface.mediaTransferDTO.MediaTransferDTO;
 import com.gemiso.zodiac.app.appInterface.prompterCueDTO.*;
 import com.gemiso.zodiac.app.appInterface.prompterProgramDTO.PrompterProgramDTO;
 import com.gemiso.zodiac.app.appInterface.prompterProgramDTO.PrompterProgramDataDTO;
@@ -47,6 +48,7 @@ import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
+import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -1884,14 +1886,15 @@ public class InterfaceService {
     }
 
     //전송상태 업데이트
-    public void stateChange(Integer contentId, String trnsfStCd, Integer trnasfVal){
+    public void stateChange(MediaTransferDTO mediaTransferDTO){
+
+        Integer contentId = mediaTransferDTO.getContentId();
+        String trnsfStCd = mediaTransferDTO.getTrnsfStCd();
+        Integer trnasfVal = mediaTransferDTO.getTrnasfVal();
 
         //검색조건으로 부조전송날짜 mediaMtchDtm 에 당일로? 아니면 그냥 오늘당일콘텐츠만 조회하여 업데이트
         //콘텐츠아이디 + 비디오아이디 로 기사 미디어 검색.
         List<ArticleMedia> articleMediaList = articleMediaRepository.findArticleMediaListByContentId(contentId);
-
-        //콘텐츠 아이디로 찾은 정보가 있으면 처리 [ 무조건 성공으로 넘어간다. ]
-        
         
         //검색된 기사 미디어 값 업데이트
         for (ArticleMedia articleMedia : articleMediaList){

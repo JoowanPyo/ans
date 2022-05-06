@@ -104,7 +104,7 @@ public class CueSheetService {
     private final CueSheetItemCapCreateMapper cueSheetItemCapCreateMapper;
 
     private final ProgramService programService;
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
     private final ArticleService articleService;
 
     private final DailyProgramService dailyProgramService;
@@ -420,10 +420,8 @@ public class CueSheetService {
 
 
         //큐시트 등록
-    public Long create(CueSheetCreateDTO cueSheetCreateDTO) throws JsonProcessingException {
+    public Long create(CueSheetCreateDTO cueSheetCreateDTO, String userId) throws JsonProcessingException {
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
         cueSheetCreateDTO.setInputrId(userId);
         cueSheetCreateDTO.setCueOderVer(0);
         cueSheetCreateDTO.setCueVer(0);
@@ -462,7 +460,7 @@ public class CueSheetService {
     }
 
     //큐시트 수정
-    public void update(CueSheetUpdateDTO cueSheetUpdateDTO, Long cueId) throws JsonProcessingException {
+    public void update(CueSheetUpdateDTO cueSheetUpdateDTO, Long cueId, String userId) throws JsonProcessingException {
 
         //수정! 잠금여부? 잠금사용자, 잠금일시 도 수정할 때 정보를 넣어주나?
 
@@ -485,7 +483,7 @@ public class CueSheetService {
 
         cueSheetRepository.save(cueSheet);
 
-        cueSheetHistUpdate(cueId, cueSheet);
+        cueSheetHistUpdate(cueId, cueSheet, userId);
 
         //수정! 버전정보 안들어가나요?
         //큐시트 토픽 메세지 전송
@@ -494,14 +492,12 @@ public class CueSheetService {
     }
 
     //큐시트 삭제
-    public void delete(Long cueId) throws JsonProcessingException {
+    public void delete(Long cueId, String userId) throws JsonProcessingException {
 
         CueSheet cueSheet = cueSheetFindOrFail(cueId);
 
         CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
         cueSheetDTO.setDelrId(userId);
         cueSheetDTO.setDelDtm(new Date());
         cueSheetDTO.setDelYn("Y");
@@ -510,7 +506,7 @@ public class CueSheetService {
 
         cueSheetRepository.save(cueSheet);
 
-        cueSheetHistDelete( cueId, cueSheet);
+        cueSheetHistDelete( cueId, cueSheet, userId);
 
         sendCueTopic(cueSheet, "CuSheet Delete", cueSheetDTO);
 
@@ -587,7 +583,7 @@ public class CueSheetService {
     }
 
     //큐시트 이력 수정
-    public void cueSheetHistUpdate(Long cueId, CueSheet cueSheet){
+    public void cueSheetHistUpdate(Long cueId, CueSheet cueSheet, String userId){
 
         List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //큐시트 아이템 엔티티 조회
 
@@ -600,8 +596,6 @@ public class CueSheetService {
                 .map(n -> String.valueOf(n))
                 .collect(Collectors.joining());
 
-
-        String userId = userAuthService.authUser.getUserId();//수정자 아이디 get
         //큐시트 이력에 넣어줄 큐시트 아이디 빌드
         CueSheetSimpleDTO cueSheetSimpleDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
 
@@ -626,7 +620,7 @@ public class CueSheetService {
     }
     
     //큐시트 이력 삭제
-    public void cueSheetHistDelete(Long cueId, CueSheet cueSheet){
+    public void cueSheetHistDelete(Long cueId, CueSheet cueSheet, String userId){
 
         List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //큐시트 아이템 엔티티 조회
 
@@ -639,8 +633,6 @@ public class CueSheetService {
                 .map(n -> String.valueOf(n))
                 .collect(Collectors.joining());
 
-
-        String userId = userAuthService.authUser.getUserId();//수정자 아이디 get
         //큐시트 이력에 넣어줄 큐시트 아이디 빌드
         CueSheetSimpleDTO cueSheetSimpleDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
 
@@ -706,14 +698,14 @@ public class CueSheetService {
     }
     
     //큐시트 락
-    public void cueSheetOrderLock(CueSheetOrderLockDTO cueSheetOrderLockDTO, Long cueId){
+    public void cueSheetOrderLock(CueSheetOrderLockDTO cueSheetOrderLockDTO, Long cueId, String userId){
 
         CueSheet cueSheet = cueSheetFindOrFail(cueId);
 
         String lckYn = cueSheetOrderLockDTO.getLckYn();
 
         if (lckYn != null && lckYn.equals("Y")) { //락 여부값이 Y 가 아닐경우 lck값 초기화
-            String userId = userAuthService.authUser.getUserId();
+            //String userId = userAuthService.authUser.getUserId();
             cueSheetOrderLockDTO.setLckrId(userId);
             cueSheetOrderLockDTO.setLckDtm(new Date());
             cueSheetOrderLockDTO.setLckYn("Y");
@@ -748,13 +740,12 @@ public class CueSheetService {
     }
     
     //큐시트 복사
-    public Long copy(Long cueId, String brdcPgmId, String brdcDt) throws Exception {
+    public Long copy(Long cueId, String brdcPgmId, String brdcDt, String userId) throws Exception {
 
         CueSheet getCueSheet = cueSheetFindOrFail(cueId);//원본 큐시트 get
 
         CueSheetCreateDTO cueSheetCreateDTO = cueSheetCreateMapper.toDto(getCueSheet);//원본 큐시트의 데이터를 createDTO에set
 
-        String userId = userAuthService.authUser.getUserId(); // 로그인 Id로 입력자 set
         cueSheetCreateDTO.setInputrId(userId);
         cueSheetCreateDTO.setCueVer(0); //큐시트 버전 리셋
         cueSheetCreateDTO.setCueOderVer(0); //큐시트 오더버전 리셋

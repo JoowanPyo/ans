@@ -32,8 +32,6 @@ public class CueSheetItemCapService {
     private final CueSheetItemCapCreateMapper cueSheetItemCapCreateMapper;
     private final CueSheetItemCapUpdateMapper cueSheetItemCapUpdateMapper;
 
-    private final UserAuthService userAuthService;
-
 
 
     public List<CueSheetItemCapDTO> findAll(Long cueId, Long cueItemId, String cueItemCapDivCd){
@@ -61,13 +59,11 @@ public class CueSheetItemCapService {
         return cueSheetItemCapDTO;
     }
 
-    public Long create(CueSheetItemCapCreateDTO cueSheetItemCapCreateDTO, Long cueId, Long cueItemId){
+    public Long create(CueSheetItemCapCreateDTO cueSheetItemCapCreateDTO, Long cueId, Long cueItemId, String userId){
 
         //수정. cueId???, cueItemCapDivCd값으로 큐시트아이템아티클캡 업데이트
 
         cueSheetItemCapCreateDTO.setCueItemId(cueItemId);//큐아이템 아이디 추가.
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
         cueSheetItemCapCreateDTO.setInputrId(userId);//등록자 아이디 추가.
 
         CueSheetItemCap cueSheetItemCap = cueSheetItemCapCreateMapper.toEntity(cueSheetItemCapCreateDTO);
@@ -79,10 +75,10 @@ public class CueSheetItemCapService {
     }
 
 
-    public void createList(List<CueSheetItemCapCreateDTO> cueSheetItemCapCreateDTOList, Long cueId, Long cueItemId){
+    public void createList(List<CueSheetItemCapCreateDTO> cueSheetItemCapCreateDTOList, Long cueId, Long cueItemId, String userId){
 
         if (ObjectUtils.isEmpty(cueSheetItemCapCreateDTOList) == false) {
-            log.error("cueSheetItemCapCreateDTOList is empty");
+            log.error("CueSheet Item Cap CreateDTO List is empty"+" cueId - "+cueId+" CueItemId - "+cueItemId);
             return;
         }
 
@@ -92,8 +88,6 @@ public class CueSheetItemCapService {
         for (CueSheetItemCapCreateDTO cueSheetItemCapCreateDTO : cueSheetItemCapCreateDTOList){ //큐시트 아이템 자막 저장
             cueSheetItemCapCreateDTO.setCueItemId(cueItemId);
 
-            // 토큰 인증된 사용자 아이디를 입력자로 등록
-            String userId = userAuthService.authUser.getUserId();
             cueSheetItemCapCreateDTO.setInputrId(userId);//등록자 아이디 추가.
 
             CueSheetItemCap cueSheetItemCap = cueSheetItemCapCreateMapper.toEntity(cueSheetItemCapCreateDTO);
@@ -103,14 +97,13 @@ public class CueSheetItemCapService {
 
     }
 
-    public void update(CueSheetItemCapUpdateDTO cueSheetItemCapUpdateDTO, Long cueId, Long cueItemId, Long cueItemCapId){
+    public void update(CueSheetItemCapUpdateDTO cueSheetItemCapUpdateDTO, Long cueId, Long cueItemId
+            , Long cueItemCapId, String userId){
 
         CueSheetItemCap cueSheetItemCap = cueItemCapFindOrFail(cueItemCapId);
 
         cueSheetItemCapUpdateDTO.setCueItemId(cueItemId);//큐아이템 아이디 등록
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
         cueSheetItemCapUpdateDTO.setUpdtrId(userId);
 
         cueSheetItemCapUpdateMapper.updateFromDto(cueSheetItemCapUpdateDTO, cueSheetItemCap);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.cueSheet.dto.*;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,6 +28,7 @@ public class CueSheetController {
 
     private final CueSheetService cueSheetService;
 
+    private final UserAuthService userAuthService;
 
     @Operation(summary = "큐시트 목록조회", description = "큐시트 목록조회")
     @GetMapping(path = "")
@@ -75,7 +77,12 @@ public class CueSheetController {
     public AnsApiResponse<CueSheetSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                               @RequestBody @Valid CueSheetCreateDTO cueSheetCreateDTO,
                                               @Parameter(name = "cueTmpltId", description = "큐시트템플릿아이디", in = ParameterIn.QUERY)
-                                              @RequestParam(value = "cueTmpltId", required = false) Long cueTmpltId) throws JsonProcessingException {
+                                              @RequestParam(value = "cueTmpltId", required = false) Long cueTmpltId) throws Exception {
+
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Create : UserId - "+userId +"<br>"+
+                "CueSheet model - "+cueSheetCreateDTO.toString());
 
         //큐시트 생성 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         CueSheetSimpleDTO cueSheetSimpleDTO = new CueSheetSimpleDTO();
@@ -84,10 +91,11 @@ public class CueSheetController {
 
         //이미 같은날짜에 같은프로그램으로 큐시트 생성되어 있을시 error ( 409 )
         if (cueCnt != 0){
-            return new AnsApiResponse<>(cueSheetSimpleDTO, HttpStatus.CONFLICT);
+            //return new AnsApiResponse<>(cueSheetSimpleDTO, HttpStatus.CONFLICT);
+            throw new Exception("이미 같은날짜에 생성된 큐시트가 존재합니다.");
         }
 
-        Long cueId = cueSheetService.create(cueSheetCreateDTO);
+        Long cueId = cueSheetService.create(cueSheetCreateDTO, userId);
 
         //수정! 큐시트아이템복사.???
 
@@ -105,9 +113,13 @@ public class CueSheetController {
                                               @PathVariable("cueId") Long cueId) throws JsonProcessingException {
         //버전체크
         //토픽메세지
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Update : UserId - "+userId +"<br>"+
+                "CueSheet model - "+cueSheetUpdateDTO.toString());
 
 
-        cueSheetService.update(cueSheetUpdateDTO, cueId);
+        cueSheetService.update(cueSheetUpdateDTO, cueId, userId);
 
         //큐시트 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         CueSheetSimpleDTO cueSheetSimpleDTO = new CueSheetSimpleDTO();
@@ -125,20 +137,30 @@ public class CueSheetController {
 
         //사용자 비밀번호 체크
         //토픽메세지
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Update : UserId - "+userId +"<br>"+
+                "CueSheet Id - "+cueId);
 
-        cueSheetService.delete(cueId);
+        cueSheetService.delete(cueId, userId);
 
         return AnsApiResponse.noContent();
     }
 
     @Operation(summary = "큐시트 오더락", description = "큐시트 오더락")
     @PutMapping(path = "/{cueId}/orderLock")
-    public AnsApiResponse<CueSheetDTO> cueSheetOrderLock(@Parameter(name = "cueSheetUpdateDTO", required = true, description = "필수값<br>")
+    public AnsApiResponse<CueSheetDTO> cueSheetOrderLock(@Parameter(name = "cueSheetOrderLockDTO", required = true, description = "필수값<br>")
                                                          @Valid @RequestBody CueSheetOrderLockDTO cueSheetOrderLockDTO,
                                                          @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
                                                          @PathVariable("cueId") Long cueId) {
 
-        cueSheetService.cueSheetOrderLock(cueSheetOrderLockDTO, cueId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet OrderLock : UserId - "+userId + "CueSheet Id - "+cueId+
+                "<br>"+"CueSheet Model - "+cueSheetOrderLockDTO.toString());
+
+
+        cueSheetService.cueSheetOrderLock(cueSheetOrderLockDTO, cueId, userId);
 
         //큐시트 오더락 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         CueSheetDTO cueSheetDTO = new CueSheetDTO();
@@ -152,6 +174,11 @@ public class CueSheetController {
     @PutMapping(path = "/{cueId}/unLock")
     public AnsApiResponse<CueSheetDTO> cueSheetUnLock(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
                                                       @PathVariable("cueId") Long cueId) {
+
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Unlock : UserId - "+userId + "CueSheet Id - "+cueId);
+
 
         cueSheetService.cueSheetUnLock(cueId);
 
@@ -171,6 +198,10 @@ public class CueSheetController {
                                                           @Parameter(name = "brdcDt", description = "방송일자")
                                                           @RequestParam(value = "brdcDt", required = false) String brdcDt) throws Exception {
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Copy : UserId - "+userId + "CueSheet Id - "+cueId+" Program Id - "+brdcPgmId+" Brdc Date - "+brdcDt);
+
         //오더버전?
         //토픽메세지
 
@@ -183,7 +214,7 @@ public class CueSheetController {
             return new AnsApiResponse<>(cueSheetSimpleDTO, HttpStatus.CONFLICT);
         }
 
-        Long cueSheetId = cueSheetService.copy(cueId, brdcPgmId, brdcDt);
+        Long cueSheetId = cueSheetService.copy(cueId, brdcPgmId, brdcDt, userId);
 
         cueSheetSimpleDTO.setCueId(cueSheetId);
 

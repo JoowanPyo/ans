@@ -32,7 +32,6 @@ public class CueSheetTemplateService {
     private final CueSheetTemplateCreateMapper cueSheetTemplateCreateMapper;
     private final CueSheetTemplateUpdateMapper cueSheetTemplateUpdateMapper;
 
-    private final UserAuthService userAuthService;
 
 
     //큐시트 템플릿 목록조회
@@ -61,10 +60,8 @@ public class CueSheetTemplateService {
     }
 
     //큐시트 템플릿 등록
-    public Long create(CueSheetTemplateCreateDTO cueSheetTemplateCreateDTO){
+    public Long create(CueSheetTemplateCreateDTO cueSheetTemplateCreateDTO, String userId){
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록.
-        String userId = userAuthService.authUser.getUserId();
         cueSheetTemplateCreateDTO.setInputrId(userId);
 
         //DTO -> 엔티티 변환.
@@ -77,12 +74,10 @@ public class CueSheetTemplateService {
     }
 
     //큐시트 템플릿 수정
-    public void update(Long cueTmpltId, CueSheetTemplateUpdateDTO cueSheetTemplateUpdateDTO){
+    public void update(Long cueTmpltId, CueSheetTemplateUpdateDTO cueSheetTemplateUpdateDTO, String userId){
 
         CueSheetTemplate cueSheetTemplate = cueSheetTemplateFindOrFail(cueTmpltId);//큐시트 템플릿 존재 유무 확인 및 단건조회.
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록.
-        String userId = userAuthService.authUser.getUserId();
         cueSheetTemplateUpdateDTO.setUpdtrId(userId);
         //조회된 기존등록된 큐시트 템플릿 정보에 업데이트 정보로 들어온 바뀐 정보 set.
         cueSheetTemplateUpdateMapper.updateFromDto(cueSheetTemplateUpdateDTO, cueSheetTemplate);
@@ -92,7 +87,7 @@ public class CueSheetTemplateService {
 
     }
 
-    public void delete(Long cueTmpltId){
+    public void delete(Long cueTmpltId, String userId){
 
         CueSheetTemplate cueSheetTemplate = cueSheetTemplateFindOrFail(cueTmpltId);//큐시트 템플릿 존재 유무 확인 및 단건조회.
         //조회된 큐시트 템플릿 엔티티 DTO변환 [데이터 셋팅 위해 DTO 변환].
@@ -100,8 +95,6 @@ public class CueSheetTemplateService {
 
         cueSheetTemplateDTO.setDelDtm(new Date());//삭제일시 set.
         cueSheetTemplateDTO.setDelYn("Y");//삭제여부값 "Y"
-        // 토큰 인증된 사용자 아이디를 입력자로 등록.
-        String userId = userAuthService.authUser.getUserId();
         cueSheetTemplateDTO.setDelrId(userId);
         //조회된 기존등록된 큐시트 템플릿 정보에 업데이트 정보로 들어온 바뀐 정보 set.
         cueSheetTemplateMapper.updateFromDto(cueSheetTemplateDTO, cueSheetTemplate);

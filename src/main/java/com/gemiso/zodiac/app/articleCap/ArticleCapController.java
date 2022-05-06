@@ -50,11 +50,15 @@ public class ArticleCapController {
     public AnsApiResponse<ArticleCapDTO> create(@Parameter(description = "필수값<br>, ", required = true)
                                              @RequestBody ArticleCapCreateDTO articleCapCreateDTO) {
 
+        log.info(" Create ArticleCap : "+articleCapCreateDTO.toString());
+
         Long articleCapId = articleCapService.create(articleCapCreateDTO);
 
         //기사자막 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleCapDTO articleCapDTO = new ArticleCapDTO();
         articleCapDTO.setArtclCapId(articleCapId);
+
+        log.info(" Create ArticleCap Success : ID = "+articleCapId);
 
         return new AnsApiResponse<>(articleCapDTO);
     }
@@ -65,6 +69,8 @@ public class ArticleCapController {
                                              @RequestBody ArticleCapUpdateDTO articleCapUpdateDTO,
                                                 @Parameter(name = "articleCapId", required = true, description = "기사자막 아이디")
                                              @PathVariable("articleCapId") Long articleCapId) {
+
+        log.info(" Update ArticleCap : ID - "+articleCapId +" Update Model - "+articleCapUpdateDTO.toString());
 
         articleCapService.update(articleCapUpdateDTO, articleCapId);
 
@@ -81,6 +87,8 @@ public class ArticleCapController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "articleCapId", required = true, description = "기사자막 아이디")
                                      @PathVariable("articleCapId") long articleCapId){
+
+        log.info(" Delete ArticleCap : ID - "+articleCapId );
 
         articleCapService.delete(articleCapId);
 

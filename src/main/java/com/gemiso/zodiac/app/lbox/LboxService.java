@@ -244,8 +244,6 @@ public class LboxService {
 
                 responsBody = responseEntity.getBody();
 
-                log.info("Destination : " + destination + "Response Data : " + responsBody);
-
                 MediaTransportDataDTO data = responsBody.getData();
                 clipInfoDTO = data.getClip_info(); //이미 전송된 영상이거나 전송완료인 영상 데이터DTO
                 List<TasksDTO> tasksDTO = data.getTasks(); //전송시작시 데이터
@@ -260,11 +258,12 @@ public class LboxService {
             } catch (Exception e) { //부조 전송오류가 있을시,
 
                 TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
-                transportFaildDTO.setMessage(e.getMessage()); //오류 메시지
+                transportFaildDTO.setMessage(e.getLocalizedMessage()); //오류 메시지
                 transportFaildDTO.setSubrmNm(subrmNm); //부조 명
                 transportFaildDTO.setDestination(faildDest); // 전송대상
 
                 transportFaildDTOList.add(transportFaildDTO);
+
             }
         }
 

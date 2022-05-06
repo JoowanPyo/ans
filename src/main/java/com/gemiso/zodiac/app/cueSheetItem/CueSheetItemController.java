@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.*;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +26,8 @@ public class CueSheetItemController {
 
     private final CueSheetItemService cueSheetItemService;
     /*private final ArticleService articleService;*/
+
+    private final UserAuthService userAuthService;
 
     @Operation(summary = "큐시트 아이템 목록조회", description = "큐시트 아이템 목록조회")
     @GetMapping(path = "")
@@ -59,7 +62,13 @@ public class CueSheetItemController {
                                                                 @Parameter(name = "cueId", description = "큐시트아이디")
                                                                 @PathVariable("cueId") Long cueId) throws JsonProcessingException {
 
-        cueSheetItemService.createTemplate(cueSheetItemCreateDTOList, cueId);
+        //토큰 사용자 Id(현재 로그인된 사용자 ID)
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Item Template Create : userId - "+userId+ " CueId - "+cueId +"<br>"+
+                " CueSheet Item Model List - " +cueSheetItemCreateDTOList.toString());
+
+
+        cueSheetItemService.createTemplate(cueSheetItemCreateDTOList, cueId, userId);
 
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
 
@@ -75,7 +84,12 @@ public class CueSheetItemController {
                                                   @Parameter(name = "cueId", description = "큐시트아이디")
                                                   @PathVariable("cueId") Long cueId) throws JsonProcessingException {
 
-        Long cueItemId = cueSheetItemService.create(cueSheetItemCreateDTO, cueId);
+        //토큰 사용자 Id(현재 로그인된 사용자 ID)
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Item Create : userId - "+userId+ " CueId - "+cueId +"<br>"+
+                " CueSheet Item Model - " +cueSheetItemCreateDTO.toString());
+
+        Long cueItemId = cueSheetItemService.create(cueSheetItemCreateDTO, cueId, userId);
 
         CueSheetItemDTO cueSheetItemDTO = cueSheetItemService.find(cueItemId);
 
@@ -93,6 +107,13 @@ public class CueSheetItemController {
                                                   @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
                                                   @PathVariable("cueItemId") Long cueItemId) throws Exception {
 
+        //토큰 사용자 Id(현재 로그인된 사용자 ID)
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Item Create : userId - "+userId+ " CueId - "+cueId +" CueItemDivCd - "+cueItemDivCd
+                        +"CueItemId - "+cueItemId+"<br>"+
+                " CueSheet Item Model - " +cueSheetItemUpdateDTO.toString());
+
+
         if (cueItemDivCd == null || "".equals(cueItemDivCd)) {
 
             throw new ResourceNotFoundException("큐시트 아이템 구분 코드가 잘못 되었습니다. 구분코드 : " + cueItemDivCd);
@@ -101,13 +122,13 @@ public class CueSheetItemController {
         } else if ("cue_item".equals(cueItemDivCd) || "cue_template".equals(cueItemDivCd)) {
 
             //큐시트 템플릿 Update
-            cueSheetItemService.update(cueSheetItemUpdateDTO, cueId, cueItemId);
+            cueSheetItemService.update(cueSheetItemUpdateDTO, cueId, cueItemId, userId);
 
             //큐시트 아이템 코드가 cue_article일 경우 [큐시트 아이템 수정 & 기사 수정]
         } else if ("cue_article".equals(cueItemDivCd)) {
 
             //기사복사본 수정.
-            cueSheetItemService.updateCueItemArticle(cueSheetItemUpdateDTO, cueId, cueItemId);
+            cueSheetItemService.updateCueItemArticle(cueSheetItemUpdateDTO, cueId, cueItemId, userId);
 
         } else {
             throw new ResourceNotFoundException("큐시트 아이템 구분코드를 확인해 주세요. 큐시트 아이템 구분 코드 : " + cueItemDivCd);
@@ -126,7 +147,12 @@ public class CueSheetItemController {
                                     @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
                                     @PathVariable("cueItemId") Long cueItemId) throws Exception {
 
-        cueSheetItemService.delete(cueId, cueItemId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Item Delete : userId - "+userId+ " CueId - "+cueId
+                +"CueItemId - "+cueItemId);
+
+        cueSheetItemService.delete(cueId, cueItemId, userId);
 
         return AnsApiResponse.noContent();
     }
@@ -142,6 +168,11 @@ public class CueSheetItemController {
                                                            @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
                                                            @RequestParam(value = "spareYn", required = true) String spareYn
     ) {
+
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Item OrderUpdate : userId - "+userId+ " CueId - "+cueId
+                +"CueItemId - "+cueItemId+ "Order - "+cueItemOrd+ " SpareYn - "+spareYn);
 
         cueSheetItemService.ordUpdate(cueId, cueItemId, cueItemOrd, spareYn);
 
@@ -181,9 +212,13 @@ public class CueSheetItemController {
                                                                @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
                                                                @RequestParam(value = "spareYn", required = false) String spareYn) throws Exception {
 
-        log.info("Drag and Drop Request : " + "cueId : " + cueId + " ");
+        //토큰 사용자 Id(현재 로그인된 사용자 ID)
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Item Create [Drag and Drop] : userId - "+userId+ " CueId - "+cueId +"<br>"+
+                " ArticleId - " +artclId + " Order - "+cueItemOrd+" SpareYn - "+spareYn);
 
-        cueSheetItemService.createCueItem(cueId, artclId, cueItemOrd, cueItemDivCd, spareYn);
+
+        cueSheetItemService.createCueItem(cueId, artclId, cueItemOrd, cueItemDivCd, spareYn, userId);
 
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
 
@@ -201,7 +236,11 @@ public class CueSheetItemController {
                                                                    @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
                                                                    @RequestParam(value = "spareYn", required = false) String spareYn) throws Exception {
 
-        cueSheetItemService.createCueItemList(cueSheetItemCreateListDTO, cueId, spareYn);
+        //토큰 사용자 Id(현재 로그인된 사용자 ID)
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Item Create [Drag and Drop List] : userId - "+userId+ " CueId - "+cueId );
+
+        cueSheetItemService.createCueItemList(cueSheetItemCreateListDTO, cueId, spareYn, userId);
 
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
 
@@ -232,6 +271,10 @@ public class CueSheetItemController {
                                                                      @PathVariable("cueItemId") Long cueItemId,
                                                                      @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
                                                                      @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd) throws JsonProcessingException {
+
+        //토큰 사용자 Id(현재 로그인된 사용자 ID)
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Item Restore : userId - "+userId+ " CueId - "+cueId +" Order - "+cueItemOrd);
 
         CueSheetItemSimpleDTO cueSheetItemSimpleDTO = cueSheetItemService.cueSheetItemRestore(cueId, cueItemId, cueItemOrd);
 

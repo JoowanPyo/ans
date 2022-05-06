@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.appInterface;
 
 import com.gemiso.zodiac.app.appInterface.codeDTO.TakerCodeDTO;
+import com.gemiso.zodiac.app.appInterface.mediaTransferDTO.MediaTransferDTO;
 import com.gemiso.zodiac.app.appInterface.prompterCueDTO.PrompterCueSheetDTO;
 import com.gemiso.zodiac.app.appInterface.prompterCueDTO.PrompterCueSheetDataDTO;
 import com.gemiso.zodiac.app.appInterface.prompterProgramDTO.PrompterProgramDTO;
@@ -8,6 +9,7 @@ import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDataDT
 import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerCueRefreshDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerSpareCueRefreshDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleDeleteConfirmDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
@@ -24,6 +26,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -352,7 +355,7 @@ public class InterfaceController {
                                 @RequestParam(value = "cue_st_cd", required = false) String cue_st_cd,
                                 @RequestHeader(value = "securityKey") String securityKey) {
 
-        log.info("Taker CueSheet State Code Update : rd_id - "+rd_id+" cue_st_cd : "+cue_st_cd);
+        log.info("Taker CueSheet State Code Update : rd_id - " + rd_id + " cue_st_cd : " + cue_st_cd);
 
         ParentProgramDTO parentProgramDTO = interfaceService.cueStCdUpdate(rd_id, cue_st_cd);
 
@@ -363,16 +366,15 @@ public class InterfaceController {
 
     @Operation(summary = "영상 전송 상태 업데이트", description = "영상 전송 상태 업데이트")
     @PutMapping(path = "/mediatransfer/updatestate")
-    public AnsApiResponse<?> stateChange(@Parameter(name = "contentId", description = "콘텐츠 아이디.")
-                                         @RequestParam(value = "contentId", required = false) Integer contentId,
-                                         @Parameter(name = "trnasfVal", description = "전송률.")
-                                         @RequestParam(value = "trnasfVal", required = false) Integer trnasfVal,
-                                         @Parameter(name = "trnsfStCd", description = "match_ready:준비됨, match_inprocess : 시작됨,<br> " +
-                                                 "match_failed : 실패, match_completed : 완료")
-                                         @RequestParam(value = "trnsfStCd", required = false) String trnsfStCd,
+    public AnsApiResponse<?> stateChange(@Parameter(description = "필수값<br> lckYn ", required = true)
+                                         @RequestBody @Valid MediaTransferDTO mediaTransferDTO,
                                          @RequestHeader(value = "securityKey") String securityKey) {
 
-        interfaceService.stateChange(contentId, trnsfStCd, trnasfVal);
+        //콘텐츠 아이디로 찾은 정보가 있으면 처리 [ 무조건 성공으로 넘어간다. ]
+        log.info("Media State Update : ContentId : " + mediaTransferDTO.getContentId() + " Code : " + mediaTransferDTO.getTrnsfStCd() + " val : "
+                + mediaTransferDTO.getTrnasfVal());
+
+        interfaceService.stateChange(mediaTransferDTO);
         return new AnsApiResponse<>("complete");
     }
 }

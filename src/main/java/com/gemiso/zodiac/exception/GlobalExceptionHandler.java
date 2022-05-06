@@ -76,11 +76,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
 
     @ExceptionHandler(value = ResourceNotFoundException.class)
     public ResponseEntity<Object> handleApiRequestException(ResourceNotFoundException ex) {
+        log.error(" ResourceNotFoundException : "+ ApiErrorResponse.makeResourceNotFoundResponse(ex));
         return new ResponseEntity<>(ApiErrorResponse.makeResourceNotFoundResponse(ex), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(value = UserFailException.class)
     public ResponseEntity<Object> handleApiRequestException(UserFailException ex) {
+        log.error(" UserFailException : "+ ApiErrorResponse.makeUserFailResponse(ex));
         return new ResponseEntity<>(ApiErrorResponse.makeUserFailResponse(ex), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
@@ -89,14 +91,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         ApiErrorResponse.Error error =
                 new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.InternalServerError, ex.getMessage());
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(ApiErrorResponse.makeExceptionHandlerErrorResponse(ex), HttpStatus.INTERNAL_SERVER_ERROR);
+        log.error(" Exception : "+ apiErrorResponse);
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = {JsonProcessingException.class})
     public ResponseEntity<Object> handleJsonProcessingException(HttpServletRequest request, JsonProcessingException e) {
         ApiErrorResponse.Error error =
-                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.InternalServerError, e.getMessage());
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.InternalServerError, e.getLocalizedMessage());
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
+
+        log.error(" JsonProcessingException : "+ apiErrorResponse);
+
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -105,6 +111,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         ApiErrorResponse.Error error =
                 new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.expiredAccesstoken, ex.getLocalizedMessage());
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
+
+
+        log.error(" ExpiredJwtException : "+ apiErrorResponse);
+
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.UNAUTHORIZED);
     }
 

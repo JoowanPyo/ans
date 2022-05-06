@@ -32,6 +32,8 @@ public class IssueController {
 
     private final IssueService issueService;
 
+    private final UserAuthService userAuthService;
+
     @Operation(summary = "이슈 목록 조회", description = "조회조건으로 이슈 목록 조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<IssueDTO>> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
@@ -73,7 +75,11 @@ public class IssueController {
     public AnsApiResponse<IssueDTO> create(
             @Parameter(description = "필수값<br>이슈제목, 이슈일자", required = true) @RequestBody IssueCreateDTO issueCreateDTO) throws Exception {
 
-        IssueDTO issuDto = issueService.create(issueCreateDTO);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info(" Issue Create : userId - "+userId +"<br>" +" Issue Model - "+issueCreateDTO);
+
+        IssueDTO issuDto = issueService.create(issueCreateDTO, userId);
 
         return new AnsApiResponse<>(issuDto);
     }
@@ -84,7 +90,11 @@ public class IssueController {
             @Parameter(description = "Update issue object", required = true) @RequestBody IssueUpdateDTO issueDTO,
             @Parameter(description = "이슈 아이디", required = true) @PathVariable("issuId") Long issuId) {
 
-        issueService.update(issueDTO, issuId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info(" Issue Update : userId - "+userId +"<br>" +" Issue Model - "+issueDTO);
+
+        issueService.update(issueDTO, issuId, userId);
 
         IssueDTO issueDto = issueService.find(issuId);
 
@@ -97,7 +107,11 @@ public class IssueController {
     public AnsApiResponse<?> delete(
             @Parameter(name = "issuId", required = true, description = "이슈아이디") @PathVariable("issuId") Long issuId) {
 
-        issueService.delete(issuId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info(" Issue Delete : userId - "+userId +"<br>" +" Issue Id - "+issuId);
+
+        issueService.delete(issuId, userId);
 
         return AnsApiResponse.noContent();
     }
@@ -110,7 +124,11 @@ public class IssueController {
             @Parameter(description = "복사할 이슈", required = true) @RequestBody List<IssueCopyDTO> issueCopyDTO
     ) throws Exception {
 
-        Date endDate = issueService.copy(issueCopyDTO, targetDate);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info(" Issue Copy : userId - "+userId +" targetDate - "+targetDate+"<br>" +" Issue Model - "+issueCopyDTO.toString());
+
+        Date endDate = issueService.copy(issueCopyDTO, targetDate, userId);
 
         List<IssueDTO> issueDTOList = issueService.findAll(targetDate, endDate, "N");
 
@@ -125,6 +143,11 @@ public class IssueController {
                                                       @Parameter(name = "issuOrd", required = true, description = "이슈 순번")
                                                       @RequestParam(value = "issuOrd") Integer issuOrd) throws Exception {
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info(" Issue Change Ord : userId - "+userId +" Issue Id - "+issuId + " IssueOrd - "+issuOrd);
+
+
         List<IssueDTO> issueDTOList = issueService.changeOrder(issuId, issuOrd);
 
         return new AnsApiResponse<>(issueDTOList);
@@ -134,6 +157,10 @@ public class IssueController {
     @PutMapping(path = "/{issuId}/restore")
     public AnsApiResponse<IssueDTO> restoreIssue(@Parameter(name = "issuId", required = true, description = "이슈아이디")
                                                  @PathVariable("issuId") Long issuId) {
+
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info(" Issue Restore : userId - "+userId +" Issue Id - "+issuId );
 
         issueService.restoreIssue(issuId);
 

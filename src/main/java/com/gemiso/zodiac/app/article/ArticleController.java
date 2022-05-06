@@ -7,6 +7,7 @@ import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import com.gemiso.zodiac.core.service.UserAuthChkService;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,7 +34,8 @@ public class ArticleController {
 
     private final ArticleService articleService;
 
-    private final UserAuthChkService userAuthService;
+    private final UserAuthService userAuthService;
+    private final UserAuthChkService userAuthChkService;
 
     @Operation(summary = "기사 목록조회", description = "기사 목록조회")
     @GetMapping(path = "")
@@ -168,15 +170,18 @@ public class ArticleController {
     public AnsApiResponse<ArticleSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                                    @RequestBody @Valid ArticleCreateDTO articleCreateDTO) throws Exception {
 
-        log.info( "Article Create DTO : " + articleCreateDTO);
 
-        Long artclId = articleService.create(articleCreateDTO);
+        String userId = userAuthService.authUser.getUserId();
+
+        log.debug( "Article Create : User Id - "+userId +"<br>"+ "Create Model - " + articleCreateDTO);
+
+        Long artclId = articleService.create(articleCreateDTO, userId);
 
         //기사 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
         articleDTO.setArtclId(artclId);
 
-        log.info( "Article Create ID : " + articleDTO);
+        log.info( "Article Create Success ID : " + articleDTO);
 
         return new AnsApiResponse<>(articleDTO);
     }
@@ -188,21 +193,23 @@ public class ArticleController {
                                                    @Parameter(name = "artclId", required = true, description = "기사 아이디")
                                                    @PathVariable("artclId") Long artclId) throws Exception {
 
-        log.info( "Article Update DTO : " + articleUpdateDTO);
+        String userId = userAuthService.authUser.getUserId();
+        log.debug( "Article Update : User Id - "+userId+ "<br>" +
+                " Article Model -"+articleUpdateDTO);
 
         //수정. 잠금사용자확인
-        if (articleService.chkOrderLock(artclId)) {
+        if (articleService.chkOrderLock(artclId, userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND); //해당기사 잠금여부가 Y일 경우 NOT_FOUND EXPCEPTION.
         }
 
-        articleService.update(articleUpdateDTO, artclId);
+        articleService.update(articleUpdateDTO, artclId, userId);
 
         /* ArticleDTO articleDTO = articleService.find(artclId);*/
         //기사 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
         articleDTO.setArtclId(artclId);
 
-        log.info( "Article Update Create : " + articleDTO);
+        log.info( "Article Update Success Id : "+artclId + "Update Model" + articleDTO);
 
         return new AnsApiResponse<>(articleDTO);
 
@@ -214,9 +221,11 @@ public class ArticleController {
     public AnsApiResponse<?> delete(@Parameter(name = "artclId", required = true, description = "기사 아이디")
                                     @PathVariable("artclId") Long artclId) throws Exception {
 
-        log.info( "Article Delete Id : " + artclId);
+        String userId = userAuthService.authUser.getUserId();
+        log.info( "Article Delete  : User Id - "+userId + "<br>" +
+                " Article Id"+artclId);
 
-        articleService.delete(artclId);
+        articleService.delete(artclId, userId);
 
         return AnsApiResponse.noContent();
 
@@ -227,8 +236,13 @@ public class ArticleController {
     public AnsApiResponse<ArticleAuthConfirmDTO> articleConfirm(@Parameter(name = "artclId", required = true, description = "기사 아이디")
                                                                 @PathVariable("artclId") Long artclId) {
 
+        // 사용자 정보
+        String userId = userAuthService.authUser.getUserId();//토큰에서 유저 아이디를 가져온다.
 
-        ArticleAuthConfirmDTO articleAuthConfirmDTO = articleService.articleConfirm(artclId);
+        //권한 확인 로그
+        log.info( "Article Confirm : Article Id" + artclId+ " User Id: "+userId);
+
+        ArticleAuthConfirmDTO articleAuthConfirmDTO = articleService.articleConfirm(artclId, userId);
 
         /*if (ObjectUtils.isEmpty(article) == false){
             ArticleAuthConfirmDTO articleAuthConfirmDTO = articleService.errorArticleAuthConfirm(article);
@@ -247,14 +261,16 @@ public class ArticleController {
                                                   @Parameter(description = "필수값<br> lckYn ", required = true)
                                                   @RequestBody @Valid ArticleLockDTO articleLockDTO) throws Exception {
 
-        log.info( "Article Lock : ArticleId : "+artclId +" Lock Info : " + articleLockDTO);
+        String userId = userAuthService.authUser.getUserId();
+        log.info( "Article Lock : ArticleId - "+artclId +" User Id - "+userId
+                +"<br>"+" Lock Info : " + articleLockDTO  );
 
         //권한체크(기사 쓰기)
-        if (userAuthService.authChk(AuthEnum.ArticleWrite.getAuth())) {
+        if (userAuthChkService.authChk(AuthEnum.ArticleWrite.getAuth())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
          }
 
-        articleService.articleLock(artclId, articleLockDTO);
+        articleService.articleLock(artclId, articleLockDTO, userId);
 
         ArticleDTO articleDTO = articleService.find(artclId);
 
@@ -268,8 +284,12 @@ public class ArticleController {
                                                     @Parameter(description = "필수값<br> lckYn ", required = true)
                                                     @RequestBody @Valid ArticleLockDTO articleLockDTO) throws Exception {
 
+        String userId = userAuthService.authUser.getUserId();
+        log.info( "Article Unlock : ArticleId = "+artclId +" User Id - "+userId+"" +
+                "<br>"+" Unlock Info : " + articleLockDTO);
+
         //권한, 작성자 확인
-        articleService.articleUnlock(artclId, articleLockDTO);
+        articleService.articleUnlock(artclId, articleLockDTO, userId);
 
         ArticleDTO articleDTO = articleService.find(artclId);
 
@@ -285,8 +305,14 @@ public class ArticleController {
                                                   ", article_fix[기자 픽스], editor_fix[에디터 픽스], anchor_fix[앵커 픽스], desk_fix[데스크 픽스])")
                                           @RequestParam(value = "apprvDivCd", required = true) String apprvDivCd) throws Exception {
 
+        // 사용자 정보
+        String userId = userAuthService.authUser.getUserId();
 
-        articleService.vaildFixStaus(artclId, apprvDivCd);
+        //픽스정보
+        log.info( "Article Fix Info : ArticleId = "+artclId /*+" OrgApprvDivcd : " + orgApprvDivcd*/ + "NewApprvDivcd : "+apprvDivCd
+                +" User Id : "+userId);
+
+        articleService.vaildFixStaus(artclId, apprvDivCd, userId);
 
         ArticleDTO articleDTO = articleService.find(artclId);
 
@@ -300,7 +326,10 @@ public class ArticleController {
                                          @Parameter(name = "artclId", description = "기사 아이디")
                                          @PathVariable("artclId") Long artclId) {
 
-        articleService.confirmUser(articleDeleteConfirmDTO, artclId);
+        String userId = userAuthService.authUser.getUserId(); //토큰에서 유저 아이디를 가져온다.
+        log.info(" Article Delete User Confirm : Article Id - "+artclId + "User Id :" + userId);
+
+        articleService.confirmUser(articleDeleteConfirmDTO, artclId, userId);
 
         return AnsApiResponse.ok();
     }

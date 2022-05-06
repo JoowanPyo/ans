@@ -39,9 +39,6 @@ public class IssueService {
     private final IssueMapper issueMapper;
     private final IssueUpdateMapper issueUpdateMapper;
 
-    private final UserAuthService userAuthService;
-    private final CodeUpdateService codeUpdateService;
-
     private final DateChangeHelper dateChangeHelper;
 
 
@@ -79,14 +76,12 @@ public class IssueService {
     }
 
 
-    public IssueDTO create(IssueCreateDTO issueCreateDTO) throws Exception {
+    public IssueDTO create(IssueCreateDTO issueCreateDTO, String userId) throws Exception {
 
         Integer issuOrd = getOrd();
 
         issueCreateDTO.setIssuOrd(issuOrd + 1);
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
         issueCreateDTO.setInputrId(userId);
         /*issueCreateDTO.setInputDtm(new Date());*/
 
@@ -96,7 +91,7 @@ public class IssueService {
         return issueMapper.toDto(issue);
     }
 
-    public void update(IssueUpdateDTO issueUpdateDTO, Long issuId) { //이부분 찾아보기.
+    public void update(IssueUpdateDTO issueUpdateDTO, Long issuId, String userId) { //이부분 찾아보기.
 
         Issue issue = issueFindOrFail(issuId);
 
@@ -117,7 +112,7 @@ public class IssueService {
         }*/
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        /*String userId = userAuthService.authUser.getUserId();*/
         issueUpdateDTO.setUpdtrId(userId);
        /* issueUpdateDTO.setUpdtDtm(new Date());*/
 
@@ -127,7 +122,7 @@ public class IssueService {
 
     }
 
-    public void delete(Long issuId) {
+    public void delete(Long issuId, String userId) {
 
         Issue issue = issueFindOrFail(issuId);
 
@@ -136,8 +131,6 @@ public class IssueService {
         issueDto.setIssuDelYn("Y");
         issueDto.setDelDtm(new Date());
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
         issueDto.setDelrId(userId);
 
         issueMapper.updateFromDto(issueDto, issue);
@@ -176,10 +169,7 @@ public class IssueService {
         return booleanBuilder;
     }
 
-    public Date copy(List<IssueCopyDTO> issueCopyDTO, Date targetDate) throws Exception {
-
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+    public Date copy(List<IssueCopyDTO> issueCopyDTO, Date targetDate, String userId) throws Exception {
 
         if (!CollectionUtils.isEmpty(issueCopyDTO)){ //이슈 복사하기위한 원복 issueDTO를 새로운 엔티티로 빌드
             for (IssueCopyDTO issueCopyDto : issueCopyDTO){

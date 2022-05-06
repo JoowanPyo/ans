@@ -29,7 +29,9 @@ import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.mapper.CueSheetItemCapCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolDTO;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.mapper.CueSheetItemSymbolCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.mapper.CueSheetItemSymbolMapper;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
 import com.gemiso.zodiac.app.program.Program;
@@ -82,12 +84,13 @@ public class CueSheetItemService {
     private final CueSheetItemCreateMapper cueSheetItemCreateMapper;
     private final CueSheetItemUpdateMapper cueSheetItemUpdateMapper;
     private final CueSheetItemSymbolMapper cueSheetItemSymbolMapper;
+    private final CueSheetItemSymbolCreateMapper cueSheetItemSymbolCreateMapper;
     //private final ArticleMapper articleMapper;
     private final CueSheetItemCapCreateMapper cueSheetItemCapCreateMapper;
     private final ArticleMapper articleMapper;
 
     private final CueSheetService cueSheetService;
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
     private final MarshallingJsonHelper marshallingJsonHelper;
     private final TopicService topicService;
@@ -128,14 +131,13 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 등록
-    public Long create(CueSheetItemCreateDTO cueSheetItemCreateDTO, Long cueId) throws JsonProcessingException {
+    public Long create(CueSheetItemCreateDTO cueSheetItemCreateDTO, Long cueId, String userId) throws JsonProcessingException {
 
 
         //큐시트 아이디 등록
         CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
         cueSheetItemCreateDTO.setCueSheet(cueSheetDTO);
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
-        String userId = userAuthService.authUser.getUserId();
         cueSheetItemCreateDTO.setInputrId(userId);
 
         CueSheetItem cueSheetItem = cueSheetItemCreateMapper.toEntity(cueSheetItemCreateDTO);
@@ -182,7 +184,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 수정 [기사 x]
-    public void update(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId) throws JsonProcessingException {
+    public void update(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId, String userId) throws JsonProcessingException {
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
 
@@ -190,7 +192,6 @@ public class CueSheetItemService {
         cueSheetItemUpdateDTO.setCueSheet(cueSheetDTO);
         cueSheetItemUpdateDTO.setCueItemId(cueItemId);*/
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
         cueSheetItemUpdateDTO.setUpdtrId(userId);
 
         cueSheetItemUpdateMapper.updateFromDto(cueSheetItemUpdateDTO, cueSheetItem);
@@ -226,7 +227,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 기사 수정시
-    public void updateCueItemArticle(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId) throws Exception {
+    public void updateCueItemArticle(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId, String userId) throws Exception {
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
 
@@ -234,7 +235,6 @@ public class CueSheetItemService {
         //cueSheetItemUpdateDTO.setCueSheet(cueSheetDTO);
         //cueSheetItemUpdateDTO.setCueItemId(cueItemId);
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
         cueSheetItemUpdateDTO.setUpdtrId(userId);
 
         cueSheetItemUpdateMapper.updateFromDto(cueSheetItemUpdateDTO, cueSheetItem);
@@ -252,7 +252,7 @@ public class CueSheetItemService {
                 articleUpdateDTO.setArtclTypDtlCd(newCueItemTypCd);
             }
 
-            articleService.update(articleUpdateDTO, artclId); //기사 수정.
+            articleService.update(articleUpdateDTO, artclId, userId); //기사 수정.
         }
 
         /************ MQ messages *************/
@@ -277,14 +277,12 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 삭제
-    public void delete(Long cueId, Long cueItemId) throws Exception {
+    public void delete(Long cueId, Long cueItemId, String userId) throws Exception {
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
 
         CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
 
-        // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
         cueSheetItemDTO.setDelrId(userId);
         cueSheetItemDTO.setDelYn("Y");
         cueSheetItemDTO.setDelDtm(new Date());
@@ -382,10 +380,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 생성[Drag and Drop]
-    public void createCueItem(Long cueId, Long artclId, int cueItemOrd, String cueItemDivCd, String spareYn) throws Exception {
-
-        //토큰 사용자 Id(현재 로그인된 사용자 ID)
-        String userId = userAuthService.authUser.getUserId();
+    public void createCueItem(Long cueId, Long artclId, int cueItemOrd, String cueItemDivCd, String spareYn, String userId) throws Exception {
 
         //기사 복사[복사된 기사 Id get]
         Article copyArtcl = copyArticle(artclId, cueId, userId);
@@ -473,10 +468,11 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 생성[Drag and Drop] List
-    public void createCueItemList(List<CueSheetItemCreateListDTO> cueSheetItemCreateListDTO, Long cueId, String spareYn) throws Exception {
+    public void createCueItemList(List<CueSheetItemCreateListDTO> cueSheetItemCreateListDTO, Long cueId, String spareYn
+            , String userId) throws Exception {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
 
         //예비큐시트 값 set
         if (spareYn == null && spareYn.trim().isEmpty() ){
@@ -627,15 +623,13 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 등록( 템플릿 ) : 운영참조
-    public void createTemplate(List<CueSheetItemCreateDTO> cueSheetItemCreateDTOList, Long cueId) throws JsonProcessingException {
+    public void createTemplate(List<CueSheetItemCreateDTO> cueSheetItemCreateDTOList, Long cueId, String userId)  {
 
         //큐시트 아이디 등록
         CueSheetSimpleDTO cueSheetDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
 
         for (CueSheetItemCreateDTO cueSheetItemCreateDTO : cueSheetItemCreateDTOList) {
             cueSheetItemCreateDTO.setCueSheet(cueSheetDTO);
-            //토큰 사용자 Id(현재 로그인된 사용자 ID)
-            String userId = userAuthService.authUser.getUserId();
             cueSheetItemCreateDTO.setInputrId(userId);
 
             CueSheetItem cueSheetItem = cueSheetItemCreateMapper.toEntity(cueSheetItemCreateDTO);
@@ -651,9 +645,32 @@ public class CueSheetItemService {
                 createCap(cueSheetItemCapDTOList, cueItemId, userId);//큐시트 아이템 자막 리스트 등록
             }
 
+            List<CueSheetItemSymbolCreateDTO> cueSheetItemSymbolList = cueSheetItemCreateDTO.getCueSheetItemSymbol();
+            if (CollectionUtils.isEmpty(cueSheetItemSymbolList)){
+                createSymbol(cueSheetItemSymbolList, cueItemId);
+            }
+
             //순서변경을 타야하나?
             ordUpdate( cueId,  cueItemId,  cueItemOrd, "N");
         }
+    }
+
+    //큐시트 템플릿 방송아이콘 등록
+    public void createSymbol(List<CueSheetItemSymbolCreateDTO> cueSheetItemSymbolList, Long cueItemId){
+
+        CueSheetItemSimpleDTO cueSheetItem = CueSheetItemSimpleDTO.builder().cueItemId(cueItemId).build();
+
+        for (CueSheetItemSymbolCreateDTO cueSheetItemSymbolDTO : cueSheetItemSymbolList){
+
+            cueSheetItemSymbolDTO.setCueSheetItem(cueSheetItem);
+
+            CueSheetItemSymbol cueSheetItemSymbol = cueSheetItemSymbolCreateMapper.toEntity(cueSheetItemSymbolDTO);
+
+            cueSheetItemSymbolRepository.save(cueSheetItemSymbol);
+
+
+        }
+
     }
 
     //큐시트 아이템 자막 등록
