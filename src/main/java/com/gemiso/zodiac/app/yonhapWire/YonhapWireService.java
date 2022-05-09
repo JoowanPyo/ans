@@ -41,12 +41,12 @@ import java.util.Optional;
 public class YonhapWireService {
 
     private final YonhapWireRepository yonhapWireRepository;
-    private final AttachFileRepository attachFileRepository;
-    private final YonhapWireAttchFileRepository yonhapWireAttchFileRepository;
+    //private final AttachFileRepository attachFileRepository;
+    //private final YonhapWireAttchFileRepository yonhapWireAttchFileRepository;
 
     private final YonhapWireMapper yonhapWireMapper;
-    private final AttachFileMapper attachFileMapper;
-    private final YonhapWireAttchFileMapper yonhapWireAttchFileMapper;
+    //private final AttachFileMapper attachFileMapper;
+    //private final YonhapWireAttchFileMapper yonhapWireAttchFileMapper;
 
 
     private final DateChangeHelper dateChangeHelper;
@@ -264,14 +264,14 @@ public class YonhapWireService {
 
         YonhapWire yonhapWire = findYonhapWire(yhWireId);
 
-        List<YonhapWireAttchFile> yonhapWireAttchFile = yonhapWireAttchFileRepository.findByYonhapWireFile(yhWireId);
+        //List<YonhapWireAttchFile> yonhapWireAttchFile = yonhapWireAttchFileRepository.findByYonhapWireFile(yhWireId);
 
         YonhapWireDTO yonhapWireDTO = yonhapWireMapper.toDto(yonhapWire);
 
-        if (CollectionUtils.isEmpty(yonhapWireAttchFile) == false){
+       /* if (CollectionUtils.isEmpty(yonhapWireAttchFile) == false){
             List<YonhapWireAttchFileDTO> yonhapWireAttchFileDTOS = yonhapWireAttchFileMapper.toDtoList(yonhapWireAttchFile);
             yonhapWireDTO.setYonhapWireAttchFiles(yonhapWireAttchFileDTOS);
-        }
+        }*/
 
         return yonhapWireDTO;
 
@@ -407,7 +407,7 @@ public class YonhapWireService {
         return new YonhapExceptionDomain(reuterId, "2000", "yonhapPhoto", "", "");
     }
 
-    public YonhapAptnDTO formatAptn(YonhapWireDTO yonhapWireDTO){
+    /*public YonhapAptnDTO formatAptn(YonhapWireDTO yonhapWireDTO){
 
         List<YonhapWireAttchFileDTO> yonhapWireAttchFiles = yonhapWireDTO.getYonhapWireAttchFiles();
 
@@ -437,7 +437,7 @@ public class YonhapWireService {
                 .build();
 
         return yonhapAptnDTO;
-    }
+    }*/
 
     public YonhapReuterDTO formatReuter(YonhapWireDTO yonhapWireDTO){
 

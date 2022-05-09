@@ -4,19 +4,17 @@ import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.file.AttachFileRepository;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.mapper.AttachFileMapper;
-import com.gemiso.zodiac.app.yonhap.dto.*;
-import com.gemiso.zodiac.app.yonhapAttchFile.YonhapAttchFileRepository;
-import com.gemiso.zodiac.app.yonhapAttchFile.mapper.YonhapAttachFileMapper;
+import com.gemiso.zodiac.app.yonhap.dto.YonhapCreateDTO;
+import com.gemiso.zodiac.app.yonhap.dto.YonhapDTO;
+import com.gemiso.zodiac.app.yonhap.dto.YonhapResponseDTO;
 import com.gemiso.zodiac.app.yonhap.mapper.YonhapMapper;
 import com.gemiso.zodiac.app.yonhapAttchFile.YonhapAttchFile;
+import com.gemiso.zodiac.app.yonhapAttchFile.YonhapAttchFileRepository;
 import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileCreateDTO;
 import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileDTO;
-import com.gemiso.zodiac.app.yonhapPhoto.YonhapPhoto;
+import com.gemiso.zodiac.app.yonhapAttchFile.mapper.YonhapAttachFileMapper;
 import com.gemiso.zodiac.app.yonhapPhoto.dto.YonhapExceptionDomain;
-import com.gemiso.zodiac.app.yonhapPotoAttchFile.YonhapPhotoAttchFile;
 import com.gemiso.zodiac.app.yonhapPotoAttchFile.YonhapPhotoAttchFileRepository;
-import com.gemiso.zodiac.app.yonhapWire.YonhapWire;
-import com.gemiso.zodiac.app.yonhapWireAttchFile.YonhapWireAttchFile;
 import com.gemiso.zodiac.app.yonhapWireAttchFile.YonhapWireAttchFileRepository;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.util.PropertyUtil;
@@ -29,12 +27,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.io.File;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -45,12 +43,12 @@ public class YonhapService {
     private final YonhapRepository yonhapRepository;
     private final YonhapAttchFileRepository yonhapAttchFileRepository;
     private final AttachFileRepository attachFileRepository;
-    private final YonhapPhotoAttchFileRepository yonhapPhotoAttchFileRepository;
-    private final YonhapWireAttchFileRepository yonhapWireAttchFileRepository;
+    //private final YonhapPhotoAttchFileRepository yonhapPhotoAttchFileRepository;
+    //private final YonhapWireAttchFileRepository yonhapWireAttchFileRepository;
 
     private final YonhapMapper yonhapMapper;
-    private final YonhapAttachFileMapper yonhapAttachFileMapper;
     private final AttachFileMapper attachFileMapper;
+    //private final YonhapAttachFileMapper yonhapAttachFileMapper;
 
     private final DateChangeHelper dateChangeHelper;
 
@@ -321,13 +319,13 @@ public class YonhapService {
             if (divcd.equals("07")) {
                 deleteYonhapFile(yh_artcl_id);
 
-            } else if (divcd.equals("06")) {
+            } /*else if (divcd.equals("06")) {
                 deleteYonhapPhotoFile(yh_artcl_id);
 
             } else if (divcd.equals("08")) {
                 deleteYonhapAptnFile(yh_artcl_id);
 
-            }
+            }*/
 
             for (YonhapAttachFileCreateDTO file : yh_attc_file_vo_list) {
 
@@ -381,13 +379,13 @@ public class YonhapService {
                 if (divcd.equals("07")) {
                     postYonhapFile(file);
 
-                } else if (divcd.equals("06")) {
+                } /*else if (divcd.equals("06")) {
                     postYonhapPhotoFile(file);
 
                 } else if (divcd.equals("08")) {
                     postYonhapAptnFile(file);
 
-                }
+                }*/
 
 
             }
@@ -408,7 +406,42 @@ public class YonhapService {
         }
     }
 
-    public void deleteYonhapPhotoFile(Long id){
+    //연합파일 등록
+    public void postYonhapFile(YonhapAttachFileCreateDTO file){
+
+        Long yhArtclId = file.getYh_artcl_id();
+        Long fileId = file.getFile_id();
+
+        Yonhap yonhap = Yonhap.builder().yonhapId(yhArtclId).build();
+        AttachFile attachFile = AttachFile.builder().fileId(fileId).build();
+
+        YonhapAttchFile yonhapAttchFile = YonhapAttchFile.builder()
+                .yonhap(yonhap)
+                .attachFile(attachFile)
+                .fileOrd(file.getFile_ord())
+                .fileTitl(file.getFile_titl())
+                .mimeType(file.getMime_typ())
+                .cap(file.getCap())
+                .yhUrl(file.getYh_url())
+                .build();
+
+        yonhapAttchFileRepository.save(yonhapAttchFile);
+
+    }
+
+    //파일네임 확장자 파싱
+    public static String cutExtension(String s) {
+        String returnValue = null;
+        if (s != null) {
+            int index = s.lastIndexOf('.');
+            if (index != -1) {
+                returnValue = s.substring(index + 1);
+            }
+        }
+        return returnValue;
+    }
+
+    /*public void deleteYonhapPhotoFile(Long id){
 
         List<YonhapPhotoAttchFile> yonhapPhotoAttchFiles = yonhapPhotoAttchFileRepository.findYonhapPhoto(id);
 
@@ -452,31 +485,9 @@ public class YonhapService {
 
         yonhapWireAttchFileRepository.save(yonhapWireAttchFile);
 
-    }
+    }*/
 
-    //연합파일 등록
-    public void postYonhapFile(YonhapAttachFileCreateDTO file){
-
-        Long yhArtclId = file.getYh_artcl_id();
-        Long fileId = file.getFile_id();
-
-        Yonhap yonhap = Yonhap.builder().yonhapId(yhArtclId).build();
-        AttachFile attachFile = AttachFile.builder().fileId(fileId).build();
-
-        YonhapAttchFile yonhapAttchFile = YonhapAttchFile.builder()
-                .yonhap(yonhap)
-                .attachFile(attachFile)
-                .fileOrd(file.getFile_ord())
-                .fileTitl(file.getFile_titl())
-                .mimeType(file.getMime_typ())
-                .cap(file.getCap())
-                .yhUrl(file.getYh_url())
-                .build();
-
-        yonhapAttchFileRepository.save(yonhapAttchFile);
-
-    }
-    //연합포토파일 등록
+    /*//연합포토파일 등록
     public void postYonhapPhotoFile(YonhapAttachFileCreateDTO file){
 
         Long yonhapPotoId = file.getYh_artcl_id();
@@ -497,18 +508,6 @@ public class YonhapService {
 
         yonhapPhotoAttchFileRepository.save(yonhapPhotoAttchFile);
 
-    }
-
-    //파일네임 확장자 파싱
-    public static String cutExtension(String s) {
-        String returnValue = null;
-        if (s != null) {
-            int index = s.lastIndexOf('.');
-            if (index != -1) {
-                returnValue = s.substring(index + 1);
-            }
-        }
-        return returnValue;
-    }
+    }*/
 
 }

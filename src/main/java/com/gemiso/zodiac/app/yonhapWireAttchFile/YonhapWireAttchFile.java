@@ -1,14 +1,6 @@
 package com.gemiso.zodiac.app.yonhapWireAttchFile;
 
-import com.gemiso.zodiac.app.file.AttachFile;
-import com.gemiso.zodiac.app.yonhap.Yonhap;
-import com.gemiso.zodiac.app.yonhapWire.YonhapWire;
-import lombok.*;
-import org.hibernate.annotations.DynamicUpdate;
-
-import javax.persistence.*;
-
-@Entity
+/*@Entity
 @Table(
         name = "tb_yonhap_wire_attc_file"
 )
@@ -18,10 +10,10 @@ import javax.persistence.*;
 @Getter
 @ToString
 @Setter
-@DynamicUpdate
+@DynamicUpdate*/
 public class YonhapWireAttchFile {
 
-    @Id
+   /* @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private  Long id;
@@ -47,7 +39,7 @@ public class YonhapWireAttchFile {
     private String cap;
 
     @Column(name = "yh_url", length = 2000)
-    private String yhUrl;
+    private String yhUrl;*/
 
 
 }

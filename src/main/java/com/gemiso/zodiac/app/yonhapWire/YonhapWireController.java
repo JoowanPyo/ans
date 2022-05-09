@@ -106,9 +106,9 @@ public class YonhapWireController {
         }
 
         YonhapWireDTO yonhapWireDTO = yonhapWireService.find(yonhapExceptionDomain.getId());
-        YonhapAptnDTO yonhapAptnDTO = yonhapWireService.formatAptn(yonhapWireDTO);
+        //YonhapAptnDTO yonhapAptnDTO = yonhapWireService.formatAptn(yonhapWireDTO);
 
-        return new ResponseEntity<>(yonhapAptnDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(yonhapWireDTO, HttpStatus.CREATED);
     }
 
     @Operation(summary = "연합외신 등록 REUTER", description = "연합외신 등록 REUTER")

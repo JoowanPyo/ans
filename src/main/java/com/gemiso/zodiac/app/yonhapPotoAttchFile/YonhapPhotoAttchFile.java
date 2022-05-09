@@ -7,7 +7,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
-@Entity
+/*@Entity
 @Table(
         name = "tb_yonhap_photo_attc_file"
 )
@@ -17,10 +17,10 @@ import javax.persistence.*;
 @Getter
 @ToString(exclude = "userGroupUser")
 @Setter
-@DynamicUpdate
+@DynamicUpdate*/
 public class YonhapPhotoAttchFile {
 
-    @Id
+    /*@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
@@ -46,6 +46,6 @@ public class YonhapPhotoAttchFile {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "yonhap_artcl_id")
-    private YonhapPhoto yonhapPhoto;
+    private YonhapPhoto yonhapPhoto;*/
 
 }

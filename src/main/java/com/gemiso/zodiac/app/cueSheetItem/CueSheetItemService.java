@@ -645,6 +645,7 @@ public class CueSheetItemService {
                 createCap(cueSheetItemCapDTOList, cueItemId, userId);//큐시트 아이템 자막 리스트 등록
             }
 
+            //심볼까지 같이 불러와서 등록
             List<CueSheetItemSymbolCreateDTO> cueSheetItemSymbolList = cueSheetItemCreateDTO.getCueSheetItemSymbol();
             if (CollectionUtils.isEmpty(cueSheetItemSymbolList)){
                 createSymbol(cueSheetItemSymbolList, cueItemId);

@@ -14,8 +14,7 @@ public interface YonhapWireRepository extends JpaRepository<YonhapWire, Long> , 
     @Query("select a from YonhapWire a where a.contId = :contId")
     List<YonhapWire> findYhArtclId(@Param("contId") String contId);
 
-    @Query("select a from YonhapWire a left outer join YonhapWireAttchFile b on b.yonhapWire.wireId = a.wireId " +
-            "where a.wireId =:yhWireId")
+    @Query("select a from YonhapWire a where a.wireId =:yhWireId")
     Optional<YonhapWire> findYhWire(@Param("yhWireId")Long yhWireId);
 
 }
