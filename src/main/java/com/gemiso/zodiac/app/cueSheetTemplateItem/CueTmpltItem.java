@@ -1,8 +1,12 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItem;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.gemiso.zodiac.app.CUeSheetTemplateMedia.CueTmpltMedia;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
+import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
+import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.CueTmpltItemCap;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbol;
@@ -115,8 +119,9 @@ public class CueTmpltItem extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = lckr_id)")
     private String lckrNm;
 
-    @ManyToOne
-    @JoinColumn(name = "cue_tmplt_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "cue_tmplt_id",nullable = false)
+    @JsonBackReference
     private CueSheetTemplate cueSheetTemplate;
 
     @OneToMany(mappedBy = "cueTmpltItem")
@@ -126,6 +131,11 @@ public class CueTmpltItem extends BaseEntity {
     @OneToMany(mappedBy = "cueTmpltItem")
     @JsonManagedReference
     private List<CueTmplSymbol> cueTmplSymbol = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cueTmpltItem")
+    @JsonManagedReference
+    private List<CueTmpltMedia> cueTmpltMedia = new ArrayList<>();
+
 
     @PrePersist
     public void prePersist() {

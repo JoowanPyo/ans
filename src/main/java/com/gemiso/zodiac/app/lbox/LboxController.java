@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.article.dto.ArticleAuthConfirmDTO;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
+import com.gemiso.zodiac.app.lbox.mediaTransportDTO.CueMediaTransportResponseDTO;
 import com.gemiso.zodiac.app.lbox.mediaTransportDTO.TransportResponseDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
@@ -78,20 +79,20 @@ public class LboxController {
     @Operation(summary = "부조 전송", description = "부조 전송")
     @PutMapping(path = "/mediatransfer/{mediaId}")
     public AnsApiResponse<TransportResponseDTO> mediaTransfer(@Parameter(name = "mediaId", required = true, description = "미디어 아이디")
-                                                         @PathVariable("mediaId") Long mediaId,
-                                                         @Parameter(name = "contentId", description = "콘텐츠 아이디")
-                                                         @RequestParam(value = "contentId", required = true) Integer contentId,
-                                                         @Parameter(name = "subrmNm", description = "부조명")
-                                                         @RequestParam(value = "subrmNm", required = true) String subrmNm,
+                                                              @PathVariable("mediaId") Long mediaId,
+                                                              @Parameter(name = "contentId", description = "콘텐츠 아이디")
+                                                              @RequestParam(value = "contentId", required = true) Integer contentId,
+                                                              @Parameter(name = "subrmNm", description = "부조명")
+                                                              @RequestParam(value = "subrmNm", required = true) String subrmNm,
                                                                 /*@Parameter(name = "destinations", description = "전송대상(NS, PS_A, PS_B, PS_C) required.")
                                                                 @RequestParam(value = "destinations", required = false) List<String> destinations,*/
-                                                         @Parameter(name = "isUrgent", description = "긴급 여부")
-                                                         @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
-                                                         @Parameter(name = "isRetry", description = "재전송 여부")
-                                                         @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
+                                                              @Parameter(name = "isUrgent", description = "긴급 여부")
+                                                              @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
+                                                              @Parameter(name = "isRetry", description = "재전송 여부")
+                                                              @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
 
-        log.info("부조전송 = "+"미디어 아이디 : "+mediaId+" 텐츠 아이디 : "+contentId+
-                " 부조명 : "+subrmNm+" 긴급 여부 : "+isUrgent+" 재전송 여부 : "+isRetry);
+        log.info("부조전송 = " + "미디어 아이디 : " + mediaId + " 텐츠 아이디 : " + contentId +
+                " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry);
 
         String destinations = "T";
         TransportResponseDTO transportResponseDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
@@ -103,20 +104,20 @@ public class LboxController {
     @Operation(summary = "PS 긴급전송", description = "PS 긴급전송")
     @PutMapping(path = "/mediatransfer/{mediaId}/psemergency")
     public AnsApiResponse<TransportResponseDTO> psEmergencyTransfer(@Parameter(name = "mediaId", required = true, description = "미디어 아이디")
-                                                               @PathVariable("mediaId") Long mediaId,
-                                                               @Parameter(name = "contentId", description = "콘텐츠 아이디")
-                                                               @RequestParam(value = "contentId", required = true) Integer contentId,
-                                                               @Parameter(name = "subrmNm", description = "부조명")
-                                                               @RequestParam(value = "subrmNm", required = true) String subrmNm,
+                                                                    @PathVariable("mediaId") Long mediaId,
+                                                                    @Parameter(name = "contentId", description = "콘텐츠 아이디")
+                                                                    @RequestParam(value = "contentId", required = true) Integer contentId,
+                                                                    @Parameter(name = "subrmNm", description = "부조명")
+                                                                    @RequestParam(value = "subrmNm", required = true) String subrmNm,
                                                                 /*@Parameter(name = "destinations", description = "전송대상(NS, PS_A, PS_B, PS_C) required.")
                                                                 @RequestParam(value = "destinations", required = false) List<String> destinations,*/
-                                                               @Parameter(name = "isUrgent", description = "긴급 여부")
-                                                               @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
-                                                               @Parameter(name = "isRetry", description = "재전송 여부")
-                                                               @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
+                                                                    @Parameter(name = "isUrgent", description = "긴급 여부")
+                                                                    @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
+                                                                    @Parameter(name = "isRetry", description = "재전송 여부")
+                                                                    @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
 
-        log.info("PS 긴급전송 = "+"미디어 아이디 : "+mediaId+" 텐츠 아이디 : "+contentId+
-                " 부조명 : "+subrmNm+" 긴급 여부 : "+isUrgent+" 재전송 여부 : "+isRetry);
+        log.info("PS 긴급전송 = " + "미디어 아이디 : " + mediaId + " 텐츠 아이디 : " + contentId +
+                " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry);
 
         String destinations = "P";
         TransportResponseDTO transportResponseDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
@@ -128,20 +129,20 @@ public class LboxController {
     @Operation(summary = "NS 긴급전송", description = "NS 긴급전송")
     @PutMapping(path = "/mediatransfer/{mediaId}/nsemergency")
     public AnsApiResponse<TransportResponseDTO> nsEmergencyTransfer(@Parameter(name = "mediaId", required = true, description = "미디어 아이디")
-                                                               @PathVariable("mediaId") Long mediaId,
-                                                               @Parameter(name = "contentId", description = "콘텐츠 아이디")
-                                                               @RequestParam(value = "contentId", required = true) Integer contentId,
-                                                               @Parameter(name = "subrmNm", description = "부조명")
-                                                               @RequestParam(value = "subrmNm", required = true) String subrmNm,
+                                                                    @PathVariable("mediaId") Long mediaId,
+                                                                    @Parameter(name = "contentId", description = "콘텐츠 아이디")
+                                                                    @RequestParam(value = "contentId", required = true) Integer contentId,
+                                                                    @Parameter(name = "subrmNm", description = "부조명")
+                                                                    @RequestParam(value = "subrmNm", required = true) String subrmNm,
                                                                 /*@Parameter(name = "destinations", description = "전송대상(NS, PS_A, PS_B, PS_C) required.")
                                                                 @RequestParam(value = "destinations", required = false) List<String> destinations,*/
-                                                               @Parameter(name = "isUrgent", description = "긴급 여부")
-                                                               @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
-                                                               @Parameter(name = "isRetry", description = "재전송 여부")
-                                                               @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
+                                                                    @Parameter(name = "isUrgent", description = "긴급 여부")
+                                                                    @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
+                                                                    @Parameter(name = "isRetry", description = "재전송 여부")
+                                                                    @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
 
-        log.info("NS 긴급전송 = "+"미디어 아이디 : "+mediaId+" 텐츠 아이디 : "+contentId+
-                " 부조명 : "+subrmNm+" 긴급 여부 : "+isUrgent+" 재전송 여부 : "+isRetry);
+        log.info("NS 긴급전송 = " + "미디어 아이디 : " + mediaId + " 텐츠 아이디 : " + contentId +
+                " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry);
 
         String destinations = "N";
         TransportResponseDTO transportResponseDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
@@ -171,23 +172,50 @@ public class LboxController {
     @Operation(summary = "부조 전송 [백드롭]", description = "부조 전송 [백드롭]")
     @PutMapping(path = "/mediatransfer/{mediaId}/backdrop")
     public AnsApiResponse<TransportResponseDTO> psBackDrop(@Parameter(name = "mediaId", required = true, description = "미디어 아이디")
-                                                                    @PathVariable("mediaId") Long mediaId,
-                                                                    @Parameter(name = "contentId", description = "콘텐츠 아이디")
-                                                                    @RequestParam(value = "contentId", required = true) Integer contentId,
-                                                                    @Parameter(name = "subrmNm", description = "부조명")
-                                                                    @RequestParam(value = "subrmNm", required = true) String subrmNm,
+                                                           @PathVariable("mediaId") Long mediaId,
+                                                           @Parameter(name = "contentId", description = "콘텐츠 아이디")
+                                                           @RequestParam(value = "contentId", required = true) Integer contentId,
+                                                           @Parameter(name = "subrmNm", description = "부조명")
+                                                           @RequestParam(value = "subrmNm", required = true) String subrmNm,
                                                                 /*@Parameter(name = "destinations", description = "전송대상(NS, PS_A, PS_B, PS_C) required.")
                                                                 @RequestParam(value = "destinations", required = false) List<String> destinations,*/
-                                                                    @Parameter(name = "isUrgent", description = "긴급 여부")
-                                                                    @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
-                                                                    @Parameter(name = "isRetry", description = "재전송 여부")
-                                                                    @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
+                                                           @Parameter(name = "isUrgent", description = "긴급 여부")
+                                                           @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
+                                                           @Parameter(name = "isRetry", description = "재전송 여부")
+                                                           @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
 
-        log.info("PS 긴급전송 = "+"미디어 아이디 : "+mediaId+" 텐츠 아이디 : "+contentId+
-                " 부조명 : "+subrmNm+" 긴급 여부 : "+isUrgent+" 재전송 여부 : "+isRetry);
+        log.info("PS 긴급전송 = " + "미디어 아이디 : " + mediaId + " 텐츠 아이디 : " + contentId +
+                " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry);
 
         String destinations = "B";
         TransportResponseDTO transportResponseDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
+
+
+        return new AnsApiResponse<>(transportResponseDTO);
+    }
+
+    @Operation(summary = "큐시트 미디어 부조전송", description = "큐시트 미디어 부조전송")
+    @PutMapping(path = "/cuemediatransfer/{cueMediaId}")
+    public AnsApiResponse<CueMediaTransportResponseDTO> cueMediaTransfer(@Parameter(name = "cueMediaId", required = true, description = "cueMediaId")
+                                                                 @PathVariable("cueMediaId") Long cueMediaId,
+                                                                 @Parameter(name = "contentId", description = "콘텐츠 아이디")
+                                                                 @RequestParam(value = "contentId", required = true) Integer contentId,
+                                                                 @Parameter(name = "subrmNm", description = "부조명")
+                                                                 @RequestParam(value = "subrmNm", required = true) String subrmNm,
+                                                                /*@Parameter(name = "destinations", description = "전송대상(NS, PS_A, PS_B, PS_C) required.")
+                                                                @RequestParam(value = "destinations", required = false) List<String> destinations,*/
+                                                                 @Parameter(name = "isUrgent", description = "긴급 여부")
+                                                                 @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
+                                                                 @Parameter(name = "isRetry", description = "재전송 여부")
+                                                                 @RequestParam(value = "isRetry", required = false) Boolean isRetry,
+                                                                 @Parameter(name = "isType", description = "일반(T), 백드롭(B)")
+                                                                 @RequestParam(value = "isType", required = false) String isType) throws JsonProcessingException {
+
+        log.info("큐시트 미디어 부조전송 = " + "미디어 아이디 : " + cueMediaId + " 텐츠 아이디 : " + contentId +
+                " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry+" 전송타입 : "+isType);
+
+        //String destinations = "P";
+        CueMediaTransportResponseDTO transportResponseDTO = lboxService.cueMediaTransfer(cueMediaId, contentId, subrmNm, isUrgent, isRetry, isType);
 
 
         return new AnsApiResponse<>(transportResponseDTO);

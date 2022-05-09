@@ -1,9 +1,12 @@
 package com.gemiso.zodiac.app.cueSheetTemplate.dto;
 
+import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -41,4 +44,5 @@ public class CueSheetTemplateSimpleDTO {
     private String delrId;
     private String delrNm;
     private ProgramSimpleDTO program;*/
+    private List<CueTmpltItemSimpleDTO> cueTmpltItem;
 }

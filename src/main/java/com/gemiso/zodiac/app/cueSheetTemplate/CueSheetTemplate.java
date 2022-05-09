@@ -3,6 +3,8 @@ package com.gemiso.zodiac.app.cueSheetTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.baseProgram.BaseProgram;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
+import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbol;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.core.entity.BaseEntity;
@@ -140,6 +142,10 @@ public class CueSheetTemplate extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "bas_pgmsch_id")
     private BaseProgram baseProgram;
+
+    @OneToMany(mappedBy = "cueSheetTemplate")
+    @JsonManagedReference
+    private List<CueTmpltItem> cueTmpltItem = new ArrayList<>();
 
     /*@OneToMany(mappedBy = "cueSheetTemplate")
     @JsonManagedReference

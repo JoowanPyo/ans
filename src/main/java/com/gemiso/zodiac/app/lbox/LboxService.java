@@ -6,6 +6,11 @@ import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
+import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
+import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMediaRepository;
+import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMediaService;
+import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaDTO;
+import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaMapper;
 import com.gemiso.zodiac.app.lbox.mediaTransportDTO.*;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -36,14 +41,19 @@ public class LboxService {
     private String namUrl;
 
     private final ArticleMediaRepository articleMediaRepository;
+    private final CueSheetMediaRepository cueSheetMediaRepository;
 
     private final ArticleMediaMapper articleMediaMapper;
+    private final CueSheetMediaMapper cueSheetMediaMapper;
+
+    private final UserAuthService userAuthService;
+
+    private final CueSheetMediaService cueSheetMediaService;
 
     private static final String CONTENTS_URL = "api/ans/v2/contents";
     private static final String CATEGORIES_URL = "api/ans/v2/categories";
     private static final String USER_INFO_URL = "api/ans/v2/users";
 
-    private final UserAuthService userAuthService;
 
 
     //엘박스 영상정보 조회 [anm]
@@ -310,6 +320,146 @@ public class LboxService {
         }
 
         return articleMediaEntity.get();
+    }
+
+    //큐시트 미디어 부조 전송
+    public CueMediaTransportResponseDTO cueMediaTransfer(Long cueMediaId, Integer contentId, String subrmNm
+            , Boolean isUrgent, Boolean isRetry, String isType) throws JsonProcessingException {
+
+        CueMediaTransportResponseDTO transportResponseDTO = new CueMediaTransportResponseDTO(); //리턴해줄 미디어정보, 오류내용 [전송 오류가 있을시.]
+        List<TransportFaildDTO> transportFaildDTOList = new ArrayList<>(); //부조전송시 오류가 있을시 오류내용 Respons
+
+        String userId = userAuthService.authUser.getUserId();
+
+        //헤더 설정
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+
+        int tasksCount = 0;
+        int clipInfoCount = 0;
+        ClipInfoDTO clipInfoDTO = new ClipInfoDTO();
+        List<String> destinations = new ArrayList<>();
+
+        switch (isType) {
+            case "T":
+                //test 용으로 클라우트 콘피그 구현시 교체
+                if ("A".equals(subrmNm)) {
+                    destinations.add("NS");
+                    destinations.add("PS_A");
+                    destinations.add("PS_B");
+
+                } else if ("B".equals(subrmNm)) {
+                    destinations.add("NS");
+                    destinations.add("PS_A");
+                    destinations.add("PS_B");
+                    destinations.add("PS_C");
+                }
+                break;
+            case "B":
+                if ("A".equals(subrmNm)) {
+                    //destinations.add("NS");
+                    destinations.add("PS_A");
+                    destinations.add("PS_B");
+
+                } else if ("B".equals(subrmNm)) {
+                    //destinations.add("NS");
+                    destinations.add("PS_A");
+                    destinations.add("PS_B");
+                    destinations.add("PS_C");
+                }
+                break;
+        }
+
+        String faildDest = ""; //실패된 전송대상명
+
+        if (CollectionUtils.isEmpty(destinations)){
+            throw new ResourceNotFoundException(subrmNm +"부조에 대한 전송대상이 없습니다. ");
+        }
+
+        for (String dest : destinations) {
+
+            faildDest = dest;
+
+            //Object Mapper를 통한 Json바인딩할 dmParam생성
+            Map<String, Object> params = new HashMap<>();
+            params.put("content_id", contentId); //콘텐츠 아이디
+            params.put("scr", subrmNm); //부조값 ( A, B )
+            params.put("destination", dest);
+            params.put("user_account_id", userId); //사용자 아이디
+            params.put("is_urgent", isUrgent); //긴급여부
+            params.put("is_retry", isRetry); //재전송 여부
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String param = objectMapper.writeValueAsString(params);
+
+            //httpEntity에 헤더 및 params 설정
+            HttpEntity entity = new HttpEntity(param, httpHeaders);
+
+            ResponsMediaTransportDTO responsBody = new ResponsMediaTransportDTO();
+
+            try {
+
+                RestTemplate restTemplate = new RestTemplate();
+                ResponseEntity<ResponsMediaTransportDTO> responseEntity =
+                        restTemplate.exchange(namUrl + "api/ans/v2/transfer-scr", HttpMethod.POST,
+                                entity, ResponsMediaTransportDTO.class);
+
+                responsBody = responseEntity.getBody();
+
+                MediaTransportDataDTO data = responsBody.getData();
+                clipInfoDTO = data.getClip_info(); //이미 전송된 영상이거나 전송완료인 영상 데이터DTO
+                List<TasksDTO> tasksDTO = data.getTasks(); //전송시작시 데이터
+
+                if (CollectionUtils.isEmpty(tasksDTO) == false) {
+                    ++tasksCount; //전송중이 한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
+                }
+                if (ObjectUtils.isEmpty(clipInfoDTO) == false){
+                    ++clipInfoCount;//이미전송된 파일이  한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
+                }
+
+            } catch (Exception e) { //부조 전송오류가 있을시,
+
+                TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
+                transportFaildDTO.setMessage(e.getLocalizedMessage()); //오류 메시지
+                transportFaildDTO.setSubrmNm(subrmNm); //부조 명
+                transportFaildDTO.setDestination(faildDest); // 전송대상
+
+                transportFaildDTOList.add(transportFaildDTO);
+
+            }
+        }
+
+        CueSheetMedia cueSheetMedia = cueSheetMediaService.cueSheetMediaFindOrFail(cueMediaId);
+        CueSheetMediaDTO cueSheetMediaDTO = cueSheetMediaMapper.toDto(cueSheetMedia);
+
+        //전송중 값이 1개라도 체크가 되어있는 경우
+        if (tasksCount > 0 ) {
+
+            //기사 미디어 부조 전송 시작.
+
+            cueSheetMediaDTO.setTrnsfStCd("match_ready"); //전송시작 코드
+            cueSheetMediaMapper.updateFromDto(cueSheetMediaDTO, cueSheetMedia); //기존 기사미디어 정보에 업데이트 정보 업데이트
+            cueSheetMediaRepository.save(cueSheetMedia); //수정
+
+            transportResponseDTO.setCueSheetMediaDTO(cueSheetMediaDTO);// 셋팅된 미디어정보
+
+        } else if (clipInfoCount > 0 && tasksCount == 0){ //전송중 값이 0개이고 전송완료값이 0보다 크면 전송완료값으로 셋팅
+
+            //기사 미디어 부조 전송 완료(이미 전송된 영상)
+            cueSheetMediaDTO.setTrnsfFileNm(clipInfoDTO.getFilename()); //전송완료된 파일네임(0001 ~ 9999 + .mxf)
+            cueSheetMediaDTO.setTrnsfStCd("match_completed"); //전송완료 코드
+            cueSheetMediaMapper.updateFromDto(cueSheetMediaDTO, cueSheetMedia); //기존 기사미디어 정보에 업데이트 정보 업데이트
+            cueSheetMediaRepository.save(cueSheetMedia); //수정
+
+            transportResponseDTO.setCueSheetMediaDTO(cueSheetMediaDTO); // 셋팅된 미디어정보
+        }
+
+        transportResponseDTO.setTransportFaild(transportFaildDTOList);
+
+        log.info("SubrmNm : " + subrmNm + "변경된 미디어 정보 : " + cueSheetMedia + " 에러정보 : "+ transportFaildDTOList);
+
+        return transportResponseDTO;
+
     }
 
 

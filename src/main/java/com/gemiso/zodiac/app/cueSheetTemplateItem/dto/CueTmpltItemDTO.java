@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItem.dto;
 
+import com.gemiso.zodiac.app.CUeSheetTemplateMedia.CueTmpltMedia;
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.CueTmpltItemCap;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapDTO;
@@ -50,4 +51,5 @@ public class CueTmpltItemDTO {
     private CueSheetTemplateSimpleDTO cueSheetTemplate;
     private List<CueTmpltItemCapSimpleDTO> cueTmpltItemCap;
     private List<CueTmplSymbolDTO> cueTmplSymbol = new ArrayList<>();
+    private List<CueTmpltMedia> cueTmpltMedia = new ArrayList<>();
 }

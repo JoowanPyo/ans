@@ -2,6 +2,8 @@ package com.gemiso.zodiac.app.cueSheetTemplate.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.baseProgram.dto.BaseProgramSimpleDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
+import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
 import lombok.AllArgsConstructor;
@@ -62,5 +64,6 @@ public class CueSheetTemplateDTO {
     private String subrmNm;
     private ProgramSimpleDTO program;
     private BaseProgramSimpleDTO baseProgram;
+    private List<CueTmpltItemSimpleDTO> cueTmpltItem;
     //private List<CueTmplSymbolDTO> cueTmplSymbol = new ArrayList<>();
 }
