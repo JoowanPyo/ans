@@ -44,10 +44,10 @@ public class ArticleMedia extends BaseEntity {
     private String mediaTypCdNm;
 
     @Column(name = "media_ord")
-    private int mediaOrd;
+    private Integer mediaOrd;
 
     @Column(name = "cont_id", length = 8)
-    private int contId;
+    private Integer contId;
 
     @Column(name = "trnsf_file_nm", length = 255)
     private String trnsfFileNm;
@@ -73,7 +73,7 @@ public class ArticleMedia extends BaseEntity {
     @Column(name = "video_edtr_nm", length = 100)
     private String videoEdtrNm;
 
-    @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'")
+    @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String delYn;
 
     @Column(name = "del_dtm")

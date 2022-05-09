@@ -154,10 +154,14 @@ public class MisService {
                     // 패스워드 변경시
                     if (passwordEncoder.matches(misPassword, ansPassword) == false) {
                         updateUserPwd(user, misPassword);
+
+                        log.info("Mis User Password Update : userId - "+ ansUserId);
                     }
                     // 부서코드 변경시
                     if (misDeptCode.equals(ansDeptCode) == false){
                         updateUserDept(user, misDeptCode);
+
+                        log.info("Mis User Dept Code Update : userId - "+ ansUserId+" Dept Code - "+misDeptCode);
                     }
 
                   continue loof1;  
@@ -171,6 +175,8 @@ public class MisService {
 
     //사용자 등록
     public void createUser(MisUser misUser){
+
+        log.info("Mis User Create : Mis User Model - "+misUser.toString());
 
         //조회된 misUser에 등록된 부서코드를 가져와 부서 아이디 조회
         String misDeptCode = misUser.getDeptCode();
@@ -296,6 +302,8 @@ public class MisService {
 
         deptsRepository.save(dept); //수정
 
+        log.info("Update Dept Info : Dept Id : "+dept.getId() +" IsEnabled : "+"N");
+
     }
 
     //부서정보 업데이트
@@ -311,6 +319,9 @@ public class MisService {
         deptsMapper.updateFromDto(deptsDTO, dept); //원본에서 수정된값 업데이트
 
         deptsRepository.save(dept); //수정
+
+        log.info("Update Dept Info : Dept Id : "+dept.getId() +" CODE : "+misDeptCode+" DEPT NAME : "
+                +misDeptName +" IsEnabled : "+"Y" +" ParentCode : "+parentCode+" Parent Id :"+parentId);
     }
 
     //부모코드로 부모아이디 find

@@ -145,7 +145,10 @@ public class BisInterfaceService {
                         /*.inputrId(userId)*/
                         .build();
 
+
                 programRepository.save(program);
+
+                log.info("Program Create sucess : program Id -"+program.getBrdcPgmId());
             }
         }
     }
@@ -407,7 +410,7 @@ public class BisInterfaceService {
         //현재 날짜 구하기
         Date now = new Date();
         //Date to String (yyyymmdd)
-        String nowDate = dateChangeHelper.dateToStringNoTimeStraight(now);
+        String nowDate = dateChangeHelper.dateToStringNoTime(now);
 
         BooleanBuilder booleanBuilder = getSearch(nowDate);
 
@@ -494,6 +497,8 @@ public class BisInterfaceService {
 
             dailyProgramRepository.save(dailyProgram);
 
+
+            Long id = dailyProgram.getDailyPgmId();
 
         }
 

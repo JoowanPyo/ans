@@ -67,7 +67,7 @@ public class ArticleMediaService {
 
     }
 
-    public Long create(ArticleMediaCreateDTO articleMediaCreateDTO, String userId) throws JsonProcessingException {
+    public ArticleMediaDTO create(ArticleMediaCreateDTO articleMediaCreateDTO, String userId) throws JsonProcessingException {
 
 
         articleMediaCreateDTO.setInputrId(userId);
@@ -75,6 +75,15 @@ public class ArticleMediaService {
         ArticleMedia articleMedia = articleMediaCreateMapper.toEntity(articleMediaCreateDTO);
 
         articleMediaRepository.save(articleMedia);
+
+        Long artclMediaId = articleMedia.getArtclMediaId();
+        Integer contId = articleMedia.getContId();
+
+        //기사영상 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        ArticleMediaDTO articleMediaDTO = new ArticleMediaDTO();
+        articleMediaDTO.setArtclMediaId(artclMediaId);
+        articleMediaDTO.setContId(contId);
+
 
         /********** MQ [TOPIC] ************/
         Article article = articleMedia.getArticle();
@@ -86,7 +95,7 @@ public class ArticleMediaService {
         sendCueTopicCreate(null, null, null , articleId, null, "Article Media Create",
                 null, "Y", "Y");
 
-        return articleMedia.getArtclMediaId();
+        return articleMediaDTO;
 
     }
 

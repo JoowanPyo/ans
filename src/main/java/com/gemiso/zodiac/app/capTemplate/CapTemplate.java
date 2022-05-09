@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrp;
 import com.gemiso.zodiac.app.code.Code;
+import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
@@ -118,6 +119,10 @@ public class CapTemplate extends BaseEntity {
 
     @OneToMany(mappedBy = "capTemplate")
     private List<ArticleCap> articleCap;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "file_id")
+    private AttachFile attachFile;
 
     @PrePersist
     public void prePersist() {

@@ -75,14 +75,14 @@ public class CueSheetController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<CueSheetSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                              @RequestBody @Valid CueSheetCreateDTO cueSheetCreateDTO,
-                                              @Parameter(name = "cueTmpltId", description = "큐시트템플릿아이디", in = ParameterIn.QUERY)
-                                              @RequestParam(value = "cueTmpltId", required = false) Long cueTmpltId) throws Exception {
+                                                    @RequestBody @Valid CueSheetCreateDTO cueSheetCreateDTO,
+                                                    @Parameter(name = "cueTmpltId", description = "큐시트템플릿아이디", in = ParameterIn.QUERY)
+                                                    @RequestParam(value = "cueTmpltId", required = false) Long cueTmpltId) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        log.info("CueSheet Create : UserId - "+userId +"<br>"+
-                "CueSheet model - "+cueSheetCreateDTO.toString());
+        log.info("CueSheet Create : UserId - " + userId + "<br>" +
+                "CueSheet model - " + cueSheetCreateDTO.toString());
 
         //큐시트 생성 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         CueSheetSimpleDTO cueSheetSimpleDTO = new CueSheetSimpleDTO();
@@ -90,7 +90,7 @@ public class CueSheetController {
         int cueCnt = cueSheetService.getCueSheetCount(cueSheetCreateDTO);
 
         //이미 같은날짜에 같은프로그램으로 큐시트 생성되어 있을시 error ( 409 )
-        if (cueCnt != 0){
+        if (cueCnt != 0) {
             //return new AnsApiResponse<>(cueSheetSimpleDTO, HttpStatus.CONFLICT);
             throw new Exception("이미 같은날짜에 생성된 큐시트가 존재합니다.");
         }
@@ -108,15 +108,15 @@ public class CueSheetController {
     @Operation(summary = "큐시트 수정", description = "큐시트 수정")
     @PutMapping(path = "/{cueId}")
     public AnsApiResponse<CueSheetSimpleDTO> update(@Parameter(name = "cueSheetUpdateDTO", required = true, description = "필수값<br>")
-                                              @Valid @RequestBody CueSheetUpdateDTO cueSheetUpdateDTO,
-                                              @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                              @PathVariable("cueId") Long cueId) throws JsonProcessingException {
+                                                    @Valid @RequestBody CueSheetUpdateDTO cueSheetUpdateDTO,
+                                                    @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
+                                                    @PathVariable("cueId") Long cueId) throws JsonProcessingException {
         //버전체크
         //토픽메세지
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        log.info("CueSheet Update : UserId - "+userId +"<br>"+
-                "CueSheet model - "+cueSheetUpdateDTO.toString());
+        log.info("CueSheet Update : UserId - " + userId + "<br>" +
+                "CueSheet model - " + cueSheetUpdateDTO.toString());
 
 
         cueSheetService.update(cueSheetUpdateDTO, cueId, userId);
@@ -139,8 +139,8 @@ public class CueSheetController {
         //토픽메세지
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        log.info("CueSheet Update : UserId - "+userId +"<br>"+
-                "CueSheet Id - "+cueId);
+        log.info("CueSheet Update : UserId - " + userId + "<br>" +
+                "CueSheet Id - " + cueId);
 
         cueSheetService.delete(cueId, userId);
 
@@ -156,8 +156,8 @@ public class CueSheetController {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        log.info("CueSheet OrderLock : UserId - "+userId + "CueSheet Id - "+cueId+
-                "<br>"+"CueSheet Model - "+cueSheetOrderLockDTO.toString());
+        log.info("CueSheet OrderLock : UserId - " + userId + "CueSheet Id - " + cueId +
+                "<br>" + "CueSheet Model - " + cueSheetOrderLockDTO.toString());
 
 
         cueSheetService.cueSheetOrderLock(cueSheetOrderLockDTO, cueId, userId);
@@ -177,7 +177,7 @@ public class CueSheetController {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        log.info("CueSheet Unlock : UserId - "+userId + "CueSheet Id - "+cueId);
+        log.info("CueSheet Unlock : UserId - " + userId + "CueSheet Id - " + cueId);
 
 
         cueSheetService.cueSheetUnLock(cueId);
@@ -200,7 +200,7 @@ public class CueSheetController {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        log.info("CueSheet Copy : UserId - "+userId + "CueSheet Id - "+cueId+" Program Id - "+brdcPgmId+" Brdc Date - "+brdcDt);
+        log.info("CueSheet Copy : UserId - " + userId + "CueSheet Id - " + cueId + " Program Id - " + brdcPgmId + " Brdc Date - " + brdcDt);
 
         //오더버전?
         //토픽메세지
@@ -210,7 +210,7 @@ public class CueSheetController {
         int cueCnt = cueSheetService.getCueSheetCount2(brdcDt, brdcPgmId);
 
         //이미 같은날짜에 같은프로그램으로 큐시트 생성되어 있을시 error ( 409 )
-        if (cueCnt != 0){
+        if (cueCnt != 0) {
             return new AnsApiResponse<>(cueSheetSimpleDTO, HttpStatus.CONFLICT);
         }
 
@@ -219,6 +219,19 @@ public class CueSheetController {
         cueSheetSimpleDTO.setCueId(cueSheetId);
 
         return new AnsApiResponse<>(cueSheetSimpleDTO);
+    }
+
+    @Operation(summary = "큐시트 자막 다운로드", description = "큐시트 자막 다운로드")
+    @GetMapping(path = "/{cueId}/download")
+    public String capDownload(@Parameter(name = "cueId", description = "큐시트 아이디")
+                              @PathVariable("cueId") Long cueId,
+                              @Parameter(name = "brdcPgmId", description = "프로그램 아이디")
+                              @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId) {
+
+        String capDownload = cueSheetService.capDownload(cueId, brdcPgmId);
+
+
+        return capDownload;
     }
 
 

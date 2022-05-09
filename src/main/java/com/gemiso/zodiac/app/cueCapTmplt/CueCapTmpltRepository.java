@@ -15,4 +15,7 @@ public interface CueCapTmpltRepository extends JpaRepository<CueCapTmplt, Long>,
 
     @Query("select a from CueCapTmplt a where a.program.brdcPgmId =:brdcPgmId")
     List<CueCapTmplt> findCueCapTmpltList(@Param("brdcPgmId")String brdcPgmId);
+
+    @Query("select a from CueCapTmplt a where a.program.brdcPgmId =:brdcPgmId")
+    List<CueCapTmplt> findCueCapTmpltByPgmId(@Param("brdcPgmId") String brdcPgmId);
 }

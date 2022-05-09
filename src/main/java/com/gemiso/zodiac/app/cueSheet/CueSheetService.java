@@ -8,13 +8,14 @@ import com.gemiso.zodiac.app.article.ArticleRepository;
 import com.gemiso.zodiac.app.article.ArticleService;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
-import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleSimpleMapper;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
-import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
+import com.gemiso.zodiac.app.capTemplate.CapTemplate;
+import com.gemiso.zodiac.app.cueCapTmplt.CueCapTmplt;
+import com.gemiso.zodiac.app.cueCapTmplt.CueCapTmpltRepository;
 import com.gemiso.zodiac.app.cueSheet.dto.*;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetCreateMapper;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
@@ -26,7 +27,6 @@ import com.gemiso.zodiac.app.cueSheetHist.dto.CueSheetHistCreateDTO;
 import com.gemiso.zodiac.app.cueSheetHist.mapper.CueSheetHistCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
-import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
 import com.gemiso.zodiac.app.cueSheetItem.QCueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
@@ -49,12 +49,11 @@ import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.program.ProgramService;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
-import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.core.enumeration.ActionEnum;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
+import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.core.topic.TopicService;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.CueSheetTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -89,6 +88,7 @@ public class CueSheetService {
     private final AnchorCapRepository anchorCapRepository;
     private final ArticleMediaRepository articleMediaRepository;
     private final CueSheetItemCapRepotitory cueSheetItemCapRepotitory;
+    private final CueCapTmpltRepository cueCapTmpltRepository;
 
 
     private final CueSheetMapper cueSheetMapper;
@@ -1044,7 +1044,7 @@ public class CueSheetService {
                     .artclExtTime(article.getArtclExtTime())
                     .videoTime(article.getVideoTime())
                     .deptCd(article.getDeptCd())
-                    .deviceCd(article.getDeviceCd())
+                    //.deviceCd(article.getDeviceCd())
                     .parentArtlcId(article.getArtclId())//복사한 기사 아이디 set
                     .issue(article.getIssue())
                     .cueSheet(cueSheet)//큐시트 아이디 set
@@ -1105,7 +1105,7 @@ public class CueSheetService {
                     .artclExtTime(article.getArtclExtTime())
                     .videoTime(article.getVideoTime())
                     .deptCd(article.getDeptCd())
-                    .deviceCd(article.getDeviceCd())
+                    //.deviceCd(article.getDeviceCd())
                     .parentArtlcId(article.getArtclId())//복사한 기사 아이디 set
                     .issue(article.getIssue())
                     .cueSheet(cueSheet)//큐시트 아이디 set
@@ -1172,6 +1172,170 @@ public class CueSheetService {
                 .article(articleEntity)
                 .build();
     }
+
+    //큐시트 자막 출력 [ xml ]
+    public String capDownload(Long cueId, String brdcPgmId){
+        
+        List<CueSheetCapDownloadCgDTO> cueSheetCapDownloadCgDTOS = new ArrayList<>();
+
+        int seq = 1001;
+
+        CueSheet cueSheet = cueSheetFindOrFail(cueId);
+
+        //CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
+        List<CueCapTmplt> cueCapTmpltList = cueCapTmpltRepository.findCueCapTmpltByPgmId(brdcPgmId);
+
+        List<String> divCdList = new ArrayList<>();
+        for (CueCapTmplt cueCapTmplt : cueCapTmpltList){
+            String divCd = cueCapTmplt.getCgDivCd();
+            divCdList.add(divCd);
+        }
+
+
+        List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //큐시트 아이템 출력
+        
+        for (CueSheetItem cueSheetItem : cueSheetItemList){
+
+            Article article = cueSheetItem.getArticle(); //기사 정보를 가져온다.
+            
+            if (ObjectUtils.isEmpty(article)){ //일반 큐시트 아이템, 템플릿아이템
+
+                List<CueSheetItemCap> cueSheetItemCapList = cueSheetItem.getCueSheetItemCap();
+
+                for (CueSheetItemCap cueSheetItemCap : cueSheetItemCapList){
+
+                    String cueCapDivCd = cueSheetItemCap.getCueItemCapDivCd();
+                    String capCtt = cueSheetItemCap.getCapCtt();
+
+                    for (CueCapTmplt cueCapTmplt : cueCapTmpltList){
+
+                        String capDivCd = cueCapTmplt.getCgDivCd();
+                        CapTemplate capTemplate = cueCapTmplt.getCapTemplate();
+
+                        if (divCdList.contains(cueCapDivCd)) {
+                            if (capDivCd.equals(cueCapDivCd)) {
+
+                                CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
+                                        .page(seq)
+                                        .content(capCtt)
+                                        .template(capTemplate.getCapTmpltNm())
+                                        .build();
+
+                                cueSheetCapDownloadCgDTOS.add(cueSheetCapDownloadCg);
+
+                                ++seq;
+                            }
+                        }else {
+                            CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
+                                    .page(seq)
+                                    .content(capCtt)
+                                    .template("")
+                                    .build();
+
+                            cueSheetCapDownloadCgDTOS.add(cueSheetCapDownloadCg);
+
+                            ++seq;
+                        }
+                    }
+
+                }
+                
+            }else {
+
+                List<AnchorCap> anchorCapList = article.getAnchorCap();
+
+                for (AnchorCap anchorCap : anchorCapList){
+
+                    String anchorCapDivCd = anchorCap.getCapDivCd();
+                    String capCtt = anchorCap.getCapCtt();
+
+                    for (CueCapTmplt cueCapTmplt : cueCapTmpltList){
+                        String capDivCd = cueCapTmplt.getCgDivCd();
+                        CapTemplate capTemplate = cueCapTmplt.getCapTemplate();
+
+                        if (divCdList.contains(anchorCapDivCd)) {
+                            if (capDivCd.equals(anchorCapDivCd)) {
+
+                                CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
+                                        .page(seq)
+                                        .content(capCtt)
+                                        .template(capTemplate.getCapTmpltNm())
+                                        .build();
+
+                                cueSheetCapDownloadCgDTOS.add(cueSheetCapDownloadCg);
+
+                                ++seq;
+                            }
+                        }else {
+                            CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
+                                    .page(seq)
+                                    .content(capCtt)
+                                    .template("")
+                                    .build();
+
+                            cueSheetCapDownloadCgDTOS.add(cueSheetCapDownloadCg);
+
+                            ++seq;
+                        }
+                    }
+                }
+
+
+                List<ArticleCap> articleCapList = article.getArticleCap();
+
+                for (ArticleCap articleCap : articleCapList){
+
+                    String anchorCapDivCd = articleCap.getCapDivCd();
+                    String capCtt = articleCap.getCapCtt();
+
+                    for (CueCapTmplt cueCapTmplt : cueCapTmpltList){
+                        String capDivCd = cueCapTmplt.getCgDivCd();
+                        CapTemplate capTemplate = cueCapTmplt.getCapTemplate();
+
+                        if (divCdList.contains(anchorCapDivCd)) {
+                            if (capDivCd.equals(anchorCapDivCd)) {
+
+                                CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
+                                        .page(seq)
+                                        .content(capCtt)
+                                        .template(capTemplate.getCapTmpltNm())
+                                        .build();
+
+                                cueSheetCapDownloadCgDTOS.add(cueSheetCapDownloadCg);
+
+                                ++seq;
+                            }
+                        }else {
+                            CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
+                                    .page(seq)
+                                    .content(capCtt)
+                                    .template("")
+                                    .build();
+
+                            cueSheetCapDownloadCgDTOS.add(cueSheetCapDownloadCg);
+
+                            ++seq;
+                        }
+                    }
+                }
+
+
+            }
+            
+        }
+        
+
+        CueSheetCapDownloadXMLDTO cueSheetCapDownloadXMLDTO = new CueSheetCapDownloadXMLDTO();
+        cueSheetCapDownloadXMLDTO.setCd(cueSheetCapDownloadCgDTOS);
+
+        //DTO TO XML 파싱
+        String xml = JAXBXmlHelper.marshal(cueSheetCapDownloadXMLDTO, CueSheetCapDownloadXMLDTO.class);
+
+
+        return xml;
+    }
+
+
 
 }
 

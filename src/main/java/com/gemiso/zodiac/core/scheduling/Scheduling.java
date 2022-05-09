@@ -23,9 +23,11 @@ public class Scheduling {
     private final MisService misService;
 
     //BIS프로그램 조회 및 등록
-    //@Scheduled(cron = "0 0 5 * * ?")//매일 새벽 5시에 한번씩
+    @Scheduled(cron = "0 0 5 * * ?")//매일 새벽 5시에 한번씩
     //@Scheduled(cron = "0 * * * * *")
     public void bisProgramCreate() throws Exception {
+
+        log.info("Program Create Start");
 
         //bis에서 프로그램 정보를 가져온다.
         BisProgramDTO bisProgramDTO = bisInterfaceService.bisProgramfindAll();
@@ -50,9 +52,11 @@ public class Scheduling {
 
     //Bis주간편성 조회 및 등록
     //@Scheduled(cron = "0 * * * * *")
-    @Scheduled(cron = "0 0 5 * * ?")//매일 새벽 5시에 한번씩
+    @Scheduled(cron = "0 10 5 * * ?")//매일 새벽 5시10분에 한번씩
     //@Scheduled(cron = "* * 3 * * ?")//3시간에 한번씩
     public void bisDailyScheduleCreate() throws Exception {
+
+        log.info("Dailly Program Create Start");
 
         BisDailyScheduleDTO bisDailyScheduleDTO = bisInterfaceService.bisDailyScheduleFindAll();
 
@@ -61,9 +65,11 @@ public class Scheduling {
     }
 
     //주간편성 금요일 새벽 5시마다 업데이트
-    @Scheduled(cron = "0 0 5 * * FRI")//매주 금요일 새벽 5시에 한번씩
+    @Scheduled(cron = "0 0 23 ? * FRI")//매주 금요일 새벽 5시에 한번씩
     //@Scheduled(cron = "0 * * * * *")
     public void bisDailyScheduleCreateFri() throws Exception {
+
+        log.info("Dailly Program Week Create Start");
 
         List<BisDailyScheduleDTO> bisDailyScheduleDTOList = bisInterfaceService.bisDailyScheduleFindAllFri();
 
@@ -76,14 +82,18 @@ public class Scheduling {
     @Scheduled(cron = "0 0 5 * * ?")//매일 새벽 5시에 한번씩
     public void misDeptScheduled(){
 
+        log.info("Mis Dept Create Start");
+
         misService.findMisDept();
 
     }
 
     //Mis 사용자 조회 및 등록(수정)
     //@Scheduled(cron = "0 * * * * *")
-    @Scheduled(cron = "0 0 5 * * ?")//매일 새벽 5시에 한번씩
+    @Scheduled(cron = "0 10 5 * * ?")//매일 새벽 5시에 한번씩
     public void misUserScheduled(){
+
+        log.info("Mis User Create Start");
 
         misService.findUser();
 

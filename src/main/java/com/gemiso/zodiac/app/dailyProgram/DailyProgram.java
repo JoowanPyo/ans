@@ -92,7 +92,6 @@ public class DailyProgram{
     @Column(name = "brdc_run_time", length = 8)
     private String brdcRunTime;
 
-    /*@Column(name = "brdc_pgm_id")*/
     @ManyToOne
     @JoinColumn(name = "brdc_pgm_id")
     private Program program;

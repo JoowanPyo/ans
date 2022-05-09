@@ -402,7 +402,7 @@ public class ArticleService {
         copyArticle.setArtclExtTime(article.getArtclExtTime());
         copyArticle.setVideoTime(article.getVideoTime());
         copyArticle.setDeptCd(article.getDeptCd());
-        copyArticle.setDeviceCd(article.getDeviceCd());
+        //copyArticle.setDeviceCd(article.getDeviceCd());
         //copyArticle.setParentArtlcId();
         copyArticle.setMemo(article.getMemo());
         copyArticle.setEditorId(article.getEditorId());

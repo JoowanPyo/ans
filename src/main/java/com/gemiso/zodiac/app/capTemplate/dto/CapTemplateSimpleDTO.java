@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.capTemplate.dto;
 
+import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,5 +41,7 @@ public class CapTemplateSimpleDTO {
     private String updtrNm;
     private String delrId;
     private String delrNm;
+    private AttachFileDTO attachFile;
+    private String url;
     //private CapTemplateGrpDTO capTemplateGrp;
 }

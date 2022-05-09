@@ -83,11 +83,8 @@ public class ArticleMediaController {
 
         log.info(" Create Article Media : User Id - "+userId+" Media Model -"+articleMediaCreateDTO.toString());
 
-        Long artclMediaId = articleMediaService.create(articleMediaCreateDTO, userId);
+        ArticleMediaDTO articleMediaDTO = articleMediaService.create(articleMediaCreateDTO, userId);
 
-        //기사영상 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
-        ArticleMediaDTO articleMediaDTO = new ArticleMediaDTO();
-        articleMediaDTO.setArtclMediaId(artclMediaId);
 
         return new AnsApiResponse<>(articleMediaDTO);
     }

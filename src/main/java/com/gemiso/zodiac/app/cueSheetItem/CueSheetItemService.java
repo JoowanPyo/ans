@@ -975,7 +975,7 @@ public class CueSheetItemService {
                     .artclExtTime(article.getArtclExtTime())
                     .videoTime(article.getVideoTime())
                     .deptCd(article.getDeptCd())
-                    .deviceCd(article.getDeviceCd())
+                    //.deviceCd(article.getDeviceCd())
                     .parentArtlcId(article.getArtclId())//복사한 기사 아이디 set
                     .issue(article.getIssue())
                     .cueSheet(cueSheet)//큐시트 아이디 set
@@ -1036,7 +1036,7 @@ public class CueSheetItemService {
                     .artclExtTime(article.getArtclExtTime())
                     .videoTime(article.getVideoTime())
                     .deptCd(article.getDeptCd())
-                    .deviceCd(article.getDeviceCd())
+                    //.deviceCd(article.getDeviceCd())
                     .parentArtlcId(article.getArtclId())//복사한 기사 아이디 set
                     .issue(article.getIssue())
                     .cueSheet(cueSheet)//큐시트 아이디 set
