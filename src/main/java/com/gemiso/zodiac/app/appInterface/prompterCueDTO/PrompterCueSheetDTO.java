@@ -54,9 +54,6 @@ public class PrompterCueSheetDTO {
     @XmlElement(name = "artcl_fld_nm")
     private String artclFldNm;
 
-    @XmlElement(name = "artcl_frm")
-    private String artclFrm;
-
     @XmlElement(name = "artcl_titl")
     private String artclTitl;
 

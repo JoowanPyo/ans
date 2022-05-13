@@ -41,8 +41,8 @@ public class CueTmpltMediaController {
                                                          @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
                                                          @Parameter(name = "trnsfFileNm", description = "전송 파일 명")
                                                          @RequestParam(value = "trnsfFileNm", required = false) String trnsfFileNm,
-                                                         @Parameter(name = "cueTmpltMediaId", description = "큐시트 템플릿 미디어 아이디")
-                                                         @RequestParam(value = "cueTmpltMediaId", required = false) Long cueTmpltMediaId,
+                                                         @Parameter(name = "cueTmpltItemId", description = "큐시트 템플릿 미디어 아이디")
+                                                         @RequestParam(value = "cueTmpltItemId", required = false) Long cueTmpltItemId,
                                                          @Parameter(name = "mediaTypCd", description = "미디어 유형 코드[media_typ_001 : 영상, media_typ_002 : 백드롭]")
                                                          @RequestParam(value = "mediaTypCd", required = false) String mediaTypCd) throws Exception {
 
@@ -52,10 +52,10 @@ public class CueTmpltMediaController {
             //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
             SearchDate searchDate = new SearchDate(sdate, edate);
 
-            cueTmpltMediaDTOList = cueTmpltMediaService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), trnsfFileNm, cueTmpltMediaId, mediaTypCd);
+            cueTmpltMediaDTOList = cueTmpltMediaService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), trnsfFileNm, cueTmpltItemId, mediaTypCd);
 
         } else {
-            cueTmpltMediaDTOList = cueTmpltMediaService.findAll(null, null, trnsfFileNm, cueTmpltMediaId, mediaTypCd);
+            cueTmpltMediaDTOList = cueTmpltMediaService.findAll(null, null, trnsfFileNm, cueTmpltItemId, mediaTypCd);
         }
         return new AnsApiResponse<>(cueTmpltMediaDTOList);
     }

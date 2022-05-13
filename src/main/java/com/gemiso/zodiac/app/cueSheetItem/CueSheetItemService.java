@@ -105,6 +105,8 @@ public class CueSheetItemService {
 
         List<CueSheetItem> cueSheetItemList = (List<CueSheetItem>) cueSheetItemRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "cueItemOrd"));
 
+        //List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findAllItems(artclId, cueId, delYn, spareYn);
+
         //List<CueSheetItem> cueSheetItemList = getSearch(artclId, cueId, delYn, spareYn);
 
         //List<CueSheetItem> cueSheetItemFormatList = new ArrayList<>();
@@ -165,7 +167,7 @@ public class CueSheetItemService {
         //큐시트 아이템 조회
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
 
-        Article article = cueSheetItem.getArticle();
+        /*Article article = cueSheetItem.getArticle();
 
         if (ObjectUtils.isEmpty(article) == false) {
             String delYn = article.getDelYn();
@@ -178,7 +180,7 @@ public class CueSheetItemService {
 
                 cueSheetItem.setArticle(article);
             }
-        }
+        }*/
         //큐시트 아이템 방송아이콘 List 조회
         List<CueSheetItemSymbol> cueSheetItemSymbol = cueSheetItem.getCueSheetItemSymbol();
         //List<CueSheetItemSymbol> cueSheetItemSymbol = cueSheetItemSymbolRepository.findSymbol(cueItemId);

@@ -1355,7 +1355,6 @@ public class InterfaceService {
                         .artclTitl(cueSheetItem.getCueItemTitl()) //국문제목
                         .artclTitlEn(cueSheetItem.getCueItemTitlEn()) // 영문제목
                         .artclCtt(cueSheetItem.getCueItemCtt())
-                        .artclFrm(cueSheetItem.getCueItemFrmCd())
                         //.newsAcumTime(newsAcumTime) //누적시간
                         .cueId(cueSheet.getCueId()) //Topic 사용 큐시트 아이디
                         .cueItemId(cueSheetItem.getCueItemId()) //Topic 사용 큐시트 아이템 아이디
@@ -1403,12 +1402,11 @@ public class InterfaceService {
                         .artclId(article.getArtclId())
                         .artclFldCd(article.getArtclFldCd())
                         .artclFldNm(article.getArtclFldCdNm())
-                        .artclFrmCd(article.getArtclFrmCd())
-                        .artclFrmNm(article.getArtclFrmCdNm())
+                        .artclFrmCd(article.getArtclTypDtlCd())// 비롤, 패키지
+                        .artclFrmNm(article.getArtclTypDtlCdNm())
                         .artclTitl(article.getArtclTitl()) //국문제목
                         .artclTitlEn(article.getArtclTitlEn()) // 영문제목
                         .artclCtt(article.getArtclCtt())
-                        .artclFrm(cueSheetItem.getCueItemFrmCd())
                         .ancCtt(article.getAncMentCtt())//앵커맨트
                         .rptrId(article.getRptrId()) //기자 아이디
                         .rptrNm(article.getRptrNm()) //기자 명
@@ -1501,8 +1499,8 @@ public class InterfaceService {
                         .artclId(article.getArtclId())
                         .artclFldCd(article.getArtclFldCd())
                         .artclFldNm(article.getArtclFldCdNm())
-                        .artclFrmCd(article.getArtclFrmCd())
-                        .artclFrmNm(article.getArtclFrmCdNm())
+                        .artclFrmCd(article.getArtclTypDtlCd())// 비롤, 패키지
+                        .artclFrmNm(article.getArtclTypDtlCdNm())
                         .artclTitl(article.getArtclTitl()) //국문제목
                         .artclTitlEn(article.getArtclTitlEn()) // 영문제목
                         .artclCtt(article.getArtclCtt())

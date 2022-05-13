@@ -33,9 +33,9 @@ public class CueTmpltMediaService {
 
 
     //큐시트 템플릿 미디어 목록조회
-    public List<CueTmpltMediaDTO> findAll(Date sdate, Date edate, String trnsfFileNm, Long cueTmpltMediaId, String mediaTypCd) {
+    public List<CueTmpltMediaDTO> findAll(Date sdate, Date edate, String trnsfFileNm, Long cueTmpltItemId, String mediaTypCd) {
 
-        BooleanBuilder booleanBuilder = getSearch(sdate, edate, trnsfFileNm, cueTmpltMediaId, mediaTypCd);
+        BooleanBuilder booleanBuilder = getSearch(sdate, edate, trnsfFileNm, cueTmpltItemId, mediaTypCd);
 
         List<CueTmpltMedia> cueTmpltMediaList = (List<CueTmpltMedia>) cueTmpltMediaRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "mediaOrd"));
 
@@ -127,7 +127,7 @@ public class CueTmpltMediaService {
     }
 
     //목록조회 조건 빌드
-    public BooleanBuilder getSearch(Date sdate, Date edate, String trnsfFileNm, Long cueTmpltMediaId, String mediaTypCd){
+    public BooleanBuilder getSearch(Date sdate, Date edate, String trnsfFileNm, Long cueTmpltItemId, String mediaTypCd){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -139,8 +139,8 @@ public class CueTmpltMediaService {
         if (trnsfFileNm != null && trnsfFileNm.trim().isEmpty() == false) {
             booleanBuilder.and(qCueTmpltMedia.trnsfFileNm.contains(trnsfFileNm));
         }
-        if (ObjectUtils.isEmpty(cueTmpltMediaId) == false){
-            booleanBuilder.and(qCueTmpltMedia.cueTmpltMediaId.eq(cueTmpltMediaId));
+        if (ObjectUtils.isEmpty(cueTmpltItemId) == false){
+            booleanBuilder.and(qCueTmpltMedia.cueTmpltItem.cueTmpltItemId.eq(cueTmpltItemId));
         }
 
         if (mediaTypCd != null && mediaTypCd.trim().isEmpty() == false){
