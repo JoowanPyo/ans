@@ -1,15 +1,11 @@
-package com.gemiso.zodiac.app.CUeSheetTemplateMedia.dto;
+package com.gemiso.zodiac.app.cueSheetTemplateMedia.dto;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Formula;
 
-import javax.persistence.*;
 import java.util.Date;
 
 @Data

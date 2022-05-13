@@ -51,7 +51,7 @@ public class UserService {
 
     private final UserAuthService userAuthService;
 
-    @Value("${password.salt-key:saltKey}")
+    @Value("${password.salt.key:saltKey}")
     private String saltKey;
 
   /*  @Override
@@ -123,7 +123,7 @@ public class UserService {
 
         //들어온 패스워드 해싱[sha256]
         String getPwd = userCreateDTO.getPwd();
-        EncodingHelper encodingHelper = new EncodingHelper(getPwd);
+        EncodingHelper encodingHelper = new EncodingHelper(getPwd, saltKey);
         String hexPwd = encodingHelper.getHex();
 
         //password encoding
@@ -192,7 +192,7 @@ public class UserService {
 
         if (getPwd != null && getPwd.trim().isEmpty() == false) {
             //들어온 패스워드 해싱[sha256]
-            EncodingHelper encodingHelper = new EncodingHelper(getPwd);
+            EncodingHelper encodingHelper = new EncodingHelper(getPwd, saltKey);
             String hexPwd = encodingHelper.getHex();
 
             //password encoding
@@ -240,6 +240,12 @@ public class UserService {
         return userEntity.get();
     }
 
+    //패스워드 비크립트
+    public String encodePassword(String password) {
+
+        return passwordEncoder.encode(password);
+    }
+
 
     private BooleanBuilder getSearch(String userId, String userNm, String delYn) {
 
@@ -259,10 +265,6 @@ public class UserService {
             booleanBuilder.and(quser.userId.eq(userId));
         }
         return booleanBuilder;
-    }
-
-    public String encodePassword(String password) {
-        return passwordEncoder.encode(password);
     }
 
     public boolean checkUser(String userId){

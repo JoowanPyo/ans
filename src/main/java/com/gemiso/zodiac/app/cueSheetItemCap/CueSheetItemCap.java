@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.cueSheetItemCap;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
@@ -28,6 +29,7 @@ import java.util.List;
 @Setter
 @ToString
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CueSheetItemCap {
 
     @Id

@@ -39,7 +39,14 @@ public class InterfaceFilter implements Filter {
         //param-value URL값 적용
         String path = ((HttpServletRequest) request).getServletPath();
 
-        if (excludedUrls.contains(path)) {
+        //인터페이스 필터정보
+        String interfacePath = "/interface/cuestcdupdate"+path.substring(path.lastIndexOf("/"));
+
+        if (interfacePath.equals(path)){
+            chain.doFilter(request, response);
+        }
+
+        if (excludedUrls.contains(path) ) {
 
             final String requestTokenHeader = httpServletRequest.getHeader("securityKey");
 

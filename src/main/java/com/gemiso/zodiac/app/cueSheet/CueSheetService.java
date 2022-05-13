@@ -27,6 +27,7 @@ import com.gemiso.zodiac.app.cueSheetHist.dto.CueSheetHistCreateDTO;
 import com.gemiso.zodiac.app.cueSheetHist.mapper.CueSheetHistCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
 import com.gemiso.zodiac.app.cueSheetItem.QCueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
@@ -132,17 +133,93 @@ public class CueSheetService {
 
         List<CueSheetDTO> cueSheetDTOList = cueSheetMapper.toDtoList(cueSheets);
 
-        List<CueSheetDTO> newCueSheetDTOList = checkDelItem(cueSheetDTOList); //삭제된 기사아이템 제거.
+        //List<CueSheetDTO> newCueSheetDTOList = checkDelItem(cueSheetDTOList); //삭제된 기사아이템 제거.
+
+        CueSheetFindAllDTO cueSheetFindAllDTO = unionPgmInterface(cueSheetDTOList, sdate, edate, brdcPgmId,
+                brdcPgmNm, searchWord); //큐시트 유니온 방송프로그램.
+
+        //큐시트에 포함된 기사수를 계산한다[ 큐시트 목록조회시 화면에 필요 ]
+        cueSheetFindAllDTO = getArticleCount(cueSheetFindAllDTO);
+
+        //큐시트에 포함된 기사수를 계산한다[ 큐시트 목록조회시 화면에 필요 ]
+        //cueSheetFindAllDTO = createArticleCount(cueSheetFindAllDTO);
+
+        return cueSheetFindAllDTO;
+
+
+    }
+
+    //큐시트에 큐시트아이템 정보 추가
+    public List<CueSheetDTO> addCueItem( List<CueSheetDTO> cueSheetDTOList){
+
+        List<CueSheetDTO> returnCueSheet = new ArrayList<>();
+
+        for (CueSheetDTO cueSheetDTO : cueSheetDTOList){
+
+            Long cueId = cueSheetDTO.getCueId();
+
+            List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
+            List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
+            cueSheetDTO.setCueSheetItem(cueSheetItemDTOList);
+
+            returnCueSheet.add(cueSheetDTO);
+        }
+
+        return returnCueSheet;
+    }
+
+
+    //큐시트 목록조회 + 유니온 일일편성 [큐시트 인터페이스+큐시트 아이템추가 목록]
+    public CueSheetFindAllDTO psTakerFindAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord){
+
+        BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm,  searchWord);
+
+        //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
+        List<Sort.Order> orders = new ArrayList<>();
+        Sort.Order order1 = new Sort.Order(Sort.Direction.ASC, "brdcDt");
+        orders.add(order1);
+        Sort.Order order2 = new Sort.Order(Sort.Direction.ASC, "brdcStartTime");
+        orders.add(order2);
+
+        List<CueSheet> cueSheets = (List<CueSheet>) cueSheetRepository.findAll(booleanBuilder, Sort.by(orders));
+
+        List<CueSheetDTO> cueSheetDTOList = cueSheetMapper.toDtoList(cueSheets);
+
+        //List<CueSheetDTO> newCueSheetDTOList = checkDelItem(cueSheetDTOList); //삭제된 기사아이템 제거.
+        List<CueSheetDTO> newCueSheetDTOList = addCueItem(cueSheetDTOList); //큐시트에 큐시트아이템정보 추가
 
         CueSheetFindAllDTO cueSheetFindAllDTO = unionPgmInterface(newCueSheetDTOList, sdate, edate, brdcPgmId,
                 brdcPgmNm, searchWord); //큐시트 유니온 방송프로그램.
 
         //큐시트에 포함된 기사수를 계산한다[ 큐시트 목록조회시 화면에 필요 ]
-        cueSheetFindAllDTO = createArticleCount(cueSheetFindAllDTO);
+        cueSheetFindAllDTO = getArticleCount(cueSheetFindAllDTO);
+
+        //큐시트에 포함된 기사수를 계산한다[ 큐시트 목록조회시 화면에 필요 ]
+        //cueSheetFindAllDTO = createArticleCount(cueSheetFindAllDTO);
 
         return cueSheetFindAllDTO;
 
 
+    }
+
+    public CueSheetFindAllDTO getArticleCount(CueSheetFindAllDTO cueSheetFindAllDTO){
+
+        List<CueSheetDTO> cueSheetDTOs = cueSheetFindAllDTO.getCueSheetDTO();
+        List<CueSheetDTO> cueSheetDTOList = new ArrayList<>();
+
+        for(CueSheetDTO cueSheetDTO : cueSheetDTOs){
+
+            Long cueId = cueSheetDTO.getCueId();
+
+            int count = articleRepository.findArticleCount(cueId);
+            cueSheetDTO.setArticleCount(count);
+
+            cueSheetDTOList.add(cueSheetDTO);
+        }
+
+        cueSheetFindAllDTO.setCueSheetDTO(cueSheetDTOList);
+
+        return cueSheetFindAllDTO;
     }
 
     //큐시트에 포함된 기사수를 계산한다[ 큐시트 목록조회시 화면에 필요 ]
@@ -323,29 +400,14 @@ public class CueSheetService {
         CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
 
         //기사 미디어 있을경우 set
-        List<CueSheetItem> cueSheetItemList = cueSheetItemFindAll(cueId);
-        List<CueSheetItem> setCueSheetItemList = new ArrayList<>();
+        //List<CueSheetItem> cueSheetItemList = cueSheetItemFindAll(cueId);
+        //List<CueSheetItem> setCueSheetItemList = new ArrayList<>();
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
+        //List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
 
-       /* for (CueSheetItemDTO cueSheetItem : cueSheetItemDTOList){
-            ArticleCueItemDTO article = cueSheetItem.getArticle();
+        //cueSheetItemDTOList = setSymbol(cueSheetItemDTOList);
 
-            if (ObjectUtils.isEmpty(article) == false){
-                Long articleId = article.getArtclId();
-
-                List<ArticleMedia> articleMedia = articleMediaRepository.findArticleMediaList(articleId);
-                List<ArticleMediaDTO> articleMediaDTOList = articleMediaMapper.toDtoList(articleMedia);
-                article.setArticleMediaDTO(articleMediaDTOList);
-                cueSheetItem.setArticle(article);
-            }
-
-            setCueSheetItemList.add(cueSheetItem);
-        }*/
-
-        cueSheetItemDTOList = setSymbol(cueSheetItemDTOList);
-
-        cueSheetDTO.setCueSheetItem(cueSheetItemDTOList);
+        //cueSheetDTO.setCueSheetItem(cueSheetItemDTOList);
 
         return cueSheetDTO;
 
@@ -551,19 +613,19 @@ public class CueSheetService {
     //큐시트 이력 등록
     public void cueSheetHistCreate(Long cueId, CueSheet cueSheet, String userId){
 
-        List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //큐시트 아이템 엔티티 조회
+        //List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //큐시트 아이템 엔티티 조회
 
         //조회된 큐시트 아이템 엔티티 DTO변환[ 엔티티를 바로 써버리면 필요없는 데이터가 다 보여지기 때문.]
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
+        //List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
         /*String cueSheetItem = String.valueOf(cueSheetItemList);*/
 
         //큐시트 아이템 리스트를 String 으로 변환 리스트 정보를 text로 저장하기 위함.
-        String cueSheetItem = null;
-        if (CollectionUtils.isEmpty(cueSheetItemDTOList) == false) {
-            cueSheetItem = cueSheetItemDTOList.stream()
-                    .map(n -> String.valueOf(n))
-                    .collect(Collectors.joining());
-        }
+        //String cueSheetItem = null;
+        //if (CollectionUtils.isEmpty(cueSheetItemDTOList) == false) {
+        //    cueSheetItem = cueSheetItemDTOList.stream()
+        //            .map(n -> String.valueOf(n))
+        //            .collect(Collectors.joining());
+        // }
 
         //큐시트 이력에 넣어줄 큐시트 아이디 빌드
         CueSheetSimpleDTO cueSheetSimpleDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
@@ -573,7 +635,7 @@ public class CueSheetService {
                 .cueAction(ActionEnum.CREATE.getAction(ActionEnum.CREATE))
                 .inputrId(userId)
                 .cueSheet(cueSheetSimpleDTO)
-                .cueItemData(cueSheetItem)
+                //.cueItemData(cueSheetItem)
                 .build();
 
         CueSheetHist cueSheetHist = cueSheetHistCreateMapper.toEntity(cueSheetHistBuild);
@@ -585,16 +647,16 @@ public class CueSheetService {
     //큐시트 이력 수정
     public void cueSheetHistUpdate(Long cueId, CueSheet cueSheet, String userId){
 
-        List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //큐시트 아이템 엔티티 조회
+        //List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //큐시트 아이템 엔티티 조회
 
         //조회된 큐시트 아이템 엔티티 DTO변환[ 엔티티를 바로 써버리면 필요없는 데이터가 다 보여지기 때문.]
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList); 
+        //List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
         /*String cueSheetItem = String.valueOf(cueSheetItemList);*/
 
         //큐시트 아이템 리스트를 String 으로 변환 리스트 정보를 text로 저장하기 위함.
-        String cueSheetItem = cueSheetItemDTOList.stream() 
-                .map(n -> String.valueOf(n))
-                .collect(Collectors.joining());
+        //String cueSheetItem = cueSheetItemDTOList.stream()
+        //        .map(n -> String.valueOf(n))
+        //        .collect(Collectors.joining());
 
         //큐시트 이력에 넣어줄 큐시트 아이디 빌드
         CueSheetSimpleDTO cueSheetSimpleDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
@@ -606,7 +668,7 @@ public class CueSheetService {
         CueSheetHistCreateDTO cueSheetHistBuild = CueSheetHistCreateDTO.builder()
                 .cueVer(cueSheet.getCueVer())
                 .cueAction(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
-                .cueItemData(cueSheetItem)
+                //.cueItemData(cueSheetItem)
                 .inputrId(userId)
                 .cueSheet(cueSheetSimpleDTO)
                 .build();
@@ -622,16 +684,16 @@ public class CueSheetService {
     //큐시트 이력 삭제
     public void cueSheetHistDelete(Long cueId, CueSheet cueSheet, String userId){
 
-        List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //큐시트 아이템 엔티티 조회
+        //List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //큐시트 아이템 엔티티 조회
 
         //조회된 큐시트 아이템 엔티티 DTO변환[ 엔티티를 바로 써버리면 필요없는 데이터가 다 보여지기 때문.]
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
+        //List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
         /*String cueSheetItem = String.valueOf(cueSheetItemList);*/
 
         //큐시트 아이템 리스트를 String 으로 변환 리스트 정보를 text로 저장하기 위함.
-        String cueSheetItem = cueSheetItemDTOList.stream()
-                .map(n -> String.valueOf(n))
-                .collect(Collectors.joining());
+        //String cueSheetItem = cueSheetItemDTOList.stream()
+        //        .map(n -> String.valueOf(n))
+        //        .collect(Collectors.joining());
 
         //큐시트 이력에 넣어줄 큐시트 아이디 빌드
         CueSheetSimpleDTO cueSheetSimpleDTO = CueSheetSimpleDTO.builder().cueId(cueId).build();
@@ -643,7 +705,7 @@ public class CueSheetService {
         CueSheetHistCreateDTO cueSheetHistBuild = CueSheetHistCreateDTO.builder()
                 .cueVer(cueSheet.getCueVer())
                 .cueAction(ActionEnum.DELETE.getAction(ActionEnum.DELETE))
-                .cueItemData(cueSheetItem)
+                //.cueItemData(cueSheetItem)
                 .inputrId(userId)
                 .cueSheet(cueSheetSimpleDTO)
                 .build();
@@ -1180,7 +1242,7 @@ public class CueSheetService {
 
         int seq = 1001;
 
-        CueSheet cueSheet = cueSheetFindOrFail(cueId);
+        //CueSheet cueSheet = cueSheetFindOrFail(cueId);
 
         //CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
         List<CueCapTmplt> cueCapTmpltList = cueCapTmpltRepository.findCueCapTmpltByPgmId(brdcPgmId);
@@ -1192,7 +1254,7 @@ public class CueSheetService {
         }
 
 
-        List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem(); //큐시트 아이템 출력
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId); //큐시트 아이템 출력
         
         for (CueSheetItem cueSheetItem : cueSheetItemList){
 

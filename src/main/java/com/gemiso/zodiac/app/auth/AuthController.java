@@ -32,6 +32,8 @@ public class AuthController {
                                      @Valid @RequestBody AuthRequestDTO authRequestDTO
     ) throws Exception {
 
+        //log.info(" 로그인 : "+ authRequestDTO.toString());
+
         JwtDTO jwtDTO = authService.login(authRequestDTO);
 
         return new AnsApiResponse<>(jwtDTO);

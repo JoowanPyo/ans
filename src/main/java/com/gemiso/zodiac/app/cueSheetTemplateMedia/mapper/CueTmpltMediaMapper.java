@@ -1,7 +1,7 @@
-package com.gemiso.zodiac.app.CUeSheetTemplateMedia.mapper;
+package com.gemiso.zodiac.app.cueSheetTemplateMedia.mapper;
 
-import com.gemiso.zodiac.app.CUeSheetTemplateMedia.CueTmpltMedia;
-import com.gemiso.zodiac.app.CUeSheetTemplateMedia.dto.CueTmpltMediaDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.CueTmpltMedia;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.dto.CueTmpltMediaDTO;
 import com.gemiso.zodiac.core.mapper.GenericMapper;
 import org.mapstruct.Mapper;
 

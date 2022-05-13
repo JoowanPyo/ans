@@ -12,8 +12,7 @@ public interface BaseProgramRepository extends JpaRepository<BaseProgram, Long>,
     @Query("select a from BaseProgram a where a.basePgmschId = :basePgmschId and a.delYn = 'N'")
     Optional<BaseProgram> findBasePgm(@Param("basePgmschId")Long basePgmschId);
 
-    @Query("select a from BaseProgram a where a.program.brdcPgmId=:brdcPgmId and a.brdcStartClk =:formatBoradHm " +
-            "and a.brdcDay =:day")
+    @Query("select a from BaseProgram a where a.program.brdcPgmId=:brdcPgmId and a.brdcStartClk =:formatBoradHm")
     Optional<BaseProgram> findByBasePropram(
-            @Param("brdcPgmId")String brdcPgmId, @Param("formatBoradHm")String formatBoradHm, @Param("day")String day);
+            @Param("brdcPgmId")String brdcPgmId, @Param("formatBoradHm")String formatBoradHm/*, @Param("day")String day*/);
 }

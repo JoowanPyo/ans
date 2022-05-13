@@ -44,5 +44,5 @@ public class CueSheetTemplateSimpleDTO {
     private String delrId;
     private String delrNm;
     private ProgramSimpleDTO program;*/
-    private List<CueTmpltItemSimpleDTO> cueTmpltItem;
+    //private List<CueTmpltItemSimpleDTO> cueTmpltItem;
 }

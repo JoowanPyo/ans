@@ -11,16 +11,19 @@ import com.gemiso.zodiac.app.user.mapper.UserMapper;
 import com.gemiso.zodiac.app.userGroup.UserGroup;
 import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
 import com.gemiso.zodiac.app.userGroupUser.UserGroupUserRepository;
+import com.gemiso.zodiac.core.helper.EncodingHelper;
 import com.gemiso.zodiac.exception.PasswordFailedException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +34,8 @@ import java.util.Optional;
 @Transactional
 public class MisService {
 
+    @Value("${password.salt.key:saltKey}")
+    private String saltKey;
 
     private final MisDeptRepository misDeptRepository;
     private final MisUserRepository misUserRepository;
@@ -43,6 +48,9 @@ public class MisService {
     private final UserMapper userMapper;
 
     private final PasswordEncoder passwordEncoder;
+
+    /*@Value("${password.salt.key:saltKey}")
+    private String saltKey;*/
 
     //Mis 부서정보 수정 및 등록
     public void findMisDept() {
@@ -125,7 +133,7 @@ public class MisService {
     }
     
     //Mis 사용자 정보 수정 및 등록
-    public void findUser(){
+    public void findUser() throws NoSuchAlgorithmException {
 
         //mis에서 ans사용가능한 사용자만 찾기위해 조건 빌드 ANSX_YSNO ="1"
         BooleanBuilder misBooleanBuilder = getBuilder();
@@ -141,6 +149,22 @@ public class MisService {
             String misUserId = misUserIdDTO.getUserIdxx(); //Mis사용자 아이디
             String misPassword = misUser.getScrtNumb(); //Mis사용자 비밀번호
             String misDeptCode = Optional.ofNullable(misUser.getDeptCode()).orElse(""); //Mis사용자 부서코트
+
+            if ("hkkim".equals(misUserId)){
+
+                String passw = "1234";
+
+                //아리랑 pwd sha256해싱 [ pwd + salt ]
+                EncodingHelper encodingHelper = new EncodingHelper(passw, saltKey);
+                String hexPwd = encodingHelper.getHex();
+                String encodePassword = encodePassword(hexPwd); //패스워드 비크립트
+
+                if(passwordEncoder.matches(misPassword, encodePassword)){
+
+                    System.out.println("true true true true true true true true true true true true true true true true true true");
+                }
+
+            }
             
             loof2:
             for (User user : userList){

@@ -88,7 +88,7 @@ public class Yonhap {
     private String stockCd;
 
     @Column(name = "artclqnty", length = 8)
-    private int artclqnty;
+    private Integer artclqnty;
 
     @Column(name = "cmnt", length = 2000)
     private String cmnt;

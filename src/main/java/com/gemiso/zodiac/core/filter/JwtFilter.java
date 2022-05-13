@@ -86,8 +86,14 @@ public class JwtFilter implements Filter {
 
         if (!StringUtils.pathEquals(httpServletRequest.getMethod(), "OPTIONS")) {
 
+            //인터페이스 필터정보
+            String interfacePath = "/interface/cuestcdupdate" + path.substring(path.lastIndexOf("/"));
+            if (interfacePath.equals(path)) {
+                chain.doFilter(request, response);
+            }
 
-            if (excludedUrls.contains(path) == false) {
+
+            if (excludedUrls.contains(path) == false ) {
 
                 try {
                     final StringBuilder logMessage = new StringBuilder("TOKEN FILTER API - ");

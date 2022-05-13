@@ -35,7 +35,7 @@ import java.util.Date;
 @Transactional
 public class AuthService {
 
-    @Value("${password.salt-key:saltKey}")
+    @Value("${password.salt.key:saltKey}")
     private String saltKey;
 
     private final UserService userService;
@@ -66,8 +66,11 @@ public class AuthService {
         UserDTO userDTO = userMapper.toDto(userEntity); //tb_user_login 테이블에 정보를 저장하기위한 DTO생성
 
         //아리랑 pwd sha256해싱 [ pwd + salt ]
-        EncodingHelper encodingHelper = new EncodingHelper(password);
+        EncodingHelper encodingHelper = new EncodingHelper(password, saltKey);
         String hexPwd = encodingHelper.getHex();
+        //String encodePassword = encodePassword(hexPwd); //패스워드 비크립트
+
+        //log.info(" 패스워드 확인 : "+ hexPwd.toString());
 
         if (!passwordEncoder.matches(hexPwd, userEntity.getPwd())) {
             throw new PasswordFailedException("Password failed.");
@@ -153,6 +156,12 @@ public class AuthService {
 
         return jwtDTO;
 
+    }
+
+    //패스워드 비크립트
+    public String encodePassword(String password) {
+
+        return passwordEncoder.encode(password);
     }
 
     public JwtDTO reissuance(String authorization) throws Exception {

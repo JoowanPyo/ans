@@ -1,9 +1,7 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItem.dto;
 
-import com.gemiso.zodiac.app.CUeSheetTemplateMedia.CueTmpltMedia;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.CueTmpltMedia;
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateSimpleDTO;
-import com.gemiso.zodiac.app.cueSheetTemplateItemCap.CueTmpltItemCap;
-import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolDTO;
 import lombok.AllArgsConstructor;

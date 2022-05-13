@@ -187,9 +187,9 @@ public class CueSheet {
     @JoinColumn(name = "bas_pgmsch_id")
     private BaseProgram baseProgram;
 
-    @OneToMany(mappedBy = "cueSheet")
+  /*  @OneToMany(mappedBy = "cueSheet")
     @JsonManagedReference
-    private List<CueSheetItem> cueSheetItem = new ArrayList<>();
+    private List<CueSheetItem> cueSheetItem = new ArrayList<>();*/
 
     @PrePersist
     public void prePersist() {

@@ -1,11 +1,11 @@
-package com.gemiso.zodiac.app.CUeSheetTemplateMedia;
+package com.gemiso.zodiac.app.cueSheetTemplateMedia;
 
-import com.gemiso.zodiac.app.CUeSheetTemplateMedia.dto.CueTmpltMediaCreateDTO;
-import com.gemiso.zodiac.app.CUeSheetTemplateMedia.dto.CueTmpltMediaDTO;
-import com.gemiso.zodiac.app.CUeSheetTemplateMedia.dto.CueTmpltMediaUpdateDTO;
-import com.gemiso.zodiac.app.CUeSheetTemplateMedia.mapper.CueTmpltMediaCreateMapper;
-import com.gemiso.zodiac.app.CUeSheetTemplateMedia.mapper.CueTmpltMediaMapper;
-import com.gemiso.zodiac.app.CUeSheetTemplateMedia.mapper.CueTmpltMediaUpdateMapper;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.dto.CueTmpltMediaCreateDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.dto.CueTmpltMediaDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.dto.CueTmpltMediaUpdateDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.mapper.CueTmpltMediaCreateMapper;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.mapper.CueTmpltMediaMapper;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.mapper.CueTmpltMediaUpdateMapper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;

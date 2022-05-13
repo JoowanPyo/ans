@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheetTemplateSymbol;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
@@ -19,6 +20,7 @@ import javax.persistence.*;
 @Setter
 @ToString(exclude = "program")
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CueTmplSymbol {
 
     @Id

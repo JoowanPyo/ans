@@ -1,8 +1,8 @@
-package com.gemiso.zodiac.app.CUeSheetTemplateMedia;
+package com.gemiso.zodiac.app.cueSheetTemplateMedia;
 
-import com.gemiso.zodiac.app.CUeSheetTemplateMedia.dto.CueTmpltMediaCreateDTO;
-import com.gemiso.zodiac.app.CUeSheetTemplateMedia.dto.CueTmpltMediaDTO;
-import com.gemiso.zodiac.app.CUeSheetTemplateMedia.dto.CueTmpltMediaUpdateDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.dto.CueTmpltMediaCreateDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.dto.CueTmpltMediaDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.dto.CueTmpltMediaUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import com.gemiso.zodiac.core.service.UserAuthService;

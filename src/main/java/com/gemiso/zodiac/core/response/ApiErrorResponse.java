@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.gemiso.zodiac.exception.UserFailException;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -33,6 +34,7 @@ import java.util.*;
  * }
  */
 @Getter
+@ToString
 public class ApiErrorResponse extends BaseApiResponse {
     /**
      * 에러코드 열거형
@@ -61,6 +63,7 @@ public class ApiErrorResponse extends BaseApiResponse {
      * 에러 클래스
      */
     @Getter
+    @ToString
     public static class Error {
         private final ErrorCodes code;
         private final String message;
@@ -154,7 +157,7 @@ public class ApiErrorResponse extends BaseApiResponse {
     }
     public static ApiErrorResponse makeExceptionHandlerErrorResponse(Exception exception) {
 
-        String bindingResult = exception.getMessage();
+        //String bindingResult = exception.getMessage();
 
         //HashMap<String, List<String>> errors = exception.hashCode();
         //Error error = new Error(ErrorCodes.InvalidArguments, "입력 값이 유효하지 않습니다.", errors);

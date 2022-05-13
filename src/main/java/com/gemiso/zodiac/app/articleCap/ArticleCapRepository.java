@@ -12,4 +12,5 @@ public interface ArticleCapRepository extends JpaRepository<ArticleCap, Long>, Q
 
     @Query("select a from ArticleCap a where a.article.artclId = :artclId")
     List<ArticleCap> findArticleCap(@Param("artclId") Long artclId);
+
 }

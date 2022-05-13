@@ -79,6 +79,11 @@ dependencies {
     //RestTemplat get방식 사용 에러 해결
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
 
+    // https://mvnrepository.com/artifact/org.springframework/spring-web
+    //implementation group: 'org.springframework', name: 'spring-web', version: '4.3.8.RELEASE'
+
+
+
 }
 
 /*bootWar {

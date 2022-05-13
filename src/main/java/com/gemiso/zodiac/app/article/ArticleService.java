@@ -69,9 +69,11 @@ import com.gemiso.zodiac.exception.PasswordFailedException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.gemiso.zodiac.exception.UserFailException;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -186,23 +188,25 @@ public class ArticleService {
 
         //기사정보를 불러와 맵퍼스트럭트 사용시 스텍오버플로우에러[기사에 포함된 리스트에 기사정보포함되어이써 문제 발생] 때문에 따로 DTO변환.
         //List<ArticleHistSimpleDTO> articleHistDTOList = articleHistSimpleMapper.toDtoList(article.getArticleHist());//기사이력정보 DTO변환
-        List<ArticleCapSimpleDTO> articleCapDTOList = articleCapSimpleMapper.toDtoList(article.getArticleCap()); //기사자막정보 DTO변환
-        List<ArticleMediaSimpleDTO> articleMediaSimpleDTOList = articleMediaSimpleMapper.toDtoList(article.getArticleMedia()); //기사미디어정보 DTO변환
-        List<ArticleOrderSimpleDTO> articleOrderSimpleDTOList = articleOrderSimpleMapper.toDtoList(article.getArticleOrder()); //기사의뢰정보 DTO변환
-        List<AnchorCapSimpleDTO> anchorCapSimpleDTOList = anchorCapSimpleMapper.toDtoList(article.getAnchorCap());//앵커기사정보 DTO 변환
+        //List<ArticleCapSimpleDTO> articleCapDTOList = articleCapSimpleMapper.toDtoList(article.getArticleCap()); //기사자막정보 DTO변환
+        //List<ArticleMediaSimpleDTO> articleMediaSimpleDTOList = articleMediaSimpleMapper.toDtoList(article.getArticleMedia()); //기사미디어정보 DTO변환
+        //List<ArticleOrderSimpleDTO> articleOrderSimpleDTOList = articleOrderSimpleMapper.toDtoList(article.getArticleOrder()); //기사의뢰정보 DTO변환
+        //List<AnchorCapSimpleDTO> anchorCapSimpleDTOList = anchorCapSimpleMapper.toDtoList(article.getAnchorCap());//앵커기사정보 DTO 변환
 
 
         //방송아이콘 이미지 Url 추가. 기사자막 방송아이콘 url set
-        List<ArticleCapSimpleDTO> setArticleCapDTOList = setUrlArticleCap(articleCapDTOList);
+        //List<ArticleCapSimpleDTO> setArticleCapDTOList = setUrlArticleCap(articleCapDTOList);
+        List<ArticleCapSimpleDTO> setArticleCapDTOList = setUrlArticleCap(articleDTO.getArticleCap());
         //방송아이콘 이미지 Url 추가. 앵커자막 방송아이콘 url set
-        List<AnchorCapSimpleDTO> setAnchorCapDTOList = setUrlAnchorCap(anchorCapSimpleDTOList);
+        //List<AnchorCapSimpleDTO> setAnchorCapDTOList = setUrlAnchorCap(anchorCapSimpleDTOList);
+        List<AnchorCapSimpleDTO> setAnchorCapDTOList = setUrlAnchorCap(articleDTO.getAnchorCap());
 
         //기사이력, 자막, 미디어, 의뢰 정보 set
         //articleDTO.setArticleHistDTO(articleHistDTOList);
         articleDTO.setArticleCap(setArticleCapDTOList);
         articleDTO.setAnchorCap(setAnchorCapDTOList);
-        articleDTO.setArticleMedia(articleMediaSimpleDTOList);
-        articleDTO.setArticleOrder(articleOrderSimpleDTOList);
+        //articleDTO.setArticleMedia(articleMediaSimpleDTOList);
+        //articleDTO.setArticleOrder(articleOrderSimpleDTOList);
 
 
         return articleDTO;
@@ -541,8 +545,21 @@ public class ArticleService {
 
         //List<ArticleCap> articleCapList = article.getArticleCap();
         //List<AnchorCap> anchorCapList = article.getAnchorCap();
-        //article.setArticleCap(null);
-        //article.setAnchorCap(null);
+
+        /*CueSheet cueSheet = article.getCueSheet();
+        Long cueId = null;
+        if (ObjectUtils.isEmpty(cueSheet) == false){
+            cueId = cueSheet.getCueId();
+        }else {
+
+        }*/
+
+        article.setArticleCap(null);
+        article.setAnchorCap(null);
+        article.setArticleMedia(null);
+        article.setArticleTag(null);
+        article.setArticleHist(null);
+        article.setArticleOrder(null);
 
         //기사 액션로그 빌드
         ArticleActionLog articleActionLog = ArticleActionLog.builder()
@@ -1525,7 +1542,7 @@ public class ArticleService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        //픽스단계대로 픽스자, 픽스일시 set
+        //픽스단계대로 픽스자, 픽스일시 set[원본이 픽스가 된경우, 복사본이 픽스가 안됫을 경우 복사본도 같이 픽스]
         article = fixUserInfoSet(apprvDivCd, orgApprvDivcd, article, userId);
 
         ArticleDTO articleDTO = articleMapper.toDto(article);
@@ -1573,6 +1590,27 @@ public class ArticleService {
                 article.setAnchorFixDtm(null);
                 article.setDeskFixUser("");
                 article.setDeskFixDtm(null);
+
+                Long artclId = article.getArtclId();
+
+                List<Article> articleList = articleRepository.findCopyArticle(artclId);
+
+                for (Article articleEntity : articleList){
+
+                    String apprvDicCd = articleEntity.getApprvDivCd();
+
+                    if ("fix_none".equals(apprvDicCd)){ //복사된 기사가 fix_none일경우 article_fix로 업데이트
+
+                        ArticleDTO articleDTO = articleMapper.toDto(articleEntity);
+                        articleDTO.setApprvDivCd("article_fix");
+                        articleDTO.setArtclFixUser(userId);
+                        articleDTO.setArtclFixDtm(new Date());
+
+                        articleMapper.updateFromDto(articleDTO, articleEntity);
+
+                        articleRepository.save(articleEntity);
+                    }
+                }
                 
             }else { // article_fix 으로 픽스를 풀 경우 등록된 에디터, 앵커 기록 삭제
 

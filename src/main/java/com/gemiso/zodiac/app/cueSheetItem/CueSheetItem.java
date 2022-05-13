@@ -42,7 +42,7 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "cue_item_titl_en", length = 300)
     private String cueItemTitlEn;
 
-    @Column(name = "cue_item_ctt", length = 500)
+    @Column(name = "cue_item_ctt", length = 4000)
     private String cueItemCtt;
 
     @Column(name = "cue_item_ord")

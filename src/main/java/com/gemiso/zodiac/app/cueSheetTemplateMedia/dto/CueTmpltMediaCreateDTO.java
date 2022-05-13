@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.CUeSheetTemplateMedia.dto;
+package com.gemiso.zodiac.app.cueSheetTemplateMedia.dto;
 
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemSimpleDTO;
 import lombok.AllArgsConstructor;

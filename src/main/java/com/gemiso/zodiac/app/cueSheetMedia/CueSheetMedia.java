@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.cueSheetMedia;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
@@ -27,6 +28,7 @@ import java.util.Date;
 @ToString
 @Setter
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CueSheetMedia extends BaseEntity {
 
     @Id

@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueCapTmplt;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.user.User;
@@ -17,6 +18,7 @@ import javax.persistence.*;
 @Setter
 @ToString(exclude = {"capTemplate","program"})
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CueCapTmplt {
 
     @Id

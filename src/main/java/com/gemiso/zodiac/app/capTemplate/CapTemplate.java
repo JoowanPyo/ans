@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.capTemplate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrp;
@@ -30,6 +31,7 @@ import java.util.List;
 @ToString(exclude = {"capTemplateGrp", "articleCap"})
 @Setter
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CapTemplate extends BaseEntity {
 
     @Id

@@ -281,9 +281,9 @@ public class YonhapService {
             booleanBuilder.and(qYonhap.regionCd.in(region_cds));
         }
         //검색어
-        if (search_word != null & search_word.trim().isEmpty() == false) {
-            booleanBuilder.and(qYonhap.artclTitl.contains(search_word));
-        }
+        //if (search_word != null & search_word.trim().isEmpty() == false) {
+        //    booleanBuilder.and(qYonhap.artclTitl.contains(search_word));
+        //}
         //서비스 유형 ( 국문 AKRO, 영문 AENO )
         if (svcTyp != null && svcTyp.trim().isEmpty() == false){
             booleanBuilder.and(qYonhap.svcTyp.eq(svcTyp));

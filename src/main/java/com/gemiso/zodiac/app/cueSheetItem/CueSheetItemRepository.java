@@ -18,7 +18,9 @@ public interface CueSheetItemRepository extends JpaRepository<CueSheetItem, Long
             "where a.cueSheet.cueId = :cueId  and a.delYn = 'N' and a.spareYn = :spareYn order by a.cueItemOrd asc ")
     List<CueSheetItem> findByCueItemListSpareYn(@Param("cueId")Long cueId, @Param("spareYn")String spareYn);
 
-    @Query("select a from CueSheetItem a where a.cueItemId = :cueItemId and a.delYn = 'N'")
+    @Query("select a from CueSheetItem a left outer join Article b on b.artclId = a.article.artclId and b.delYn = 'N'" +
+            "left outer join ArticleMedia c on c.article.artclId = b.artclId and c.delYn = 'N'  " +
+            "where a.cueItemId = :cueItemId and a.delYn = 'N'")
     Optional<CueSheetItem> findByCueItem(@Param("cueItemId")Long cueItemId);
 
     @Query("select a from CueSheetItem a where a.delYn = 'N' and a.article.artclId =:artclId and a.article.delYn = 'N'")
@@ -29,4 +31,7 @@ public interface CueSheetItemRepository extends JpaRepository<CueSheetItem, Long
 
     @Query("select a from CueSheetItem a where a.cueItemId = :cueItemId and a.delYn = 'Y'")
     Optional<CueSheetItem> findDeletedCueItem(@Param("cueItemId")Long cueItemId);
+
+    @Query("select a from CueSheetItem a where a.cueSheet.cueId = :cueId")
+    List<Long> findCueItemId(@Param("cueId")Long cueId);
 }

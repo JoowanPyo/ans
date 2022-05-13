@@ -17,6 +17,7 @@ import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramResultDTO;
+import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerCdUpdateDTO;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
@@ -870,18 +871,26 @@ public class InterfaceService {
         TakerCueSheetVideoDTO returnDTO = new TakerCueSheetVideoDTO(); //리턴할 비디오 DTO 리스트
         List<TakerCueSheetVideoClipDTO> takerCueSheetVideoDTOList = new ArrayList<>();
 
+        Integer seq = 1;
         //Mam되면 수정
         for (CueSheetMedia cueSheetMedia : cueSheetMediaList) {//큐시트 아이템에 포함된 큐시트 미디어 정보 get
 
-            //테이커 비디오 정보 빌드
-            TakerCueSheetVideoClipDTO takerCueSheetVideoDTO = TakerCueSheetVideoClipDTO.builder()
-                    .title(cueSheetMedia.getCueMediaTitl()) //미디어 제목
-                    .playout_id("") // clip Id
-                    .duration(cueSheetMedia.getMediaDurtn()) // 미디어 길이
-                    .build();
+            String delYn = cueSheetMedia.getDelYn(); //엔티티 조회로 인해 연관관계 미디어쪽 삭제 플레그를 검출하지않고 출력
+            String mediaTypeCd = cueSheetMedia.getMediaTypCd();
 
-            takerCueSheetVideoDTOList.add(takerCueSheetVideoDTO);
+            if ("N".equals(delYn) && "media_typ_001".equals(mediaTypeCd)) {
+                //테이커 비디오 정보 빌드
+                TakerCueSheetVideoClipDTO takerCueSheetVideoDTO = TakerCueSheetVideoClipDTO.builder()
+                        .title(cueSheetMedia.getCueMediaTitl()) //미디어 제목
+                        .playout_id("") // clip Id
+                        .duration(cueSheetMedia.getMediaDurtn()) // 미디어 길이
+                        .seq(seq)
+                        .build();
 
+                takerCueSheetVideoDTOList.add(takerCueSheetVideoDTO);
+
+                seq++;
+            }
         }
         returnDTO.setTakerCueSheetVideoClipDTO(takerCueSheetVideoDTOList);
 
@@ -914,18 +923,23 @@ public class InterfaceService {
         //Mam되면 수정
         for (ArticleMedia articleMedia : cueSheetMediaArticleList) {//큐시트 아이템에 포함된 큐시트 미디어 정보 get
 
-            //테이커 비디오 정보 빌드
-            TakerCueSheetVideoClipDTO takerCueSheetVideoDTO = TakerCueSheetVideoClipDTO.builder()
-                    .title(articleMedia.getArtclMediaTitl()) //미디어 제목
-                    .playout_id(articleMedia.getVideoId()) // clip Id
-                    .duration(articleMedia.getMediaDurtn()) // 미디어 길이
-                    .seq(seq)
-                    .build();
+            String delYn = articleMedia.getDelYn();
+            String mediaTypeCd = articleMedia.getMediaTypCd();
 
-            takerCueSheetVideoDTOList.add(takerCueSheetVideoDTO);
+            if ("N".equals(delYn) && "media_typ_001".equals(mediaTypeCd)) {
 
-            seq++;
+                //테이커 비디오 정보 빌드
+                TakerCueSheetVideoClipDTO takerCueSheetVideoDTO = TakerCueSheetVideoClipDTO.builder()
+                        .title(articleMedia.getArtclMediaTitl()) //미디어 제목
+                        .playout_id(articleMedia.getVideoId()) // clip Id
+                        .duration(articleMedia.getMediaDurtn()) // 미디어 길이
+                        .seq(seq)
+                        .build();
 
+                takerCueSheetVideoDTOList.add(takerCueSheetVideoDTO);
+
+                seq++;
+            }
         }
         returnDTO.setTakerCueSheetVideoClipDTO(takerCueSheetVideoDTOList);
 
@@ -1160,8 +1174,9 @@ public class InterfaceService {
             brdcPgmId = programDTO.getBrdcPgmId();
         }
 
+        int articleCount = cueSheet.getArticleCount();
         //기사수 get
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheet.getCueSheetItem();
+        /*List<CueSheetItemDTO> cueSheetItemDTOList = cueSheet.getCueSheetItem();
         int articleCount = 0;
         for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList) {
             ArticleCueItemDTO article = cueSheetItemDTO.getArticle();
@@ -1169,7 +1184,7 @@ public class InterfaceService {
                 continue;
             }
             ++articleCount; //기사가 포함되어있으면 +1
-        }
+        }*/
 
         PrompterProgramDTO program = PrompterProgramDTO.builder()
                 .rdId(cueSheet.getCueId())
@@ -1340,6 +1355,7 @@ public class InterfaceService {
                         .artclTitl(cueSheetItem.getCueItemTitl()) //국문제목
                         .artclTitlEn(cueSheetItem.getCueItemTitlEn()) // 영문제목
                         .artclCtt(cueSheetItem.getCueItemCtt())
+                        .artclFrm(cueSheetItem.getCueItemFrmCd())
                         //.newsAcumTime(newsAcumTime) //누적시간
                         .cueId(cueSheet.getCueId()) //Topic 사용 큐시트 아이디
                         .cueItemId(cueSheetItem.getCueItemId()) //Topic 사용 큐시트 아이템 아이디
@@ -1392,6 +1408,7 @@ public class InterfaceService {
                         .artclTitl(article.getArtclTitl()) //국문제목
                         .artclTitlEn(article.getArtclTitlEn()) // 영문제목
                         .artclCtt(article.getArtclCtt())
+                        .artclFrm(cueSheetItem.getCueItemFrmCd())
                         .ancCtt(article.getAncMentCtt())//앵커맨트
                         .rptrId(article.getRptrId()) //기자 아이디
                         .rptrNm(article.getRptrNm()) //기자 명
@@ -1913,8 +1930,10 @@ public class InterfaceService {
     }
 
     //큐시트 방송상태 업데이트[taker]
-    public ParentProgramDTO cueStCdUpdate(Long cueId, String cueStCd){
+    public ParentProgramDTO cueStCdUpdate(Long cueId, TakerCdUpdateDTO takerCdUpdateDTO){
 
+
+        String cueStCd = takerCdUpdateDTO.getCue_st_cd();
         CueSheet cueSheet = findCueSheet(cueId, "N");
 
         CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);

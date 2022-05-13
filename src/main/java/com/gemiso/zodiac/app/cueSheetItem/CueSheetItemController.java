@@ -57,7 +57,7 @@ public class CueSheetItemController {
 
     @Operation(summary = "큐시트 아이템 템플릿(운영참조) 등록", description = "큐시트 아이템 템플릿(운영참조) 등록")
     @PostMapping(path = "/{cueId}/item/template")
-    public AnsApiResponse<List<CueSheetItemDTO>> createTemplate(@Parameter(description = "필수값<br> ", required = true)
+    public AnsApiResponse<CueSheetItemResponseDTO> createTemplate(@Parameter(description = "필수값<br> ", required = true)
                                                                 @RequestBody @Valid List<CueSheetItemCreateDTO> cueSheetItemCreateDTOList,
                                                                 @Parameter(name = "cueId", description = "큐시트아이디")
                                                                 @PathVariable("cueId") Long cueId) throws JsonProcessingException {
@@ -70,7 +70,9 @@ public class CueSheetItemController {
 
         cueSheetItemService.createTemplate(cueSheetItemCreateDTOList, cueId, userId);
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
+        CueSheetItemResponseDTO cueSheetItemDTOList = new CueSheetItemResponseDTO();
+        cueSheetItemDTOList.setCueId(cueId);
+        //List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
 
@@ -79,7 +81,7 @@ public class CueSheetItemController {
     @Operation(summary = "큐시트 아이템 등록", description = "큐시트 아이템 등록")
     @PostMapping(path = "/{cueId}/item")
     @ResponseStatus(HttpStatus.CREATED)
-    public AnsApiResponse<CueSheetItemDTO> create(@Parameter(description = "필수값<br> ", required = true)
+    public AnsApiResponse<CueSheetItemResponseDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                                   @RequestBody @Valid CueSheetItemCreateDTO cueSheetItemCreateDTO,
                                                   @Parameter(name = "cueId", description = "큐시트아이디")
                                                   @PathVariable("cueId") Long cueId) throws JsonProcessingException {
@@ -91,14 +93,17 @@ public class CueSheetItemController {
 
         Long cueItemId = cueSheetItemService.create(cueSheetItemCreateDTO, cueId, userId);
 
-        CueSheetItemDTO cueSheetItemDTO = cueSheetItemService.find(cueItemId);
+        CueSheetItemResponseDTO cueSheetItemDTOList = new CueSheetItemResponseDTO();
+        cueSheetItemDTOList.setCueId(cueId);
 
-        return new AnsApiResponse<>(cueSheetItemDTO);
+        //CueSheetItemDTO cueSheetItemDTO = cueSheetItemService.find(cueItemId);
+
+        return new AnsApiResponse<>(cueSheetItemDTOList);
     }
 
     @Operation(summary = "큐시트 아이템 수정", description = "큐시트 아이템 수정")
     @PutMapping(path = "/{cueId}/item/{cueItemId}")
-    public AnsApiResponse<CueSheetItemDTO> update(@Parameter(description = "필수값<br> ", required = true)
+    public AnsApiResponse<CueSheetItemResponseDTO> update(@Parameter(description = "필수값<br> ", required = true)
                                                   @RequestBody @Valid CueSheetItemUpdateDTO cueSheetItemUpdateDTO,
                                                   @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드", required = true)
                                                   @RequestParam(value = "cueItemDivCd") String cueItemDivCd,
@@ -133,9 +138,12 @@ public class CueSheetItemController {
         } else {
             throw new ResourceNotFoundException("큐시트 아이템 구분코드를 확인해 주세요. 큐시트 아이템 구분 코드 : " + cueItemDivCd);
         }
-        CueSheetItemDTO cueSheetItemDTO = cueSheetItemService.find(cueItemId);
 
-        return new AnsApiResponse<>(cueSheetItemDTO);
+        CueSheetItemResponseDTO cueSheetItemDTOList = new CueSheetItemResponseDTO();
+        cueSheetItemDTOList.setCueId(cueId);
+
+
+        return new AnsApiResponse<>(cueSheetItemDTOList);
 
     }
 
@@ -159,7 +167,7 @@ public class CueSheetItemController {
 
     @Operation(summary = "큐시트 아이템 순서변경", description = "큐시트 아이템 순서변경")
     @PutMapping(path = "/{cueId}/item/{cueItemId}/ord")
-    public AnsApiResponse<List<CueSheetItemDTO>> ordUpdate(@Parameter(name = "cueId", description = "큐시트아이디")
+    public AnsApiResponse<CueSheetItemResponseDTO> ordUpdate(@Parameter(name = "cueId", description = "큐시트아이디")
                                                            @PathVariable("cueId") Long cueId,
                                                            @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
                                                            @PathVariable("cueItemId") Long cueItemId,
@@ -176,7 +184,10 @@ public class CueSheetItemController {
 
         cueSheetItemService.ordUpdate(cueId, cueItemId, cueItemOrd, spareYn);
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
+        CueSheetItemResponseDTO cueSheetItemDTOList = new CueSheetItemResponseDTO();
+        cueSheetItemDTOList.setCueId(cueId);
+
+        //List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
 
@@ -201,7 +212,7 @@ public class CueSheetItemController {
     @Operation(summary = "큐시트 아이템 생성[Drag and Drop]", description = "큐시트 아이템 생성[Drag and Drop]")
     @PostMapping(path = "/{cueId}/item/{artclId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public AnsApiResponse<List<CueSheetItemDTO>> createCueItem(@Parameter(name = "cueId", description = "큐시트아이디")
+    public AnsApiResponse<CueSheetItemResponseDTO> createCueItem(@Parameter(name = "cueId", description = "큐시트아이디")
                                                                @PathVariable("cueId") Long cueId,
                                                                @Parameter(name = "artclId", description = "기사 아이디")
                                                                @PathVariable("artclId") Long artclId,
@@ -220,7 +231,10 @@ public class CueSheetItemController {
 
         cueSheetItemService.createCueItem(cueId, artclId, cueItemOrd, cueItemDivCd, spareYn, userId);
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
+        //List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
+
+        CueSheetItemResponseDTO cueSheetItemDTOList = new CueSheetItemResponseDTO();
+        cueSheetItemDTOList.setCueId(cueId);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
 
@@ -229,7 +243,7 @@ public class CueSheetItemController {
     @Operation(summary = "큐시트 아이템 생성[Drag and Drop] List", description = "큐시트 아이템 생성[Drag and Drop] List")
     @PostMapping(path = "/{cueId}/item/createList")
     @ResponseStatus(HttpStatus.CREATED)
-    public AnsApiResponse<List<CueSheetItemDTO>> createCueItemList(@Parameter(description = "필수값<br> ", required = true)
+    public AnsApiResponse<CueSheetItemResponseDTO> createCueItemList(@Parameter(description = "필수값<br> ", required = true)
                                                                    @RequestBody @Valid List<CueSheetItemCreateListDTO> cueSheetItemCreateListDTO,
                                                                    @Parameter(name = "cueId", description = "큐시트아이디")
                                                                    @PathVariable("cueId") Long cueId,
@@ -242,7 +256,10 @@ public class CueSheetItemController {
 
         cueSheetItemService.createCueItemList(cueSheetItemCreateListDTO, cueId, spareYn, userId);
 
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
+        //List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemService.findAll(null, cueId, null, null);
+
+        CueSheetItemResponseDTO cueSheetItemDTOList = new CueSheetItemResponseDTO();
+        cueSheetItemDTOList.setCueId(cueId);
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
     }

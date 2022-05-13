@@ -275,7 +275,7 @@ public class BisInterfaceService {
         httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
         httpHeaders.add("Session_user_id", "ans");
 
-        for (int i = 1; i < 8; i++) {
+        for (int i = 3; i < 9; i++) {
             Calendar cal = Calendar.getInstance();
             //현재 날짜 구하기
             Date now = new Date();
@@ -465,41 +465,46 @@ public class BisInterfaceService {
 
         for (DschWeekDTO dschWeekDTO : dschWeekDTOList) {
 
-            String brdcPgmId = dschWeekDTO.getPgmCd(); //프로그램 아이디
+            String broadType = dschWeekDTO.getBroadType();
 
-            String boroadYmd = formatYmd(dschWeekDTO.getBroadYmd());
+            if ("L".equals(broadType.trim())) {
 
-            //시간 HHmm -> HH:mm:ss변환[시작시간, 종료시간(시작시간+방송길이)]
-            String broadRun = dschWeekDTO.getBroadRun(); //방송길이
-            String broadHm = dschWeekDTO.getBroadHm(); //방송시각
-            String formatBoradHm = broadHm.substring(0, 2) + ":" + broadHm.substring(2, 4) + ":00";
+                String brdcPgmId = dschWeekDTO.getPgmCd(); //프로그램 아이디
 
-            String endTime = getEndTime(broadRun, formatBoradHm);
+                String boroadYmd = formatYmd(dschWeekDTO.getBroadYmd());
 
-            //기본편성 생성 및 업데이트 return value = 기본편성 아이디
-            Long basePgmId = createBaseProgram(boroadYmd, formatBoradHm, endTime, brdcPgmId);
+                //시간 HHmm -> HH:mm:ss변환[시작시간, 종료시간(시작시간+방송길이)]
+                String broadRun = dschWeekDTO.getBroadRun(); //방송길이
+                String broadHm = dschWeekDTO.getBroadHm(); //방송시각
+                String formatBoradHm = broadHm.substring(0, 2) + ":" + broadHm.substring(2, 4) + ":00";
 
-            //기본편성 아이디 빌드
-            BaseProgram baseProgram = BaseProgram.builder().basePgmschId(basePgmId).build();
-            //방송프로그램 아이디 빌드
-            Program program = Program.builder().brdcPgmId(brdcPgmId).build();
+                String endTime = getEndTime(broadRun, formatBoradHm);
 
-            DailyProgram dailyProgram = DailyProgram.builder()
-                    .brdcDt(boroadYmd) //방송일자
-                    .brdcStartTime(formatBoradHm) // 방송시각
-                    .brdcEndClk(endTime) //방송종료 시각
-                    .inputDtm(dschWeekDTO.getRegDt()) //입력일시
-                    .updtDtm(dschWeekDTO.getUpdDt()) //수정일시
-                    .program(program) //프로그램 아이디
-                    .brdcRunTime(broadRun)
-                    .baseProgram(baseProgram)
-                    .build();
+                //기본편성 생성 및 업데이트 return value = 기본편성 아이디
+                Long basePgmId = createBaseProgram(boroadYmd, formatBoradHm, endTime, brdcPgmId);
 
-            dailyProgramRepository.save(dailyProgram);
+                //기본편성 아이디 빌드
+                BaseProgram baseProgram = BaseProgram.builder().basePgmschId(basePgmId).build();
+                //방송프로그램 아이디 빌드
+                Program program = Program.builder().brdcPgmId(brdcPgmId).build();
+
+                DailyProgram dailyProgram = DailyProgram.builder()
+                        .brdcDt(boroadYmd) //방송일자
+                        .brdcStartTime(formatBoradHm) // 방송시각
+                        .brdcEndClk(endTime) //방송종료 시각
+                        .inputDtm(dschWeekDTO.getRegDt()) //입력일시
+                        .updtDtm(dschWeekDTO.getUpdDt()) //수정일시
+                        .program(program) //프로그램 아이디
+                        .brdcRunTime(broadRun)
+                        .baseProgram(baseProgram)
+                        .build();
+
+                dailyProgramRepository.save(dailyProgram);
 
 
-            Long id = dailyProgram.getDailyPgmId();
+                Long id = dailyProgram.getDailyPgmId();
 
+            }
         }
 
     }
@@ -519,7 +524,7 @@ public class BisInterfaceService {
         Program program = Program.builder().brdcPgmId(brdcPgmId).build();
 
         //프로그램 아이디, 시작날짜, 요일로 검색조건 [ 같은 기본편성이 있는지 확인 ]
-        Optional<BaseProgram> baseProgramEntity = baseProgramRepository.findByBasePropram(brdcPgmId, formatBoradHm, day);
+        Optional<BaseProgram> baseProgramEntity = baseProgramRepository.findByBasePropram(brdcPgmId, formatBoradHm/*, day*/);
 
         //검색조건으로 조회한 기본편성이 있을경우 리턴, 없을경우 생성.
         if (baseProgramEntity.isPresent()){
@@ -530,7 +535,7 @@ public class BisInterfaceService {
             BaseProgram baseProgram = BaseProgram.builder()
                     .brdcStartClk(formatBoradHm)
                     .brdcEndClk(endTime)
-                    .brdcDay(day)
+                    .brdcDay("")//day - 2022-05-10 성민효과장이 배제하라고함
                     .program(program)
                     .build();
             
@@ -553,37 +558,41 @@ public class BisInterfaceService {
 
         for (DschWeekDTO dschWeekDTO : dschWeekDTOList) {
 
-            String brdcPgmId = dschWeekDTO.getPgmCd(); //프로그램 아이디
+            String broadType = dschWeekDTO.getBroadType();
+            if ("L".equals(broadType.trim())) {
 
-            String boroadYmd = formatYmd(dschWeekDTO.getBroadYmd());
+                String brdcPgmId = dschWeekDTO.getPgmCd(); //프로그램 아이디
 
-            //시간 HHmm -> HH:mm:ss변환[시작시간, 종료시간(시작시간+방송길이)]
-            String broadRun = dschWeekDTO.getBroadRun(); //방송길이
-            String broadHm = dschWeekDTO.getBroadHm(); //방송시각
-            String formatBoradHm = broadHm.substring(0, 2) + ":" + broadHm.substring(2, 4) + ":00";
+                String boroadYmd = formatYmd(dschWeekDTO.getBroadYmd());
 
-            String endTime = getEndTime(broadRun, formatBoradHm);
+                //시간 HHmm -> HH:mm:ss변환[시작시간, 종료시간(시작시간+방송길이)]
+                String broadRun = dschWeekDTO.getBroadRun(); //방송길이
+                String broadHm = dschWeekDTO.getBroadHm(); //방송시각
+                String formatBoradHm = broadHm.substring(0, 2) + ":" + broadHm.substring(2, 4) + ":00";
 
-            //기본편성 생성 및 업데이트 return value = 기본편성 아이디
-            Long basePgmId = createBaseProgram(boroadYmd, formatBoradHm, endTime, brdcPgmId);
+                String endTime = getEndTime(broadRun, formatBoradHm);
 
-            //기본편성 아이디 빌드
-            BaseProgram baseProgram = BaseProgram.builder().basePgmschId(basePgmId).build();
-            //방송프로그램 아이디 빌드
-            Program program = Program.builder().brdcPgmId(brdcPgmId).build();
+                //기본편성 생성 및 업데이트 return value = 기본편성 아이디
+                Long basePgmId = createBaseProgram(boroadYmd, formatBoradHm, endTime, brdcPgmId);
 
-            DailyProgram dailyProgram = DailyProgram.builder()
-                    .brdcDt(boroadYmd) //방송일자
-                    .brdcStartTime(formatBoradHm) // 방송시각
-                    .brdcEndClk(endTime) //방송종료 시각
-                    .inputDtm(dschWeekDTO.getRegDt()) //입력일시
-                    .updtDtm(dschWeekDTO.getUpdDt()) //수정일시
-                    .program(program) //프로그램 아이디
-                    .brdcRunTime(broadRun)
-                    .baseProgram(baseProgram)
-                    .build();
+                //기본편성 아이디 빌드
+                BaseProgram baseProgram = BaseProgram.builder().basePgmschId(basePgmId).build();
+                //방송프로그램 아이디 빌드
+                Program program = Program.builder().brdcPgmId(brdcPgmId).build();
 
-            dailyProgramRepository.save(dailyProgram);
+                DailyProgram dailyProgram = DailyProgram.builder()
+                        .brdcDt(boroadYmd) //방송일자
+                        .brdcStartTime(formatBoradHm) // 방송시각
+                        .brdcEndClk(endTime) //방송종료 시각
+                        .inputDtm(dschWeekDTO.getRegDt()) //입력일시
+                        .updtDtm(dschWeekDTO.getUpdDt()) //수정일시
+                        .program(program) //프로그램 아이디
+                        .brdcRunTime(broadRun)
+                        .baseProgram(baseProgram)
+                        .build();
+
+                dailyProgramRepository.save(dailyProgram);
+            }
         }
     }
 

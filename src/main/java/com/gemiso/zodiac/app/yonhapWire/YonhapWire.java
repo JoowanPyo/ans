@@ -57,7 +57,7 @@ public class YonhapWire {
     private String credit;
 
     @Column(name = "artclqnty")
-    private int artclqnty;
+    private Integer artclqnty;
 
     @Column(name = "source", length = 100)
     private String source;

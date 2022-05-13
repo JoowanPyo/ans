@@ -74,7 +74,6 @@ public class LboxService {
                 .queryParam("limit", limit)
                 .queryParam("sort", sort);
 
-        System.out.println(builder.toUriString());
 
         HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
         httpRequestFactory.setConnectionRequestTimeout(30000); // 연결시간 초과

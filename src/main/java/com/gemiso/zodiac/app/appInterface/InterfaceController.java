@@ -9,7 +9,9 @@ import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDataDT
 import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerCueRefreshDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerSpareCueRefreshDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
+import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerCdUpdateDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleDeleteConfirmDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
@@ -72,6 +74,8 @@ public class InterfaceController {
                                   @Parameter(name = "os_type", description = "os타입 SCU")
                                   @RequestParam(value = "os_type", required = false) String os_type,
                                   @RequestHeader(value = "securityKey") String securityKey) throws Exception {
+
+        log.info("Taker FindAll : brdc_pgm_id - " + brdc_pgm_id + " pgm_nm -" + pgm_nm);
 
         List<ParentProgramDTO> parentProgramDTOList = new ArrayList<>();
         String takerCueSheetDTO = "";
@@ -149,6 +153,7 @@ public class InterfaceController {
                              @RequestParam(value = "os_type", required = false) String os_type,
                              @RequestHeader(value = "securityKey") String securityKey) {
 
+        log.info("Taker Find : rd_id - " + rd_id);
 
         TakerCueSheetDataDTO takerCueSheetDataDTO = interfaceService.cuefindAll(rd_id, play_seq, cued_seq, vplay_seq, vcued_seq, del_yn,
                 ch_div_cd, usr_id, token, usr_ip, format, lang, os_type);
@@ -167,6 +172,8 @@ public class InterfaceController {
                                       @Parameter(name = "spare_yn", description = "스페어 여부값(N, Y)")
                                       @RequestParam(value = "spare_yn", required = false) String spare_yn,
                                       @RequestHeader(value = "securityKey") String securityKey) {
+
+        log.info("Taker Refresh : rd_id - " + rd_id + " rd_seq - " + rd_seq + " spare_yn - " + spare_yn);
 
         String returnData = "";
 
@@ -256,6 +263,9 @@ public class InterfaceController {
                                     @RequestParam(value = "usr_id", required = false) String usr_id,
                                     @RequestHeader(value = "securityKey") String securityKey) throws Exception {
 
+
+        log.info("Prompter FindAll : Start - " + sdate + " End - " + fdate + " pro_id - " + pro_id);
+
         List<PrompterProgramDTO> prompterProgramDTOList = new ArrayList<>();
         String prompterProgram = "";
 
@@ -287,6 +297,8 @@ public class InterfaceController {
                                      @Parameter(name = "user_ip", description = "사용자 아이피???")
                                      @RequestParam(value = "user_ip", required = false) String user_ip,
                                      @RequestHeader(value = "securityKey") String securityKey) {
+
+        log.info("Prompter Find : cs_id - " + cs_id);
 
         //set Lsit<PrompterCueRefreshDTO>
         PrompterCueSheetDataDTO prompterCueSheetDataDTO = interfaceService.getCuesheetService(cs_id);
@@ -320,16 +332,19 @@ public class InterfaceController {
                                                       @RequestParam(value = "searchWord", required = false) String searchWord,
                                                       @RequestHeader(value = "securityKey") String securityKey) throws Exception {
 
+        log.info("PS Taker FindAll : Start - " + sdate + " End - " + edate + " brdcPgmId - " + brdcPgmId +
+                " brdcPgmNm - " + brdcPgmNm + " searchWord - " + searchWord);
+
         CueSheetFindAllDTO cueSheetFindAllDTO = new CueSheetFindAllDTO();
 
 
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
             //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 24:00:00)
             SearchDate searchDate = new SearchDate(sdate, edate);
-            cueSheetFindAllDTO = cueSheetService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), brdcPgmId, brdcPgmNm, searchWord);
+            cueSheetFindAllDTO = cueSheetService.psTakerFindAll(searchDate.getStartDate(), searchDate.getEndDate(), brdcPgmId, brdcPgmNm, searchWord);
 
         } else {
-            cueSheetFindAllDTO = cueSheetService.findAll(null, null, brdcPgmId, brdcPgmNm, searchWord);
+            cueSheetFindAllDTO = cueSheetService.psTakerFindAll(null, null, brdcPgmId, brdcPgmNm, searchWord);
         }
 
         return new AnsApiResponse<>(cueSheetFindAllDTO);
@@ -341,14 +356,15 @@ public class InterfaceController {
                                             @RequestParam(value = "cueId", required = false) Long cueId,
                                             @RequestHeader(value = "securityKey") String securityKey) {
 
+        log.info("PS Taker Find : cueId - " + cueId);
 
         CueSheetDTO cueSheetDTO = cueSheetService.find(cueId);
 
         return new AnsApiResponse<>(cueSheetDTO);
     }
 
-    @Operation(summary = "테이커 방송중 상태 업데이트[ on_air ]", description = "테이커 방송중 상태 업데이트[ on_air ]")
-    @PutMapping(path = "/cuestcdupdate")
+    /*@Operation(summary = "테이커 방송중 상태 업데이트[ on_air ]", description = "테이커 방송중 상태 업데이트[ on_air ]")
+    @GetMapping(path = "/cuestcdupdate")
     public String cueStCdUpdate(@Parameter(name = "rd_id", description = "프로그램 아이디")
                                 @RequestParam(value = "rd_id", required = false) Long rd_id,
                                 @Parameter(name = "cue_st_cd", description = "방송상태 코드 [ on_air : 방송중]")
@@ -358,6 +374,23 @@ public class InterfaceController {
         log.info("Taker CueSheet State Code Update : rd_id - " + rd_id + " cue_st_cd : " + cue_st_cd);
 
         ParentProgramDTO parentProgramDTO = interfaceService.cueStCdUpdate(rd_id, cue_st_cd);
+
+        String takerCueSheetDTO = interfaceService.takerPgmToXmlOne(parentProgramDTO);
+
+        return takerCueSheetDTO;
+    }*/
+
+    @Operation(summary = "테이커 방송중 상태 업데이트[ on_air ]", description = "테이커 방송중 상태 업데이트[ on_air ]")
+    @PutMapping(path = "/cuestcdupdate/{rd_id}")
+    public String cueStCdUpdate(@Parameter(name = "rd_id", required = true, description = "프로그램 아이디")
+                                @PathVariable("rd_id") Long rd_id,
+                                @Parameter(description = "필수값<br> on_air ", required = true)
+                                @RequestBody @Valid TakerCdUpdateDTO takerCdUpdateDTO,
+                                @RequestHeader(value = "securityKey") String securityKey) {
+
+        log.info("Taker CueSheet State Code Update : rd_id - " + rd_id + " cue_st_cd : " + takerCdUpdateDTO.toString());
+
+        ParentProgramDTO parentProgramDTO = interfaceService.cueStCdUpdate(rd_id, takerCdUpdateDTO);
 
         String takerCueSheetDTO = interfaceService.takerPgmToXmlOne(parentProgramDTO);
 

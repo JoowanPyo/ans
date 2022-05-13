@@ -88,22 +88,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
 
     @ExceptionHandler(value = { Exception.class })
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
+        log.error(" Exception : "+ ApiErrorResponse.makeExceptionHandlerErrorResponse(ex));
+
         ApiErrorResponse.Error error =
-                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.InternalServerError, ex.getMessage());
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.InternalServerError, ex.getLocalizedMessage());
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
-        log.error(" Exception : "+ apiErrorResponse);
+
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = {JsonProcessingException.class})
     public ResponseEntity<Object> handleJsonProcessingException(HttpServletRequest request, JsonProcessingException e) {
-        ApiErrorResponse.Error error =
-                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.InternalServerError, e.getLocalizedMessage());
-        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
 
-        log.error(" JsonProcessingException : "+ apiErrorResponse);
+        log.error(" JsonProcessingException : "+ApiErrorResponse.makeJonsFailResponse(e));
 
-        return new ResponseEntity<>(apiErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(ApiErrorResponse.makeJonsFailResponse(e), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = { ExpiredJwtException.class })
@@ -113,7 +112,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
 
 
-        log.error(" ExpiredJwtException : "+ apiErrorResponse);
+        log.error(" ExpiredJwtException : "+ apiErrorResponse.toString());
 
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.UNAUTHORIZED);
     }

@@ -1,10 +1,7 @@
-package com.gemiso.zodiac.app.CUeSheetTemplateMedia;
+package com.gemiso.zodiac.app.cueSheetTemplateMedia;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.gemiso.zodiac.app.article.Article;
-import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
-import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
