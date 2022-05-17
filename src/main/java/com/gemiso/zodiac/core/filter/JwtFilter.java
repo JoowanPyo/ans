@@ -56,7 +56,7 @@ public class JwtFilter implements Filter {
     public final void init(FilterConfig filterConfig) throws ServletException {
 
         ///users/createuser - 사용자등록 최초시
-        String excludePattern = "/swagger-ui/index.html,/swagger-ui/springfox.css,/swagger-ui/swagger-ui-standalone-preset.js"
+        String excludePattern = "/swagger-ui/index.html,/swagger-ui/springfox.css,/swagger-ui/swagger-ui-standalone-preset.js,/swagger-ui/null/swagger-resources/configuration/ui"
                 + ",/swagger-ui/springfox.css,/swagger-ui/swagger-ui-bundle.js,/swagger-ui/springfox.js,/swagger-ui/favicon-32x32.png"
                 + ",/swagger-ui/favicon-16x16.png, /swagger-ui/swagger-ui-standalone-preset.js,/swagger-ui/swagger-ui-standalone-preset.js"
                 + ",/swagger-ui/favicon-32x32.png,/swagger-ui/favicon-16x16.png,/swagger-resources/configuration/ui"
@@ -64,6 +64,7 @@ public class JwtFilter implements Filter {
                 + ",/swagger-ui/favicon-32x32.png,/swagger-resources/configuration/ui,/v3/api-docs,/swagger-ui/swagger-ui.css,/error"
                 + ",/swagger-ui/index.html/swagger-resources,/swagger-ui/index.html/swagger-resources/configuration/ui"
                 + ",/swagger-ui/index.html/swagger-resources/configuration/security,/auth/login,/auth/againlogin,/auth/logout"
+                + "/swagger-ui/null/swagger-resources/configuration/security,/swagger-ui/null/swagger-resources"
                 + ",/yonhapinternational,/yonhapinternational/aptn,/yonhapinternational/reuter"
                 + ",/yonhap"
                 + ",/yonhapphoto/extend"
@@ -88,66 +89,64 @@ public class JwtFilter implements Filter {
 
             //인터페이스 필터정보
             String interfacePath = "/interface/cuestcdupdate" + path.substring(path.lastIndexOf("/"));
-            if (interfacePath.equals(path)) {
-                chain.doFilter(request, response);
-            }
+           /* if (interfacePath.equals(path)) {
+                chain.doFilter(request, response);*/
+
+                if (excludedUrls.contains(path) == false && interfacePath.equals(path) == false) {
+
+                    try {
+                        final StringBuilder logMessage = new StringBuilder("TOKEN FILTER API - ");
+
+                        final String requestTokenHeader = httpServletRequest.getHeader("Authorization");
+
+                        String jwtToken = null;
 
 
-            if (excludedUrls.contains(path) == false ) {
+                        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
 
-                try {
-                    final StringBuilder logMessage = new StringBuilder("TOKEN FILTER API - ");
-
-                    final String requestTokenHeader = httpServletRequest.getHeader("Authorization");
-
-                    String jwtToken = null;
-
-
-                    if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
-
-                        //헤더에 있는 Bearer Substring => 토큰값을 빼기 위함.
-                        jwtToken = requestTokenHeader.substring(6);
-                        Claims claims = Jwts.parser()
-                                .setSigningKey(secretKey.getBytes("UTF-8")) // Set Key
-                                .parseClaimsJws(jwtToken) // 파싱 및 검증, 실패 시 에러
-                                .getBody();
+                            //헤더에 있는 Bearer Substring => 토큰값을 빼기 위함.
+                            jwtToken = requestTokenHeader.substring(6);
+                            Claims claims = Jwts.parser()
+                                    .setSigningKey(secretKey.getBytes("UTF-8")) // Set Key
+                                    .parseClaimsJws(jwtToken) // 파싱 및 검증, 실패 시 에러
+                                    .getBody();
 
 
-                        Date expiration = claims.get("exp", Date.class);
-                        Date nowDate = new Date();
+                            Date expiration = claims.get("exp", Date.class);
+                            Date nowDate = new Date();
 
-                        //토큰만료 시간 체크
-                        if (expiration.before(nowDate)) {
-                            //Header header, Claims claims, String message
-                            //throw new UserExpiredJwtException(null, null, "EXPIRED_ACCESSTOKEN");
-                            //((HttpServletResponse) response).sendError(401, "UserExpiredJwtException error");
-                            httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "EXPIRED_ACCESSTOKEN");
+                            //토큰만료 시간 체크
+                            if (expiration.before(nowDate)) {
+                                //Header header, Claims claims, String message
+                                //throw new UserExpiredJwtException(null, null, "EXPIRED_ACCESSTOKEN");
+                                //((HttpServletResponse) response).sendError(401, "UserExpiredJwtException error");
+                                httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "EXPIRED_ACCESSTOKEN");
+                            } else {
+                                logMessage.append(" [TOKEN EXPIRATION TIME:").append(expiration.toString()).append("]");
+                            }
+
+                            String userId = claims.get("userId", String.class);
+
+
+                            User user = userRepository.findById(userId)
+                                    .orElseThrow(() -> new ResourceNotFoundException("UserId not found. UserId : " + userId));
+
+                            userAuthService.authUser = UserDTO.builder().userId(user.getUserId()).build();
+
+                            logMessage.append(" [TOKEN USER ID:").append(user.getUserId().toString()).append("]");
+
                         } else {
-                            logMessage.append(" [TOKEN EXPIRATION TIME:").append(expiration.toString()).append("]");
+                            httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "토큰이 없거나 토큰정보가 정확하지 않습니다.");
+                            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
                         }
 
-                        String userId = claims.get("userId", String.class);
+                        logMessage.append(" [RESPONSE STATUS:").append(httpServletResponse.getStatus()).append("]"); //코드를 넘겨줌
+
+                        //log.info(String.valueOf(logMessage));
 
 
-                        User user = userRepository.findById(userId)
-                                .orElseThrow(() -> new ResourceNotFoundException("UserId not found. UserId : " + userId));
-
-                        userAuthService.authUser = UserDTO.builder().userId(user.getUserId()).build();
-
-                        logMessage.append(" [TOKEN USER ID:").append(user.getUserId().toString()).append("]");
-
-                    } else {
-                        httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "토큰이 없거나 토큰정보가 정확하지 않습니다.");
-                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-                    }
-
-                    logMessage.append(" [RESPONSE STATUS:").append(httpServletResponse.getStatus()).append("]"); //코드를 넘겨줌
-
-                    //log.info(String.valueOf(logMessage));
-
-
-                } catch (ExpiredJwtException ex) {
-                    log.error(ex.toString());
+                    } catch (ExpiredJwtException ex) {
+                        log.error(ex.toString());
 
                    /* //에러리스폰스 작성.
                     ApiErrorResponse.Error error =
@@ -160,11 +159,11 @@ public class JwtFilter implements Filter {
                     PrintWriter out = httpServletResponse.getWriter();
                     out.println(mapper.writeValueAsString(apiErrorResponse));
                     out.flush();*/
-                    httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "EXPIRED_ACCESSTOKEN");
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+                        httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "EXPIRED_ACCESSTOKEN");
+                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
 
-                    /*resolver.resolveException(httpServletRequest, httpServletResponse, null, ex);//filter error handling방법*/
-                } /*catch (Throwable a) {
+                        /*resolver.resolveException(httpServletRequest, httpServletResponse, null, ex);//filter error handling방법*/
+                    } /*catch (Throwable a) {
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     PrintStream pinrtStream = new PrintStream(out);
                     a.printStackTrace(pinrtStream);
@@ -173,8 +172,8 @@ public class JwtFilter implements Filter {
 
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
                 }*/
+                }
             }
-        }
         chain.doFilter(request, response);
 
     }

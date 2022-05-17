@@ -6,10 +6,8 @@ import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapCreateDTO;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.anchorCap.mapper.AnchorCapCreateMapper;
-import com.gemiso.zodiac.app.anchorCap.mapper.AnchorCapSimpleMapper;
 import com.gemiso.zodiac.app.anchorCapHist.AnchorCapHist;
 import com.gemiso.zodiac.app.anchorCapHist.AnchorCapHistRepository;
-import com.gemiso.zodiac.app.anchorCapHist.AnchorCapHistService;
 import com.gemiso.zodiac.app.anchorCapHist.dto.AnchorCapHistCreateDTO;
 import com.gemiso.zodiac.app.anchorCapHist.mapper.AnchorCapHistCreateMapper;
 import com.gemiso.zodiac.app.article.dto.*;
@@ -24,22 +22,19 @@ import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapCreateDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapCreateMapper;
-import com.gemiso.zodiac.app.articleCap.mapper.ArticleCapSimpleMapper;
 import com.gemiso.zodiac.app.articleCapHist.ArticleCapHist;
 import com.gemiso.zodiac.app.articleCapHist.ArticleCapHistRepository;
-import com.gemiso.zodiac.app.articleCapHist.ArticleCapHistService;
 import com.gemiso.zodiac.app.articleCapHist.dto.ArticleCapHistCreateDTO;
 import com.gemiso.zodiac.app.articleCapHist.mapper.ArticleCapHistCreateMapper;
 import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.articleHist.ArticleHistRepository;
-import com.gemiso.zodiac.app.articleHist.ArticleHistService;
 import com.gemiso.zodiac.app.articleHist.dto.ArticleHistSimpleDTO;
+import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
+import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
+import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
-import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderSimpleDTO;
-import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderSimpleMapper;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
-import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
@@ -61,21 +56,19 @@ import com.gemiso.zodiac.core.helper.PageHelper;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.service.ProcessArticleFix;
 import com.gemiso.zodiac.core.service.UserAuthChkService;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.core.topic.TopicService;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.ArticleTopicDTO;
-import com.gemiso.zodiac.core.util.SearchConvert;
 import com.gemiso.zodiac.exception.PasswordFailedException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.gemiso.zodiac.exception.UserFailException;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -108,19 +101,18 @@ public class ArticleService {
     private final ArticleCapHistRepository articleCapHistRepository;
     private final AnchorCapHistRepository anchorCapHistRepository;
     private final ArticleActionLogRepository articleActionLogRepository;
+    private final ArticleMediaRepository articleMediaRepository;
 
     private final ArticleMapper articleMapper;
     private final ArticleCreateMapper articleCreateMapper;
-    private final ArticleCapSimpleMapper articleCapSimpleMapper;
-    private final ArticleMediaSimpleMapper articleMediaSimpleMapper;
-    private final ArticleOrderSimpleMapper articleOrderSimpleMapper;
     private final ArticleUpdateMapper articleUpdateMapper;
     private final ArticleLockMapper articleLockMapper;
-    private final AnchorCapSimpleMapper anchorCapSimpleMapper;
     private final ArticleCapCreateMapper articleCapCreateMapper;
     private final AnchorCapCreateMapper anchorCapCreateMapper;
     private final ArticleCapHistCreateMapper articleCapHistCreateMapper;
     private final AnchorCapHistCreateMapper anchorCapHistCreateMapper;
+    private final ArticleMediaMapper articleMediaMapper;
+    private final ArticleMediaSimpleMapper articleMediaSimpleMapper;
 
     //private final UserAuthService userAuthService;
     private final UserAuthChkService userAuthChkService;
@@ -139,17 +131,28 @@ public class ArticleService {
                                                       Integer page, Integer limit, List<String> apprvDivCdList, String deptCd,
                                                       String artclCateCd, String artclTypDtlCd, String delYn, Long artclId, String copyYn) {
 
+        //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
+        List<Sort.Order> orders = new ArrayList<>();
+        Sort.Order order1 = new Sort.Order(Sort.Direction.DESC, "inputDtm");
+        orders.add(order1);
+        Sort.Order order2 = new Sort.Order(Sort.Direction.DESC, "orgArtclId");
+        orders.add(order2);
 
-        PageHelper pageHelper = new PageHelper(page, limit);
+        //페이지 넘버 및 페이지 사이즈 값이 안들어 왔을경우 초기화셋팅
+        page = Optional.ofNullable(page).orElse(0);
+        limit = Optional.ofNullable(limit).orElse(50);
 
-        Pageable pageable = pageHelper.getArticlePageInfo();
+        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by(orders));
+
+        //Pageable pageable = pageHelper.getArticlePageInfo();
 
         //검색조건생성 [where생성]
         BooleanBuilder booleanBuilder = getSearch(sdate, edate, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd, artclTypCd,
                 searchDivCd, searchWord, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd, delYn, artclId, copyYn);
 
         //전체조회[page type]
-        Page<Article> result = articleRepository.findAll(booleanBuilder, pageable);
+        Page<Article> result = articleRepository.findAll(booleanBuilder, pageRequest);
+
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
 
@@ -164,14 +167,60 @@ public class ArticleService {
                                                            String searchDivCd, String searchWord, Integer page, Integer limit, List<String> apprvDivCdList) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
-        PageHelper pageHelper = new PageHelper(page, limit);
-        Pageable pageable = pageHelper.getArticlePageInfo();
+        /*PageHelper pageHelper = new PageHelper(page, limit);
+        Pageable pageable = pageHelper.getArticlePageInfo();*/
+
+        //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
+        List<Sort.Order> orders = new ArrayList<>();
+        Sort.Order order1 = new Sort.Order(Sort.Direction.DESC, "inputDtm");
+        orders.add(order1);
+        Sort.Order order2 = new Sort.Order(Sort.Direction.DESC, "orgArtclId");
+        orders.add(order2);
+
+        //페이지 넘버 및 페이지 사이즈 값이 안들어 왔을경우 초기화셋팅
+        page = Optional.ofNullable(page).orElse(0);
+        limit = Optional.ofNullable(limit).orElse(50);
+
+        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by(orders));
 
         BooleanBuilder booleanBuilder = getSearchIssue(sdate, edate, issuKwd, artclDivCd, artclTypCd,
                 artclTypDtlCd, artclCateCd, deptCd, inputrId, brdcPgmId, orgArtclId, delYn, searchDivCd, searchWord, apprvDivCdList);
 
         //전체조회[page type]
-        Page<Article> result = articleRepository.findAll(booleanBuilder, pageable);
+        Page<Article> result = articleRepository.findAll(booleanBuilder, pageRequest);
+
+        Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
+
+
+       return new PageResultDTO<ArticleDTO, Article>(result, fn);
+
+
+    }
+
+    // 큐시트에서 기사 목록 조회
+    public PageResultDTO<ArticleDTO, Article> findCue(Date sdate, Date edate, String searchWord, Long cueId, Integer page, Integer limit) {
+
+        //페이지 셋팅
+       /* PageHelper pageHelper = new PageHelper(page, limit);
+        Pageable pageable = pageHelper.getArticlePageInfo();*/
+
+        //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
+        List<Sort.Order> orders = new ArrayList<>();
+        Sort.Order order1 = new Sort.Order(Sort.Direction.DESC, "inputDtm");
+        orders.add(order1);
+        Sort.Order order2 = new Sort.Order(Sort.Direction.DESC, "orgArtclId");
+        orders.add(order2);
+
+        //페이지 넘버 및 페이지 사이즈 값이 안들어 왔을경우 초기화셋팅
+        page = Optional.ofNullable(page).orElse(0);
+        limit = Optional.ofNullable(limit).orElse(50);
+
+        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by(orders));
+
+        BooleanBuilder booleanBuilder = getSearchCue(sdate, edate, searchWord, cueId);
+
+        //전체조회[page type]
+        Page<Article> result = articleRepository.findAll(booleanBuilder, pageRequest);
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
 
@@ -186,27 +235,17 @@ public class ArticleService {
 
         ArticleDTO articleDTO = articleMapper.toDto(article);
 
-        //기사정보를 불러와 맵퍼스트럭트 사용시 스텍오버플로우에러[기사에 포함된 리스트에 기사정보포함되어이써 문제 발생] 때문에 따로 DTO변환.
-        //List<ArticleHistSimpleDTO> articleHistDTOList = articleHistSimpleMapper.toDtoList(article.getArticleHist());//기사이력정보 DTO변환
-        //List<ArticleCapSimpleDTO> articleCapDTOList = articleCapSimpleMapper.toDtoList(article.getArticleCap()); //기사자막정보 DTO변환
-        //List<ArticleMediaSimpleDTO> articleMediaSimpleDTOList = articleMediaSimpleMapper.toDtoList(article.getArticleMedia()); //기사미디어정보 DTO변환
-        //List<ArticleOrderSimpleDTO> articleOrderSimpleDTOList = articleOrderSimpleMapper.toDtoList(article.getArticleOrder()); //기사의뢰정보 DTO변환
-        //List<AnchorCapSimpleDTO> anchorCapSimpleDTOList = anchorCapSimpleMapper.toDtoList(article.getAnchorCap());//앵커기사정보 DTO 변환
+        List<ArticleMedia> articleMedia = articleMediaRepository.findArticleMediaList(artclId);
+        List<ArticleMediaSimpleDTO> articleMediaDTOList = articleMediaSimpleMapper.toDtoList(articleMedia);
 
 
         //방송아이콘 이미지 Url 추가. 기사자막 방송아이콘 url set
-        //List<ArticleCapSimpleDTO> setArticleCapDTOList = setUrlArticleCap(articleCapDTOList);
         List<ArticleCapSimpleDTO> setArticleCapDTOList = setUrlArticleCap(articleDTO.getArticleCap());
         //방송아이콘 이미지 Url 추가. 앵커자막 방송아이콘 url set
-        //List<AnchorCapSimpleDTO> setAnchorCapDTOList = setUrlAnchorCap(anchorCapSimpleDTOList);
         List<AnchorCapSimpleDTO> setAnchorCapDTOList = setUrlAnchorCap(articleDTO.getAnchorCap());
-
-        //기사이력, 자막, 미디어, 의뢰 정보 set
-        //articleDTO.setArticleHistDTO(articleHistDTOList);
         articleDTO.setArticleCap(setArticleCapDTOList);
         articleDTO.setAnchorCap(setAnchorCapDTOList);
-        //articleDTO.setArticleMedia(articleMediaSimpleDTOList);
-        //articleDTO.setArticleOrder(articleOrderSimpleDTOList);
+        articleDTO.setArticleMedia(articleMediaDTOList);
 
 
         return articleDTO;
@@ -472,23 +511,6 @@ public class ArticleService {
         topicService.topicWeb(json);
     }
 
-    // 큐시트에서 기사 목록 조회
-    public PageResultDTO<ArticleDTO, Article> findCue(Date sdate, Date edate, String searchWord, Long cueId, Integer page, Integer limit) {
-
-        //페이지 셋팅
-        PageHelper pageHelper = new PageHelper(page, limit);
-        Pageable pageable = pageHelper.getArticlePageInfo();
-
-        BooleanBuilder booleanBuilder = getSearchCue(sdate, edate, searchWord, cueId);
-
-        //전체조회[page type]
-        Page<Article> result = articleRepository.findAll(booleanBuilder, pageable);
-
-        Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
-
-        return new PageResultDTO<ArticleDTO, Article>(result, fn);
-    }
-
     //큐시트 기사 목록조회시 큐시트에 포함되어 있는 기사 제거.
     public PageResultDTO<ArticleDTO, Article> confirmArticleList(PageResultDTO<ArticleDTO, Article> pageList, Long cueId) {
 
@@ -556,10 +578,10 @@ public class ArticleService {
 
         article.setArticleCap(null);
         article.setAnchorCap(null);
-        article.setArticleMedia(null);
-        article.setArticleTag(null);
-        article.setArticleHist(null);
-        article.setArticleOrder(null);
+        //article.setArticleMedia(null);
+        //article.setArticleTag(null);
+        //article.setArticleHist(null);
+        //article.setArticleOrder(null);
 
         //기사 액션로그 빌드
         ArticleActionLog articleActionLog = ArticleActionLog.builder()
@@ -1332,6 +1354,8 @@ public class ArticleService {
                 booleanBuilder.and(qArticle.orgArtclId.isNotNull());
             }
         }
+
+        //PAQueryFactory queryFactory = new JPAQueryFactory(em);
 
         /*//기사 타입 코드로 조회
         if (!StringUtils.isEmpty(issuId)) {

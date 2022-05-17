@@ -103,9 +103,7 @@ public class LboxController {
 
     @Operation(summary = "PS 긴급전송", description = "PS 긴급전송")
     @PutMapping(path = "/mediatransfer/{mediaId}/psemergency")
-    public AnsApiResponse<TransportResponseDTO> psEmergencyTransfer(@Parameter(name = "mediaId", required = true, description = "미디어 아이디")
-                                                                    @PathVariable("mediaId") Long mediaId,
-                                                                    @Parameter(name = "contentId", description = "콘텐츠 아이디")
+    public AnsApiResponse<TransportResponseDTO> psEmergencyTransfer(@Parameter(name = "contentId", description = "콘텐츠 아이디")
                                                                     @RequestParam(value = "contentId", required = true) Integer contentId,
                                                                     @Parameter(name = "subrmNm", description = "부조명")
                                                                     @RequestParam(value = "subrmNm", required = true) String subrmNm,
@@ -116,11 +114,11 @@ public class LboxController {
                                                                     @Parameter(name = "isRetry", description = "재전송 여부")
                                                                     @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
 
-        log.info("PS 긴급전송 = " + "미디어 아이디 : " + mediaId + " 텐츠 아이디 : " + contentId +
+        log.info("PS 긴급전송 = " + " 텐츠 아이디 : " + contentId +
                 " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry);
 
         String destinations = "P";
-        TransportResponseDTO transportResponseDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
+        TransportResponseDTO transportResponseDTO = lboxService.emergencyTransfer(contentId, subrmNm, destinations, isUrgent, isRetry);
 
 
         return new AnsApiResponse<>(transportResponseDTO);
@@ -128,9 +126,7 @@ public class LboxController {
 
     @Operation(summary = "NS 긴급전송", description = "NS 긴급전송")
     @PutMapping(path = "/mediatransfer/{mediaId}/nsemergency")
-    public AnsApiResponse<TransportResponseDTO> nsEmergencyTransfer(@Parameter(name = "mediaId", required = true, description = "미디어 아이디")
-                                                                    @PathVariable("mediaId") Long mediaId,
-                                                                    @Parameter(name = "contentId", description = "콘텐츠 아이디")
+    public AnsApiResponse<TransportResponseDTO> nsEmergencyTransfer(@Parameter(name = "contentId", description = "콘텐츠 아이디")
                                                                     @RequestParam(value = "contentId", required = true) Integer contentId,
                                                                     @Parameter(name = "subrmNm", description = "부조명")
                                                                     @RequestParam(value = "subrmNm", required = true) String subrmNm,
@@ -141,11 +137,11 @@ public class LboxController {
                                                                     @Parameter(name = "isRetry", description = "재전송 여부")
                                                                     @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
 
-        log.info("NS 긴급전송 = " + "미디어 아이디 : " + mediaId + " 텐츠 아이디 : " + contentId +
+        log.info("NS 긴급전송 = " + " 텐츠 아이디 : " + contentId +
                 " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry);
 
         String destinations = "N";
-        TransportResponseDTO transportResponseDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
+        TransportResponseDTO transportResponseDTO = lboxService.emergencyTransfer(contentId, subrmNm, destinations, isUrgent, isRetry);
 
 
         return new AnsApiResponse<>(transportResponseDTO);

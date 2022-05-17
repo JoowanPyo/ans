@@ -48,9 +48,9 @@ public class CueSheet {
     @Column(name = "ch_div_cd", length = 50)
     private String chDivCd;
 
-    @Basic(fetch = FetchType.LAZY)
+   /* @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = ch_div_cd)")
-    private String chDivCdNm;
+    private String chDivCdNm;*/
 
     @Column(name = "brdc_dt", length = 10)
     private String brdcDt;
@@ -156,16 +156,16 @@ public class CueSheet {
     @Column(name = "td_1_id", length = 50)
     private String td1Id;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = td_1_id)")
-    private String td1Nm;
+    private String td1Nm;*/
 
     @Column(name = "td_2_id", length = 50)
     private String td2Id;
 
-    @Basic(fetch = FetchType.LAZY)
+   /* @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = td_2_id)")
-    private String td2Nm;
+    private String td2Nm;*/
 
     @Column(name = "remark", length = 500)
     private String remark;

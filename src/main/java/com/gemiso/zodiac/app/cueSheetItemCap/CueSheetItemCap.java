@@ -1,24 +1,15 @@
 package com.gemiso.zodiac.app.cueSheetItemCap;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
-import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrp;
-import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
-import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.symbol.Symbol;
-import com.gemiso.zodiac.app.user.User;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "tb_cue_item_cap")
@@ -27,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@ToString()
 @DynamicUpdate
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CueSheetItemCap {
@@ -43,8 +34,8 @@ public class CueSheetItemCap {
     @Column(name = "cue_item_cap_div_cd")
     private String cueItemCapDivCd;
 
-    @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_cap_div_cd)")
-    private String cueItemCapDivCdNm;
+   /* @Formula("(select a.cd_nm from tb_cd a where a.cd = cue_item_cap_div_cd)")
+    private String cueItemCapDivCdNm;*/
 
     @Column(name = "cap_ctt", columnDefinition = "text")
     private String capCtt;
@@ -61,8 +52,8 @@ public class CueSheetItemCap {
     @Column(name = "cap_class_cd")
     private String capClassCd;
 
-    @Formula("(select a.cd_nm from tb_cd a where a.cd = cap_class_cd)")
-    private String capClassCdNm;
+   /* @Formula("(select a.cd_nm from tb_cd a where a.cd = cap_class_cd)")
+    private String capClassCdNm;*/
 
     @Column(name = "cap_prvw_url", length = 1000)
     private String capPrvwUrl;
@@ -95,16 +86,16 @@ public class CueSheetItemCap {
     @Column(name = "updtr_id")
     private String updtrId;
 
-    @Basic(fetch = FetchType.LAZY)
+   /* @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
-    private String updtrNm;
+    private String updtrNm;*/
 
     @Column(name = "delr_id")
     private String delrId;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
-    private String delrNm;
+    private String delrNm;*/
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cap_tmplt_id")
@@ -112,7 +103,6 @@ public class CueSheetItemCap {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cue_item_id")
-    @JsonBackReference
     private CueSheetItem cueSheetItem;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -11,6 +11,7 @@ import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -123,6 +124,7 @@ public class CueTmpltItem extends BaseEntity {
 
     @OneToMany(mappedBy = "cueTmpltItem")
     @JsonManagedReference
+    @Where(clause = "del_yn = 'N'")
     private List<CueTmpltItemCap> cueTmpltItemCap = new ArrayList<>();
 
     @OneToMany(mappedBy = "cueTmpltItem")
@@ -131,6 +133,7 @@ public class CueTmpltItem extends BaseEntity {
 
     @OneToMany(mappedBy = "cueTmpltItem")
     @JsonManagedReference
+    @Where(clause = "del_yn = 'N'")
     private List<CueTmpltMedia> cueTmpltMedia = new ArrayList<>();
 
 

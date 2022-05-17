@@ -17,6 +17,7 @@ import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapCreateDT
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.mapper.CueTmpltItemCapCreateMapper;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.mapper.CueTmpltItemCapMapper;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.CueTmpltMedia;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbol;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbolRepository;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolDTO;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -68,6 +70,26 @@ public class CueTmpltItemService {
         //빌드된 목록조회 조건으로 큐시트 템플릿 아이템 목록조회
         List<CueTmpltItem> cueTmpltItems =
                 (List<CueTmpltItem>) cueTmpltItemRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "cueItemOrd"));
+
+        if (CollectionUtils.isEmpty(cueTmpltItems)==false){
+
+            for (CueTmpltItem cueTmpltItem : cueTmpltItems){
+
+                List<CueTmpltMedia> cueTmpltMedias = cueTmpltItem.getCueTmpltMedia();
+                List<CueTmpltMedia> restoreCueTmpltMedias = new ArrayList<>();
+
+                for (CueTmpltMedia cueTmpltMedia : cueTmpltMedias){
+
+                    String delYn = cueTmpltMedia.getDelYn();
+
+                    if ("N".equals(delYn)){
+                        restoreCueTmpltMedias.add(cueTmpltMedia);
+                    }
+                }
+
+                cueTmpltItem.setCueTmpltMedia(restoreCueTmpltMedias);
+            }
+        }
 
         //큐시트템필릿 아이템 엔티티 리스트 DTO리스트로 변환
         List<CueTmpltItemDTO> cueTmpltItemDTOList = cueTmpltItemMapper.toDtoList(cueTmpltItems);

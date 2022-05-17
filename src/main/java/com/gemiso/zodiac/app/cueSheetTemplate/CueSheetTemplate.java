@@ -11,6 +11,7 @@ import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -45,9 +46,9 @@ public class CueSheetTemplate extends BaseEntity {
     @Column(name = "news_div_cd", length = 50)
     private String newsDivCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = news_div_cd)")
-    private String newsDivCdNm;
+    private String newsDivCdNm;*/
 
     @Column(name = "rmk", length = 500)
     private String rmk;
@@ -68,16 +69,16 @@ public class CueSheetTemplate extends BaseEntity {
     @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
-    private String updtrNm;
+    private String updtrNm;*/
 
     @Column(name = "delr_id", length = 50)
     private String delrId;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
-    private String delrNm;
+    private String delrNm;*/
 
     @Column(name = "pd_1_id", length = 50)
     private String pd1Id;
@@ -110,16 +111,16 @@ public class CueSheetTemplate extends BaseEntity {
     @Column(name = "td_1_id")
     private String td1Id;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = td_1_id)")
-    private String td1Nm;
+    private String td1Nm;*/
 
     @Column(name = "td_2_id")
     private String td2Id;
 
-    @Basic(fetch = FetchType.LAZY)
+  /*  @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = td_2_id)")
-    private String td2Nm;
+    private String td2Nm;*/
 
     @Column(name = "stdio_id")
     private Long stdioId;
@@ -145,6 +146,7 @@ public class CueSheetTemplate extends BaseEntity {
 
     @OneToMany(mappedBy = "cueSheetTemplate")
     @JsonManagedReference
+    @Where(clause = "del_yn = 'N'")
     private List<CueTmpltItem> cueTmpltItem = new ArrayList<>();
 
     /*@OneToMany(mappedBy = "cueSheetTemplate")

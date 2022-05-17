@@ -2,6 +2,11 @@ package com.gemiso.zodiac.app.articleMedia;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.article.ArticleRepository;
+import com.gemiso.zodiac.app.article.ArticleService;
+import com.gemiso.zodiac.app.article.dto.ArticleDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
+import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaCreateDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaUpdateDTO;
@@ -10,7 +15,6 @@ import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaUpdateMapper;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.core.topic.TopicService;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.TakerCueSheetTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -21,7 +25,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -34,10 +37,14 @@ import java.util.Optional;
 public class ArticleMediaService {
 
     private final ArticleMediaRepository articleMediaRepository;
+    private final ArticleRepository articleRepository;
 
     private final ArticleMediaMapper articleMediaMapper;
     private final ArticleMediaCreateMapper articleMediaCreateMapper;
     private final ArticleMediaUpdateMapper articleMediaUpdateMapper;
+    private final ArticleMapper articleMapper;
+
+    private final ArticleService articleService;
 
     //private final UserAuthService userAuthService;
 
@@ -84,9 +91,22 @@ public class ArticleMediaService {
         articleMediaDTO.setArtclMediaId(artclMediaId);
         articleMediaDTO.setContId(contId);
 
+        ArticleSimpleDTO articleSimpleDTO = articleMediaCreateDTO.getArticle();
+        Long artclId = articleSimpleDTO.getArtclId();
+
+        Article article = articleService.articleFindOrFail(artclId);
+
+        ArticleDTO articleDTO = articleMapper.toDto(article);
+        Integer orgVideoTime = articleDTO.getVideoTime();
+        Integer newVideoTime = articleMedia.getMediaDurtn();
+        Integer totalVideoTime = Optional.ofNullable(orgVideoTime).orElse(0) + Optional.ofNullable(newVideoTime).orElse(0);
+        articleDTO.setVideoTime(totalVideoTime);
+
+        articleMapper.updateFromDto(articleDTO, article);
+        articleRepository.save(article);
 
         /********** MQ [TOPIC] ************/
-        Article article = articleMedia.getArticle();
+        //Article article = articleMedia.getArticle();
         Long articleId = null;
         if (ObjectUtils.isEmpty(article) == false){
             articleId = article.getArtclId();
@@ -159,6 +179,21 @@ public class ArticleMediaService {
         articleMediaMapper.updateFromDto(articleMediaDTO, articleMedia);
 
         articleMediaRepository.save(articleMedia);
+
+
+        ArticleSimpleDTO articleSimpleDTO = articleMediaDTO.getArticle();
+        Long artclId = articleSimpleDTO.getArtclId();
+
+        Article article = articleService.articleFindOrFail(artclId);
+
+        ArticleDTO articleDTO = articleMapper.toDto(article);
+        Integer orgVideoTime = articleDTO.getVideoTime();
+        Integer newVideoTime = articleMedia.getMediaDurtn();
+        Integer totalVideoTime = Optional.ofNullable(orgVideoTime).orElse(0) - Optional.ofNullable(newVideoTime).orElse(0);
+        articleDTO.setVideoTime(totalVideoTime);
+
+        articleMapper.updateFromDto(articleDTO, article);
+        articleRepository.save(article);
 
     }
 

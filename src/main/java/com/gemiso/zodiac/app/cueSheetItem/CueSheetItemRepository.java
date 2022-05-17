@@ -16,7 +16,7 @@ public interface CueSheetItemRepository extends JpaRepository<CueSheetItem, Long
     List<CueSheetItem> findAllItems(@Param("artclId")Long artclId, @Param("cueId")Long cueId,
                                     @Param("delYn")String delYn, @Param("spareYn")String spareYn);
 
-    @Query("select a from CueSheetItem a left outer join Article b on b.artclId = a.article.artclId " +
+    @Query("select a from CueSheetItem a left outer join Article b on b.artclId = a.article.artclId and b.delYn = 'N' " +
             "where a.cueSheet.cueId = :cueId  and a.delYn = 'N' and a.spareYn = 'N' order by a.cueItemOrd asc ")
     List<CueSheetItem> findByCueItemList(@Param("cueId")Long cueId);
 

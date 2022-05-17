@@ -13,6 +13,7 @@ import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"cueSheet","article","cueSheetTemplate","cueSheetMedia"})
+@ToString(exclude = {"cueSheet","article","cueSheetTemplate","cueSheetMedia","cueSheetItemCap","cueSheetItemSymbol"})
 @DynamicUpdate
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CueSheetItem extends BaseEntity {
@@ -71,9 +72,9 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "brdc_st_cd", length = 50)
     private String brdcStCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = brdc_st_cd)")
-    private String brdcStCdNm;
+    private String brdcStCdNm;*/
 
     @Column(name = "brdc_clk", length = 6)
     private String brdcClk;
@@ -87,9 +88,9 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "artcl_cap_st_cd", length = 50)
     private String artclCapStCd;
 
-    @Basic(fetch = FetchType.LAZY)
+   /* @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_cap_st_cd)")
-    private String artclCapStCdNm;
+    private String artclCapStCdNm;*/
 
     @Column(name = "cue_artcl_cap_chg_yn", columnDefinition = "bpchar(1) default 'N'")
     private String cueArtclCapChgYn;
@@ -145,16 +146,16 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "cap_st_cd", length = 50)
     private String capStCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = cap_st_cd)")
-    private String capStCdNm;
+    private String capStCdNm;*/
 
     @Column(name = "artcl_st_cd", length = 50)
     private String artclStCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_st_cd)")
-    private String artclStCdNm;
+    private String artclStCdNm;*/
 
     @Column(name = "media_durtn", length = 20)
     private String mediaDurtn;
@@ -172,16 +173,16 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
-    private String updtrNm;
+    private String updtrNm;*/
 
     @Column(name = "delr_id", length = 50)
     private String delrId;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
-    private String delrNm;
+    private String delrNm;*/
 
     @Column(name = "lckr_id", length = 50)
     private String lckrId;
@@ -218,10 +219,12 @@ public class CueSheetItem extends BaseEntity {
 
     @OneToMany(mappedBy = "cueSheetItem")
     @JsonManagedReference
+    @Where(clause = "del_yn = 'N'")
     private List<CueSheetMedia> cueSheetMedia = new ArrayList<>();
 
     @OneToMany(mappedBy = "cueSheetItem")
     @JsonManagedReference
+    @Where(clause = "del_yn = 'N'")
     private List<CueSheetItemCap> cueSheetItemCap = new ArrayList<>();
 
       /*@Column(name = "artcl_id", length = 21)

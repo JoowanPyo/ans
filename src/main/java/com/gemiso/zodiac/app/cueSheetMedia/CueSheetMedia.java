@@ -68,9 +68,9 @@ public class CueSheetMedia extends BaseEntity {
     @Column(name = "assn_st_cd", length = 50)
     private String assnStCd;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = assn_st_cd)")
-    private String assnStCdNm;
+    private String assnStCdNm;*/
 
     @Column(name = "video_edtr_nm", length = 100)
     private String videoEdtrNm;
@@ -94,16 +94,16 @@ public class CueSheetMedia extends BaseEntity {
     @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
-    @Basic(fetch = FetchType.LAZY)
+   /* @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
-    private String updtrNm;
+    private String updtrNm;*/
 
     @Column(name = "delr_id", length = 50)
     private String delrId;
 
-    @Basic(fetch = FetchType.LAZY)
+   /* @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
-    private String delrNm;
+    private String delrNm;*/
 
     @Column(name = "cue_media_titl", length = 300)
     private String cueMediaTitl;
@@ -119,7 +119,6 @@ public class CueSheetMedia extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cue_item_id")
-    @JsonBackReference
     private CueSheetItem cueSheetItem;
 
     @PrePersist

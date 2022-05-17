@@ -358,7 +358,7 @@ public class InterfaceController {
 
         log.info("PS Taker Find : cueId - " + cueId);
 
-        CueSheetDTO cueSheetDTO = cueSheetService.find(cueId);
+        CueSheetDTO cueSheetDTO = cueSheetService.psFind(cueId);
 
         return new AnsApiResponse<>(cueSheetDTO);
     }
@@ -410,4 +410,19 @@ public class InterfaceController {
         interfaceService.stateChange(mediaTransferDTO);
         return new AnsApiResponse<>("complete");
     }
+
+   /* @Operation(summary = "방송중 테이커 큐시트 동기화", description = "방송중 테이커 큐시트 동기화")
+    @GetMapping(path = "/takersetcue")
+    public String takerSetCue(@Parameter(name = "rd_id", required = true, description = "프로그램 아이디")
+                                @PathVariable("rd_id") Long rd_id,
+                                @RequestHeader(value = "securityKey") String securityKey) {
+
+        log.info("Taker On Air status  : rd_id - " + rd_id );
+
+        ParentProgramDTO parentProgramDTO = interfaceService.cueStCdUpdate(rd_id);
+
+        String takerCueSheetDTO = interfaceService.takerPgmToXmlOne(parentProgramDTO);
+
+        return takerCueSheetDTO;
+    }*/
 }

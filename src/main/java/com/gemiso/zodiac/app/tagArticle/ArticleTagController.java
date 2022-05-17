@@ -22,13 +22,25 @@ public class ArticleTagController {
     private final ArticleTagService articleTagService;
 
 
+    @Operation(summary = "기사 테그 목록조회", description = "기사 테그 목록조회")
+    @GetMapping(path = "")
+    public AnsApiResponse<List<ArticleTagDTO>> findAll(@Parameter(name = "artclId", description = "기사 아이디")
+                                                      @RequestParam(value = "artclId", required = false)Long artclId) {
+
+        articleTagService.findAll(artclId);
+
+        List<ArticleTagDTO> articleTagDTOList = articleTagService.find(artclId);
+
+        return new AnsApiResponse<>(articleTagDTOList);
+    }
+
     @Operation(summary = "기사 테그 등록", description = "기사 테그 등록")
     @PostMapping(path = "/{artclId}")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<List<ArticleTagDTO>> create(@Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                                   @PathVariable("artclId") long artclId,
+                                                      @PathVariable("artclId") long artclId,
                                                       @Parameter(name = "tag", description = "테그")
-                                                   @RequestParam(value = "tag", required = false) List<String> tagList) {
+                                                      @RequestParam(value = "tag", required = false) List<String> tagList) {
 
         articleTagService.create(artclId, tagList);
 

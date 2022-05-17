@@ -13,6 +13,8 @@ import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
+import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
+import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.cueCapTmplt.CueCapTmplt;
 import com.gemiso.zodiac.app.cueCapTmplt.CueCapTmpltRepository;
@@ -27,7 +29,6 @@ import com.gemiso.zodiac.app.cueSheetHist.dto.CueSheetHistCreateDTO;
 import com.gemiso.zodiac.app.cueSheetHist.mapper.CueSheetHistCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
-import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
 import com.gemiso.zodiac.app.cueSheetItem.QCueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
@@ -69,7 +70,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -103,6 +103,7 @@ public class CueSheetService {
     private final CueSheetItemSymbolCreateMapper cueSheetItemSymbolCreateMapper;
     private final ArticleSimpleMapper articleSimpleMapper;
     private final CueSheetItemCapCreateMapper cueSheetItemCapCreateMapper;
+    private final ArticleMediaSimpleMapper articleMediaSimpleMapper;
 
     private final ProgramService programService;
     //private final UserAuthService userAuthService;
@@ -145,6 +146,38 @@ public class CueSheetService {
         //cueSheetFindAllDTO = createArticleCount(cueSheetFindAllDTO);
 
         return cueSheetFindAllDTO;
+
+
+    }
+
+    //큐시트 목록조회 + 유니온 일일편성 [큐시트 인터페이스+큐시트 아이템추가 목록]
+    public List<CueSheetDTO> takerFindAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord){
+
+        BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm,  searchWord);
+
+        //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
+        List<Sort.Order> orders = new ArrayList<>();
+        Sort.Order order1 = new Sort.Order(Sort.Direction.ASC, "brdcDt");
+        orders.add(order1);
+        Sort.Order order2 = new Sort.Order(Sort.Direction.ASC, "brdcStartTime");
+        orders.add(order2);
+
+        List<CueSheet> cueSheets = (List<CueSheet>) cueSheetRepository.findAll(booleanBuilder, Sort.by(orders));
+
+        List<CueSheetDTO> cueSheetDTOList = cueSheetMapper.toDtoList(cueSheets);
+
+        //List<CueSheetDTO> newCueSheetDTOList = checkDelItem(cueSheetDTOList); //삭제된 기사아이템 제거.
+
+        /*CueSheetFindAllDTO cueSheetFindAllDTO = unionPgmInterface(cueSheetDTOList, sdate, edate, brdcPgmId,
+                brdcPgmNm, searchWord); //큐시트 유니온 방송프로그램.*/
+
+        //큐시트에 포함된 기사수를 계산한다[ 큐시트 목록조회시 화면에 필요 ]
+        /*cueSheetFindAllDTO = getArticleCount(cueSheetFindAllDTO);*/
+
+        //큐시트에 포함된 기사수를 계산한다[ 큐시트 목록조회시 화면에 필요 ]
+        cueSheetDTOList = getTakerArticleCount(cueSheetDTOList);
+
+        return cueSheetDTOList;
 
 
     }
@@ -202,6 +235,25 @@ public class CueSheetService {
 
     }
 
+    //큐시트 아이템에 포함된 기사수 생성[ 테이커 , 프롬프터]
+    public List<CueSheetDTO> getTakerArticleCount(List<CueSheetDTO> cueSheetDTOList){
+
+        List<CueSheetDTO> returncueSheetDTOList = new ArrayList<>();
+
+        for(CueSheetDTO cueSheetDTO : cueSheetDTOList){
+
+            Long cueId = cueSheetDTO.getCueId();
+
+            int count = articleRepository.findArticleCount(cueId);
+            cueSheetDTO.setArticleCount(count);
+
+            returncueSheetDTOList.add(cueSheetDTO);
+        }
+
+        return returncueSheetDTOList;
+    }
+
+    //큐시트 아이템에 포함된 기사수 생성
     public CueSheetFindAllDTO getArticleCount(CueSheetFindAllDTO cueSheetFindAllDTO){
 
         List<CueSheetDTO> cueSheetDTOs = cueSheetFindAllDTO.getCueSheetDTO();
@@ -399,6 +451,50 @@ public class CueSheetService {
 
         CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
 
+        /*List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);*/
+
+        //기사 미디어 있을경우 set
+        //List<CueSheetItem> cueSheetItemList = cueSheetItemFindAll(cueId);
+        //List<CueSheetItem> setCueSheetItemList = new ArrayList<>();
+
+        //List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
+
+        //cueSheetItemDTOList = setSymbol(cueSheetItemDTOList);
+
+        //cueSheetDTO.setCueSheetItem(cueSheetItemDTOList);
+
+        return cueSheetDTO;
+
+    }
+
+    //큐시트 상세조회
+    public CueSheetDTO psFind(Long cueId){
+
+        CueSheet cueSheet = cueSheetFindOrFail(cueId);
+
+        CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
+
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
+
+        List<CueSheetItemDTO> restoreCueSheetItemDTOList = new ArrayList<>();
+
+
+        for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList) {
+            ArticleCueItemDTO article = cueSheetItemDTO.getArticle();
+            if (ObjectUtils.isEmpty(article) == false) {
+
+                Long artclId = article.getArtclId();
+                List<ArticleMedia> articleMedia = articleMediaRepository.findArticleMediaList(artclId);
+                List<ArticleMediaSimpleDTO> articleMediaSimpleDTOS = articleMediaSimpleMapper.toDtoList(articleMedia);
+                article.setArticleMedia(articleMediaSimpleDTOS);
+            }
+            cueSheetItemDTO.setArticle(article);
+            restoreCueSheetItemDTOList.add(cueSheetItemDTO);
+        }
+
+        cueSheetDTO.setCueSheetItem(restoreCueSheetItemDTOList);
         //기사 미디어 있을경우 set
         //List<CueSheetItem> cueSheetItemList = cueSheetItemFindAll(cueId);
         //List<CueSheetItem> setCueSheetItemList = new ArrayList<>();
@@ -450,7 +546,7 @@ public class CueSheetService {
                 }
 
 
-                cueSheetItemDTO.setCueSheetItemSymbolDTO(cueSheetItemSymbolDTO); //아이템에 set방송아이콘List
+                cueSheetItemDTO.setCueSheetItemSymbol(cueSheetItemSymbolDTO); //아이템에 set방송아이콘List
 
             }
         }
@@ -723,7 +819,7 @@ public class CueSheetService {
 
         Optional<CueSheet> cueSheet = cueSheetRepository.findByCue(cueId);
 
-        if (!cueSheet.isPresent()){
+        if (cueSheet.isPresent() == false){
             throw new ResourceNotFoundException("CueSheetId not found. cueSheetId : " + cueId);
         }
 
@@ -1006,7 +1102,7 @@ public class CueSheetService {
         /* 미디어 정보 저장 하는 부분 */
 
         //기사 아이디로 기사 미디어 조회
-        List<ArticleMedia> articleMediaList = article.getArticleMedia();
+        List<ArticleMedia> articleMediaList = articleMediaRepository.findArticleMediaList(artclId);
         //List<ArticleMedia> articleMediaList = articleMediaRepository.findArticleMediaList(artclId);
 
         //조회된 기사 미디어가 있으면 복사된 기사 아이디로 기사미디어 신규 저장.
@@ -1259,10 +1355,11 @@ public class CueSheetService {
         for (CueSheetItem cueSheetItem : cueSheetItemList){
 
             Article article = cueSheetItem.getArticle(); //기사 정보를 가져온다.
+            Long cueItemId = cueSheetItem.getCueItemId();
             
             if (ObjectUtils.isEmpty(article)){ //일반 큐시트 아이템, 템플릿아이템
 
-                List<CueSheetItemCap> cueSheetItemCapList = cueSheetItem.getCueSheetItemCap();
+                List<CueSheetItemCap> cueSheetItemCapList = cueSheetItemCapRepotitory.findCueSheetItemCapList(cueItemId);
 
                 for (CueSheetItemCap cueSheetItemCap : cueSheetItemCapList){
 

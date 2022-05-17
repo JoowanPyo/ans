@@ -3,6 +3,7 @@ package com.gemiso.zodiac.app.cueSheetItem.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
+import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolDTO;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
@@ -85,7 +86,7 @@ public class CueSheetItemDTO {
     private ArticleCueItemDTO article;
     private CueSheetTemplateSimpleDTO cueSheetTemplate;
     private List<CueSheetMediaDTO> cueSheetMedia = new ArrayList<>();
-    private List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTO = new ArrayList<>();
-    private List<CueSheetItemCapSimpleDTO> cueSheetItemCap = new ArrayList<>();
+    private List<CueSheetItemSymbolDTO> cueSheetItemSymbol = new ArrayList<>();
+    private List<CueSheetItemCapDTO> cueSheetItemCap = new ArrayList<>();
 
 }

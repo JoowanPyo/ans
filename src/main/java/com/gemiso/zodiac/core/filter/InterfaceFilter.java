@@ -42,19 +42,17 @@ public class InterfaceFilter implements Filter {
         //인터페이스 필터정보
         String interfacePath = "/interface/cuestcdupdate"+path.substring(path.lastIndexOf("/"));
 
-        if (interfacePath.equals(path)){
-            chain.doFilter(request, response);
-        }
 
-        if (excludedUrls.contains(path) ) {
+            if (excludedUrls.contains(path) || interfacePath.equals(path)) {
 
-            final String requestTokenHeader = httpServletRequest.getHeader("securityKey");
+                final String requestTokenHeader = httpServletRequest.getHeader("securityKey");
 
                 if (secretKey.equals(requestTokenHeader) == false || requestTokenHeader == null || requestTokenHeader.trim().isEmpty()) {
                     log.error("헤더에 Security key 값이 값이 잘못 되었습니다." + requestTokenHeader);
                     httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                 }
-        }
+            }
+
         chain.doFilter(request, response);
     }
 }

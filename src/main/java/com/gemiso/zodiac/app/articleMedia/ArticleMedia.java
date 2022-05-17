@@ -1,9 +1,6 @@
 package com.gemiso.zodiac.app.articleMedia;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gemiso.zodiac.app.article.Article;
-import com.gemiso.zodiac.app.code.Code;
-import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -15,11 +12,7 @@ import java.util.Date;
 @Entity
 @Table(name = "tb_artcl_media",
         indexes = {@Index(name = "index_article_media_input_dtm", columnList = "input_dtm")
-                ,@Index(name = "index_article_media_trnsf_file_nm", columnList = "trnsf_file_nm")}
-/*,
-        uniqueConstraints = {
-                @UniqueConstraint(name = "file_fileId_unique", columnNames = "file_id")
-        }*/)
+                ,@Index(name = "index_article_media_trnsf_file_nm", columnList = "trnsf_file_nm")})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -67,8 +60,8 @@ public class ArticleMedia extends BaseEntity {
     @Column(name = "assn_st_cd", length = 50)
     private String assnStCd;
 
-    @Formula("(select a.cd_nm from tb_cd a where a.cd = assn_st_cd)")
-    private String assnStCdNm;
+    /*@Formula("(select a.cd_nm from tb_cd a where a.cd = assn_st_cd)")
+    private String assnStCdNm;*/
 
     @Column(name = "video_edtr_nm", length = 100)
     private String videoEdtrNm;
@@ -89,16 +82,16 @@ public class ArticleMedia extends BaseEntity {
     @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
-    private String updtrNm;
+    private String updtrNm;*/
 
     @Column(name = "delr_id", length = 50)
     private String delrId;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
-    private String delrNm;
+    private String delrNm;*/
 
     @Column(name = "video_edtr_id", length = 50)
     private String videoEdtrId;
@@ -114,7 +107,6 @@ public class ArticleMedia extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artcl_id")
-    @JsonBackReference
     private Article article;
 
     @PrePersist

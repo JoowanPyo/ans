@@ -60,8 +60,8 @@ public class CueTmpltMedia extends BaseEntity {
     @Column(name = "assn_st_cd", length = 50)
     private String assnStCd;
 
-    @Formula("(select a.cd_nm from tb_cd a where a.cd = assn_st_cd)")
-    private String assnStCdNm;
+   /* @Formula("(select a.cd_nm from tb_cd a where a.cd = assn_st_cd)")
+    private String assnStCdNm;*/
 
     @Column(name = "video_edtr_nm", length = 100)
     private String videoEdtrNm;
@@ -82,16 +82,16 @@ public class CueTmpltMedia extends BaseEntity {
     @Column(name = "updtr_id", length = 50)
     private String updtrId;
 
-    @Basic(fetch = FetchType.LAZY)
+   /* @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = updtr_id)")
-    private String updtrNm;
+    private String updtrNm;*/
 
     @Column(name = "delr_id", length = 50)
     private String delrId;
 
-    @Basic(fetch = FetchType.LAZY)
+    /*@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
-    private String delrNm;
+    private String delrNm;*/
 
     @Column(name = "video_edtr_id", length = 50)
     private String videoEdtrId;

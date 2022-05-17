@@ -10,11 +10,13 @@ import com.gemiso.zodiac.app.tagArticle.mapper.ArticleTagMapper;
 import com.gemiso.zodiac.app.tag.mapper.TagMapper;
 import com.gemiso.zodiac.app.tagArticle.dto.ArticleTagCreateDTO;
 import com.gemiso.zodiac.app.tagArticle.dto.ArticleTagDTO;
+import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +36,29 @@ public class ArticleTagService {
 
     private final TagService tagService;
 
+
+    public List<ArticleTagDTO> findAll(Long artclId){
+
+        BooleanBuilder booleanBuilder = getSearch(artclId);
+
+        List<ArticleTag> articleTagList = (List<ArticleTag>) articleTagRepository.findAll(booleanBuilder);
+
+        List<ArticleTagDTO> articleTagDTOList = articleTagMapper.toDtoList(articleTagList);
+
+        return articleTagDTOList;
+    }
+
+    public BooleanBuilder getSearch(Long artclId){
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        QArticleTag qArticleTag = QArticleTag.articleTag;
+
+        if (ObjectUtils.isEmpty(artclId) == false){
+            booleanBuilder.and(qArticleTag.article.artclId.eq(artclId));
+        }
+
+        return booleanBuilder;
+    }
 
     public List<ArticleTagDTO> find(Long articleId){
 

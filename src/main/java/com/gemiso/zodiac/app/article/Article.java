@@ -15,6 +15,8 @@ import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.Where;
+import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -33,11 +35,9 @@ indexes = { @Index(name = "index_article_input_dtm", columnList = "input_dtm")
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"issue","articleMedia","articleOrder","articleHist","articleCap","anchorCap","articleTag"})
+@ToString(exclude = {"issue","cueSheet","articleMedia","articleCap","anchorCap"})
 @DynamicUpdate
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-/*@Table(indexes = @Index(name = "ans_article", columnList = "inputDtm"),
-@Index(name = "ans_article", columnList = ""))*/
 public class Article extends BaseEntity {
 
     @Id
@@ -54,23 +54,23 @@ public class Article extends BaseEntity {
     @Column(name = "ch_div_cd", length = 50)
     private String chDivCd;
 
-    @Basic(fetch = FetchType.EAGER)
+   /* @Basic(fetch = FetchType.EAGER)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = ch_div_cd)")
-    private String chDivCdNm;
+    private String chDivCdNm;*/
 
     @Column(name = "artcl_kind_cd", length = 50)
     private String artclKindCd;
 
-    //@Basic(fetch = FetchType.LAZY)
+    /*//@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_kind_cd)")
-    private String artclKindCdNm;
+    private String artclKindCdNm;*/
 
     @Column(name = "artcl_frm_cd", length = 50)
     private String artclFrmCd;
 
-    //@Basic(fetch = FetchType.LAZY)
+    /*//@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_frm_cd)")
-    private String artclFrmCdNm;
+    private String artclFrmCdNm;*/
 
     @Column(name = "artcl_div_cd", length = 50)
     private String artclDivCd;
@@ -96,9 +96,9 @@ public class Article extends BaseEntity {
     @Column(name = "prd_div_cd", length = 50)
     private String prdDivCd;
 
-    //@Basic(fetch = FetchType.LAZY)
+    /*//@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.cd_nm from tb_cd a where a.cd = prd_div_cd)")
-    private String prdDivCdNm;
+    private String prdDivCdNm;*/
 
     @Column(name = "artcl_typ_cd", length = 50)
     private String artclTypCd;
@@ -213,9 +213,9 @@ public class Article extends BaseEntity {
     @Column(name = "delr_id", length = 50)
     private String delrId;
 
-    @Basic(fetch = FetchType.LAZY)
+   /* @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
-    private String delrNm;
+    private String delrNm;*/
 
     @Column(name = "apprvr_id", length = 50)
     private String apprvrId;
@@ -268,26 +268,26 @@ public class Article extends BaseEntity {
     @Column(name = "artcl_fix_user", length = 50)
     private String artclFixUser;
 
-    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = artcl_fix_user)")
-    private String artclFixUserNm;
+    /*@Formula("(select a.user_nm from tb_user_mng a where a.user_id = artcl_fix_user)")
+    private String artclFixUserNm;*/
 
     @Column(name = "editor_fix_user", length = 50)
     private String editorFixUser;
 
-    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = editor_fix_user)")
-    private String editorFixUserNm;
+    /*@Formula("(select a.user_nm from tb_user_mng a where a.user_id = editor_fix_user)")
+    private String editorFixUserNm;*/
 
     @Column(name = "anchor_fix_user", length = 50)
     private String anchorFixUser;
 
-    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = anchor_fix_user)")
-    private String anchorFixUserNm;
+    /*@Formula("(select a.user_nm from tb_user_mng a where a.user_id = anchor_fix_user)")
+    private String anchorFixUserNm;*/
 
     @Column(name = "desk_fix_user", length = 50)
     private String deskFixUser;
 
-    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = desk_fix_user)")
-    private String deskFixUserNm;
+    /*@Formula("(select a.user_nm from tb_user_mng a where a.user_id = desk_fix_user)")
+    private String deskFixUserNm;*/
 
     @Column(name = "artcl_fix_dtm")
     private Date artclFixDtm;
@@ -312,33 +312,30 @@ public class Article extends BaseEntity {
     @JoinColumn(name = "issu_id")
     private Issue issue;
 
-    /*@OneToMany(mappedBy="article")
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<CueSheetItem> cueSheetItem = new ArrayList<>();*/
-
-    @OneToMany(mappedBy = "article")
-    @JsonManagedReference
+    @Where(clause = "del_yn = 'N'")
     private List<ArticleMedia> articleMedia = new ArrayList<>();
 
-    @OneToMany(mappedBy = "article")
+    /*@OneToMany(mappedBy = "article")
     @JsonManagedReference
     private List<ArticleOrder> articleOrder = new ArrayList<>();
 
     @OneToMany(mappedBy = "article")
     @JsonManagedReference
-    private List<ArticleHist> articleHist = new ArrayList<>();
+    private List<ArticleHist> articleHist = new ArrayList<>();*/
 
-    @OneToMany(mappedBy = "article")
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<ArticleCap> articleCap = new ArrayList<>();
 
-    @OneToMany(mappedBy = "article")
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<AnchorCap> anchorCap = new ArrayList<>();
 
-    @OneToMany(mappedBy = "article")
+   /* @OneToMany(mappedBy = "article")
     @JsonManagedReference
-    private List<ArticleTag> articleTag = new ArrayList<>();
+    private List<ArticleTag> articleTag = new ArrayList<>();*/
 
     @PrePersist
     public void prePersist() {
