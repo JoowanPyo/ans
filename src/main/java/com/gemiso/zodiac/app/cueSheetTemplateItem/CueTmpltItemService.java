@@ -148,10 +148,13 @@ public class CueTmpltItemService {
     //큐시트 템플릿 아이템 등록
     public CueTmpltItemSimpleDTO create(CueTmpltItemCreateDTO cueTmpltItemCreateDTO, Long cueTmpltId, String userId){
 
+        Integer getOrd = cueTmpltItemRepository.findOrd(cueTmpltId);
+
         //큐시트 템플릿 아이디 빌드
         CueSheetTemplateSimpleDTO cueSheetTemplateSimpleDTO = CueSheetTemplateSimpleDTO.builder().cueTmpltId(cueTmpltId).build();
         cueTmpltItemCreateDTO.setInputrId(userId); //입력자아이디  set
         cueTmpltItemCreateDTO.setCueSheetTemplate(cueSheetTemplateSimpleDTO);//큐시트 템플릿 아이디  set
+        cueTmpltItemCreateDTO.setCueItemOrd(++getOrd);
 
         CueTmpltItem cueTmpltItem = cueTmpltItemCreateMapper.toEntity(cueTmpltItemCreateDTO); //엔티티 변환
 

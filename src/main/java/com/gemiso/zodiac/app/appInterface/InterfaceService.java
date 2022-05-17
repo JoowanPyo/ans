@@ -50,6 +50,7 @@ import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
+import com.gemiso.zodiac.core.topic.TopicService;
 import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,6 +83,8 @@ public class InterfaceService {
     private final CueSheetItemService cueSheetItemService;
 
     private final DateChangeHelper dateChangeHelper;
+
+    private final TopicService topicService;
 
 
     public List<ParentProgramDTO> dailyPgmFindAll(Date sdate, Date edate, String brdc_pgm_id, String pgm_nm) throws ParseException {
@@ -1974,5 +1977,11 @@ public class InterfaceService {
         return takerCueSheetDataDTO;*/
 
         return parentProgramDTO;
+    }
+
+    public void takerSetCue(Long rd_id){
+
+
+
     }
 }

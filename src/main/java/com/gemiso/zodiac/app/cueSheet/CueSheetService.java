@@ -45,8 +45,15 @@ import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolDTO;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.mapper.CueSheetItemSymbolCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.mapper.CueSheetItemSymbolMapper;
+import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
+import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMediaRepository;
+import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaCreateDTO;
+import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaCreateMapper;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgramService;
 import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
+import com.gemiso.zodiac.app.facilityManage.FacilityManage;
+import com.gemiso.zodiac.app.facilityManage.FacilityManageService;
+import com.gemiso.zodiac.app.lbox.LboxService;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.program.ProgramService;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
@@ -84,6 +91,7 @@ public class CueSheetService {
     private final CueSheetItemRepository cueSheetItemRepository;
     private final CueSheetHistRepository cueSheetHistRepository;
     private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
+    private final CueSheetMediaRepository cueSheetMediaRepository;
     private final ArticleRepository articleRepository;
     private final ArticleCapRepository articleCapRepository;
     private final AnchorCapRepository anchorCapRepository;
@@ -104,6 +112,7 @@ public class CueSheetService {
     private final ArticleSimpleMapper articleSimpleMapper;
     private final CueSheetItemCapCreateMapper cueSheetItemCapCreateMapper;
     private final ArticleMediaSimpleMapper articleMediaSimpleMapper;
+    private final CueSheetMediaCreateMapper cueSheetMediaCreateMapper;
 
     private final ProgramService programService;
     //private final UserAuthService userAuthService;
@@ -116,6 +125,8 @@ public class CueSheetService {
     private final MarshallingJsonHelper marshallingJsonHelper;
 
     private final TopicService topicService;
+    private final FacilityManageService facilityManageService;
+    private final LboxService lboxService;
 
 
     //큐시트 목록조회 + 유니온 일일편성 [큐시트 인터페이스+큐시트 아이템추가 목록]
@@ -927,7 +938,7 @@ public class CueSheetService {
 
         Long newCueId = cueSheet.getCueId(); //복사된 큐시트 아이디 get
 
-        copyCueItem(cueId, newCueId, userId);//복사된 큐시트의 아이템 리스트 복사
+        copyCueItem(cueId, newCueId, userId, getCueSheet);//복사된 큐시트의 아이템 리스트 복사
 
 
         return newCueId;
@@ -935,7 +946,7 @@ public class CueSheetService {
     }
 
     //큐시트 아이템 복사.
-    public void copyCueItem( Long orgCueId, Long newCueId, String userId) throws Exception { //복사된 큐시트의 아이템 리스트 복사
+    public void copyCueItem( Long orgCueId, Long newCueId, String userId, CueSheet CueSheet) throws Exception { //복사된 큐시트의 아이템 리스트 복사
 
         List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(orgCueId); //원본 큐시트에 입력된 아이템 get
 
@@ -974,23 +985,66 @@ public class CueSheetService {
                 createCap(cueSheetItemCapDTOList, cueItemId, userId);//큐시트 아이템 자막 리스트 등록
             }
 
-            //큐시트 아이템 방송아이콘 List 조회
+            //큐시트 아이템 방송아이콘 List 등록
             List<CueSheetItemSymbolCreateDTO> cueSheetItemSymbol = cueItemDTO.getCueSheetItemSymbol();
+            createItemSymbol(cueSheetItemSymbol, cueItemId);
 
-            //방송아이콩에 넣어줄 큐시트 아이템 아이디 빌드
-            CueSheetItemSimpleDTO cueSheetItemSimpleDTO = CueSheetItemSimpleDTO.builder().cueItemId(cueItemId).build();
+            //큐시트 미디어 등록
+            List<CueSheetMediaCreateDTO> cueSheetMedia = cueItemDTO.getCueSheetMedia();
+            createMedia(cueSheetMedia, cueItemId, userId, CueSheet);
 
-            //방송아이콘  복사
-            for (CueSheetItemSymbolCreateDTO symbol : cueSheetItemSymbol){
 
-                symbol.setCueSheetItem(cueSheetItemSimpleDTO);
+        }
 
-                CueSheetItemSymbol copySymbol = cueSheetItemSymbolCreateMapper.toEntity(symbol);
+    }
 
-                cueSheetItemSymbolRepository.save(copySymbol);
+    //큐시트 미디어 등록[ 큐시트 복사 ]
+    public void createMedia(List<CueSheetMediaCreateDTO> cueSheetMedia, Long cueItemId, String userId, CueSheet cueSheet) throws JsonProcessingException {
+
+        CueSheetItemSimpleDTO cueSheetItemSimpleDTO = CueSheetItemSimpleDTO.builder().cueItemId(cueItemId).build();
+
+        Long subrmId = cueSheet.getSubrmId();
+        FacilityManage facilityManage = facilityManageService.findFacility(subrmId);
+        String subrmNm = facilityManage.getFcltyDivCd();
+
+        for (CueSheetMediaCreateDTO cueSheetMediaDTO : cueSheetMedia){
+
+            String mediaTypCd = cueSheetMediaDTO.getMediaTypCd();
+
+            if ("media_typ_001".equals(mediaTypCd)){
+
+                cueSheetMediaDTO.setCueSheetItem(cueSheetItemSimpleDTO);
+                cueSheetMediaDTO.setInputrId(userId);
+
+                CueSheetMedia cueSheetMediaEntity = cueSheetMediaCreateMapper.toEntity(cueSheetMediaDTO);
+
+                cueSheetMediaRepository.save(cueSheetMediaEntity);
+
+                Long mediaId = cueSheetMediaEntity.getCueMediaId();
+                Integer contentId = cueSheetMediaEntity.getContId();
+
+                //추후에 T는 클라우드 콘피그 교체
+                lboxService.cueMediaTransfer(mediaId, contentId, subrmNm, false, false, "T");
 
             }
 
+        }
+    }
+
+    //큐시트 아이템 방송아이콘 List 등록
+    public void createItemSymbol(List<CueSheetItemSymbolCreateDTO> cueSheetItemSymbol, Long cueItemId ){
+
+        //방송아이콩에 넣어줄 큐시트 아이템 아이디 빌드
+        CueSheetItemSimpleDTO cueSheetItemSimpleDTO = CueSheetItemSimpleDTO.builder().cueItemId(cueItemId).build();
+
+        //방송아이콘  복사
+        for (CueSheetItemSymbolCreateDTO symbol : cueSheetItemSymbol){
+
+            symbol.setCueSheetItem(cueSheetItemSimpleDTO);
+
+            CueSheetItemSymbol copySymbol = cueSheetItemSymbolCreateMapper.toEntity(symbol);
+
+            cueSheetItemSymbolRepository.save(copySymbol);
 
         }
 

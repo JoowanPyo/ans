@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.app.articleMedia;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
@@ -20,6 +22,7 @@ import java.util.Date;
 @Setter
 @ToString(exclude = "article")
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ArticleMedia extends BaseEntity {
 
     @Id
@@ -107,6 +110,7 @@ public class ArticleMedia extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artcl_id")
+    @JsonBackReference
     private Article article;
 
     @PrePersist

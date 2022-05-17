@@ -41,6 +41,6 @@ public class CueSheetItemSymbol {
     private Symbol symbol;
 
     @Column(name = "ord", nullable = false)
-    private int ord;
+    private Integer ord;
 
 }

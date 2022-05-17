@@ -411,7 +411,7 @@ public class InterfaceController {
         return new AnsApiResponse<>("complete");
     }
 
-   /* @Operation(summary = "방송중 테이커 큐시트 동기화", description = "방송중 테이커 큐시트 동기화")
+    @Operation(summary = "방송중 테이커 큐시트 동기화", description = "방송중 테이커 큐시트 동기화")
     @GetMapping(path = "/takersetcue")
     public String takerSetCue(@Parameter(name = "rd_id", required = true, description = "프로그램 아이디")
                                 @PathVariable("rd_id") Long rd_id,
@@ -419,10 +419,8 @@ public class InterfaceController {
 
         log.info("Taker On Air status  : rd_id - " + rd_id );
 
-        ParentProgramDTO parentProgramDTO = interfaceService.cueStCdUpdate(rd_id);
+        interfaceService.takerSetCue(rd_id);
 
-        String takerCueSheetDTO = interfaceService.takerPgmToXmlOne(parentProgramDTO);
-
-        return takerCueSheetDTO;
-    }*/
+        return null;
+    }
 }

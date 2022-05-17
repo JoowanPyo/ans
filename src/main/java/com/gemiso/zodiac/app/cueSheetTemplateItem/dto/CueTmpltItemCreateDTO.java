@@ -22,9 +22,9 @@ public class CueTmpltItemCreateDTO {
     private String cueItemTitl;
     private String cueItemTitlEn;
     private String cueItemCtt;
-    private int cueItemOrd;
+    private Integer cueItemOrd;
     private String cueItemOrdCd;
-    private int cueItemTime;
+    private Integer cueItemTime;
     private String cueItemFrmCd;
     private String cueItemDivCd;
     private String mediaChCd;
