@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.issue;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -23,6 +24,7 @@ import java.util.Date;
 @Setter
 @ToString
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 /*@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)*/
 public class Issue extends BaseEntity {
 

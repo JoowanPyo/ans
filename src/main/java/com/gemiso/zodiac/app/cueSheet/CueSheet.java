@@ -179,11 +179,11 @@ public class CueSheet {
     @Column(name = "cue_oder_ver")
     private Integer cueOderVer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brdc_pgm_id")
     private Program program;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bas_pgmsch_id")
     private BaseProgram baseProgram;
 

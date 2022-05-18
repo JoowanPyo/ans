@@ -71,7 +71,7 @@ public class JwtFilter implements Filter {
                 + ",/ytnrundown"
                 + ",/interface,/interface/dailypgm,/interface/cuesheet,/interface/code,/interface/mediatransrate,/interface/getmstlistservice"
                 + ",/interface/getcuesheetservice,/interface/pstakerlist,/interface/pstaker,/interface/takerrefresh"
-                + ",/interface/mediatransfer/updatestate,/interface/cuestcdupdate";
+                + ",/interface/mediatransfer/updatestate,/interface/cuestcdupdate,/interface/takersetcue";
         excludedUrls = Arrays.asList(excludePattern.split(","));
 
     }

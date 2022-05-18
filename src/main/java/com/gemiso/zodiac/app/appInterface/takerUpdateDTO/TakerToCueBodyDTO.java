@@ -11,8 +11,10 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TakerCdUpdateDTO {
+public class TakerToCueBodyDTO {
 
     @NotNull
-    private String cue_st_cd;
+    private Long rd_id;
+    private Long cue_id;
+    private String playout_id;
 }

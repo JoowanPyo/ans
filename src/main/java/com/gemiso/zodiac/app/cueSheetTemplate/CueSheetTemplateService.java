@@ -108,7 +108,7 @@ public class CueSheetTemplateService {
         Optional<CueSheetTemplate> cueSheetTemplate = cueSheetTemplateRepository.findCueTemplate(cueTmpltId);
 
         if (cueSheetTemplate.isPresent() == false){
-            throw new ResourceNotFoundException("큐시트 아이템이 없습니다.");
+            throw new ResourceNotFoundException("큐시트 템플릿을 찾을 수 없습니다. Id : "+cueTmpltId);
         }
 
         return cueSheetTemplate.get();

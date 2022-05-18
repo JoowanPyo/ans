@@ -131,27 +131,13 @@ public class ArticleService {
                                                       Integer page, Integer limit, List<String> apprvDivCdList, String deptCd,
                                                       String artclCateCd, String artclTypDtlCd, String delYn, Long artclId, String copyYn) {
 
-        //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
-        List<Sort.Order> orders = new ArrayList<>();
-        Sort.Order order1 = new Sort.Order(Sort.Direction.DESC, "inputDtm");
-        orders.add(order1);
-        Sort.Order order2 = new Sort.Order(Sort.Direction.DESC, "orgArtclId");
-        orders.add(order2);
-
-        //페이지 넘버 및 페이지 사이즈 값이 안들어 왔을경우 초기화셋팅
-        page = Optional.ofNullable(page).orElse(0);
-        limit = Optional.ofNullable(limit).orElse(50);
-
-        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by(orders));
-
-        //Pageable pageable = pageHelper.getArticlePageInfo();
-
-        //검색조건생성 [where생성]
-        BooleanBuilder booleanBuilder = getSearch(sdate, edate, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd, artclTypCd,
-                searchDivCd, searchWord, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd, delYn, artclId, copyYn);
+        //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
+        PageHelper pageHelper = new PageHelper(page, limit);
+        Pageable pageable = pageHelper.getArticlePageInfo();
 
         //전체조회[page type]
-        Page<Article> result = articleRepository.findAll(booleanBuilder, pageRequest);
+        Page<Article> result = articleRepository.findByArticleList(sdate, edate, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd, artclTypCd,
+                searchDivCd, searchWord, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd, delYn, artclId, copyYn, pageable);
 
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
@@ -167,30 +153,18 @@ public class ArticleService {
                                                            String searchDivCd, String searchWord, Integer page, Integer limit, List<String> apprvDivCdList) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
-        /*PageHelper pageHelper = new PageHelper(page, limit);
-        Pageable pageable = pageHelper.getArticlePageInfo();*/
+        PageHelper pageHelper = new PageHelper(page, limit);
+        Pageable pageable = pageHelper.getArticlePageInfo();
 
-        //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
-        List<Sort.Order> orders = new ArrayList<>();
-        Sort.Order order1 = new Sort.Order(Sort.Direction.DESC, "inputDtm");
-        orders.add(order1);
-        Sort.Order order2 = new Sort.Order(Sort.Direction.DESC, "orgArtclId");
-        orders.add(order2);
-
-        //페이지 넘버 및 페이지 사이즈 값이 안들어 왔을경우 초기화셋팅
-        page = Optional.ofNullable(page).orElse(0);
-        limit = Optional.ofNullable(limit).orElse(50);
-
-        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by(orders));
-
-        BooleanBuilder booleanBuilder = getSearchIssue(sdate, edate, issuKwd, artclDivCd, artclTypCd,
-                artclTypDtlCd, artclCateCd, deptCd, inputrId, brdcPgmId, orgArtclId, delYn, searchDivCd, searchWord, apprvDivCdList);
+       /* BooleanBuilder booleanBuilder = getSearchIssue(sdate, edate, issuKwd, artclDivCd, artclTypCd,
+                artclTypDtlCd, artclCateCd, deptCd, inputrId, brdcPgmId, orgArtclId, delYn, searchDivCd, searchWord, apprvDivCdList);*/
 
         //전체조회[page type]
-        Page<Article> result = articleRepository.findAll(booleanBuilder, pageRequest);
+        Page<Article> result = articleRepository.findByArticleIssue(sdate, edate, issuKwd, artclDivCd, artclTypCd,
+                artclTypDtlCd, artclCateCd, deptCd, inputrId, brdcPgmId, orgArtclId, delYn, searchDivCd, searchWord,
+                apprvDivCdList, pageable);
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
-
 
        return new PageResultDTO<ArticleDTO, Article>(result, fn);
 
@@ -200,27 +174,14 @@ public class ArticleService {
     // 큐시트에서 기사 목록 조회
     public PageResultDTO<ArticleDTO, Article> findCue(Date sdate, Date edate, String searchWord, Long cueId, Integer page, Integer limit) {
 
-        //페이지 셋팅
-       /* PageHelper pageHelper = new PageHelper(page, limit);
-        Pageable pageable = pageHelper.getArticlePageInfo();*/
-
-        //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
-        List<Sort.Order> orders = new ArrayList<>();
-        Sort.Order order1 = new Sort.Order(Sort.Direction.DESC, "inputDtm");
-        orders.add(order1);
-        Sort.Order order2 = new Sort.Order(Sort.Direction.DESC, "orgArtclId");
-        orders.add(order2);
-
-        //페이지 넘버 및 페이지 사이즈 값이 안들어 왔을경우 초기화셋팅
-        page = Optional.ofNullable(page).orElse(0);
-        limit = Optional.ofNullable(limit).orElse(50);
-
-        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by(orders));
+        //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
+        PageHelper pageHelper = new PageHelper(page, limit);
+        Pageable pageable = pageHelper.getArticlePageInfo();
 
         BooleanBuilder booleanBuilder = getSearchCue(sdate, edate, searchWord, cueId);
 
         //전체조회[page type]
-        Page<Article> result = articleRepository.findAll(booleanBuilder, pageRequest);
+        Page<Article> result = articleRepository.findByArticleCue(sdate, edate, searchWord, cueId, pageable);
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
 
@@ -542,8 +503,8 @@ public class ArticleService {
     //기사 액션로그 등록
     public void articleActionLogCreate(Article article, String userId) throws Exception {
 
-        List<ArticleCap> articleCapList = article.getArticleCap();
-        List<AnchorCap> anchorCapList = article.getAnchorCap();
+        Set<ArticleCap> articleCapList = article.getArticleCap();
+        Set<AnchorCap> anchorCapList = article.getAnchorCap();
         article.setArticleCap(null);
         article.setAnchorCap(null);
 
@@ -601,8 +562,8 @@ public class ArticleService {
     //기사 수정 로그
     public void copyArticleActionLogUpdate(Article article, Article updateArticle, String userId) throws Exception {
 
-        List<ArticleCap> articleCapList = article.getArticleCap();//기사로그에 등록할 기사자막 리스트를 기사에서 가져온다.
-        List<AnchorCap> anchorCapList = article.getAnchorCap();//기사로그에 등록할 앵커자막 리스트를 기사에서 가져온다.
+        Set<ArticleCap> articleCapList = article.getArticleCap();//기사로그에 등록할 기사자막 리스트를 기사에서 가져온다.
+        Set<AnchorCap> anchorCapList = article.getAnchorCap();//기사로그에 등록할 앵커자막 리스트를 기사에서 가져온다.
         article.setArticleCap(null);//기사에서 기사자막삭제
         article.setAnchorCap(null);//기사에서 앵커자막삭제
 
@@ -674,8 +635,8 @@ public class ArticleService {
     //기사 수정 로그
     public void articleActionLogUpdate(Article article, ArticleUpdateDTO articleUpdateDTO, String userId) throws Exception {
 
-        List<ArticleCap> articleCapList = article.getArticleCap();//기사로그에 등록할 기사자막 리스트를 기사에서 가져온다.
-        List<AnchorCap> anchorCapList = article.getAnchorCap();//기사로그에 등록할 앵커자막 리스트를 기사에서 가져온다.
+        Set<ArticleCap> articleCapList = article.getArticleCap();//기사로그에 등록할 기사자막 리스트를 기사에서 가져온다.
+        Set<AnchorCap> anchorCapList = article.getAnchorCap();//기사로그에 등록할 앵커자막 리스트를 기사에서 가져온다.
         article.setArticleCap(null);//기사에서 기사자막삭제
         article.setAnchorCap(null);//기사에서 앵커자막삭제
 
@@ -746,7 +707,7 @@ public class ArticleService {
 
     //기사로그 저장
     public void buildArticleActionLog(String actionLog, String userId, Article article,
-                                      List<ArticleCap> articleCapList, List<AnchorCap> anchorCapList) throws JsonProcessingException {
+                                      Set<ArticleCap> articleCapList, Set<AnchorCap> anchorCapList) throws JsonProcessingException {
 
         ArticleActionLog articleActionLog = new ArticleActionLog(); //기사액션로그 저장할 엔티티
 
@@ -796,8 +757,8 @@ public class ArticleService {
     // 기사 삭제 액션로그 등록
     public void articleActionLogDelete(Article article, String userId) throws Exception {
 
-        List<ArticleCap> articleCapList = article.getArticleCap();//기사로그에 등록할 기사자막 리스트를 기사에서 가져온다.
-        List<AnchorCap> anchorCapList = article.getAnchorCap();//기사로그에 등록할 앵커자막 리스트를 기사에서 가져온다.
+        Set<ArticleCap> articleCapList = article.getArticleCap();//기사로그에 등록할 기사자막 리스트를 기사에서 가져온다.
+        Set<AnchorCap> anchorCapList = article.getAnchorCap();//기사로그에 등록할 앵커자막 리스트를 기사에서 가져온다.
         article.setArticleCap(null);//기사에서 기사자막삭제
         article.setAnchorCap(null);//기사에서 앵커자막삭제
 
@@ -1031,7 +992,7 @@ public class ArticleService {
         }
 
 
-        List<ArticleCap> capSimpleList = updateArticle.getArticleCap(); //update로 들어온 기사 등록
+        Set<ArticleCap> capSimpleList = updateArticle.getArticleCap(); //update로 들어온 기사 등록
         List<ArticleCapCreateDTO> capSimpleDTOList = new ArrayList<>();
         for (ArticleCap articleCap : capSimpleList){
 
@@ -1092,7 +1053,7 @@ public class ArticleService {
             anchorCapRepository.deleteById(anchorCapId);
         }
 
-        List<AnchorCap> capSimpleList = updateArticle.getAnchorCap(); //update로 들어온 기사 등록
+        Set<AnchorCap> capSimpleList = updateArticle.getAnchorCap(); //update로 들어온 기사 등록
         List<AnchorCapCreateDTO> capSimpleDTOList = new ArrayList<>();
         for (AnchorCap anchorCap : capSimpleList){
 
@@ -1696,8 +1657,8 @@ public class ArticleService {
     //기사 액션 로그 등록
     public void articleActionLogfix(String apprvDivCd, String orgApprvDivcd, String userId, Article article) throws Exception {
 
-        List<ArticleCap> articleCapList = article.getArticleCap();//기사로그에 등록할 기사자막 리스트를 기사에서 가져온다.
-        List<AnchorCap> anchorCapList = article.getAnchorCap();//기사로그에 등록할 앵커자막 리스트를 기사에서 가져온다.
+        Set<ArticleCap> articleCapList = article.getArticleCap();//기사로그에 등록할 기사자막 리스트를 기사에서 가져온다.
+        Set<AnchorCap> anchorCapList = article.getAnchorCap();//기사로그에 등록할 앵커자막 리스트를 기사에서 가져온다.
         article.setArticleCap(null);//기사에서 기사자막삭제
         article.setAnchorCap(null);//기사에서 앵커자막삭제
 

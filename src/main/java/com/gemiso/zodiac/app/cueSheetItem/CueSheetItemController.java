@@ -225,7 +225,7 @@ public class CueSheetItemController {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
         String userId = userAuthService.authUser.getUserId();
-        log.info("CueSheet Item Create [Drag and Drop] : userId - "+userId+ " CueId - "+cueId +"<br>"+
+        log.info("CueSheet Item Create [Drag and Drop] Article : userId - "+userId+ " CueId - "+cueId +"<br>"+
                 " ArticleId - " +artclId + " Order - "+cueItemOrd+" SpareYn - "+spareYn);
 
 
@@ -269,6 +269,33 @@ public class CueSheetItemController {
 
         return new AnsApiResponse<>(cueSheetItemDTOList);
 
+    }
+
+    @Operation(summary = "큐시트 아이템 생성[Drag and Drop] By CueTemplateItem", description = "큐시트 아이템 생성[Drag and Drop] By CueTemplateItem")
+    @PostMapping(path = "/{cueId}/template/{cueTmpltItemId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AnsApiResponse<CueSheetItemResponseDTO> createCueTemplate(@Parameter(name = "cueId", description = "큐시트아이디")
+                                                                 @PathVariable("cueId") Long cueId,
+                                                                 @Parameter(name = "cueTmpltItemId", description = "큐시트 템플릿 아이템 아이디")
+                                                                 @PathVariable("cueTmpltItemId") Long cueTmpltItemId,
+                                                                 @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
+                                                                 @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd,
+                                                                 @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드")
+                                                                 @RequestParam(value = "cueItemDivCd", required = false) String cueItemDivCd,
+                                                                 @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
+                                                                 @RequestParam(value = "spareYn", required = false) String spareYn) throws Exception {
+
+        //토큰 사용자 Id(현재 로그인된 사용자 ID)
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Item Create [Drag and Drop] CueSheetTemplate : userId - "+userId+ " CueId - "+cueId +"<br>"+
+                " CueTmpltItemId - " +cueTmpltItemId + " Order - "+cueItemOrd+" SpareYn - "+spareYn);
+
+        cueSheetItemService.createCueTemplate(cueId, cueTmpltItemId, cueItemOrd, cueItemDivCd, spareYn, userId);
+
+        CueSheetItemResponseDTO cueSheetItemDTOList = new CueSheetItemResponseDTO();
+        cueSheetItemDTOList.setCueId(cueId);
+
+        return new AnsApiResponse<>(cueSheetItemDTOList);
     }
 
     @Operation(summary = "큐시트 아이템 생성[Drag and Drop] List", description = "큐시트 아이템 생성[Drag and Drop] List")

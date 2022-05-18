@@ -13,7 +13,7 @@ public interface CueTmpltItemRepository extends JpaRepository<CueTmpltItem, Long
     @Query("select a from CueTmpltItem a left outer join CueTmpltMedia b on b.cueTmpltItem.cueTmpltItemId = a.cueTmpltItemId and b.delYn = 'N' where a.cueTmpltItemId = :cueTmpltItemId and a.delYn = 'N' ")
     Optional<CueTmpltItem> findCueTmplItem(@Param("cueTmpltItemId")Long cueTmpltItemId);
 
-    @Query("select a from CueTmpltItem a where a.cueSheetTemplate.cueTmpltId=:cueTmpltId and a.delYn = 'N'")
+    @Query("select a from CueTmpltItem a where a.cueSheetTemplate.cueTmpltId=:cueTmpltId and a.delYn = 'N' order by a.cueItemOrd asc ")
     List<CueTmpltItem> findCueTmplItemList(@Param("cueTmpltId")Long cueTmpltId);
 
     @Query("select max(a.cueItemOrd) from  CueTmpltItem a where a.cueSheetTemplate.cueTmpltId =:cueTmpltId and a.delYn = 'N' ")

@@ -2,40 +2,34 @@ package com.gemiso.zodiac.app.article;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
-import com.gemiso.zodiac.app.articleHist.ArticleHist;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.issue.Issue;
-import com.gemiso.zodiac.app.articleOrder.ArticleOrder;
-import com.gemiso.zodiac.app.tagArticle.ArticleTag;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Where;
-import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "tb_artcl",
-indexes = { @Index(name = "index_article_input_dtm", columnList = "input_dtm")
-        ,@Index(name = "index_article_title", columnList = "artcl_titl")
-        ,@Index(name = "index_article_title_en", columnList = "artcl_titl_en")
-        ,@Index(name = "index_article_retrid", columnList = "rptr_id")
-})
+        indexes = {@Index(name = "index_article_input_dtm", columnList = "input_dtm")
+                , @Index(name = "index_article_title", columnList = "artcl_titl")
+                , @Index(name = "index_article_title_en", columnList = "artcl_titl_en")
+                , @Index(name = "index_article_retrid", columnList = "rptr_id")
+        })
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"issue","cueSheet","articleMedia","articleCap","anchorCap"})
+@ToString(exclude = {"issue", "cueSheet", "articleMedia", "articleCap", "anchorCap"})
 @DynamicUpdate
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Article extends BaseEntity {
@@ -304,18 +298,23 @@ public class Article extends BaseEntity {
     /*@Column(name = "cue_id", length = 50)
     private Long cueId;*/
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cue_id")
     private CueSheet cueSheet;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "issu_id")
     private Issue issue;
 
+   /* @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    @Where(clause = "del_yn = 'N'")*/
+
+    @BatchSize(size = 100)
+    @Where(clause = "del_yn = 'N'")
     @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     @JsonManagedReference
-    @Where(clause = "del_yn = 'N'")
-    private List<ArticleMedia> articleMedia = new ArrayList<>();
+    private Set<ArticleMedia> articleMedia = Collections.emptySet();
 
     /*@OneToMany(mappedBy = "article")
     @JsonManagedReference
@@ -325,13 +324,15 @@ public class Article extends BaseEntity {
     @JsonManagedReference
     private List<ArticleHist> articleHist = new ArrayList<>();*/
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<ArticleCap> articleCap = new ArrayList<>();
+    private Set<ArticleCap> articleCap =  Collections.emptySet();
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<AnchorCap> anchorCap = new ArrayList<>();
+    private Set<AnchorCap> anchorCap =  Collections.emptySet();
 
    /* @OneToMany(mappedBy = "article")
     @JsonManagedReference

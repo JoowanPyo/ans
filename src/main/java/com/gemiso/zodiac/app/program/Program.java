@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.program;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
@@ -17,6 +18,7 @@ import java.util.Date;
 @Setter
 @ToString
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Program {
 
     @Id

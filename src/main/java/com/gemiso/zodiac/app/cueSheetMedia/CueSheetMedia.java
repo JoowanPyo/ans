@@ -119,6 +119,7 @@ public class CueSheetMedia extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cue_item_id")
+    @JsonBackReference
     private CueSheetItem cueSheetItem;
 
     @PrePersist

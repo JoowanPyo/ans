@@ -11,14 +11,13 @@ import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "tb_cue_item")
@@ -203,36 +202,42 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "spare_yn", columnDefinition = "bpchar(1) default 'N'")
     private String spareYn;
 
+    @BatchSize(size = 100)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cue_id", nullable = false)
     @JsonBackReference
     private CueSheet cueSheet;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @BatchSize(size = 100)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "artcl_id")
     @JsonBackReference
     private Article article;
 
+    @BatchSize(size = 100)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cue_tmplt_id")
     private CueSheetTemplate cueSheetTemplate;
 
-    @OneToMany(mappedBy = "cueSheetItem")
-    @JsonManagedReference
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "cueSheetItem", fetch = FetchType.LAZY)
     @Where(clause = "del_yn = 'N'")
-    private List<CueSheetMedia> cueSheetMedia = new ArrayList<>();
+    @JsonManagedReference
+    private Set<CueSheetMedia> cueSheetMedia = Collections.emptySet();
 
-    @OneToMany(mappedBy = "cueSheetItem")
-    @JsonManagedReference
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "cueSheetItem", fetch = FetchType.LAZY)
     @Where(clause = "del_yn = 'N'")
-    private List<CueSheetItemCap> cueSheetItemCap = new ArrayList<>();
+    @JsonManagedReference
+    private Set<CueSheetItemCap> cueSheetItemCap = Collections.emptySet();
 
       /*@Column(name = "artcl_id", length = 21)
     private String artclId;*/
 
-    @OneToMany(mappedBy = "cueSheetItem")
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "cueSheetItem", fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<CueSheetItemSymbol> cueSheetItemSymbol = new ArrayList<>();
+    private Set<CueSheetItemSymbol> cueSheetItemSymbol = Collections.emptySet();
 
 
     @PrePersist

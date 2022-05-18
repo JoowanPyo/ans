@@ -1117,8 +1117,8 @@ public class CueSheetService {
         Article articleEntity = getArticleEntity(article, artclOrd, cueSheet);
         articleRepository.save(articleEntity); //복사된 기사 등록
 
-        List<ArticleCap> articleCapList = article.getArticleCap(); //기사자막 리스트 get
-        List<AnchorCap> anchorCapList = article.getAnchorCap(); //앵커자막 리스트 get
+        Set<ArticleCap> articleCapList = article.getArticleCap(); //기사자막 리스트 get
+        Set<AnchorCap> anchorCapList = article.getAnchorCap(); //앵커자막 리스트 get
 
         articleService.articleActionLogCreate(article, userId); //기사 액션 로그 등록
         Long articleHistId = articleService.createArticleHist(article);//기사 이력 create
@@ -1455,7 +1455,7 @@ public class CueSheetService {
                 
             }else {
 
-                List<AnchorCap> anchorCapList = article.getAnchorCap();
+                Set<AnchorCap> anchorCapList = article.getAnchorCap();
 
                 for (AnchorCap anchorCap : anchorCapList){
 
@@ -1494,7 +1494,7 @@ public class CueSheetService {
                 }
 
 
-                List<ArticleCap> articleCapList = article.getArticleCap();
+                Set<ArticleCap> articleCapList = article.getArticleCap();
 
                 for (ArticleCap articleCap : articleCapList){
 

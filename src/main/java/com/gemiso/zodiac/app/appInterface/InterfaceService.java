@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.appInterface;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.appInterface.codeDTO.*;
 import com.gemiso.zodiac.app.appInterface.mediaTransferDTO.MediaTransferDTO;
@@ -18,6 +19,7 @@ import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramResultDTO;
 import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerCdUpdateDTO;
+import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerToCueBodyDTO;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
@@ -50,7 +52,10 @@ import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
+import com.gemiso.zodiac.core.helper.ListSortHelper;
+import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.topic.TopicService;
+import com.gemiso.zodiac.core.topic.articleTopicDTO.TakerToCueMqDTO;
 import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -83,6 +88,7 @@ public class InterfaceService {
     private final CueSheetItemService cueSheetItemService;
 
     private final DateChangeHelper dateChangeHelper;
+    private final MarshallingJsonHelper marshallingJsonHelper;
 
     private final TopicService topicService;
 
@@ -1396,8 +1402,8 @@ public class InterfaceService {
                 //String articleTypDtlCd = article.getArtclTypDtlCd(); // 기상 유형 상세 코드
 
                 //기사&앵커자막 조회데이터 get
-                List<ArticleCap> articleCapList = article.getArticleCap();
-                List<AnchorCap> anchorCapList = article.getAnchorCap();
+                Set<ArticleCap> articleCapList = article.getArticleCap();
+                Set<AnchorCap> anchorCapList = article.getAnchorCap();
                 //자박정보 set
                 PrompterArticleCaps prompterArticleCap = getPrompterArticleCap(articleCapList);
                 PrompterAnchorCaps prompterAnchorCap = getPrompterAnchorCap(anchorCapList);
@@ -1503,8 +1509,8 @@ public class InterfaceService {
             } else { //기사 아이템인 경우
 
                 //기사&앵커자막 조회데이터 get
-                List<ArticleCap> articleCapList = article.getArticleCap();
-                List<AnchorCap> anchorCapList = article.getAnchorCap();
+                Set<ArticleCap> articleCapList = article.getArticleCap();
+                Set<AnchorCap> anchorCapList = article.getAnchorCap();
                 //자박정보 set
                 PrompterArticleCaps prompterArticleCap = getPrompterArticleCap(articleCapList);
                 PrompterAnchorCaps prompterAnchorCap = getPrompterAnchorCap(anchorCapList);
@@ -1554,7 +1560,7 @@ public class InterfaceService {
     }
 
     //프롬프터 기사 자막정보 빌드후 리턴 
-    public PrompterArticleCaps getPrompterArticleCap(List<ArticleCap> articleCapList) {
+    public PrompterArticleCaps getPrompterArticleCap(Set<ArticleCap> articleCapList) {
 
         PrompterArticleCaps prompterArticleCaps = new PrompterArticleCaps();
         List<PrompterArticleCapDTO> prompterArticleCapDTOList = new ArrayList<>();
@@ -1564,8 +1570,12 @@ public class InterfaceService {
             return prompterArticleCaps;
         }
 
+        List<ArticleCap> articleCaps = new ArrayList<>(articleCapList);
+
+        Collections.sort(articleCaps, new ListSortHelper());
+
         //기사자막&방송아이콘 정보로 프롬프터에 사용되는 자막정보 빌드
-        for (ArticleCap articleCap : articleCapList) {
+        for (ArticleCap articleCap : articleCaps) {
 
             Symbol symbol = articleCap.getSymbol();
 
@@ -1586,7 +1596,7 @@ public class InterfaceService {
     }
 
     //프롬프터 앵커 자막정보 빌드후 리턴
-    public PrompterAnchorCaps getPrompterAnchorCap(List<AnchorCap> anchorCapList) {
+    public PrompterAnchorCaps getPrompterAnchorCap(Set<AnchorCap> anchorCapList) {
 
         PrompterAnchorCaps prompterAnchorCaps = new PrompterAnchorCaps();
         List<PrompterAnchorCapDTO> prompterAnchorCapDTOList = new ArrayList<>();
@@ -1960,7 +1970,7 @@ public class InterfaceService {
         CueSheet cueSheet = findCueSheet(cueId, "N");
 
         CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
-        if ("on_air".equals(cueStCd)) {
+        if ("on_air".equals(cueStCd) || "end_on_air".equals(cueStCd)) {
             cueSheetDTO.setCueStCd(cueStCd);
 
             cueSheetMapper.updateFromDto(cueSheetDTO, cueSheet);
@@ -1969,19 +1979,24 @@ public class InterfaceService {
 
         ParentProgramDTO parentProgramDTO = cueToTaker(cueSheetDTO);
 
-
-       /* TakerCueSheetDataDTO takerCueSheetDataDTO = cuefindAll(rdId, null, null, null, null, "N", null
-                , null, null, null, null, null, null);
-
-
-        return takerCueSheetDataDTO;*/
-
         return parentProgramDTO;
     }
 
-    public void takerSetCue(Long rd_id){
+    //방송중 테이커 큐시트 동기화
+    public void takerSetCue(TakerToCueBodyDTO takerToCueBodyDTO) throws JsonProcessingException {
 
+        Long rdId = takerToCueBodyDTO.getRd_id();
+        Long cueId = takerToCueBodyDTO.getCue_id();
 
+        CueSheetItem cueSheetItem = cueSheetItemService.cueItemFindOrFail(rdId);
 
+        TakerToCueMqDTO takerToCueMqDTO = new TakerToCueMqDTO();
+        takerToCueMqDTO.setEventId("CueSheetItem Start From The Taker");
+        takerToCueMqDTO.setCueItemId(rdId);
+        takerToCueMqDTO.setCueId(cueId);
+
+        String json = marshallingJsonHelper.MarshallingJson(takerToCueMqDTO);
+
+        topicService.topicWeb(json);
     }
 }

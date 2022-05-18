@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.appInterface;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.appInterface.codeDTO.TakerCodeDTO;
 import com.gemiso.zodiac.app.appInterface.mediaTransferDTO.MediaTransferDTO;
 import com.gemiso.zodiac.app.appInterface.prompterCueDTO.PrompterCueSheetDTO;
@@ -10,6 +11,8 @@ import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerCueRefreshData
 import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerSpareCueRefreshDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerCdUpdateDTO;
+import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerToCueBodyDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleCreateDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleDeleteConfirmDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
@@ -380,7 +383,7 @@ public class InterfaceController {
         return takerCueSheetDTO;
     }*/
 
-    @Operation(summary = "테이커 방송중 상태 업데이트[ on_air ]", description = "테이커 방송중 상태 업데이트[ on_air ]")
+    @Operation(summary = "테이커 방송중 상태 업데이트[ on_air, end_on_air ]", description = "테이커 방송중 상태 업데이트[ on_air, end_on_air ]")
     @PutMapping(path = "/cuestcdupdate/{rd_id}")
     public String cueStCdUpdate(@Parameter(name = "rd_id", required = true, description = "프로그램 아이디")
                                 @PathVariable("rd_id") Long rd_id,
@@ -412,15 +415,15 @@ public class InterfaceController {
     }
 
     @Operation(summary = "방송중 테이커 큐시트 동기화", description = "방송중 테이커 큐시트 동기화")
-    @GetMapping(path = "/takersetcue")
-    public String takerSetCue(@Parameter(name = "rd_id", required = true, description = "프로그램 아이디")
-                                @PathVariable("rd_id") Long rd_id,
-                                @RequestHeader(value = "securityKey") String securityKey) {
+    @PostMapping(path = "/takersetcue")
+    public AnsApiResponse<?> takerSetCue(@Parameter(description = "필수값<br> ", required = true)
+                              @RequestBody @Valid TakerToCueBodyDTO takerToCueBodyDTO,
+                              @RequestHeader(value = "securityKey") String securityKey) throws JsonProcessingException {
 
-        log.info("Taker On Air status  : rd_id - " + rd_id );
+        log.info("Taker On Air status  : rd_id - " + takerToCueBodyDTO.toString());
 
-        interfaceService.takerSetCue(rd_id);
+        interfaceService.takerSetCue(takerToCueBodyDTO);
 
-        return null;
+        return AnsApiResponse.ok();
     }
 }

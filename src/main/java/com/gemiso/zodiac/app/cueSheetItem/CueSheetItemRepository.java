@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface CueSheetItemRepository extends JpaRepository<CueSheetItem, Long>, QuerydslPredicateExecutor<CueSheetItem> {
+public interface CueSheetItemRepository extends JpaRepository<CueSheetItem, Long>, QuerydslPredicateExecutor<CueSheetItem>, CueSheetItemRepositoryCustorm {
 
     @Query("select a from CueSheetItem a left outer join Article b on b.artclId = a.article.artclId and b.delYn = 'N' " +
             "left outer join ArticleMedia c on c.article.artclId = b.artclId and c.delYn = 'N' " +

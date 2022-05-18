@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheetItemCap;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
@@ -103,6 +104,7 @@ public class CueSheetItemCap {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cue_item_id")
+    @JsonBackReference
     private CueSheetItem cueSheetItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
