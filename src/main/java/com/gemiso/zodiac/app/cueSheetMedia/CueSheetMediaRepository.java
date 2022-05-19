@@ -16,4 +16,9 @@ public interface CueSheetMediaRepository extends JpaRepository<CueSheetMedia, Lo
 
     @Query("select a from CueSheetMedia a where a.cueSheetItem.cueItemId =:cueItemId and a.delYn = 'N' ")
     List<CueSheetMedia> findCueMediaList(@Param("cueItemId")Long cueItemId);
+
+
+    @Query("select a from CueSheetMedia a where a.cueSheetItem.cueItemId =:cueItemId and a.delYn = 'Y' ")
+    List<CueSheetMedia> findDeleteCueMediaList(@Param("cueItemId")Long cueItemId);
+
 }

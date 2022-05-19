@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheetItem;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
@@ -8,9 +9,11 @@ import com.gemiso.zodiac.app.article.ArticleRepository;
 import com.gemiso.zodiac.app.article.ArticleService;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
 import com.gemiso.zodiac.app.articleActionLog.ArticleActionLog;
+import com.gemiso.zodiac.app.articleActionLog.ArticleActionLogRepository;
 import com.gemiso.zodiac.app.articleActionLog.ArticleActionLogService;
 import com.gemiso.zodiac.app.articleActionLog.dto.ArticleActionLogDTO;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
@@ -72,6 +75,8 @@ import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Where;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -79,6 +84,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import java.util.*;
 
 @Service
@@ -102,7 +109,8 @@ public class CueSheetItemService {
     private final ArticleMediaRepository articleMediaRepository;
     private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
     private final CueSheetMediaRepository cueSheetMediaRepository;
-    private final CueTmpltItemRepository cueTmpltItemRepository;
+    private final ArticleActionLogRepository articleActionLogRepository;
+    //private final CueTmpltItemRepository cueTmpltItemRepository;
 
     private final CueSheetMapper cueSheetMapper;
     private final CueSheetItemMapper cueSheetItemMapper;
@@ -355,6 +363,16 @@ public class CueSheetItemService {
         }
         cueSheetItemRepository.save(cueSheetItem);
 
+        //삭제되 아이템이 포함된 미디어정보 삭제 플레그 처리 ( delYn = "Y")
+        Set<CueSheetMedia> cueSheetMedia = cueSheetItem.getCueSheetMedia();
+        deleteMedia(cueSheetMedia, userId);
+        //삭제되 아이템이 포함된 자막 삭제 플레그 처리 ( delYn = "Y")
+        Set<CueSheetItemCap> cueSheetItemCap = cueSheetItem.getCueSheetItemCap();
+        deleteItemCap(cueSheetItemCap, userId);
+        //삭제되 아이템이 포함된 방송아이콘 삭제
+        /*Set<CueSheetItemSymbol> cueSheetItemSymbol = cueSheetItem.getCueSheetItemSymbol();
+        deleteItemSymbol(cueSheetItemSymbol);*/
+
         String spareYn = cueSheetItem.getSpareYn();//스페어 여부값
 
         //삭제시 삭제된 데이터 배제하고 순서변경
@@ -380,6 +398,53 @@ public class CueSheetItemService {
         sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Update CueSheetItem-Article",
                 spareYn, "Y", "Y");
     }
+
+    //삭제되 아이템이 포함된 방송아이콘 삭제
+    public void deleteItemSymbol(Set<CueSheetItemSymbol> cueSheetItemSymbolSet){
+
+        for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolSet){
+
+            Long id = cueSheetItemSymbol.getId();
+
+            cueSheetItemSymbolRepository.deleteById(id);
+        }
+    }
+
+    //삭제되 아이템이 포함된 자막 삭제 플레그 처리 ( delYn = "Y")
+    public void deleteItemCap(Set<CueSheetItemCap> cueSheetItemCapSet, String userId){
+
+        for (CueSheetItemCap cueSheetItemCap : cueSheetItemCapSet){
+
+            CueSheetItemCapDTO cueSheetItemCapDTO = cueSheetItemCapMapper.toDto(cueSheetItemCap);
+            cueSheetItemCapDTO.setDelYn("Y");
+            cueSheetItemCapDTO.setDelrId(userId);
+            cueSheetItemCapDTO.setDelDtm(new Date());
+
+            cueSheetItemCapMapper.updateFromDto(cueSheetItemCapDTO, cueSheetItemCap);
+
+            cueSheetItemCapRepotitory.save(cueSheetItemCap);
+        }
+
+    }
+
+    //삭제되 아이템이 포함된 미디어정보 삭제 플레그 처리 ( delYn = "Y")
+    public void deleteMedia(Set<CueSheetMedia> cueSheetMediaSet, String userId){
+
+        for (CueSheetMedia cueSheetMedia :  cueSheetMediaSet){
+
+            CueSheetMediaDTO cueSheetMediaDTO = cueSheetMediaMapper.toDto(cueSheetMedia);
+            cueSheetMediaDTO.setDelYn("Y");
+            cueSheetMediaDTO.setDelrId(userId);
+            cueSheetMediaDTO.setDelDtm(new Date());
+
+            cueSheetMediaMapper.updateFromDto(cueSheetMediaDTO, cueSheetMedia);
+
+            cueSheetMediaRepository.save(cueSheetMedia);
+
+        }
+
+    }
+
     //큐시트 아이템 생성[Drag and Drop CueSheetItem]
     public void createCueItem(Long cueId, Long cueItemId, Integer cueItemOrd, String cueItemDivCd, String spareYn, String userId) throws Exception {
 
@@ -426,31 +491,36 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 생성[Drag and Drop] By CueTemplateItem
-    public void createCueTemplate(Long cueId, Long cueTmpltItemId, Integer cueItemOrd, String cueItemDivCd, String spareYn, String userId) throws JsonProcessingException {
+    public void createCueTemplate(Long cueId, List<CueSheetItemCreateTmplDTO> cueSheetItemCreateTmplDTO, String cueItemDivCd, String spareYn, String userId) throws JsonProcessingException {
 
         //큐시트 아이디로 큐시트 조회 및 존재유무 확인.
         CueSheet cueSheet = cueSheetService.cueSheetFindOrFail(cueId);
 
-        CueTmpltItem cueTmpltItem = cueTmpltItemService.findCueTmplItem(cueTmpltItemId);
+        for (CueSheetItemCreateTmplDTO DTO : cueSheetItemCreateTmplDTO) {
 
-        //큐시트 템플릿 아이템을 큐시트 아이템으로 복사
-        CueSheetItem cueSheetItemEntity = copyTmpltItem(cueTmpltItem, cueId, userId, spareYn);
+            Long cueTmpltItemId = DTO.getCueTmpltItemId();
+            Integer cueItemOrd = DTO.getCueItemOrd();
 
-        Long copyCueItemId = cueSheetItemEntity.getCueItemId();
+            CueTmpltItem cueTmpltItem = cueTmpltItemService.findCueTmplItem(cueTmpltItemId);
 
-        //큐시트 아이템 자막 등록
-        List<CueTmpltItemCap> cueTmpltItemCap = cueTmpltItem.getCueTmpltItemCap();
-        copyTemplateCap(cueTmpltItemCap, copyCueItemId, userId);
-        //큐시트 아이템 심볼 등록
-        List<CueTmplSymbol> cueTmplSymbol = cueTmpltItem.getCueTmplSymbol();
-        copyTemplateSymbol(cueTmplSymbol, copyCueItemId);
-        //큐시트 미디어 등록
-        List<CueTmpltMedia> cueTmpltMedia = cueTmpltItem.getCueTmpltMedia();
-        copyTemplateMedia(cueTmpltMedia, copyCueItemId, userId, cueSheet);
+            //큐시트 템플릿 아이템을 큐시트 아이템으로 복사
+            CueSheetItem cueSheetItemEntity = copyTmpltItem(cueTmpltItem, cueId, userId, spareYn);
 
-        //신규 등록후 순서정렬
-        ordUpdateDrop(cueSheetItemEntity, cueId, cueItemOrd, spareYn); //큐시트 순번 정렬
+            Long copyCueItemId = cueSheetItemEntity.getCueItemId();
 
+            //큐시트 아이템 자막 등록
+            List<CueTmpltItemCap> cueTmpltItemCap = cueTmpltItem.getCueTmpltItemCap();
+            copyTemplateCap(cueTmpltItemCap, copyCueItemId, userId);
+            //큐시트 아이템 심볼 등록
+            List<CueTmplSymbol> cueTmplSymbol = cueTmpltItem.getCueTmplSymbol();
+            copyTemplateSymbol(cueTmplSymbol, copyCueItemId);
+            //큐시트 미디어 등록
+            List<CueTmpltMedia> cueTmpltMedia = cueTmpltItem.getCueTmpltMedia();
+            copyTemplateMedia(cueTmpltMedia, copyCueItemId, userId, cueSheet);
+
+            //신규 등록후 순서정렬
+            ordUpdateDrop(cueSheetItemEntity, cueId, cueItemOrd, spareYn); //큐시트 순번 정렬
+        }
 
         //신규 등록후 순서정렬
         //ordUpdate(cueId, copyCueItemId, cueItemOrd, spareYn);
@@ -898,6 +968,11 @@ public class CueSheetItemService {
         cueSheetItemMapper.updateFromDto(cueSheetItemDTO, cueSheetItem);
         cueSheetItemRepository.save(cueSheetItem);
 
+        //삭제된 큐시트 아이템이 복구될시 포함된 큐시트 미디어 정보도 함께 복구
+        cueSheetMediaRestore(cueItemId);
+        //삭제된 큐시트 아이템이 복구될시 포함된 큐시트 자막 정보도 함께 복구 ( delYn = "N" )
+        cueSheetItemCapRestore(cueItemId);
+
         String spareYn = cueSheetItem.getSpareYn();
 
         ordUpdate(cueId, cueItemId, cueItemOrd, spareYn); //큐시트 순번 정렬
@@ -924,6 +999,41 @@ public class CueSheetItemService {
                 spareYn, "Y", "Y");
 
         return cueSheetItemSimpleDTO;
+    }
+
+    //삭제된 큐시트 아이템이 복구될시 포함된 큐시트 자막 정보도 함께 복구 ( delYn = "N" )
+    public void cueSheetItemCapRestore(Long cueItemId){
+
+        List<CueSheetItemCap> cueSheetItemCapList = cueSheetItemCapRepotitory.findDeleteCueSheetItemCapList(cueItemId);
+
+        for (CueSheetItemCap cueSheetItemCap : cueSheetItemCapList){
+
+            CueSheetItemCapDTO cueSheetItemCapDTO = cueSheetItemCapMapper.toDto(cueSheetItemCap);
+            cueSheetItemCapDTO.setDelYn("N");
+
+            cueSheetItemCapMapper.updateFromDto(cueSheetItemCapDTO, cueSheetItemCap);
+
+            cueSheetItemCapRepotitory.save(cueSheetItemCap);
+
+        }
+
+    }
+
+    //삭제된 큐시트 아이템이 복구될시 포함된 큐시트 미디어 정보도 함께 복구 ( delYn = "N" )
+    public void cueSheetMediaRestore(Long cueItemId){
+
+        List<CueSheetMedia> cueSheetMediaList = cueSheetMediaRepository.findDeleteCueMediaList(cueItemId);
+
+        for (CueSheetMedia cueSheetMedia : cueSheetMediaList){
+
+            CueSheetMediaDTO cueSheetMediaDTO = cueSheetMediaMapper.toDto(cueSheetMedia);
+            cueSheetMediaDTO.setDelYn("N");
+
+            cueSheetMediaMapper.updateFromDto(cueSheetMediaDTO, cueSheetMedia);
+
+            cueSheetMediaRepository.save(cueSheetMedia);
+        }
+
     }
 
     //방송아이콘 url 추가
@@ -1242,8 +1352,8 @@ public class CueSheetItemService {
         Set<ArticleCap> articleCapList = article.getArticleCap(); //기사자막 리스트 get
         Set<AnchorCap> anchorCapList = article.getAnchorCap(); //앵커자막 리스트 get
 
-        articleService.articleActionLogCreate(article, userId); //기사 액션 로그 등록
-        Long articleHistId = articleService.createArticleHist(article);//기사 이력 create
+        articleService.articleActionLogCreate(articleEntity, userId); //기사 액션 로그 등록
+        Long articleHistId = articleService.createArticleHist(articleEntity);//기사 이력 create
 
         /*********************/
         /* 기사 자막을 저장하는 부분 */
@@ -1303,24 +1413,38 @@ public class CueSheetItemService {
             }
         }
 
-        /*List<ArticleActionLogDTO> articleActionLogs = articleActionLogService.findAll(artclId);
+        List<ArticleActionLogDTO> articleActionLogs = articleActionLogService.findAll(artclId);
 
         for (ArticleActionLogDTO articleActionLogDTO : articleActionLogs){
 
-            ArticleActionLog articleActionLog = ArticleActionLog.builder()
-                    .message()
-                    .action()
-                    .inputDtm()
-                    .inputrId()
-                    .artclInfo()
-                    .artclCapInfo()
-                    .anchorCapInfo()
-                    .article()
-                    .build();
+            String message = articleActionLogDTO.getMessage();
 
+            //메세지에 픽스가 포함된 액션로그 복사시 등록 [ 화면에 픽스된 일시, 픽스자 표시. ]
+            if (message.contains("fix")) {
 
+                //기사엔티티를 포함하고 있으면 아이디빌드후 엔티티에 추가.
+                /*ArticleSimpleDTO articleSimpleDTO = articleActionLogDTO.getArticle();
+                Article setArticle = new Article();
+                if (ObjectUtils.isEmpty(articleSimpleDTO) == false){
+                    Long articleId = articleSimpleDTO.getArtclId();
+                    setArticle = Article.builder().artclId(articleId).build();
+                }*/
 
-        }*/
+                ArticleActionLog articleActionLog = ArticleActionLog.builder()
+                        .message(message)
+                        .action(articleActionLogDTO.getAction())
+                        .inputDtm(articleActionLogDTO.getInputDtm())
+                        .inputrId(articleActionLogDTO.getInputrId())
+                        .artclInfo(articleActionLogDTO.getArtclInfo())
+                        .artclCapInfo(articleActionLogDTO.getArtclCapInfo())
+                        .anchorCapInfo(articleActionLogDTO.getAnchorCapInfo())
+                        .article(articleEntity) //신규생성된 기사set
+                        .build();
+
+                articleActionLogRepository.save(articleActionLog);
+            }
+
+        }
 
         return articleEntity;
 

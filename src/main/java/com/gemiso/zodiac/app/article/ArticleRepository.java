@@ -26,12 +26,7 @@ import java.util.Optional;
 
 public interface ArticleRepository extends JpaRepository<Article, Long>, QuerydslPredicateExecutor<Article>, ArticleRepositoryCustorm {
 
-    @Query("select a from Article a " +
-            "left outer join Issue f on f.issuId = a.issue.issuId and f.issuDelYn = 'N' " +
-            "left outer join ArticleCap  c on c.article.artclId = a.artclId " +
-            "left outer join AnchorCap h on h.article.artclId = a.artclId " +
-            "left outer join CueSheet g on g.cueId = a.cueSheet.cueId and g.delYn = 'N' " +
-            "where a.artclId =:articleId and a.delYn = 'N' ")
+    @Query("select a from Article a where a.artclId =:articleId and a.delYn = 'N' ")
     Optional<Article> findArticle(@Param("articleId")Long articleId);
 
 
@@ -44,7 +39,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Queryds
     @Query("select max(a.artclOrd) from Article a where a.orgArtclId =:orgArtclId")
     Optional<Integer> findArticleOrd(@Param("orgArtclId")Long orgArtclId);
 
-    @Query("select count(a.cueSheet) from Article a where a.cueSheet.cueId =:cueId")
+    @Query("select count(a.cueSheet) from Article a where a.cueSheet.cueId =:cueId and a.delYn = 'N'")
     int findArticleCount(@Param("cueId")Long cueId);
 
     @Query("select max(a.artclOrd) from Article a where a.orgArtclId =:orgArtclId and a.delYn = 'N'")

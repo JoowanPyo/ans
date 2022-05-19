@@ -64,7 +64,7 @@ public class TakerCueSheetDTO {
     @XmlElement(name = "dept_nm")
     private String deptNm;
     @XmlElement(name = "artcl_reqd_sec")
-    private int artclReqdSec; //기사소요시간
+    private Integer artclReqdSec; //기사소요시간
     @XmlElement(name = "anc_reqd_sec")
     private Integer ancReqdSec; //앵커소요시간
     @XmlElement(name = "artcl_smry_ctt")
@@ -92,9 +92,9 @@ public class TakerCueSheetDTO {
     @XmlElement(name = "apprvr_nm")
     private String apprvrNm;
     @XmlElement(name = "artcl_ord")
-    private int artclOrd;
+    private Integer artclOrd;
     @XmlElement(name = "brdc_cnt")
-    private int brdcCnt;
+    private Integer brdcCnt;
     @XmlElement(name = "org_artcl_id")
     private Long orgArtclId;
     @XmlElement(name = "rpt_pln_id")

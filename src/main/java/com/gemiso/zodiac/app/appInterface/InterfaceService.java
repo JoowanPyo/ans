@@ -908,8 +908,8 @@ public class InterfaceService {
                 .rptrNm(article.getRptrNm())
                 .deptCd(article.getDeptCd())
                 .deptNm(article.getDeptNm())
-                .artclReqdSec(article.getArtclCttTime())//기사 소요시간 초
-                .ancReqdSec(article.getAncMentCttTime())//앵커 소요시간 초
+                .artclReqdSec(Optional.ofNullable(article.getArtclCttTime()).orElse(0))//기사 소요시간 초
+                .ancReqdSec(Optional.ofNullable(article.getAncMentCttTime()).orElse(0))//앵커 소요시간 초
                 .artclSmryCtt(0)//???
                 .artclDivCd(article.getArtclDivCd())
                 .artclDivNm(article.getArtclDivCdNm())
@@ -922,7 +922,7 @@ public class InterfaceService {
                 .apprvDtm(article.getApprvDtm())
                 .apprvrId(article.getApprvrId())
                 .apprvrNm(article.getApprvrNm())
-                .artclOrd(article.getArtclOrd())
+                .artclOrd(Optional.ofNullable(article.getArtclOrd()).orElse(0))
                 .brdcCnt(Optional.ofNullable(article.getBrdcCnt()).orElse(0))
                 .orgArtclId(article.getOrgArtclId())
                 .rptPlnId(article.getRptrId())

@@ -31,6 +31,7 @@ import com.gemiso.zodiac.app.articleHist.ArticleHistRepository;
 import com.gemiso.zodiac.app.articleHist.dto.ArticleHistSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
+import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
@@ -449,6 +450,10 @@ public class ArticleService {
 
         articleRepository.save(article);
 
+        //기사가 삭제될때 포함된 미디어정보도 같이 삭제처리 ( delYn = "Y")
+        Set<ArticleMedia> articleMedia = article.getArticleMedia();
+        deleteArticleMedia(articleMedia, userId);
+
         //기사 액션 로그 등록
         articleActionLogDelete(article, userId);
 
@@ -470,6 +475,23 @@ public class ArticleService {
             topicService.topicInterface(json);
         }*/
         topicService.topicWeb(json);
+    }
+
+    //기사가 삭제될때 포함된 미디어정보도 같이 삭제처리 ( delYn = "Y")
+    public void deleteArticleMedia(Set<ArticleMedia> articleMediaSet, String userId){
+
+        for (ArticleMedia articleMedia : articleMediaSet){
+
+            ArticleMediaDTO articleMediaDTO = articleMediaMapper.toDto(articleMedia);
+            articleMediaDTO.setDelYn("Y");
+            articleMediaDTO.setDelrId(userId);
+            articleMediaDTO.setDelDtm(new Date());
+
+            articleMediaMapper.updateFromDto(articleMediaDTO, articleMedia);
+
+            articleMediaRepository.save(articleMedia);
+
+        }
     }
 
     //큐시트 기사 목록조회시 큐시트에 포함되어 있는 기사 제거.

@@ -2,9 +2,12 @@ package com.gemiso.zodiac.app.user;
 
 import com.gemiso.zodiac.app.user.dto.UserCreateDTO;
 import com.gemiso.zodiac.app.user.dto.UserDTO;
+import com.gemiso.zodiac.app.userGroupUser.QUserGroupUser;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUserService;
 import com.gemiso.zodiac.app.userGroupUser.dto.UserGroupUserDTO;
 import com.gemiso.zodiac.app.user.dto.UserUpdateDTO;
 import com.gemiso.zodiac.app.user.mapper.UserCreateMapper;
+import com.gemiso.zodiac.app.userGroupUser.dto.UserToGroupUdateDTO;
 import com.gemiso.zodiac.app.userGroupUser.mapper.UserGroupUserMapper;
 import com.gemiso.zodiac.app.user.mapper.UserMapper;
 import com.gemiso.zodiac.app.user.mapper.UserUpdateMapper;
@@ -209,8 +212,62 @@ public class UserService {
         userUpdateMapper.updateFromDto(userUpdateDTO, user);
         userRepository.save(user);
 
+
+        List<UserToGroupUdateDTO> userGroupUsers = userUpdateDTO.getUserGroupUser();
+        //부서 업데이트시,
+        updateDepts(userGroupUsers, userId, user);
+
     }
 
+    public BooleanBuilder getSearchUserGroupUser(String userId){
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        QUserGroupUser qUserGroupUser = QUserGroupUser.userGroupUser;
+
+        if (userId != null && userId.trim().isEmpty() == false){
+            booleanBuilder.and(qUserGroupUser.user.userId.eq(userId));
+        }
+
+        return booleanBuilder;
+    }
+
+    //부서정보 업데이트 [ 기존저장되있던 부터 삭재후 새로들어온 정보 재등록]
+    public void updateDepts(List<UserToGroupUdateDTO> userGroupUsers, String userId, User user){
+
+        if (CollectionUtils.isEmpty(userGroupUsers) == false){
+
+            //기존에 등록되어 있던 유저그룹 삭제
+            BooleanBuilder booleanBuilder = getSearchUserGroupUser(userId);
+            List<UserGroupUser> groupUserList = (List<UserGroupUser>) userGroupUserRepository.findAll(booleanBuilder);
+            if (CollectionUtils.isEmpty(groupUserList) == false){
+
+                for (UserGroupUser userGroupUser : groupUserList){
+
+                    Long id = userGroupUser.getId();
+
+                    userGroupUserRepository.deleteById(id);
+                }
+
+            }
+
+            //유저그룹 재등록
+            for (UserToGroupUdateDTO userToGroupUdateDTO : userGroupUsers){
+
+                Long userGrpId = userToGroupUdateDTO.getUserGrpId();
+                UserGroup userGroup = userGroupFindOrFail(userGrpId);
+                //UserGroup userGroup = UserGroup.builder().userGrpId(groupId).build();
+
+                UserGroupUser userGroupUser = UserGroupUser.builder()
+                        .user(user)
+                        .userGroup(userGroup)
+                        .build();
+
+                userGroupUserRepository.save(userGroupUser);
+            }
+
+        }
+
+    }
 
     public void delete(String userId) {
 

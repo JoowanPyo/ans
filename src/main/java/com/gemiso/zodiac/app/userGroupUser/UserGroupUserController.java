@@ -25,24 +25,26 @@ public class UserGroupUserController {
 
     private final UserGroupUserService userGroupUserService;
 
-    @Operation(summary = "그룹 사용자 조회", description = "그룹에 등록되어 있는 사용자 목록 조회")
+    @Operation(summary = "그룹에 등록되어 있는 사용자 목록 조회", description = "그룹에 등록되어 있는 사용자 목록 조회")
+    @GetMapping(path = "")
+    public AnsApiResponse<List<UserGroupUserDTO>> findAll(@Parameter(name = "userGrpId", required = true)
+                                                          @RequestParam(value = "userGrpId", required = true) Long userGrpId,
+                                                          @Parameter(name = "userId", required = true)
+                                                          @RequestParam(value = "userId", required = true) String userId) {
+
+        List<UserGroupUserDTO> userDTOList = userGroupUserService.findAll(userGrpId, userId);
+
+        return new AnsApiResponse<>(userDTOList);
+
+    }
+
+    @Operation(summary = "그룹 사용자 상세조회", description = "그룹 사용자 상세조회")
     @GetMapping(path = "/{userGrpId}")
     public AnsApiResponse<List<UserDTO>> find(@Parameter(name = "userGrpId", required = true) @PathVariable("userGrpId") Long userGrpId) {
 
         List<UserDTO> userDTOList = userGroupUserService.find(userGrpId);
 
         return new AnsApiResponse<>(userDTOList);
-    }
-
-    @Operation(summary = "그룹 사용자 조회", description = "그룹에 등록되어 있는 사용자 목록 조회")
-    @GetMapping(path = "")
-    public AnsApiResponse<List<UserGroupUserDTO>> findAll(@Parameter(name = "userGrpId", required = true)
-                                                       @RequestParam(value = "userGrpId", required = true) Long userGrpId) {
-
-        List<UserGroupUserDTO> userDTOList = userGroupUserService.findAll(userGrpId);
-
-        return new AnsApiResponse<>(userDTOList);
-
     }
 
     @Operation(summary = "사용자 그룹등록", description = "사용자 그룹등록")
@@ -53,7 +55,7 @@ public class UserGroupUserController {
 
         userGroupUserService.create(userIds, userGrpId);
 
-        List<UserGroupUserDTO> returnUser = userGroupUserService.findAll(userGrpId);
+        List<UserGroupUserDTO> returnUser = userGroupUserService.findAll(userGrpId, null);
 
         return new AnsApiResponse<>(returnUser);
     }

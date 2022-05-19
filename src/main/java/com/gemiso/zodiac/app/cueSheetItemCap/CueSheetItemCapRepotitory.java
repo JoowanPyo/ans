@@ -23,4 +23,8 @@ public interface CueSheetItemCapRepotitory extends JpaRepository<CueSheetItemCap
 
     @Query("select a from CueSheetItemCap a where a.cueSheetItem.cueItemId = :cueItemId and a.delYn = 'N' ")
     List<CueSheetItemCap> findCueSheetItemCapList(@Param("cueItemId")Long cueItemId);
+
+    @Query("select a from CueSheetItemCap a where a.cueSheetItem.cueItemId = :cueItemId and a.delYn = 'Y' ")
+    List<CueSheetItemCap> findDeleteCueSheetItemCapList(@Param("cueItemId")Long cueItemId);
+
 }

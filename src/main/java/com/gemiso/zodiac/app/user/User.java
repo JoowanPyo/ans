@@ -141,18 +141,6 @@ public class User extends BaseEntity {
     @Column(name = "dept_cd", length = 50)
     private String deptCd;
 
-    /*    @JoinTable(
-            name = "tb_user_grp_user",
-            joinColumns = @JoinColumn(
-                    name = "user_id",
-                    foreignKey = @ForeignKey(name = "USER_ID")
-            ),
-            inverseJoinColumns = @JoinColumn(
-                    name = "USER_GRP_ID",
-                    foreignKey = @ForeignKey(name = "USER_GRP_ID")
-            )
-    )*/
-
     @OneToMany(mappedBy = "user")//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제
     private List<UserGroupUser> userGroupUser = new ArrayList<>();
 

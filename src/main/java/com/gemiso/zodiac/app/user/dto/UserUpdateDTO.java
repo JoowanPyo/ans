@@ -2,6 +2,8 @@ package com.gemiso.zodiac.app.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
+import com.gemiso.zodiac.app.userGroupUser.dto.UserToGroupUdateDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,42 +56,5 @@ public class UserUpdateDTO {
     private String deptCd;
     /*private List<UserGroupUserDTO> userGroupUserDTO = new ArrayList<>();*/
 
-    /*private String userId;
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    //private Date inputDtm;
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    //private Date updtDtm;
-    private String chiefYn;
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    //private Date delDtm;
-    //private String delYn;
-    //private String delrId;
-    private String deptId;
-    private CodeSimpleDTO dutyCd;
-    private String email;
-    private String emplNo;
-    private String freeYn;
-    private String inphonNo;
-    //private String inputr;
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    //private Date lastLoginDtm;
-    //private int loginErrCnt;
-    private String memo;
-    //private String pwd;
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    //private Date pwdChgDtm;
-    private String rmk;
-    private String salt;
-    private String tel;
-    private String telPubYn;
-    private UserSimpleDTO updtr;
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    //private Date useEndDtm;
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    //private Date useStartDtm;
-    private String useYn;
-    private CodeSimpleDTO userDivCd;
-    private String userNm;
-    private CodeSimpleDTO userStCd;
-    //private List<UserGroupUserDTO> userGroupUserDTO = new ArrayList<>();*/
+    private List<UserToGroupUdateDTO> userGroupUser = new ArrayList<>();
 }

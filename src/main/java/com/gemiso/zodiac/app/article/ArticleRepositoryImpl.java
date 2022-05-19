@@ -285,6 +285,8 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
                 .leftJoin(qArticle.articleCap, qArticleCap).fetchJoin()
                 .leftJoin(qArticle.anchorCap, qAnchorCap).fetchJoin().distinct();
 
+        jpaQuery.where(qArticle.delYn.eq("N"));
+
         //등록날짜 기준으로 조회
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
             jpaQuery.where(qArticle.inputDtm.between(sdate, edate));

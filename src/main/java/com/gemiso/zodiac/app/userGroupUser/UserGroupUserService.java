@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -44,9 +45,9 @@ public class UserGroupUserService {
     private final UserGroupUserMapper userGroupUserMapper;
 
 
-    public List<UserGroupUserDTO> findAll(Long userGrpId){
+    public List<UserGroupUserDTO> findAll(Long userGrpId, String userId){
 
-        BooleanBuilder booleanBuilder = getSearch(userGrpId);
+        BooleanBuilder booleanBuilder = getSearch(userGrpId, userId);
 
         List<UserGroupUser> userGroupUsers = (List<UserGroupUser>) userGroupUserRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "id"));
 
@@ -183,14 +184,18 @@ public class UserGroupUserService {
                 .orElseThrow(() -> new ResourceNotFoundException("UserGroupId not found. userGroupId : " + userGrpId));
     }
 
-    private BooleanBuilder getSearch(Long userGrpId) {
+    private BooleanBuilder getSearch(Long userGrpId, String userId) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         QUserGroupUser qUserGroupUser = QUserGroupUser.userGroupUser;
 
-        if(!StringUtils.isEmpty(userGrpId)){
+        if(ObjectUtils.isEmpty(userGrpId) == false){
             booleanBuilder.and(qUserGroupUser.userGroup.userGrpId.eq(userGrpId));
+        }
+
+        if (userId != null && userId.trim().isEmpty() == false){
+            booleanBuilder.and(qUserGroupUser.user.userId.eq(userId));
         }
 
         return booleanBuilder;
