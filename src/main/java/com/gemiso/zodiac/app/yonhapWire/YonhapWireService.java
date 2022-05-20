@@ -132,6 +132,8 @@ public class YonhapWireService {
                 .trnsfDtm(trnsfDtm)
                 .inputDtm(inputDtm)
                 .action(yonhapWireCreateDTO.getAction())
+                .mamContId(yonhapWireCreateDTO.getMam_cont_id())
+                .mediaNo(yonhapWireCreateDTO.getMedia_no())
                 .build();
 
         return yonhapWire;

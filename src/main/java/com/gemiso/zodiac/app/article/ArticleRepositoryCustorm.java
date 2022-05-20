@@ -19,5 +19,6 @@ public interface ArticleRepositoryCustorm {
                                      String brdcPgmId, Long orgArtclId, String delYn, String searchDivCd,
                                      String searchWord, List<String> apprvDivCdList, Pageable pageable);
 
-    Page<Article> findByArticleCue(Date sdate, Date edate, String searchWord, Long cueId, Pageable pageable);
+    Page<Article> findByArticleCue(Date sdate, Date edate, String searchWord, Long cueId, String brdcPgmId,
+                                   String artclTypDtlCd, String copyYn, Pageable pageable);
 }

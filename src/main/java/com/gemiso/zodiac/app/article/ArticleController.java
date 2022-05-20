@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
 
@@ -57,17 +58,17 @@ public class ArticleController {
             @Parameter(name = "artclCateCd", description = "기사 카테고리 코드") @RequestParam(value = "artclCateCd", required = false) String artclCateCd,
             @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
             @Parameter(name = "delYn", description = "삭제 여부") @RequestParam(value = "delYn", required = false) String delYn,
-            @Parameter(name = "artclId", description = "기사아이디")@RequestParam(value = "artclId", required = false) Long artclId,
-            @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]")@RequestParam(value = "copyYn", required = false) String copyYn) throws Exception {
+            @Parameter(name = "artclId", description = "기사아이디") @RequestParam(value = "artclId", required = false) Long artclId,
+            @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]") @RequestParam(value = "copyYn", required = false) String copyYn) throws Exception {
 
         PageResultDTO<ArticleDTO, Article> pageList = null;
         //List<ArticleDTO> articleDTOList = new ArrayList<>();
 
         //기사읽기 권한이 없는 사용자 error.forbidden
         //List<String> userAuth = userAuthService.authChk(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth());
-       // if (userAuthService.authChks(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminMode.getAuth())) { //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
-       //     throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-       // }
+        // if (userAuthService.authChks(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminMode.getAuth())) { //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
+        //     throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        // }
 
         //검색조건 날짜형식이 들어왔을경우
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
@@ -99,6 +100,12 @@ public class ArticleController {
                                                                       @RequestParam(value = "searchWord", required = false) String searchWord,
                                                                       @Parameter(name = "cueId", description = "검색키워드", required = false)
                                                                       @RequestParam(value = "cueId") Long cueId,
+                                                                      @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디")
+                                                                      @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
+                                                                      @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드")
+                                                                      @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
+                                                                      @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]")
+                                                                      @RequestParam(value = "copyYn", required = false) String copyYn,
                                                                       @Parameter(name = "page", description = "시작페이지")
                                                                       @RequestParam(value = "page", required = false) Integer page,
                                                                       @Parameter(name = "limit", description = "한 페이지에 데이터 수")
@@ -108,7 +115,7 @@ public class ArticleController {
         SearchDate searchDate = new SearchDate(sdate, edate);
 
         PageResultDTO<ArticleDTO, Article> pageList = articleService.findCue(searchDate.getStartDate(), searchDate.getEndDate(),
-                searchWord, cueId, page, limit);
+                searchWord, cueId, brdcPgmId, artclTypDtlCd, copyYn, page, limit);
 
         pageList = articleService.confirmArticleList(pageList, cueId);
 
@@ -173,7 +180,7 @@ public class ArticleController {
 
         String userId = userAuthService.authUser.getUserId();
 
-        log.debug( "Article Create : User Id - "+userId +"<br>"+ "Create Model - " + articleCreateDTO);
+        log.debug("Article Create : User Id - " + userId + "<br>" + "Create Model - " + articleCreateDTO);
 
         Long artclId = articleService.create(articleCreateDTO, userId);
 
@@ -181,7 +188,7 @@ public class ArticleController {
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
         articleDTO.setArtclId(artclId);
 
-        log.info( "Article Create Success ID : " + articleDTO);
+        log.info("Article Create Success ID : " + articleDTO);
 
         return new AnsApiResponse<>(articleDTO);
     }
@@ -194,8 +201,8 @@ public class ArticleController {
                                                    @PathVariable("artclId") Long artclId) throws Exception {
 
         String userId = userAuthService.authUser.getUserId();
-        log.debug( "Article Update : User Id - "+userId+ "<br>" +
-                " Article Model -"+articleUpdateDTO);
+        log.debug("Article Update : User Id - " + userId + "<br>" +
+                " Article Model -" + articleUpdateDTO);
 
         //수정. 잠금사용자확인
         if (articleService.chkOrderLock(artclId, userId)) {
@@ -209,7 +216,7 @@ public class ArticleController {
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
         articleDTO.setArtclId(artclId);
 
-        log.info( "Article Update Success Id : "+artclId + "Update Model" + articleDTO);
+        log.info("Article Update Success Id : " + artclId + "Update Model" + articleDTO);
 
         return new AnsApiResponse<>(articleDTO);
 
@@ -222,8 +229,8 @@ public class ArticleController {
                                     @PathVariable("artclId") Long artclId) throws Exception {
 
         String userId = userAuthService.authUser.getUserId();
-        log.info( "Article Delete  : User Id - "+userId + "<br>" +
-                " Article Id"+artclId);
+        log.info("Article Delete  : User Id - " + userId + "<br>" +
+                " Article Id" + artclId);
 
         articleService.delete(artclId, userId);
 
@@ -240,7 +247,7 @@ public class ArticleController {
         String userId = userAuthService.authUser.getUserId();//토큰에서 유저 아이디를 가져온다.
 
         //권한 확인 로그
-        log.info( "Article Confirm : Article Id" + artclId+ " User Id: "+userId);
+        log.info("Article Confirm : Article Id" + artclId + " User Id: " + userId);
 
         ArticleAuthConfirmDTO articleAuthConfirmDTO = articleService.articleConfirm(artclId, userId);
 
@@ -262,13 +269,13 @@ public class ArticleController {
                                                   @RequestBody @Valid ArticleLockDTO articleLockDTO) throws Exception {
 
         String userId = userAuthService.authUser.getUserId();
-        log.info( "Article Lock : ArticleId - "+artclId +" User Id - "+userId
-                +"<br>"+" Lock Info : " + articleLockDTO  );
+        log.info("Article Lock : ArticleId - " + artclId + " User Id - " + userId
+                + "<br>" + " Lock Info : " + articleLockDTO);
 
         //권한체크(기사 쓰기)
         if (userAuthChkService.authChk(AuthEnum.ArticleWrite.getAuth())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-         }
+        }
 
         articleService.articleLock(artclId, articleLockDTO, userId);
 
@@ -285,8 +292,8 @@ public class ArticleController {
                                                     @RequestBody @Valid ArticleLockDTO articleLockDTO) throws Exception {
 
         String userId = userAuthService.authUser.getUserId();
-        log.info( "Article Unlock : ArticleId = "+artclId +" User Id - "+userId+"" +
-                "<br>"+" Unlock Info : " + articleLockDTO);
+        log.info("Article Unlock : ArticleId = " + artclId + " User Id - " + userId + "" +
+                "<br>" + " Unlock Info : " + articleLockDTO);
 
         //권한, 작성자 확인
         articleService.articleUnlock(artclId, articleLockDTO, userId);
@@ -309,8 +316,8 @@ public class ArticleController {
         String userId = userAuthService.authUser.getUserId();
 
         //픽스정보
-        log.info( "Article Fix Info : ArticleId = "+artclId /*+" OrgApprvDivcd : " + orgApprvDivcd*/ + "NewApprvDivcd : "+apprvDivCd
-                +" User Id : "+userId);
+        log.info("Article Fix Info : ArticleId = " + artclId /*+" OrgApprvDivcd : " + orgApprvDivcd*/ + "NewApprvDivcd : " + apprvDivCd
+                + " User Id : " + userId);
 
         articleService.vaildFixStaus(artclId, apprvDivCd, userId);
 
@@ -324,10 +331,10 @@ public class ArticleController {
     public AnsApiResponse<?> confirmUser(@Parameter(description = "필수값<br> lckYn ", required = true)
                                          @RequestBody @Valid ArticleDeleteConfirmDTO articleDeleteConfirmDTO,
                                          @Parameter(name = "artclId", description = "기사 아이디")
-                                         @PathVariable("artclId") Long artclId) {
+                                         @PathVariable("artclId") Long artclId) throws NoSuchAlgorithmException {
 
         String userId = userAuthService.authUser.getUserId(); //토큰에서 유저 아이디를 가져온다.
-        log.info(" Article Delete User Confirm : Article Id - "+artclId + "User Id :" + userId);
+        log.info(" Article Delete User Confirm : Article Id - " + artclId + "User Id :" + userId);
 
         articleService.confirmUser(articleDeleteConfirmDTO, artclId, userId);
 

@@ -267,7 +267,8 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
     }
 
     @Override
-    public Page<Article> findByArticleCue(Date sdate, Date edate, String searchWord, Long cueId, Pageable pageable) {
+    public Page<Article> findByArticleCue(Date sdate, Date edate, String searchWord, Long cueId, String brdcPgmId,
+                                          String artclTypDtlCd, String copyYn, Pageable pageable) {
 
 
         QArticle qArticle = QArticle.article;
@@ -295,6 +296,26 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
         //기사제목 기준으로 조회
         if (searchWord != null && searchWord.trim().isEmpty() == false) {
             jpaQuery.where(qArticle.artclTitl.contains(searchWord));
+        }
+
+        //검색조건 = 방송 프로그램 아이디
+        if (ObjectUtils.isEmpty(brdcPgmId) == false) {
+            jpaQuery.where(qArticle.brdcPgmId.eq(brdcPgmId));
+        }
+
+        //검색조건 = 기상 유형 상세 코드
+        if (artclTypDtlCd != null && artclTypDtlCd.trim().isEmpty() == false) {
+            jpaQuery.where(qArticle.artclTypDtlCd.eq(artclTypDtlCd));
+        }
+
+        //원본 기사 및 복사된 기사 검색조건
+        if (copyYn != null && copyYn.trim().isEmpty() == false) {
+
+            if ("N".equals(copyYn)) {
+                jpaQuery.where(qArticle.orgArtclId.isNull());
+            } else {
+                jpaQuery.where(qArticle.orgArtclId.isNotNull());
+            }
         }
 
         jpaQuery.orderBy(qArticle.inputDtm.desc(), qArticle.orgArtclId.desc());

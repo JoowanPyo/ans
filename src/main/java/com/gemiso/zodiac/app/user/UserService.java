@@ -63,9 +63,9 @@ public class UserService {
     }*/
 
 
-    public List<UserDTO> findAll(String userId, String userNm, String delYn) {
+    public List<UserDTO> findAll(String userId, String userNm, String searchWord, String delYn) {
 
-        BooleanBuilder booleanBuilder = getSearch(userId, userNm, delYn);
+        BooleanBuilder booleanBuilder = getSearch(userId, userNm, searchWord, delYn);
 
         List<User> userEntity = (List<User>) userRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "userNm"));
 
@@ -304,12 +304,15 @@ public class UserService {
     }
 
 
-    private BooleanBuilder getSearch(String userId, String userNm, String delYn) {
+    private BooleanBuilder getSearch(String userId, String userNm, String searchWord, String delYn) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         QUser quser = QUser.user;
 
+        if (searchWord != null && searchWord.trim().isEmpty() == false){
+            booleanBuilder.and(quser.userNm.contains(searchWord).or(quser.userId.contains(searchWord)));
+        }
         if(delYn != null && delYn.trim().isEmpty() == false){
             booleanBuilder.and(quser.delYn.eq(delYn));
         }else {

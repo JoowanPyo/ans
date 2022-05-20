@@ -39,6 +39,8 @@ public class YonhapWireDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date inputDtm;
     private String action;
+    private Long mamContId;
+    private String mediaNo;
 
     private List<AttachFileDTO> files = new ArrayList<AttachFileDTO>();
     /*private List<YonhapWireAttchFileDTO> yonhapWireAttchFiles = new ArrayList<>();*/

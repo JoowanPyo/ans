@@ -29,11 +29,16 @@ public class UserController {
 
     @Operation(summary = "사용자 목록 조회", description = "조회조건으로 사용자 목록 조회")
     @GetMapping(path = "")
-    public AnsApiResponse<List<UserDTO>> findAll(@Parameter(name = "userId", description = "사용자 아이디", in = ParameterIn.QUERY) @RequestParam(value = "userId", required = false) String userId,
-                                                 @Parameter(name = "userNm", description = "사용자명", in = ParameterIn.QUERY) @RequestParam(value = "userNm", required = false) String userNm,
-                                                 @Parameter(name = "delYn", description = "삭제 여부", in = ParameterIn.QUERY) @RequestParam(value = "delYn", required = false) String delYn) {
+    public AnsApiResponse<List<UserDTO>> findAll(@Parameter(name = "userId", description = "사용자 아이디", in = ParameterIn.QUERY)
+                                                 @RequestParam(value = "userId", required = false) String userId,
+                                                 @Parameter(name = "userNm", description = "사용자명", in = ParameterIn.QUERY)
+                                                 @RequestParam(value = "userNm", required = false) String userNm,
+                                                 @Parameter(name = "searchWord", description = "검색키워드")
+                                                 @RequestParam(value = "searchWord", required = false) String searchWord,
+                                                 @Parameter(name = "delYn", description = "삭제 여부", in = ParameterIn.QUERY)
+                                                 @RequestParam(value = "delYn", required = false) String delYn) {
 
-        List<UserDTO> result = userService.findAll(userId, userNm, delYn);
+        List<UserDTO> result = userService.findAll(userId, userNm, searchWord, delYn);
 
 
         return new AnsApiResponse<>(result);

@@ -22,7 +22,7 @@ public class DeptsController {
 
 
     @Operation(summary = "부서 목록조회", description = "부서 목록조회")
-    @GetMapping(path = "/")
+    @GetMapping(path = "")
     public AnsApiResponse<List<DeptsDTO>> findAll(@Parameter(name = "name", description = "부서 명")
                                                   @RequestParam(value = "name", required = false) String name,
                                                   @Parameter(name = "isEnabled", description = "사용여부 ( N, Y )")

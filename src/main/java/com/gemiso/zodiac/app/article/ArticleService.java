@@ -52,6 +52,7 @@ import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuthRepository;
 import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
 import com.gemiso.zodiac.app.userGroupUser.UserGroupUserRepository;
 import com.gemiso.zodiac.core.enumeration.*;
+import com.gemiso.zodiac.core.helper.EncodingHelper;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.helper.PageHelper;
 import com.gemiso.zodiac.core.page.PageResultDTO;
@@ -79,6 +80,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -91,6 +93,9 @@ public class ArticleService {
 
     @Value("${files.url-key}")
     private String fileUrl;
+
+    @Value("${password.salt.key:saltKey}")
+    private String saltKey;
 
     private final ArticleRepository articleRepository;
     private final ArticleCapRepository articleCapRepository;
@@ -173,7 +178,8 @@ public class ArticleService {
     }
 
     // 큐시트에서 기사 목록 조회
-    public PageResultDTO<ArticleDTO, Article> findCue(Date sdate, Date edate, String searchWord, Long cueId, Integer page, Integer limit) {
+    public PageResultDTO<ArticleDTO, Article> findCue(Date sdate, Date edate, String searchWord, Long cueId,
+                                                      String brdcPgmId, String artclTypDtlCd, String copyYn, Integer page, Integer limit) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
@@ -182,7 +188,8 @@ public class ArticleService {
         BooleanBuilder booleanBuilder = getSearchCue(sdate, edate, searchWord, cueId);
 
         //전체조회[page type]
-        Page<Article> result = articleRepository.findByArticleCue(sdate, edate, searchWord, cueId, pageable);
+        Page<Article> result = articleRepository.findByArticleCue(sdate, edate, searchWord, cueId,
+                brdcPgmId, artclTypDtlCd, copyYn, pageable);
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
 
@@ -217,16 +224,17 @@ public class ArticleService {
     // 기사등록[기사 이력, 자막]
     public Long create(ArticleCreateDTO articleCreateDTO, String userId) throws Exception {
 
-        //PD가 기사 작성시 기사픽스상태로 등록된다.
-        if (userAuthChkService.authChk(AuthEnum.AnchorFix.getAuth())) { //수정.
-            articleCreateDTO.setApprvDivCd(FixEnum.ARTICLE_FIX.getFixeum(FixEnum.ARTICLE_FIX));
-            articleCreateDTO.setArtclFixUser(userId);
-            articleCreateDTO.setArtclFixDtm(new Date());
-        }
 
         articleCreateDTO.setInputrId(userId); //등록자 아이디 추가.
         articleCreateDTO.setArtclOrd(0);//기사 순번 등록(0)set
         articleCreateDTO.setApprvDivCd(FixEnum.FIX_NONE.getFixeum(FixEnum.FIX_NONE));//기사픽스 상태 None set[null 상태가면 fix 구분 및 셋팅시 문제.]
+
+        //PD나 앵커가 기사 작성시 기사픽스상태로 등록된다.
+        if (userAuthChkService.authChk(AuthEnum.AnchorFix.getAuth()) == false) { //수정.
+            articleCreateDTO.setApprvDivCd(FixEnum.ARTICLE_FIX.getFixeum(FixEnum.ARTICLE_FIX));
+            articleCreateDTO.setArtclFixUser(userId);
+            articleCreateDTO.setArtclFixDtm(new Date());
+        }
 
         Article article = articleCreateMapper.toEntity(articleCreateDTO);
         articleRepository.save(article);
@@ -1726,12 +1734,16 @@ public class ArticleService {
     }
 
     //사용자 확인
-    public void confirmUser(ArticleDeleteConfirmDTO articleDeleteConfirmDTO, Long artclId, String userId) {
+    public void confirmUser(ArticleDeleteConfirmDTO articleDeleteConfirmDTO, Long artclId, String userId) throws NoSuchAlgorithmException {
 
-        String pwd = articleDeleteConfirmDTO.getPassword();//파라미터로 들어온 비밀번호
         User userEntity = userService.userFindOrFail(userId); //사용자 아이디로 사용자 유무 확인 및 사용자 정보조회.
 
-        if (passwordEncoder.matches(pwd, userEntity.getPwd()) == false) { //현재 들어온 비밀번호와 등록되어 있는 비밀번호 확인
+        String pwd = articleDeleteConfirmDTO.getPassword();//파라미터로 들어온 비밀번호
+
+        EncodingHelper encodingHelper = new EncodingHelper(pwd, saltKey);
+        String hexPwd = encodingHelper.getHex();
+
+        if (passwordEncoder.matches(hexPwd, userEntity.getPwd()) == false) { //현재 들어온 비밀번호와 등록되어 있는 비밀번호 확인
             throw new PasswordFailedException("Password failed.");
         }
 

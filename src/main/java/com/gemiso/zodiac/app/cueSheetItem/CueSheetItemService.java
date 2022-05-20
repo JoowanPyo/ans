@@ -23,7 +23,9 @@ import com.gemiso.zodiac.app.articleHist.ArticleHistService;
 import com.gemiso.zodiac.app.articleHist.dto.ArticleHistDTO;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
+import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
+import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
@@ -98,8 +100,6 @@ public class CueSheetItemService {
     @Value("${files.url-key}")
     private String fileUrl;
 
-    private final ArticleService articleService;
-
     private final CueSheetRepository cueSheetRepository;
     private final CueSheetItemRepository cueSheetItemRepository;
     private final CueSheetItemCapRepotitory cueSheetItemCapRepotitory;
@@ -124,7 +124,7 @@ public class CueSheetItemService {
     private final ArticleMapper articleMapper;
     private final CueSheetMediaMapper cueSheetMediaMapper;
     private final CueSheetItemCapMapper cueSheetItemCapMapper;
-    private final ArticleMediaSimpleMapper articleMediaSimpleMapper;
+    private final ArticleMediaMapper articleMediaMapper;
 
     private final CueSheetService cueSheetService;
     private final CueTmpltItemService cueTmpltItemService;
@@ -132,6 +132,7 @@ public class CueSheetItemService {
     private final LboxService lboxService;
     private final CueSheetTemplateService cueSheetTemplateService;
     private final ArticleActionLogService articleActionLogService;
+    private final ArticleService articleService;
     //private final UserAuthService userAuthService;
 
     private final MarshallingJsonHelper marshallingJsonHelper;
@@ -342,10 +343,10 @@ public class CueSheetItemService {
         cueSheetItemDTO.setDelYn("Y");
         cueSheetItemDTO.setDelDtm(new Date());
 
-        cueSheetItemMapper.updateFromDto(cueSheetItemDTO, cueSheetItem);
 
         //큐시트 아이템 삭제시 포함된 기사(복사된 기사)도 삭제
         Article article = cueSheetItem.getArticle();
+
         if (ObjectUtils.isEmpty(article) == false) {
             Long artclId = article.getArtclId();
             Article chkArticle = articleService.articleFindOrFailCueItem(artclId);
@@ -359,8 +360,14 @@ public class CueSheetItemService {
                 articleMapper.updateFromDto(articleDTO, chkArticle);
 
                 articleRepository.save(chkArticle);
+
+                //기사가 삭제될때 포함된 미디어정보도 같이 삭제처리 ( delYn = "Y")
+                Set<ArticleMedia> articleMedia = chkArticle.getArticleMedia();
+                deleteArticleMedia(articleMedia, userId);
             }
         }
+
+        cueSheetItemMapper.updateFromDto(cueSheetItemDTO, cueSheetItem);
         cueSheetItemRepository.save(cueSheetItem);
 
         //삭제되 아이템이 포함된 미디어정보 삭제 플레그 처리 ( delYn = "Y")
@@ -407,6 +414,23 @@ public class CueSheetItemService {
             Long id = cueSheetItemSymbol.getId();
 
             cueSheetItemSymbolRepository.deleteById(id);
+        }
+    }
+
+    //기사가 삭제될때 포함된 미디어정보도 같이 삭제처리 ( delYn = "Y")
+    public void deleteArticleMedia(Set<ArticleMedia> articleMediaSet, String userId){
+
+        for (ArticleMedia articleMedia : articleMediaSet){
+
+            ArticleMediaDTO articleMediaDTO = articleMediaMapper.toDto(articleMedia);
+            articleMediaDTO.setDelYn("Y");
+            articleMediaDTO.setDelrId(userId);
+            articleMediaDTO.setDelDtm(new Date());
+
+            articleMediaMapper.updateFromDto(articleMediaDTO, articleMedia);
+
+            articleMediaRepository.save(articleMedia);
+
         }
     }
 
@@ -1421,14 +1445,6 @@ public class CueSheetItemService {
 
             //메세지에 픽스가 포함된 액션로그 복사시 등록 [ 화면에 픽스된 일시, 픽스자 표시. ]
             if (message.contains("fix")) {
-
-                //기사엔티티를 포함하고 있으면 아이디빌드후 엔티티에 추가.
-                /*ArticleSimpleDTO articleSimpleDTO = articleActionLogDTO.getArticle();
-                Article setArticle = new Article();
-                if (ObjectUtils.isEmpty(articleSimpleDTO) == false){
-                    Long articleId = articleSimpleDTO.getArtclId();
-                    setArticle = Article.builder().artclId(articleId).build();
-                }*/
 
                 ArticleActionLog articleActionLog = ArticleActionLog.builder()
                         .message(message)

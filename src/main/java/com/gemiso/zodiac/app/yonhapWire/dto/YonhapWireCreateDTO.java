@@ -29,4 +29,6 @@ public class YonhapWireCreateDTO {
     private String trnsf_dtm;
     private String input_dtm;
     private String action;
+    private Long mam_cont_id;
+    private String media_no;
 }

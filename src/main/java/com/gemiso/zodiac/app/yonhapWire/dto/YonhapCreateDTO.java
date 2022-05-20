@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import java.util.Date;
 
 @Data
@@ -28,6 +29,7 @@ public class YonhapCreateDTO {
     private String trnsf_dtm;
     private String input_dtm;
     private String action;
-    private Long mamContId;
+    private Long mam_cont_id;
+    private String media_no;
 
 }
