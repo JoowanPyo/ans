@@ -40,6 +40,8 @@ public class CueSheetController {
                                                       @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
                                                       @Parameter(name = "brdcPgmNm", description = "프로그램 명")
                                                       @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
+                                                      @Parameter(name = "deptCd", description = "부서 코드")
+                                                      @RequestParam(value = "deptCd", required = false) Integer deptCd,
                                                       @Parameter(name = "searchWord", description = "검색키워드")
                                                       @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
 
@@ -49,10 +51,11 @@ public class CueSheetController {
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
             //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 24:00:00)
             SearchDate searchDate = new SearchDate(sdate, edate);
-            cueSheetFindAllDTO = cueSheetService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), brdcPgmId, brdcPgmNm, searchWord);
+            cueSheetFindAllDTO = cueSheetService.findAll(searchDate.getStartDate(), searchDate.getEndDate(),
+                    brdcPgmId, brdcPgmNm, deptCd, searchWord);
 
         } else {
-            cueSheetFindAllDTO = cueSheetService.findAll(null, null, brdcPgmId, brdcPgmNm, searchWord);
+            cueSheetFindAllDTO = cueSheetService.findAll(null, null, brdcPgmId, brdcPgmNm, deptCd, searchWord);
         }
 
         return new AnsApiResponse<>(cueSheetFindAllDTO);

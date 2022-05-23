@@ -130,9 +130,9 @@ public class CueSheetService {
 
 
     //큐시트 목록조회 + 유니온 일일편성 [큐시트 인터페이스+큐시트 아이템추가 목록]
-    public CueSheetFindAllDTO findAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord){
+    public CueSheetFindAllDTO findAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, Integer deptCd, String searchWord){
 
-        BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm,  searchWord);
+        BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm, deptCd, searchWord);
 
         //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
         List<Sort.Order> orders = new ArrayList<>();
@@ -164,7 +164,7 @@ public class CueSheetService {
     //큐시트 목록조회 + 유니온 일일편성 [큐시트 인터페이스+큐시트 아이템추가 목록]
     public List<CueSheetDTO> takerFindAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord){
 
-        BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm,  searchWord);
+        BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm, null,  searchWord);
 
         //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
         List<Sort.Order> orders = new ArrayList<>();
@@ -839,7 +839,7 @@ public class CueSheetService {
     }
 
     //큐시트 목록조회 조회조건 빌드
-    private BooleanBuilder getSearch(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord) {
+    private BooleanBuilder getSearch(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, Integer deptCd, String searchWord) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -861,6 +861,9 @@ public class CueSheetService {
         if(searchWord != null && searchWord.trim().isEmpty() == false){
             booleanBuilder.and(qCueSheet.brdcPgmNm.contains(searchWord).or(qCueSheet.anc1Nm.contains(searchWord))
                     .or(qCueSheet.pd2Nm.contains(searchWord)));
+        }
+        if (ObjectUtils.isEmpty(deptCd) == false){
+            booleanBuilder.and(qCueSheet.deptCd.eq(deptCd));
         }
 
         return booleanBuilder;
