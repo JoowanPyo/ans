@@ -21,8 +21,8 @@ public class TopicService {
     @Value("${topic.routing-key:routiongKey}")
     private String routingKey;
 
-    private static final String EXCHANGE_WEB_NAME = "amq.topic";
-    private static final String EXCHANGE_INTERFACE_NAME = "ans.interface";
+    private static final String EXCHANGE_WEB_NAME = "ans.topic";
+    private static final String EXCHANGE_INTERFACE_NAME = "amq.topic";
 
     public void topicWeb(String msg){
 

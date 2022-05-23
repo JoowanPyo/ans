@@ -17,6 +17,7 @@ import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.topic.TopicService;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.TakerCueSheetTopicDTO;
+import com.gemiso.zodiac.core.topic.articleTopicDTO.WebTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -113,7 +114,7 @@ public class ArticleMediaService {
         }
 
         sendCueTopicCreate(null, null, null , articleId, null, "Article Media Create",
-                null, "Y", "Y");
+                null, "Y", "Y", article);
 
         return articleMediaDTO;
 
@@ -121,7 +122,7 @@ public class ArticleMediaService {
 
     //큐시트 토픽 메세지 전송
     public void sendCueTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
-                                   String spareYn, String prompterFlag, String videoTakerFlag) throws JsonProcessingException {
+                                   String spareYn, String prompterFlag, String videoTakerFlag, Article article) throws JsonProcessingException {
 
         Integer cueVer = 0;
         Integer cueOderVer = 0;
@@ -132,25 +133,40 @@ public class ArticleMediaService {
 
         }
 
-        //토픽메세지 ArticleTopicDTO Json으로 변환후 send
-        TakerCueSheetTopicDTO takerCueSheetTopicDTO = new TakerCueSheetTopicDTO();
-        //모델부분은 안넣어줘도 될꺼같음.
-        takerCueSheetTopicDTO.setEvent_id(eventId);
-        takerCueSheetTopicDTO.setCue_id(cueId);
-        takerCueSheetTopicDTO.setCue_ver(cueVer);
-        takerCueSheetTopicDTO.setCue_oder_ver(cueOderVer);
-        takerCueSheetTopicDTO.setCue_item_id(cueItemId); //변경된 내용 추가
-        takerCueSheetTopicDTO.setArtcl_id(artclId);
-        takerCueSheetTopicDTO.setCue_tmplt_id(cueTmpltId);
-        takerCueSheetTopicDTO.setSpare_yn(spareYn);
-        takerCueSheetTopicDTO.setPrompter(prompterFlag);
-        takerCueSheetTopicDTO.setVideo_taker(videoTakerFlag);
-        String json = marshallingJsonHelper.MarshallingJson(takerCueSheetTopicDTO);
+        Long orgArtclId = article.getOrgArtclId();
 
-        //interface에 큐메세지 전송
-        topicService.topicInterface(json);
+        if (ObjectUtils.isEmpty(orgArtclId) == false) {
+
+            //토픽메세지 ArticleTopicDTO Json으로 변환후 send
+            TakerCueSheetTopicDTO takerCueSheetTopicDTO = new TakerCueSheetTopicDTO();
+            //모델부분은 안넣어줘도 될꺼같음.
+            takerCueSheetTopicDTO.setEvent_id(eventId);
+            takerCueSheetTopicDTO.setCue_id(cueId);
+            takerCueSheetTopicDTO.setCue_ver(cueVer);
+            takerCueSheetTopicDTO.setCue_oder_ver(cueOderVer);
+            takerCueSheetTopicDTO.setCue_item_id(cueItemId); //변경된 내용 추가
+            takerCueSheetTopicDTO.setArtcl_id(artclId);
+            takerCueSheetTopicDTO.setCue_tmplt_id(cueTmpltId);
+            takerCueSheetTopicDTO.setSpare_yn(spareYn);
+            takerCueSheetTopicDTO.setPrompter(prompterFlag);
+            takerCueSheetTopicDTO.setVideo_taker(videoTakerFlag);
+            String interfaceJson = marshallingJsonHelper.MarshallingJson(takerCueSheetTopicDTO);
+
+            //interface에 큐메세지 전송
+            topicService.topicInterface(interfaceJson);
+        }
+
+        WebTopicDTO webTopicDTO = new WebTopicDTO();
+        webTopicDTO.setEventId("Article Media Create");
+        webTopicDTO.setCueId(cueId);
+        webTopicDTO.setCueItemId(cueItemId);
+        webTopicDTO.setArtclId(artclId);
+        webTopicDTO.setCueVer(cueVer);
+        webTopicDTO.setCueOderVer(cueOderVer);
+        webTopicDTO.setSpareYn(spareYn);
+        String webJson = marshallingJsonHelper.MarshallingJson(webTopicDTO);
         //web에 큐메세지 전송
-        topicService.topicWeb(json);
+        topicService.topicWeb(webJson);
 
     }
 
@@ -179,7 +195,6 @@ public class ArticleMediaService {
         articleMediaMapper.updateFromDto(articleMediaDTO, articleMedia);
 
         articleMediaRepository.save(articleMedia);
-
 
         ArticleSimpleDTO articleSimpleDTO = articleMediaDTO.getArticle();
         Long artclId = articleSimpleDTO.getArtclId();

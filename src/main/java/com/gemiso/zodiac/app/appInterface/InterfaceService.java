@@ -2008,8 +2008,6 @@ public class InterfaceService {
 
         String json = marshallingJsonHelper.MarshallingJson(takerToCueMqDTO);
 
-        System.out.println(json);
-
         topicService.topicWeb(json);
     }
 }

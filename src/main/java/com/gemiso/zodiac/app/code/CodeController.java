@@ -68,10 +68,12 @@ public class CodeController {
         Long cdId = codeService.create(codeCreateDTO);
 
         //코드 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
-        CodeDTO returnCodeDTO = new CodeDTO();
-        returnCodeDTO.setCdId(cdId);
+        /*CodeDTO returnCodeDTO = new CodeDTO();
+        returnCodeDTO.setCdId(cdId);*/
 
-        return new AnsApiResponse<>(returnCodeDTO);
+        CodeDTO codeDTO = codeService.find(cdId);
+
+        return new AnsApiResponse<>(codeDTO);
     }
 
     @Operation(summary = "코드 수정", description = "코드 수정")
@@ -83,8 +85,10 @@ public class CodeController {
         codeService.update(codeUpdateDTO, cdId);
 
         //코드 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
-        CodeDTO codeDTO = new CodeDTO();
-        codeDTO.setCdId(cdId);
+        //CodeDTO codeDTO = new CodeDTO();
+        //codeDTO.setCdId(cdId);
+
+        CodeDTO codeDTO = codeService.find(cdId);
 
         return new AnsApiResponse<>(codeDTO);
     }

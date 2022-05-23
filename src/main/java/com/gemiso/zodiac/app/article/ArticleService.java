@@ -172,7 +172,7 @@ public class ArticleService {
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
 
-       return new PageResultDTO<ArticleDTO, Article>(result, fn);
+        return new PageResultDTO<ArticleDTO, Article>(result, fn);
 
 
     }
@@ -283,7 +283,7 @@ public class ArticleService {
 
         String embgYn = articleUpdateDTO.getEmbgYn();
 
-        if ("N".equals(embgYn)){ //엠바고 플레그가 N일경우 엠바고DTM null
+        if ("N".equals(embgYn)) { //엠바고 플레그가 N일경우 엠바고DTM null
             article.setEmbgDtm(null);
         }
 
@@ -308,7 +308,7 @@ public class ArticleService {
 
         //MQ메세지 전송
         sendTopic("Aarticle Update", artclId);
-      
+
 
     }
 
@@ -323,26 +323,26 @@ public class ArticleService {
         String json = marshallingJsonHelper.MarshallingJson(articleTopicDTO);
 
         topicService.topicWeb(json);
-        
+
     }
-    
+
     public void updateCopyArticle(Article article, String userId) throws Exception {
 
         //복사된 기사인 경우
         Long orgArtclId = article.getOrgArtclId();
         String apprvDivCd = article.getApprvDivCd();
         //원본기사인경우.
-        if (ObjectUtils.isEmpty(orgArtclId)){
+        if (ObjectUtils.isEmpty(orgArtclId)) {
             //원본기사가 fix_none인경우
-            if ("fix_none".equals(apprvDivCd)){
+            if ("fix_none".equals(apprvDivCd)) {
 
                 List<Article> copyArticleList = articleRepository.findCopyArticle(orgArtclId);
 
-                for (Article copyArticle : copyArticleList){
+                for (Article copyArticle : copyArticleList) {
 
                     //사본기사가 픽스구분이 fix_none인경우
                     String copyApprvDivCd = copyArticle.getApprvDivCd();
-                    if ("fix_none".equals(copyApprvDivCd)){
+                    if ("fix_none".equals(copyApprvDivCd)) {
 
                         // 수정할 기사 빌드 후 업데이트 save
                         Article updateCopyArticle = copyArticleBuild(copyArticle, article);
@@ -367,7 +367,7 @@ public class ArticleService {
     }
 
     // 수정할 기사 빌드 후 업데이트 save
-    public Article copyArticleBuild(Article copyArticle, Article article){
+    public Article copyArticleBuild(Article copyArticle, Article article) {
 
         Issue getIssue = article.getIssue();
         CueSheet cueSheet = article.getCueSheet();
@@ -486,9 +486,9 @@ public class ArticleService {
     }
 
     //기사가 삭제될때 포함된 미디어정보도 같이 삭제처리 ( delYn = "Y")
-    public void deleteArticleMedia(Set<ArticleMedia> articleMediaSet, String userId){
+    public void deleteArticleMedia(Set<ArticleMedia> articleMediaSet, String userId) {
 
-        for (ArticleMedia articleMedia : articleMediaSet){
+        for (ArticleMedia articleMedia : articleMediaSet) {
 
             ArticleMediaDTO articleMediaDTO = articleMediaMapper.toDto(articleMedia);
             articleMediaDTO.setDelYn("Y");
@@ -1024,16 +1024,16 @@ public class ArticleService {
 
         Set<ArticleCap> capSimpleList = updateArticle.getArticleCap(); //update로 들어온 기사 등록
         List<ArticleCapCreateDTO> capSimpleDTOList = new ArrayList<>();
-        for (ArticleCap articleCap : capSimpleList){
+        for (ArticleCap articleCap : capSimpleList) {
 
             CapTemplate capTemplate = articleCap.getCapTemplate();
             Long capTmpltId = null;
-            if (ObjectUtils.isEmpty(capTemplate) ==false){
+            if (ObjectUtils.isEmpty(capTemplate) == false) {
                 capTmpltId = capTemplate.getCapTmpltId();
             }
             Symbol symbol = articleCap.getSymbol();
             String symbolId = "";
-            if (ObjectUtils.isEmpty(symbol) == false){
+            if (ObjectUtils.isEmpty(symbol) == false) {
                 symbolId = symbol.getSymbolId();
             }
 
@@ -1085,16 +1085,16 @@ public class ArticleService {
 
         Set<AnchorCap> capSimpleList = updateArticle.getAnchorCap(); //update로 들어온 기사 등록
         List<AnchorCapCreateDTO> capSimpleDTOList = new ArrayList<>();
-        for (AnchorCap anchorCap : capSimpleList){
+        for (AnchorCap anchorCap : capSimpleList) {
 
             CapTemplate capTemplate = anchorCap.getCapTemplate();
             Long capTmpltId = null;
-            if (ObjectUtils.isEmpty(capTemplate) ==false){
+            if (ObjectUtils.isEmpty(capTemplate) == false) {
                 capTmpltId = capTemplate.getCapTmpltId();
             }
             Symbol symbol = anchorCap.getSymbol();
             String symbolId = "";
-            if (ObjectUtils.isEmpty(symbol) == false){
+            if (ObjectUtils.isEmpty(symbol) == false) {
                 symbolId = symbol.getSymbolId();
             }
 
@@ -1182,12 +1182,12 @@ public class ArticleService {
 
         Long orgArticleId = article.getOrgArtclId();
 
-        if (ObjectUtils.isEmpty(orgArticleId) == false){
+        if (ObjectUtils.isEmpty(orgArticleId) == false) {
             topicService.topicInterface(json);
         }
         topicService.topicWeb(json);
 
-        log.info( "Article Lock : UserId : "+userId +"Lock Value : " + lockYn);
+        log.info("Article Lock : UserId : " + userId + "Lock Value : " + lockYn);
 
     }
 
@@ -1309,39 +1309,39 @@ public class ArticleService {
                 booleanBuilder.and(qArticle.rptrId.eq(String.valueOf(qUser.userNm.contains(searchWord))));
             }
             //검색구분코드 안들어왔을 경우
-            else if(searchDivCd == null || searchDivCd.trim().isEmpty()){
+            else if (searchDivCd == null || searchDivCd.trim().isEmpty()) {
                 booleanBuilder.and(qArticle.artclTitl.contains(searchWord).or(qArticle.artclTitlEn.contains(searchWord)));
             }
 
         }
 
         //픽스구분코드[여러개의 or조건으로 가능]
-        if (CollectionUtils.isEmpty(apprvDivCdList) == false){
+        if (CollectionUtils.isEmpty(apprvDivCdList) == false) {
             booleanBuilder.and(qArticle.apprvDivCd.in(apprvDivCdList));
         }
 
         //부서코드
         //if (deptCd != null && deptCd.trim().isEmpty() == false){
         //    booleanBuilder.and(qArticle.deptCd.eq(deptCd));
-       // }
+        // }
         //기사카테고리코드
-        if (artclCateCd != null && artclCateCd.trim().isEmpty() == false){
+        if (artclCateCd != null && artclCateCd.trim().isEmpty() == false) {
             booleanBuilder.and(qArticle.artclCateCd.eq(artclCateCd));
         }
         //기사유형상세코드
-        if (artclTypDtlCd != null && artclTypDtlCd.trim().isEmpty() == false){
+        if (artclTypDtlCd != null && artclTypDtlCd.trim().isEmpty() == false) {
             booleanBuilder.and(qArticle.artclTypDtlCd.eq(artclTypDtlCd));
         }
         //기사 아이디
-        if(ObjectUtils.isEmpty(artclId) == false){
+        if (ObjectUtils.isEmpty(artclId) == false) {
             booleanBuilder.and(qArticle.artclId.eq(artclId));
         }
         //원본 기사 및 복사된 기사 검색조건
-        if (copyYn != null && copyYn.trim().isEmpty() == false){
+        if (copyYn != null && copyYn.trim().isEmpty() == false) {
 
-            if ("N".equals(copyYn)){
+            if ("N".equals(copyYn)) {
                 booleanBuilder.and(qArticle.orgArtclId.isNull());
-            }else {
+            } else {
                 booleanBuilder.and(qArticle.orgArtclId.isNotNull());
             }
         }
@@ -1427,25 +1427,21 @@ public class ArticleService {
         }
 
         //픽스구분코드[여러개의 or조건으로 가능]
-        if (CollectionUtils.isEmpty(apprvDivCdList) == false){
+        if (CollectionUtils.isEmpty(apprvDivCdList) == false) {
 
             int listSize = apprvDivCdList.size(); //리스트 길이에 맞춰 or조건 set
 
-            if (listSize == 1){
+            if (listSize == 1) {
                 booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)));
-            }
-            else if (listSize == 2){
+            } else if (listSize == 2) {
                 booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(1))));
-            }
-            else if (listSize == 3){
+            } else if (listSize == 3) {
                 booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(1)))
                         .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(2))));
-            }
-            else if (listSize == 4){
+            } else if (listSize == 4) {
                 booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(1)))
                         .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(2))).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(3))));
-            }
-            else if (listSize == 5){
+            } else if (listSize == 5) {
                 booleanBuilder.and(qArticle.apprvDivCd.eq(apprvDivCdList.get(0)).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(1)))
                         .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(2))).or(qArticle.apprvDivCd.eq(apprvDivCdList.get(3)))
                         .or(qArticle.apprvDivCd.eq(apprvDivCdList.get(4))));
@@ -1575,13 +1571,13 @@ public class ArticleService {
     }
 
     //픽스단계대로 픽스자, 픽스일시 set
-    public Article fixUserInfoSet(String apprvDivCd, String orgApprvDivcd, Article article, String userId){
+    public Article fixUserInfoSet(String apprvDivCd, String orgApprvDivcd, Article article, String userId) {
 
         //픽스 fix_none으로 들어온경우
-        if ("fix_none".equals(apprvDivCd)){
+        if ("fix_none".equals(apprvDivCd)) {
 
             // article_fix에서 fix_none으로 픽스를 풀 경우 등록된 기자,일시 삭제
-            if ("article_fix".equals(orgApprvDivcd)){
+            if ("article_fix".equals(orgApprvDivcd)) {
                 article.setArtclFixUser("");
                 article.setArtclFixDtm(null);
                 article.setEditorFixUser("");
@@ -1594,9 +1590,9 @@ public class ArticleService {
         }
 
         //픽스 article_fix으로 들어온경우
-        if ("article_fix".equals(apprvDivCd)){
+        if ("article_fix".equals(apprvDivCd)) {
 
-            if ("fix_none".equals(orgApprvDivcd)){
+            if ("fix_none".equals(orgApprvDivcd)) {
                 article.setArtclFixUser(userId);
                 article.setArtclFixDtm(new Date());
                 article.setEditorFixUser("");
@@ -1610,11 +1606,11 @@ public class ArticleService {
 
                 List<Article> articleList = articleRepository.findCopyArticle(artclId);
 
-                for (Article articleEntity : articleList){
+                for (Article articleEntity : articleList) {
 
                     String apprvDicCd = articleEntity.getApprvDivCd();
 
-                    if ("fix_none".equals(apprvDicCd)){ //복사된 기사가 fix_none일경우 article_fix로 업데이트
+                    if ("fix_none".equals(apprvDicCd)) { //복사된 기사가 fix_none일경우 article_fix로 업데이트
 
                         ArticleDTO articleDTO = articleMapper.toDto(articleEntity);
                         articleDTO.setApprvDivCd("article_fix");
@@ -1626,8 +1622,8 @@ public class ArticleService {
                         articleRepository.save(articleEntity);
                     }
                 }
-                
-            }else { // article_fix 으로 픽스를 풀 경우 등록된 에디터, 앵커 기록 삭제
+
+            } else { // article_fix 으로 픽스를 풀 경우 등록된 에디터, 앵커 기록 삭제
 
                 article.setEditorFixUser("");
                 article.setEditorFixDtm(null);
@@ -1642,7 +1638,7 @@ public class ArticleService {
         //에디터 픽스일 경우 픽스한 에디터 set
         if ("editor_fix".equals(apprvDivCd)) {
 
-            if ("article_fix".equals(orgApprvDivcd)){
+            if ("article_fix".equals(orgApprvDivcd)) {
                 article.setEditorFixUser(userId);
                 article.setEditorFixDtm(new Date());
                 article.setEditorId(userId);
@@ -1651,7 +1647,7 @@ public class ArticleService {
                 article.setDeskFixUser("");
                 article.setDeskFixDtm(null);
 
-            }else { // editor_fix 으로 픽스를 풀 경우 등록된 앵커, 데스커 기록 삭제
+            } else { // editor_fix 으로 픽스를 풀 경우 등록된 앵커, 데스커 기록 삭제
 
                 article.setAnchorFixUser("");
                 article.setAnchorFixDtm(null);
@@ -1660,21 +1656,21 @@ public class ArticleService {
             }
         }
         //앵커 픽스일 경우 픽스한 앵커 set
-        if ("anchor_fix".equals(apprvDivCd)){
+        if ("anchor_fix".equals(apprvDivCd)) {
 
-            if ("desk_fix".equals(orgApprvDivcd)){ // anchor_fix 으로 픽스를 풀 경우 등록된 데스커 기록 삭제
+            if ("desk_fix".equals(orgApprvDivcd)) { // anchor_fix 으로 픽스를 풀 경우 등록된 데스커 기록 삭제
 
                 article.setDeskFixUser("");
                 article.setDeskFixDtm(null);
 
-            }else {
+            } else {
                 article.setAnchorFixUser(userId);
                 article.setAnchorFixDtm(new Date());
             }
 
         }
         //데스커 픽스일 경우 픽스한 데스커 set
-        if ("desk_fix".equals(apprvDivCd)){
+        if ("desk_fix".equals(apprvDivCd)) {
 
             article.setDeskFixUser(userId);
             article.setDeskFixDtm(new Date());
@@ -1753,15 +1749,15 @@ public class ArticleService {
         String inputr = article.getInputrId();
 
         if (inputr.equals(userId) == false) { //기사입력자 확인, 본인기사만 삭제 가능.
-            if (userAuthChkService.authChk(FixAuth.ADMIN.name())) {
+            if (userAuthChkService.authChk(FixAuth.DESK.name())) {
                 throw new UserFailException("기사를 입력한 사용자가 아닙니다. 기사 입력자 아이디 : " + inputr);
             }
-        }
-        if (userAuthChkService.authChk(FixAuth.ADMIN.name())) {//관리자 권한 확인. 본인기사가 아니더라도 관리자면 삭제가능
-            if (inputr.equals(userId) == false) {
+        } else {
+            if (userAuthChkService.authChk(FixAuth.DESK.name())) {//관리자 권한 확인. 본인기사가 아니더라도 관리자면 삭제가능
                 throw new UserFailException("관리자 권한 이거나 기사를 입력한 사용자만 기사 삭제가 가능 합니다.");
             }
         }
+
 
     }
 

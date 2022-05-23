@@ -73,6 +73,7 @@ import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.topic.TopicService;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.TakerCueSheetTopicDTO;
+import com.gemiso.zodiac.core.topic.articleTopicDTO.WebTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -1841,8 +1842,19 @@ public class CueSheetItemService {
 
         //interface에 큐메세지 전송
         topicService.topicInterface(json);
+
+
+        WebTopicDTO webTopicDTO = new WebTopicDTO();
+        webTopicDTO.setEventId(eventId);
+        webTopicDTO.setCueId(cueId);
+        webTopicDTO.setCueItemId(cueItemId);
+        webTopicDTO.setArtclId(artclId);
+        webTopicDTO.setCueVer(cueSheet.getCueVer());
+        webTopicDTO.setCueOderVer(cueSheet.getCueOderVer());
+        webTopicDTO.setSpareYn(spareYn);
+        String webJson = marshallingJsonHelper.MarshallingJson(webTopicDTO);
         //web에 큐메세지 전송
-        topicService.topicWeb(json);
+        topicService.topicWeb(webJson);
 
     }
 
