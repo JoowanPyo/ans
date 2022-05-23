@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
@@ -41,6 +42,8 @@ public class CueSheetCreateDTO {
     private String brdcRunTime;
     private int cueVer;
     private int cueOderVer;
+    private Integer deptCd;
+    //private String deptNm;
     private BaseProgramSimpleDTO baseProgram;
     private ProgramSimpleDTO program;
 }

@@ -389,7 +389,7 @@ public class InterfaceController {
                                 @PathVariable("rd_id") Long rd_id,
                                 @Parameter(description = "필수값<br> on_air ", required = true)
                                 @RequestBody @Valid TakerCdUpdateDTO takerCdUpdateDTO,
-                                @RequestHeader(value = "securityKey") String securityKey) {
+                                @RequestHeader(value = "securityKey") String securityKey) throws JsonProcessingException {
 
         log.info("Taker CueSheet State Code Update : rd_id - " + rd_id + " cue_st_cd : " + takerCdUpdateDTO.toString());
 

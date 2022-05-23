@@ -62,7 +62,7 @@ public class TakerCueSheetSpareDTO {
     @XmlElement(name = "rptr_nm")
     private String rptrNm;
     @XmlElement(name = "dept_cd")
-    private String deptCd;
+    private Integer deptCd;
     @XmlElement(name = "dept_nm")
     private String deptNm;
     @XmlElement(name = "artcl_reqd_sec")

@@ -117,6 +117,10 @@ public class CueTmpltItem extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = lckr_id)")
     private String lckrNm;
 
+    @Column(name = "artcl_ext_time")
+    private Integer artclExtTime;
+
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cue_tmplt_id",nullable = false)
     @JsonBackReference

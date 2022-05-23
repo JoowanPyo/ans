@@ -179,6 +179,13 @@ public class CueSheet {
     @Column(name = "cue_oder_ver")
     private Integer cueOderVer;
 
+    @Column(name = "dept_cd", length = 50)
+    private Integer deptCd;
+
+    //@Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.name from tb_depts a where a.id = dept_cd)")
+    private String deptNm;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brdc_pgm_id")
     private Program program;

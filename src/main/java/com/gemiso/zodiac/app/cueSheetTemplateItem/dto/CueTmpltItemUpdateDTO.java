@@ -43,6 +43,7 @@ public class CueTmpltItemUpdateDTO {
     //private String delrNm;
     //private String lckrId;
     //private String lckrNm;
+    private Integer artclExtTime;
     private CueSheetTemplateSimpleDTO cueSheetTemplate;
     private List<CueTmpltItemCapCreateDTO> cueTmpltItemCap;
 }

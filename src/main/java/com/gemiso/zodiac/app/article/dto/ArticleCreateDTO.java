@@ -10,7 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
+import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -87,8 +89,8 @@ public class ArticleCreateDTO {
     private Integer ancMentCttTime;
     private Integer artclExtTime;
     private Integer videoTime;
-    @NotNull
-    private String deptCd;
+    private Integer deptCd;
+    //private String deptNm;
     private String deviceCd;
     private String memo;
     private IssueDTO issue;

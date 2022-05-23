@@ -241,10 +241,10 @@ public class Article extends BaseEntity {
     private Integer videoTime;
 
     @Column(name = "dept_cd", length = 50)
-    private String deptCd;
+    private Integer deptCd;
 
     //@Basic(fetch = FetchType.LAZY)
-    @Formula("(select a.cd_nm from tb_cd a where a.cd = dept_cd)")
+    @Formula("(select a.name from tb_depts a where a.id = dept_cd)")
     private String deptNm;
 
     @Column(name = "parent_artlc_id", length = 8)

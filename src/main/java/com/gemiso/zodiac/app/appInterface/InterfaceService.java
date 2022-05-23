@@ -1960,10 +1960,11 @@ public class InterfaceService {
             articleMediaRepository.save(articleMedia);
 
         }
+
     }
 
     //큐시트 방송상태 업데이트[taker]
-    public ParentProgramDTO cueStCdUpdate(Long cueId, TakerCdUpdateDTO takerCdUpdateDTO){
+    public ParentProgramDTO cueStCdUpdate(Long cueId, TakerCdUpdateDTO takerCdUpdateDTO) throws JsonProcessingException {
 
 
         String cueStCd = takerCdUpdateDTO.getCue_st_cd();
@@ -1978,6 +1979,16 @@ public class InterfaceService {
         }
 
         ParentProgramDTO parentProgramDTO = cueToTaker(cueSheetDTO);
+
+        //클로아이언트로 MQ메세지 전송
+        TakerToCueMqDTO takerToCueMqDTO = new TakerToCueMqDTO();
+        takerToCueMqDTO.setEventId("CueSheet cueStCd "+cueStCd+" update");
+        //takerToCueMqDTO.setCueItemId(rdId);
+        takerToCueMqDTO.setCueId(cueId);
+
+        String json = marshallingJsonHelper.MarshallingJson(takerToCueMqDTO);
+
+        topicService.topicWeb(json);
 
         return parentProgramDTO;
     }

@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,6 +47,7 @@ public class CueTmpltItemDTO {
     private String delrNm;
     private String lckrId;
     private String lckrNm;
+    private Integer artclExtTime;
     private CueSheetTemplateSimpleDTO cueSheetTemplate;
     private List<CueTmpltItemCapSimpleDTO> cueTmpltItemCap;
     private List<CueTmplSymbolDTO> cueTmplSymbol = new ArrayList<>();

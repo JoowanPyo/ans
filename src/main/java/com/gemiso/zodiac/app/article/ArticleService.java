@@ -134,7 +134,7 @@ public class ArticleService {
     //기사 목록조회
     public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
                                                       String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
-                                                      Integer page, Integer limit, List<String> apprvDivCdList, String deptCd,
+                                                      Integer page, Integer limit, List<String> apprvDivCdList, Integer deptCd,
                                                       String artclCateCd, String artclTypDtlCd, String delYn, Long artclId, String copyYn) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
@@ -154,7 +154,7 @@ public class ArticleService {
 
     //기사 목록조회[이슈 기사]
     public PageResultDTO<ArticleDTO, Article> findAllIsuue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd, String artclTypDtlCd,
-                                                           String artclCateCd, String deptCd, String inputrId,
+                                                           String artclCateCd, Integer deptCd, String inputrId,
                                                            String brdcPgmId, Long orgArtclId, String delYn,
                                                            String searchDivCd, String searchWord, Integer page, Integer limit, List<String> apprvDivCdList) {
 
@@ -179,7 +179,7 @@ public class ArticleService {
 
     // 큐시트에서 기사 목록 조회
     public PageResultDTO<ArticleDTO, Article> findCue(Date sdate, Date edate, String searchWord, Long cueId,
-                                                      String brdcPgmId, String artclTypDtlCd, String copyYn, Integer page, Integer limit) {
+                                                      String brdcPgmId, String artclTypDtlCd, String copyYn, Integer deptCd, Integer page, Integer limit) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
@@ -189,7 +189,7 @@ public class ArticleService {
 
         //전체조회[page type]
         Page<Article> result = articleRepository.findByArticleCue(sdate, edate, searchWord, cueId,
-                brdcPgmId, artclTypDtlCd, copyYn, pageable);
+                brdcPgmId, artclTypDtlCd, copyYn, deptCd, pageable);
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
 
@@ -1321,9 +1321,9 @@ public class ArticleService {
         }
 
         //부서코드
-        if (deptCd != null && deptCd.trim().isEmpty() == false){
-            booleanBuilder.and(qArticle.deptCd.eq(deptCd));
-        }
+        //if (deptCd != null && deptCd.trim().isEmpty() == false){
+        //    booleanBuilder.and(qArticle.deptCd.eq(deptCd));
+       // }
         //기사카테고리코드
         if (artclCateCd != null && artclCateCd.trim().isEmpty() == false){
             booleanBuilder.and(qArticle.artclCateCd.eq(artclCateCd));
@@ -1392,9 +1392,9 @@ public class ArticleService {
             booleanBuilder.and(qArticle.artclCateCd.eq(artclCateCd));
         }
         //검색조건 = 부서 코드
-        if (deptCd != null && deptCd.trim().isEmpty() == false) {
-            booleanBuilder.and(qArticle.deptCd.eq(deptCd));
-        }
+        //if (deptCd != null && deptCd.trim().isEmpty() == false) {
+        //    booleanBuilder.and(qArticle.deptCd.eq(deptCd));
+        //}
         //검색조건 = 부서 코드
         if (inputrId != null && inputrId.trim().isEmpty() == false) {
             booleanBuilder.and(qArticle.inputrId.eq(inputrId));

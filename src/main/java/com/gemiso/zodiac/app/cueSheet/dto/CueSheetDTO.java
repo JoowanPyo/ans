@@ -70,6 +70,8 @@ public class CueSheetDTO {
     private String brdcRunTime;
     private Integer cueVer;
     private Integer cueOderVer;
+    private Integer deptCd;
+    private String deptNm;
     private ProgramDTO program;
     private BaseProgramSimpleDTO baseProgram;
     private List<CueSheetItemDTO> cueSheetItem = new ArrayList<>();

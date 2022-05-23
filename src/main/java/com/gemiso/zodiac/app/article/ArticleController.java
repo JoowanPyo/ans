@@ -54,7 +54,7 @@ public class ArticleController {
             @Parameter(name = "page", description = "시작페이지") @RequestParam(value = "page", required = false) Integer page,
             @Parameter(name = "limit", description = "한 페이지에 데이터 수") @RequestParam(value = "limit", required = false) Integer limit,
             @Parameter(name = "apprvDivCdList", description = "픽스구분코드(fix_none,article_fix,editor_fix,anchor_fix,desk_fix)") @RequestParam(value = "apprvDivCdList", required = false) List<String> apprvDivCdList,
-            @Parameter(name = "deptCd", description = "부서코드") @RequestParam(value = "deptCd", required = false) String deptCd,
+            @Parameter(name = "deptCd", description = "부서코드") @RequestParam(value = "deptCd", required = false) Integer deptCd,
             @Parameter(name = "artclCateCd", description = "기사 카테고리 코드") @RequestParam(value = "artclCateCd", required = false) String artclCateCd,
             @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
             @Parameter(name = "delYn", description = "삭제 여부") @RequestParam(value = "delYn", required = false) String delYn,
@@ -106,6 +106,8 @@ public class ArticleController {
                                                                       @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
                                                                       @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]")
                                                                       @RequestParam(value = "copyYn", required = false) String copyYn,
+                                                                      @Parameter(name = "deptCd", description = "부서 코드")
+                                                                      @RequestParam(value = "deptCd", required = false) Integer deptCd,
                                                                       @Parameter(name = "page", description = "시작페이지")
                                                                       @RequestParam(value = "page", required = false) Integer page,
                                                                       @Parameter(name = "limit", description = "한 페이지에 데이터 수")
@@ -115,7 +117,7 @@ public class ArticleController {
         SearchDate searchDate = new SearchDate(sdate, edate);
 
         PageResultDTO<ArticleDTO, Article> pageList = articleService.findCue(searchDate.getStartDate(), searchDate.getEndDate(),
-                searchWord, cueId, brdcPgmId, artclTypDtlCd, copyYn, page, limit);
+                searchWord, cueId, brdcPgmId, artclTypDtlCd, copyYn, deptCd, page, limit);
 
         pageList = articleService.confirmArticleList(pageList, cueId);
 
@@ -133,7 +135,7 @@ public class ArticleController {
             @Parameter(name = "artclTypCd", description = "기사 유형 코드") @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
             @Parameter(name = "artclTypDtlCd", description = "기상 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
             @Parameter(name = "artclCateCd", description = "기사 카테고리 코드") @RequestParam(value = "artclCateCd", required = false) String artclCateCd,
-            @Parameter(name = "deptCd", description = "부서 코드") @RequestParam(value = "deptCd", required = false) String deptCd,
+            @Parameter(name = "deptCd", description = "부서 코드") @RequestParam(value = "deptCd", required = false) Integer deptCd,
             @Parameter(name = "inputrId", description = "입력자 아이디") @RequestParam(value = "inputrId", required = false) String inputrId,
             @Parameter(name = "brdcPgmId", description = "방송 프로그램 아이디") @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
             @Parameter(name = "orgArtclId", description = "원본 기사 아이디") @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,

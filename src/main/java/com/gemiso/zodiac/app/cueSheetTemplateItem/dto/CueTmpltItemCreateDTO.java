@@ -30,6 +30,7 @@ public class CueTmpltItemCreateDTO {
     private String mediaChCd;
     private String mediaDurtn;
     private String inputrId;
+    private Integer artclExtTime;
     private CueSheetTemplateSimpleDTO cueSheetTemplate;
     private List<CueTmpltItemCapCreateDTO> cueTmpltItemCap;
 }

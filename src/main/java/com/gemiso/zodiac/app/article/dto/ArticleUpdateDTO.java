@@ -84,7 +84,7 @@ public class ArticleUpdateDTO {
     private Integer ancMentCttTime;
     private Integer artclExtTime;
     private Integer videoTime;
-    private String deptCd;
+    private Integer deptCd;
     private String deviceCd;
     private String memo;
     private IssueDTO issue;
