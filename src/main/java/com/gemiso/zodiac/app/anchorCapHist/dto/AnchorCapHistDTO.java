@@ -19,5 +19,6 @@ public class AnchorCapHistDTO {
     private String capRmk;
     private String symbolId;
     private String capDivCd;
+    private Integer lnOrd;
     private ArticleHistSimpleDTO articleHist;
 }

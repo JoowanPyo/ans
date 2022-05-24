@@ -240,12 +240,16 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
         //검색어로 조회
         if (searchWord != null && searchWord.trim().isEmpty() == false) {
             //검색구분코드 01 일때 기사 제목으로 검색
-            if (searchDivCd.equals("01")) {
+            if ("01".equals(searchDivCd)) {
                 jpaQuery.where(qArticle.artclTitl.contains(searchWord).or(qArticle.artclTitlEn.contains(searchWord)));
             }
             //검색구분코드 02 일때 기자이름으로 검색
-            if (searchDivCd.equals("02")) {
+            else if ("02".equals(searchDivCd)) {
                 jpaQuery.where(qArticle.rptrId.eq(String.valueOf(qUser.userNm.contains(searchWord))));
+            }
+            //검색구분코드 안들어왔을 경우
+            else if (searchDivCd == null || searchDivCd.trim().isEmpty()) {
+                jpaQuery.where(qArticle.artclTitl.contains(searchWord).or(qArticle.artclTitlEn.contains(searchWord)));
             }
 
         }

@@ -23,6 +23,7 @@ public class UserDTO {
     private String emplNo;
     private String freeYn;
     private Long deptId;
+    private String deptNm;
     private String dutyCd;
     private String dutyCdNm;
     private String chiefYn;

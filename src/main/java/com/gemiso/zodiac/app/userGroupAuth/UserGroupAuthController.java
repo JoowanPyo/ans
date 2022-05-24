@@ -15,7 +15,7 @@ import java.util.List;
 
 @Api(description = "유저그룹 권한 추가,수정 API")
 @RestController
-@RequestMapping("/userGroups")
+@RequestMapping("/usergroupauth")
 @Slf4j
 @RequiredArgsConstructor
 public class UserGroupAuthController {

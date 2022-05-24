@@ -40,6 +40,9 @@ public class AnchorCapHist {
     @Column(name = "cap_div_cd", length = 50)
     private String capDivCd;
 
+    @Column(name = "ln_ord")
+    private Integer lnOrd;
+
     @ManyToOne
     @JoinColumn(name = "artcl_hist_id")
     private ArticleHist articleHist;

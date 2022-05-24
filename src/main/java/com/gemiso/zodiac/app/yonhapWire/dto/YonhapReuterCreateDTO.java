@@ -21,6 +21,7 @@ public class YonhapReuterCreateDTO {
     private String wire_artcl_titl;
     private String wire_artcl_ctt;
     private String mam_cont_id;
+    private String editor_number;
 
     private int artcl_brdc_count;
 

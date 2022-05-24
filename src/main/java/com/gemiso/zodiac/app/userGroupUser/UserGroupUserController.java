@@ -18,7 +18,7 @@ import java.util.List;
 //@Tag(name = "MisUser Controllers", description = "MisUser API")
 @Api(description = "사용자 그룹 추가 API")
 @RestController
-@RequestMapping("/addUserGroups")
+@RequestMapping("/addusergroups")
 @Slf4j
 @RequiredArgsConstructor
 public class UserGroupUserController {

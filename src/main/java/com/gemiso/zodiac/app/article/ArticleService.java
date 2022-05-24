@@ -952,6 +952,7 @@ public class ArticleService {
                 .capRmk(articleCap.getCapRmk())
                 .symbolId(symbolId)
                 .capDivCd(articleCap.getCapDivCd())
+                .lnOrd(articleCap.getLnOrd())
                 .build();
 
         //디비에 등록하기위해 엔티티 변환
@@ -986,6 +987,7 @@ public class ArticleService {
                 .capRmk(anchorCap.getCapRmk())
                 .symbolId(symbolId)
                 .capDivCd(anchorCap.getCapDivCd())
+                .lnOrd(anchorCap.getLnOrd())
                 .build();
         //디비에 등록하기위해 엔티티 변환
         AnchorCapHist anchorCapHist = anchorCapHistCreateMapper.toEntity(anchorCapHistCreateDTO);

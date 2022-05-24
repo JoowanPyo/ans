@@ -48,6 +48,10 @@ public class User extends BaseEntity {
     @Column(name = "dept_id")
     private Long deptId;
 
+    //@Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.name from tb_depts a where a.id = dept_id)")
+    private String deptNm;
+
     @Column(name = "duty_cd", length = 50)
     private String dutyCd;
 

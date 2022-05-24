@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.app.yonhapWire;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.file.AttachFileRepository;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
@@ -19,26 +21,30 @@ import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.PersistenceException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class YonhapWireService {
+
+    @Value("${nam.url.injest.key:url}")
+    private String namUrl;
 
     private final YonhapWireRepository yonhapWireRepository;
     //private final AttachFileRepository attachFileRepository;
@@ -361,7 +367,7 @@ public class YonhapWireService {
 
     }
 
-    public YonhapExceptionDomain createReuter(YonhapReuterCreateDTO yonhapReuterCreateDTO){
+    public YonhapExceptionDomain createReuter(YonhapReuterCreateDTO yonhapReuterCreateDTO) throws JsonProcessingException {
 
         Long reuterId = null;
 
@@ -373,13 +379,33 @@ public class YonhapWireService {
 
             reuterId = yonhapWireList.get(0).getWireId();
 
+            String getCmnt = yonhapReuterCreateDTO.getVideo_nm();
+
+
+            YonhapNamResponseDTO mamCont = mamCreateMedia(getCmnt, yonhapReuterCreateDTO);
+            NamResponseDTO data = mamCont.getData();
+            Long mamContId = null;
+            if (ObjectUtils.isEmpty(data) == false){
+                mamContId = data.getId();
+            }
+
+
+            int lenth = getCmnt.length();
+            String cmnt = getCmnt.substring(0, getCmnt.lastIndexOf(".") );
+
             YonhapWire yonhapWire = YonhapWire.builder()
                     .wireId(reuterId)
                     .contId(contId)
                     .artclTitl(yonhapReuterCreateDTO.getWire_artcl_titl())
                     .artclCtt(yonhapReuterCreateDTO.getWire_artcl_ctt())
                     .agcyNm("REUTERS")//009
-                    .agcyCd("reuters")
+                    .cmnt(cmnt)
+                    .imprt(yonhapReuterCreateDTO.getImprt())
+                    .mediaNo(yonhapReuterCreateDTO.getEditor_number())
+                    .source("REUTERS")
+                    .svcTyp("R")
+                    .agcyCd("R")
+                    .mamContId(mamContId)
                     .build();
 
             try {
@@ -390,12 +416,30 @@ public class YonhapWireService {
 
         }else {
 
+            String getCmnt = yonhapReuterCreateDTO.getVideo_nm();
+            int lenth = getCmnt.length();
+            String cmnt = getCmnt.substring(0, getCmnt.lastIndexOf(".") );
+
+            YonhapNamResponseDTO mamCont = mamCreateMedia(getCmnt, yonhapReuterCreateDTO);
+            NamResponseDTO data = mamCont.getData();
+            Long mamContId = null;
+            if (ObjectUtils.isEmpty(data) == false){
+                mamContId = data.getId();
+            }
+
+
             YonhapWire yonhapWire = YonhapWire.builder()
                     .contId(contId)
                     .artclTitl(yonhapReuterCreateDTO.getWire_artcl_titl())
                     .artclCtt(yonhapReuterCreateDTO.getWire_artcl_ctt())
-                    .agcyNm("REUTER")//009
-                    .agcyCd("reuter")
+                    .agcyNm("REUTERS")//009
+                    .cmnt(cmnt)
+                    .imprt(yonhapReuterCreateDTO.getImprt())
+                    .mediaNo(yonhapReuterCreateDTO.getEditor_number())
+                    .source("REUTERS")
+                    .svcTyp("R")
+                    .agcyCd("R")
+                    .mamContId(mamContId)
                     .build();
 
             try {
@@ -407,6 +451,40 @@ public class YonhapWireService {
 
         }
         return new YonhapExceptionDomain(reuterId, "2000", "yonhapPhoto", "", "");
+    }
+
+    public YonhapNamResponseDTO mamCreateMedia(String mediaNm, YonhapReuterCreateDTO yonhapReuterCreateDTO) throws JsonProcessingException {
+
+        //헤더 설정
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        httpHeaders.add("Session_user_id", "ans");
+
+        //Object Mapper를 통한 Json바인딩할 dmParam생성
+        Map<String, Object> param = new HashMap<>();
+        param.put("title", yonhapReuterCreateDTO.getWire_artcl_titl());
+        param.put("content", yonhapReuterCreateDTO.getWire_artcl_ctt());
+        param.put("edit_no", yonhapReuterCreateDTO.getEditor_number());
+        param.put("user_id", "");
+        param.put("filename", mediaNm);
+        param.put("org_filename", mediaNm);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String params = objectMapper.writeValueAsString(param);
+
+        //httpEntity에 헤더 및 params 설정
+        HttpEntity entity = new HttpEntity(params, httpHeaders);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<YonhapNamResponseDTO> responseEntity =
+                restTemplate.exchange(namUrl, HttpMethod.POST,
+                        entity, YonhapNamResponseDTO.class);
+
+        YonhapNamResponseDTO results = responseEntity.getBody();
+
+
+        return results;
+
     }
 
     /*public YonhapAptnDTO formatAptn(YonhapWireDTO yonhapWireDTO){

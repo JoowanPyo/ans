@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.yonhapWire;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.yonhapPhoto.dto.YonhapExceptionDomain;
 import com.gemiso.zodiac.app.yonhapWire.dto.*;
 import com.gemiso.zodiac.core.helper.SearchDate;
@@ -115,7 +116,7 @@ public class YonhapWireController {
     @PostMapping(path = "/reuter")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> createReuter(@Parameter(description = "필수값<br> ", required = true)
-                                          @RequestBody YonhapReuterCreateDTO yonhapReuterCreateDTO) {
+                                          @RequestBody YonhapReuterCreateDTO yonhapReuterCreateDTO) throws JsonProcessingException {
 
         YonhapExceptionDomain yonhapExceptionDomain = yonhapWireService.createReuter(yonhapReuterCreateDTO);
 
