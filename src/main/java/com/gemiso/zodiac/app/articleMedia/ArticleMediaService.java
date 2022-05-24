@@ -14,6 +14,11 @@ import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaCreateMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaUpdateMapper;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
+import com.gemiso.zodiac.app.cueSheet.CueSheetService;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.topic.TopicService;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.TakerCueSheetTopicDTO;
@@ -39,6 +44,8 @@ public class ArticleMediaService {
 
     private final ArticleMediaRepository articleMediaRepository;
     private final ArticleRepository articleRepository;
+    private final CueSheetRepository cueSheetRepository;
+    private final CueSheetItemRepository cueSheetItemRepository;
 
     private final ArticleMediaMapper articleMediaMapper;
     private final ArticleMediaCreateMapper articleMediaCreateMapper;
@@ -46,6 +53,8 @@ public class ArticleMediaService {
     private final ArticleMapper articleMapper;
 
     private final ArticleService articleService;
+    private final CueSheetItemService cueSheetItemService;
+    private final CueSheetService cueSheetService;
 
     //private final UserAuthService userAuthService;
 
@@ -94,27 +103,42 @@ public class ArticleMediaService {
 
         ArticleSimpleDTO articleSimpleDTO = articleMediaCreateDTO.getArticle();
         Long artclId = articleSimpleDTO.getArtclId();
-
         Article article = articleService.articleFindOrFail(artclId);
 
-        ArticleDTO articleDTO = articleMapper.toDto(article);
-        Integer orgVideoTime = articleDTO.getVideoTime();
-        Integer newVideoTime = articleMedia.getMediaDurtn();
-        Integer totalVideoTime = Optional.ofNullable(orgVideoTime).orElse(0) + Optional.ofNullable(newVideoTime).orElse(0);
-        articleDTO.setVideoTime(totalVideoTime);
+        CueSheet cueSheet = article.getCueSheet();
 
-        articleMapper.updateFromDto(articleDTO, article);
-        articleRepository.save(article);
+        if (ObjectUtils.isEmpty(cueSheet) == false){
 
-        /********** MQ [TOPIC] ************/
-        //Article article = articleMedia.getArticle();
-        Long articleId = null;
-        if (ObjectUtils.isEmpty(article) == false){
-            articleId = article.getArtclId();
+            Long cueId = cueSheet.getCueId();
+
+            Optional<CueSheet> getCueSheet = cueSheetRepository.findByCue(cueId);
+
+            if (getCueSheet.isPresent()){
+
+                CueSheet cuesheetEntity = getCueSheet.get();
+
+                Optional<CueSheetItem> cueSheetItem = cueSheetItemRepository.findArticleCue(artclId);
+
+                if (cueSheetItem.isPresent()){
+
+                    CueSheetItem cueSheetItemEntity = cueSheetItem.get();
+
+                    /********** MQ [TOPIC] ************/
+                    //Article article = articleMedia.getArticle();
+                    Long articleId = null;
+                    if (ObjectUtils.isEmpty(article) == false){
+                        articleId = article.getArtclId();
+                    }
+
+                    sendCueTopicCreate(cuesheetEntity, cuesheetEntity.getCueId(), cueSheetItemEntity.getCueItemId() , articleId, null, "Article Media Create",
+                            cueSheetItemEntity.getSpareYn(), "Y", "Y", article);
+
+
+                }
+            }
+
+
         }
-
-        sendCueTopicCreate(null, null, null , articleId, null, "Article Media Create",
-                null, "Y", "Y", article);
 
         return articleMediaDTO;
 

@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheetMedia;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaCreateDTO;
 import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaDTO;
 import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaUpdateDTO;
@@ -73,7 +74,7 @@ public class CueSheetMediaController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<CueSheetMediaDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                @RequestBody @Valid CueSheetMediaCreateDTO cueSheetMediaCreateDTO) {
+                                                @RequestBody @Valid CueSheetMediaCreateDTO cueSheetMediaCreateDTO) throws JsonProcessingException {
 
         Long cueMediaId = cueSheetMediaService.create(cueSheetMediaCreateDTO);
 

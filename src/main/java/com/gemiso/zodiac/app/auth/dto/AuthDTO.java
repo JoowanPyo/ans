@@ -3,6 +3,7 @@ package com.gemiso.zodiac.app.auth.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.appAuth.AppAuth;
 import com.gemiso.zodiac.app.appAuth.dto.AppAuthDTO;
+import com.gemiso.zodiac.app.appAuth.dto.AppAuthUserDTO;
 import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.userGroup.UserGroup;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupDTO;
@@ -36,6 +37,7 @@ public class AuthDTO {
     private String clientVer;
     private String userId;
 
+    List<AppAuthUserDTO> appAuthUser = new ArrayList<>();
     /*private List<UserGroupDTO> userGroupDTO = new ArrayList<>();
     private List<AppAuthDTO> appAuthDTO = new ArrayList<>();*/
 }

@@ -1,5 +1,8 @@
 package com.gemiso.zodiac.app.auth;
 
+import com.gemiso.zodiac.app.appAuth.AppAuth;
+import com.gemiso.zodiac.app.appAuth.dto.AppAuthUserDTO;
+import com.gemiso.zodiac.app.appAuth.mapper.AppAuthUserMapper;
 import com.gemiso.zodiac.app.auth.dto.AuthDTO;
 import com.gemiso.zodiac.app.auth.dto.AuthRequestDTO;
 import com.gemiso.zodiac.app.auth.dto.JwtDTO;
@@ -11,11 +14,17 @@ import com.gemiso.zodiac.app.user.UserRepository;
 import com.gemiso.zodiac.app.user.UserService;
 import com.gemiso.zodiac.app.user.dto.UserDTO;
 import com.gemiso.zodiac.app.user.mapper.UserMapper;
+import com.gemiso.zodiac.app.userGroup.UserGroup;
+import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuth;
+import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuthRepository;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
+import com.gemiso.zodiac.app.userGroupUser.UserGroupUserRepository;
 import com.gemiso.zodiac.core.helper.EncodingHelper;
 import com.gemiso.zodiac.core.helper.JWTBuilder;
 import com.gemiso.zodiac.core.helper.JWTParser;
 import com.gemiso.zodiac.exception.PasswordFailedException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
+import com.github.javafaker.App;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +36,9 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -43,10 +54,13 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserTokenRepository userTokenRepository;
     private final AuthRepository authRepository;
+    private final UserGroupUserRepository userGroupUserRepository;
+    private final UserGroupAuthRepository userGroupAuthRepository;
 
     private final UserMapper userMapper;
     private final UserTokenMapper userTokenMapper;
     private final AuthMapper authMapper;
+    private final AppAuthUserMapper appAuthUserMapper;
 
     private final PasswordEncoder passwordEncoder;
     private final JWTBuilder jwtBuilder;
@@ -238,6 +252,28 @@ public class AuthService {
         Auth auth = authRepository.findByLogin(userId);
 
         AuthDTO authDTO = authMapper.toDto(auth);
+
+        List<UserGroupUser> userGroupUserList = userGroupUserRepository.findByUserId(userId);
+
+        List<AppAuthUserDTO> appAuthUserDTOS = new ArrayList<>();
+
+        for (UserGroupUser userGroupUser : userGroupUserList){
+
+            UserGroup userGroup = userGroupUser.getUserGroup();
+
+            Long id =userGroup.getUserGrpId();
+            List<UserGroupAuth> userGroupAuthList = userGroupAuthRepository.findByUserGrpId(id);
+
+            for (UserGroupAuth userGroupAuth : userGroupAuthList){
+                AppAuth appAuth = userGroupAuth.getAppAuth();
+
+                AppAuthUserDTO appAuthUserDTO = appAuthUserMapper.toDto(appAuth);
+
+                appAuthUserDTOS.add(appAuthUserDTO);
+            }
+        }
+
+        authDTO.setAppAuthUser(appAuthUserDTOS);
 
         return authDTO;
 

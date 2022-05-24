@@ -1,5 +1,10 @@
 package com.gemiso.zodiac.app.cueSheetMedia;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaCreateDTO;
 import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaDTO;
 import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaUpdateDTO;
@@ -7,7 +12,11 @@ import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaCreateMapper;
 import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaMapper;
 import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaUpdateMapper;
 import com.gemiso.zodiac.app.cueSheetTemplateMedia.QCueTmpltMedia;
+import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.core.topic.TopicService;
+import com.gemiso.zodiac.core.topic.articleTopicDTO.TakerCueSheetTopicDTO;
+import com.gemiso.zodiac.core.topic.articleTopicDTO.WebTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -28,12 +37,16 @@ import java.util.Optional;
 public class CueSheetMediaService {
 
     private final CueSheetMediaRepository cueSheetMediaRepository;
+    private final CueSheetItemRepository cueSheetItemRepository;
 
     private final CueSheetMediaMapper cueSheetMediaMapper;
     private final CueSheetMediaCreateMapper cueSheetMediaCreateMapper;
     private final CueSheetMediaUpdateMapper cueSheetMediaUpdateMapper;
 
     private final UserAuthService userAuthService;
+
+    private final TopicService topicService;
+    private final MarshallingJsonHelper marshallingJsonHelper;
 
 
     public List<CueSheetMediaDTO> findAll(Date sdate, Date edate, String trnsfFileNm, Long cueItemId, String mediaTypCd, String delYn){
@@ -85,7 +98,7 @@ public class CueSheetMediaService {
         return cueSheetMediaDTO;
     }
 
-    public Long create(CueSheetMediaCreateDTO cueSheetMediaCreateDTO){
+    public Long create(CueSheetMediaCreateDTO cueSheetMediaCreateDTO) throws JsonProcessingException {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
@@ -94,6 +107,32 @@ public class CueSheetMediaService {
         CueSheetMedia cueSheetMedia = cueSheetMediaCreateMapper.toEntity(cueSheetMediaCreateDTO);
 
         cueSheetMediaRepository.save(cueSheetMedia);
+
+        CueSheetItem cueSheetItem = cueSheetMedia.getCueSheetItem();
+
+        if (ObjectUtils.isEmpty(cueSheetItem) == false){
+
+            Long cueItemId = cueSheetItem.getCueItemId();
+
+            Optional<CueSheetItem> cueSheetItemEntity = cueSheetItemRepository.findByCueItem(cueItemId);
+
+            if (cueSheetItemEntity.isPresent()){
+
+                CueSheetItem getCueSheetItem = cueSheetItemEntity.get();
+                String spareYn = getCueSheetItem.getSpareYn();
+
+                CueSheet cueSheet = getCueSheetItem.getCueSheet();
+                Long cueId = 0L;
+                if (ObjectUtils.isEmpty(cueSheet) == false){
+                    cueId = cueSheet.getCueId();
+
+                }
+
+
+                sendCueTopicCreate(cueSheet, cueId, cueItemId, null, null, "CueSheet Media Create",
+                        spareYn, "Y", "Y", null);
+            }
+        }
 
         return cueSheetMedia.getCueMediaId();
     }
@@ -139,6 +178,56 @@ public class CueSheetMediaService {
         }
 
         return cueSheetMedia.get();
+
+    }
+
+    //큐시트 토픽 메세지 전송
+    public void sendCueTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
+                                   String spareYn, String prompterFlag, String videoTakerFlag, Article article) throws JsonProcessingException {
+
+        Integer cueVer = 0;
+        Integer cueOderVer = 0;
+        if (ObjectUtils.isEmpty(cueSheet) == false){
+
+            cueVer = cueSheet.getCueVer();
+            cueOderVer = cueSheet.getCueOderVer();
+
+        }
+
+        Long orgArtclId = article.getOrgArtclId();
+
+        if (ObjectUtils.isEmpty(orgArtclId) == false) {
+
+            //토픽메세지 ArticleTopicDTO Json으로 변환후 send
+            TakerCueSheetTopicDTO takerCueSheetTopicDTO = new TakerCueSheetTopicDTO();
+            //모델부분은 안넣어줘도 될꺼같음.
+            takerCueSheetTopicDTO.setEvent_id(eventId);
+            takerCueSheetTopicDTO.setCue_id(cueId);
+            takerCueSheetTopicDTO.setCue_ver(cueVer);
+            takerCueSheetTopicDTO.setCue_oder_ver(cueOderVer);
+            takerCueSheetTopicDTO.setCue_item_id(cueItemId); //변경된 내용 추가
+            takerCueSheetTopicDTO.setArtcl_id(artclId);
+            takerCueSheetTopicDTO.setCue_tmplt_id(cueTmpltId);
+            takerCueSheetTopicDTO.setSpare_yn(spareYn);
+            takerCueSheetTopicDTO.setPrompter(prompterFlag);
+            takerCueSheetTopicDTO.setVideo_taker(videoTakerFlag);
+            String interfaceJson = marshallingJsonHelper.MarshallingJson(takerCueSheetTopicDTO);
+
+            //interface에 큐메세지 전송
+            topicService.topicInterface(interfaceJson);
+        }
+
+        WebTopicDTO webTopicDTO = new WebTopicDTO();
+        webTopicDTO.setEventId("Article Media Create");
+        webTopicDTO.setCueId(cueId);
+        webTopicDTO.setCueItemId(cueItemId);
+        webTopicDTO.setArtclId(artclId);
+        webTopicDTO.setCueVer(cueVer);
+        webTopicDTO.setCueOderVer(cueOderVer);
+        webTopicDTO.setSpareYn(spareYn);
+        String webJson = marshallingJsonHelper.MarshallingJson(webTopicDTO);
+        //web에 큐메세지 전송
+        topicService.topicWeb(webJson);
 
     }
 
