@@ -27,6 +27,7 @@ public class PropertyUtil {
                 log.debug("config root: " + getConfigRoot());
                 log.debug("config file name: " + fn);
             }
+            log.info("config root           :" + getConfigRoot().toString());
             //file:/C:/FileAttach.xml
             doc = builder.build(new File(getConfigRoot(), fn));
             log.info("doc           :" + doc);

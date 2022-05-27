@@ -24,6 +24,7 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -72,8 +73,8 @@ public class AttachFileService {
             String day = fromat2.format(time);
 
             //업로드 디렉토리 path
-            upDir = ub.getUpdir() + File.separator + year + File.separator + day;
-            realpath = ub.getDest() + File.separator + upDir;
+            upDir = ub.getUpdir() +"/"+ year + "/" + day;
+            realpath = ub.getDest() + upDir;
             log.info("file size : " + uploadsize+ ", Dest : " + ub.getDest());
             //디렉토리 생성
             if (isMakeDir(realpath)) {
@@ -85,8 +86,6 @@ public class AttachFileService {
             rname = file.getOriginalFilename();
 
             log.info("original name: " + rname);
-
-            byte[] bytes = file.getBytes();
 
             //파일 아이디 생성(날짜+""+시퀀스)
             //file_id = attachFileDAO.getFileId();
@@ -106,6 +105,8 @@ public class AttachFileService {
             // 토큰 인증된 사용자 아이디를 입력자로 등록
             String userId = userAuthService.authUser.getUserId();
             fb.setInputrId(userId);
+            fb.setFileUpldDtm(new Date());
+            fb.setInputDtm(new Date());
             //로그인 아이디로 바꿔야 함?
             //	fb.setFile_upldr_id("system");
 
@@ -133,15 +134,15 @@ public class AttachFileService {
                 rname = fileId + "." + ext;
             }
 
-            //BufferedOutputStream을 이용하여 파일 복사
+
+            byte[] bytes = file.getBytes();
+
             BufferedOutputStream buffStream = null;
-            FileOutputStream fileOutputStream = null;
             try {
 
                 //파일을 버퍼링을 이용하여 저장할 경로
                 // YYYYMMDD+FI+seq 요런식으로 들어감...
-                fileOutputStream = new FileOutputStream(new File(realpath + File.separator + rname));
-                buffStream = new BufferedOutputStream(fileOutputStream);
+                buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
 
                 //파일 복사
                 buffStream.write(bytes);
@@ -153,8 +154,9 @@ public class AttachFileService {
             }
             finally {
                 try {
-                    fileOutputStream.close();
-                    buffStream.close();
+                    if (buffStream != null) {
+                        buffStream.close();
+                    }
                 }catch (IOException e){
                     log.error(e.getMessage());
                 }
@@ -254,14 +256,14 @@ public class AttachFileService {
         response.setContentType(mimeType);
 
         //다운로드시 한글깨짐 방지처리, msie타입 지정
-        String browser = getBrowser(request);
+        /*String browser = getBrowser(request);*/
 
         //원본파일 아이디(원래값)
         String _org_file_nm = attachFileDTO.getOrgFileNm();
         String encodedFilename = "";
 
         //다운로드시 한글깨짐 방지처리
-        if (browser.equals("MSIE")) {
+        /*if (browser.equals("MSIE")) {
             encodedFilename = URLEncoder.encode(_org_file_nm, "UTF-8").replaceAll("\\+", "%20");
             log.info(encodedFilename + " 최종 받아질 파일 이름 MSIE에서 테스트  ."  );
         } else if (browser.equals("Trident")) { // IE11 문자열 깨짐 방지
@@ -280,9 +282,9 @@ public class AttachFileService {
         }
         else {
             encodedFilename = "\"" + new String(_org_file_nm.getBytes("UTF-8"), "8859_1") + "\"";
-        }
+        }*/
 
-        log.info("[browser: " + browser + "][org_file_nm: " + _org_file_nm + "][encodedFilename: " + encodedFilename + "][mimeType: " + mimeType + "]");
+        //log.info("[browser: " + browser + "][org_file_nm: " + _org_file_nm + "][encodedFilename: " + encodedFilename + "][mimeType: " + mimeType + "]");
         log.info("lencodedFilename : " + encodedFilename + " : regularExpressioned ");
 
         String fileName = URLEncoder.encode(_org_file_nm, "UTF-8");

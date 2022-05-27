@@ -23,11 +23,13 @@ public class Configuration extends AbstractConfiguration
         //Thread.currentThread().getContextClassLoader().getResource(name) 로 쓸수 있다
         //클레스 패스에서 resource를 찾는 방법이다.
         //null
-        URL configUrl = ClassLoader.getSystemResource("/app/zodiac/config/config.properties");
+        URL configUrl = ClassLoader.getSystemResource(File.separator+"data"+File.separator+"app"
+                +File.separator+"ans"+File.separator+"server"+File.separator+"config"+File.separator+"config.properties");
         if (configUrl == null) {
             //C:\Users\JOOWAN PYO\npsnrcs\config\config.properties 내컴퓨터정보와 파라미터로 넣어준 디렉토리 주소가 들어감
             //user.home실행위치
-            File defaultFile = new File(System.getProperty("file.separator"), "/app/zodiac/config/config.properties");
+            File defaultFile = new File(System.getProperty("file.separator"), File.separator+"data"+File.separator+"app"
+                    +File.separator+"ans"+File.separator+"server"+File.separator+"config"+File.separator+"config.properties");
             log.info("defaultFile       :" +defaultFile);
             //C:\\Users\\JOOWAN PYO\\npsnrcs\\config\\config.properties
             //System.getProperty key값이 실행되는 위치를 String으로 출력
@@ -43,11 +45,11 @@ public class Configuration extends AbstractConfiguration
         try
         {
             //시큐어코딩에 나온 심각사항. 파일경로 잘못들어가는거 방지.
-            if (configfileName != null && !"".equals(configfileName)){
-                configfileName = this.configFileName.replaceAll("/", ""); // "/" 필터링
-                configfileName = this.configFileName.replaceAll("\\\\", ""); // "\" 필터링
-                configfileName = this.configFileName.replaceAll("\\.\\.", ""); // ".." 필터링
-            }
+           /* if (configfileName != null && !"".equals(configfileName)){
+                configfileName = configfileName.replaceAll("/", File.separator); // "/" 필터링
+                configfileName = configfileName.replaceAll("\\\\", File.separator); // "\" 필터링
+                configfileName = configfileName.replaceAll("\\.\\.", File.separator); // ".." 필터링
+            }*/
 
             File configFile = new File(configfileName);
 

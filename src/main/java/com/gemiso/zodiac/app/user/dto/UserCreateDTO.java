@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -42,8 +43,8 @@ public class UserCreateDTO {
     //private Date pwdChgDtm;
     private String userStCd;
     //private String userStCdNm;
-    //private Date useStartDtm;
-    //private Date useEndDtm;
+    private Date useStartDtm;
+    private Date useEndDtm;
     private String useYn;
     //private String delYn;
     private String inputrId;

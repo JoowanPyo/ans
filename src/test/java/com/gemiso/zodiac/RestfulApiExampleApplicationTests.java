@@ -1,8 +1,11 @@
 package com.gemiso.zodiac;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gemiso.zodiac.core.scheduling.BisInterfaceService;
 import com.gemiso.zodiac.core.topic.TopicService;
 import com.mysema.commons.lang.Assert;
+import jdk.nashorn.internal.parser.JSONParser;
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 @SpringBootTest
@@ -69,6 +73,32 @@ class RestfulApiExampleApplicationTests {
         {
 
         }
+
+    }
+
+    @Test
+    void  testJson(){
+
+        String json = "{\"title\": \"0525 17 \uae40\uc138\uc644 \uc99d\uc2dc\uc5f0\uacb0 1_2 \uc720\ub7fd \uc544\uc2dc\uc544 \uc99d\uc2dc\"}";
+
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+
+            // convert JSON string to Map
+            Map<String, String> map = mapper.readValue(json, Map.class);
+
+            // it works
+            //Map<String, String> map = mapper.readValue(json, new TypeReference<Map<String, String>>() {});
+
+            System.out.println(map);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
 
     }
 

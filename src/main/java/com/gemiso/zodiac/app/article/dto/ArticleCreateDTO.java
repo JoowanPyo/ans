@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Formula;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;

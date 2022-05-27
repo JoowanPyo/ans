@@ -19,6 +19,8 @@ import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetFindAllDTO;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
+import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.helper.SearchDateInterface;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
@@ -46,6 +48,7 @@ public class InterfaceController {
     private final InterfaceService interfaceService;
 
     private final CueSheetService cueSheetService;
+    private final CueSheetItemService cueSheetItemService;
 
 
     @Operation(summary = "큐시트 일일편성 목록조회[Taker]", description = "큐시트 일일편성 목록조회[Taker]")
@@ -417,13 +420,65 @@ public class InterfaceController {
     @Operation(summary = "방송중 테이커 큐시트 동기화", description = "방송중 테이커 큐시트 동기화")
     @PostMapping(path = "/takersetcue")
     public AnsApiResponse<?> takerSetCue(@Parameter(description = "필수값<br> ", required = true)
-                              @RequestBody @Valid TakerToCueBodyDTO takerToCueBodyDTO,
-                              @RequestHeader(value = "securityKey") String securityKey) throws JsonProcessingException {
+                                         @RequestBody @Valid TakerToCueBodyDTO takerToCueBodyDTO,
+                                         @RequestHeader(value = "securityKey") String securityKey) throws JsonProcessingException {
 
         log.info("Taker On Air status  : rd_id - " + takerToCueBodyDTO.toString());
 
         interfaceService.takerSetCue(takerToCueBodyDTO);
 
         return AnsApiResponse.ok();
+    }
+
+    @Operation(summary = "S MAM 큐시트 목록조회", description = "S MAM 큐시트 목록조회")
+    @GetMapping(path = "/smamfindallcue")
+    public AnsApiResponse<List<CueSheetDTO>> smamFindAllCue(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
+                                                            @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                            @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
+                                                            @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                            @Parameter(name = "brdcPgmId", description = "프로그램 아이디")
+                                                            @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
+                                                            @Parameter(name = "brdcPgmNm", description = "프로그램 명")
+                                                            @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
+                                                            @Parameter(name = "deptCd", description = "부서 코드")
+                                                            @RequestParam(value = "deptCd", required = false) Integer deptCd,
+                                                            @Parameter(name = "searchWord", description = "검색키워드")
+                                                            @RequestParam(value = "searchWord", required = false) String searchWord,
+                                                            @RequestHeader(value = "securityKey") String securityKey) throws Exception {
+
+        List<CueSheetDTO> cueSheetDTOList = new ArrayList<>();
+
+
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
+            //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 24:00:00)
+            SearchDate searchDate = new SearchDate(sdate, edate);
+            cueSheetDTOList = cueSheetService.takerFindAll(searchDate.getStartDate(), searchDate.getEndDate(),
+                    brdcPgmId, brdcPgmNm, deptCd, searchWord);
+
+        } else {
+            cueSheetDTOList = cueSheetService.takerFindAll(null, null, brdcPgmId, brdcPgmNm, deptCd, searchWord);
+        }
+
+
+
+        return new AnsApiResponse<>(cueSheetDTOList);
+    }
+
+    @Operation(summary = "S MAM 큐시트 상세조회", description = "S MAM 큐시트 상세조회")
+    @GetMapping(path = "/smamfindcue")
+    public AnsApiResponse<CueSheetDTO> smamFindCue(@Parameter(name = "cueId", description = "큐시트 아이디")
+                                                   @RequestParam(value = "cueId", required = false) Long cueId,
+                                                   @Parameter(name = "articleYn", description = "기사 항목만 검색 Y, 전부 N")
+                                                   @RequestParam(value = "articleYn", required = false) String articleYn,
+                                                   @RequestHeader(value = "securityKey") String securityKey) {
+
+        CueSheetDTO cueSheetDTO = cueSheetService.find(cueId);
+
+        if ("Y".equals(articleYn)){
+
+            cueSheetDTO = interfaceService.getCueSheetItemArticle(cueSheetDTO);
+        }
+
+        return new AnsApiResponse<>(cueSheetDTO);
     }
 }

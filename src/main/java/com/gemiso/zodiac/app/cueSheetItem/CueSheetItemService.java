@@ -483,7 +483,7 @@ public class CueSheetItemService {
             spareYn = "N"; //예비여부값이 안들어오면 N 값 디폴트
         }
 
-        Article article = new Article();
+        Article article = null;
         Article copyArticle = cueSheetItem.getArticle();
         if (ObjectUtils.isEmpty(copyArticle) == false) {
             Long artclId = copyArticle.getArtclId();
@@ -1426,19 +1426,25 @@ public class CueSheetItemService {
 
             for (ArticleMedia articleMedia : articleMediaList) {
 
-                ArticleMedia articleMediaEntity = getArticleMediaEntity(articleMedia, articleEntity);
+                String mediaTypCd = articleMedia.getMediaTypCd();
 
-                articleMediaRepository.save(articleMediaEntity);
+                //빽드롭 빼고 일반영상만 매칭
+                if ("media_typ_001".equals(mediaTypCd)) {
+                    ArticleMedia articleMediaEntity = getArticleMediaEntity(articleMedia, articleEntity);
 
-                Long mediaId = articleMediaEntity.getArtclMediaId();
-                Integer contentId = articleMediaEntity.getContId();
+                    articleMediaRepository.save(articleMediaEntity);
 
-                //추후에 T는 클라우드 콘피그 교체
-                lboxService.mediaTransfer(mediaId, contentId, subrmNm, "T", false, false);
+                    Long mediaId = articleMediaEntity.getArtclMediaId();
+                    Integer contentId = articleMediaEntity.getContId();
+
+                    //추후에 T는 클라우드 콘피그 교체
+                    lboxService.mediaTransfer(mediaId, contentId, subrmNm, "T", false, false);
+
+                }
             }
         }
 
-        List<ArticleActionLogDTO> articleActionLogs = articleActionLogService.findAll(artclId);
+        /*List<ArticleActionLogDTO> articleActionLogs = articleActionLogService.findAll(artclId);
 
         for (ArticleActionLogDTO articleActionLogDTO : articleActionLogs){
 
@@ -1461,7 +1467,7 @@ public class CueSheetItemService {
                 articleActionLogRepository.save(articleActionLog);
             }
 
-        }
+        }*/
 
         return articleEntity;
 
@@ -1549,13 +1555,13 @@ public class CueSheetItemService {
                     .issue(article.getIssue())
                     .cueSheet(cueSheet)//큐시트 아이디 set
                     .artclFixUser(article.getArtclFixUser())
-                    .editorFixUser(article.getEditorFixUser())
-                    .anchorFixUser(article.getAnchorFixUser())
-                    .deskFixUser(article.getDeskFixUser())
+                    //.editorFixUser(article.getEditorFixUser())
+                    //.anchorFixUser(article.getAnchorFixUser())
+                    //.deskFixUser(article.getDeskFixUser())
                     .artclFixDtm(article.getArtclFixDtm())
-                    .editorFixDtm(article.getEditorFixDtm())
-                    .anchorFixDtm(article.getAnchorFixDtm())
-                    .deskFixDtm(article.getDeskFixDtm())
+                    //.editorFixDtm(article.getEditorFixDtm())
+                    //.anchorFixDtm(article.getAnchorFixDtm())
+                    //.deskFixDtm(article.getDeskFixDtm())
                     .build();
         } else { //원본기사 아이디가 있을시[복사된 기사 다시 복사일시]
 
@@ -1604,13 +1610,13 @@ public class CueSheetItemService {
                     .issue(article.getIssue())
                     .cueSheet(cueSheet)//큐시트 아이디 set
                     .artclFixUser(article.getArtclFixUser())
-                    .editorFixUser(article.getEditorFixUser())
-                    .anchorFixUser(article.getAnchorFixUser())
-                    .deskFixUser(article.getDeskFixUser())
+                    //.editorFixUser(article.getEditorFixUser())
+                    //.anchorFixUser(article.getAnchorFixUser())
+                    //.deskFixUser(article.getDeskFixUser())
                     .artclFixDtm(article.getArtclFixDtm())
-                    .editorFixDtm(article.getEditorFixDtm())
-                    .anchorFixDtm(article.getAnchorFixDtm())
-                    .deskFixDtm(article.getDeskFixDtm())
+                    //.editorFixDtm(article.getEditorFixDtm())
+                    //.anchorFixDtm(article.getAnchorFixDtm())
+                    //.deskFixDtm(article.getDeskFixDtm())
                     .build();
         }
     }

@@ -41,7 +41,7 @@ public class UserUpdateDTO {
     private String userStCd;
     //private String userStCdNm;
     //private Date useStartDtm;
-    //private Date useEndDtm;
+    private Date useEndDtm;
     private String useYn;
     //private String delYn;
     //private String inputrId;

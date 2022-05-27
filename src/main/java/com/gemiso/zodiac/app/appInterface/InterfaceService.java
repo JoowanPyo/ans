@@ -22,6 +22,7 @@ import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerCdUpdateDTO;
 import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerToCueBodyDTO;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
@@ -98,7 +99,7 @@ public class InterfaceService {
         /*Date formatSdate = stringToDate(sdate);
         Date formatEdate = stringToDate(edate);*/
 
-        List<CueSheetDTO> cueSheetDTOList = cueSheetService.takerFindAll(sdate, edate, brdc_pgm_id, pgm_nm, "");
+        List<CueSheetDTO> cueSheetDTOList = cueSheetService.takerFindAll(sdate, edate, brdc_pgm_id, pgm_nm, null,"");
 
         List<ParentProgramDTO> parentProgramDTOList = toTakerCueSheetList(cueSheetDTOList);
 
@@ -1149,7 +1150,7 @@ public class InterfaceService {
     //프롬프터 일일편성 목록조회
     public List<PrompterProgramDTO> getMstListService(String pro_id, Date sdate, Date fdate) throws ParseException {
 
-        List<CueSheetDTO> cueSheetDTOList = cueSheetService.takerFindAll(sdate, fdate, pro_id, "", "");
+        List<CueSheetDTO> cueSheetDTOList = cueSheetService.takerFindAll(sdate, fdate, pro_id, "", null, "");
 
         List<PrompterProgramDTO> prompterProgramDTOList = toPrompterDailyPgm(cueSheetDTOList);
 
@@ -2010,4 +2011,27 @@ public class InterfaceService {
 
         topicService.topicWeb(json);
     }
+
+    //큐시트 아이템중 기사아이템만 get
+    public CueSheetDTO getCueSheetItemArticle(CueSheetDTO cueSheetDTO){
+
+        List<CueSheetItemDTO> setItemList = new ArrayList<>();
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetDTO.getCueSheetItem();
+
+        for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList){
+
+            ArticleCueItemDTO articleCueItemDTO = cueSheetItemDTO.getArticle();
+
+            if (ObjectUtils.isEmpty(articleCueItemDTO) == false){
+
+                setItemList.add(cueSheetItemDTO);
+            }
+        }
+
+        cueSheetDTO.setCueSheetItem(setItemList);
+
+        return cueSheetDTO;
+    }
+
+
 }

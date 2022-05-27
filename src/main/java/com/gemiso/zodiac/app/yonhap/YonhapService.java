@@ -3,9 +3,11 @@ package com.gemiso.zodiac.app.yonhap;
 import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.file.AttachFileRepository;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
+import com.gemiso.zodiac.app.file.dto.StatusCodeFileDTO;
 import com.gemiso.zodiac.app.file.mapper.AttachFileMapper;
 import com.gemiso.zodiac.app.yonhap.dto.YonhapCreateDTO;
 import com.gemiso.zodiac.app.yonhap.dto.YonhapDTO;
+import com.gemiso.zodiac.app.yonhap.dto.YonhapFileResponseDTO;
 import com.gemiso.zodiac.app.yonhap.dto.YonhapResponseDTO;
 import com.gemiso.zodiac.app.yonhap.mapper.YonhapMapper;
 import com.gemiso.zodiac.app.yonhapAttchFile.YonhapAttchFile;
@@ -23,12 +25,17 @@ import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -260,6 +267,174 @@ public class YonhapService {
         return yonhapResponseDTO;
     }
 
+    public YonhapFileResponseDTO fileCreate(MultipartFile file, String fileDivCd){
+
+        int code = 200;
+
+        //AttachFileDTO attachFileDTO = new AttachFileDTO();
+
+        String ext = "";
+        String msg = "";
+        Long fileId = null;
+        String upDir = "";
+        String rname = "";
+        String realpath = "";
+        String orgFileNm = "";
+
+        try {
+            PropertyUtil xu = new PropertyUtil();
+            UploadFileBean ub = new UploadFileBean();
+
+            ub = xu.getUploadInfo("FileAttach.xml", fileDivCd);
+            System.out.println("11111111111111111");
+            int uploadsize = Integer.parseInt(ub.getMaxsize().substring(0, ub.getMaxsize().indexOf("MB")));
+
+
+            SimpleDateFormat fromat1 = new SimpleDateFormat("yyyy");
+            SimpleDateFormat fromat2 = new SimpleDateFormat("MMdd");
+
+            Date time = new Date();
+
+            String year = fromat1.format(time);
+            String day = fromat2.format(time);
+
+            //업로드 디렉토리 path
+            upDir = ub.getUpdir() +"/"+ year + "/" + day;
+            realpath = ub.getDest() + upDir;
+            log.info("file size : " + uploadsize+ ", Dest : " + ub.getDest());
+            //디렉토리 생성
+            if (isMakeDir(realpath)) {
+                log.info("Directory create: " + realpath);
+            }else {
+                throw new IOException();
+            }
+
+            rname = file.getOriginalFilename();
+
+            log.info("original name: " + rname);
+
+            //파일 아이디 생성(날짜+""+시퀀스)
+            //file_id = attachFileDAO.getFileId();
+
+            //DB 등록
+            AttachFileDTO fb = new AttachFileDTO();
+
+            //원본파일 아이디 저장
+            orgFileNm = file.getOriginalFilename();
+
+            //fb.setFileId(file_id);
+            fb.setOrgFileNm(orgFileNm);
+            //fb.setFileNm(rname);
+            fb.setFileDivCd(fileDivCd);
+            fb.setFileSize((int) file.getSize());
+            fb.setFileLoc(upDir);
+            // 토큰 인증된 사용자 아이디를 입력자로 등록
+            //String userId = userAuthService.authUser.getUserId();
+            fb.setInputrId("Yonhap");
+            fb.setFileUpldDtm(new Date());
+            fb.setInputDtm(new Date());
+            //로그인 아이디로 바꿔야 함?
+            //	fb.setFile_upldr_id("system");
+
+            msg = "/store/"+upDir+"/"+rname;
+            log.info("msg: "+msg);
+
+            //DB에 insert
+            AttachFile attachFileEntity = attachFileMapper.toEntity(fb);
+            attachFileRepository.save(attachFileEntity);
+
+            fileId = attachFileEntity.getFileId();
+
+            //DB에 insert
+            //attachFileDAO.insertStorageFile(fb);
+
+            if (log.isDebugEnabled()) {
+                log.debug("attach file insert ok: " + fileId);
+            }
+
+            //오리지널 파일네임 여부
+            if (ub.getRname_yn().equals("N") == false) {
+                //확장자 파싱
+                ext = cutExtension(rname);
+
+                rname = fileId + "." + ext;
+            }
+
+
+            byte[] bytes = file.getBytes();
+
+            BufferedOutputStream buffStream = null;
+            try {
+
+                //파일을 버퍼링을 이용하여 저장할 경로
+                // YYYYMMDD+FI+seq 요런식으로 들어감...
+                buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
+
+                //파일 복사
+                buffStream.write(bytes);
+            }
+            catch (IOException e)
+            {
+                //System.out.println("BufferedReader 파일복사 중 에러 발생");
+                log.error(e.getMessage());
+            }
+            finally {
+                try {
+                    if (buffStream != null) {
+                        buffStream.close();
+                    }
+                }catch (IOException e){
+                    log.error(e.getMessage());
+                }
+
+            }
+            /*buffStream.close();*/
+            msg += "Uploaded (" + file.getOriginalFilename() + ")";
+            code = 200;
+
+
+            AttachFile attachFile = attachFileRepository.findById(fileId)
+                    .orElseThrow(() -> new ResourceNotFoundException("File not found. FileId :"));
+
+            AttachFileDTO attachFileDTO = attachFileMapper.toDto(attachFile);
+
+            attachFileDTO.setFileNm(rname);
+            AttachFile aveAttachFile = attachFileMapper.toEntity(attachFileDTO);
+            attachFileRepository.save(aveAttachFile);
+
+
+            log.info("attach file start : " + fileId);
+
+
+            HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
+
+            //return attachFileDTO;
+
+        } catch (IOException e) {
+
+            log.error("IOException Occured "+e.getMessage());
+        }
+        //return new StatusCodeFileDTO(codeDTO, msg, file_id, org_file_nm);
+        return new YonhapFileResponseDTO(fileId);
+    }
+
+    public boolean isMakeDir(String sdir)
+    {
+        File dir = new File(sdir);
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                if (log.isDebugEnabled()) {
+                    log.info("isMakeDir Fail: " + sdir);
+                }
+            }
+            else if (log.isDebugEnabled()) {
+                log.info("isMakeDir success: " + sdir);
+            }
+        }
+
+        return true;
+    }
+
     public BooleanBuilder getSearch(Date sdate, Date edate, List<String> artcl_cate_cds, List<String> region_cds,
                                     String search_word, String svcTyp) {
 
@@ -295,101 +470,7 @@ public class YonhapService {
     public void uploadYonhapFiles(Long yh_artcl_id, List<YonhapAttachFileCreateDTO> yh_attc_file_vo_list, String divcd) throws Exception {
 
 
-        PropertyUtil xu = new PropertyUtil();
-        UploadFileBean ub = new UploadFileBean();
 
-        //연합 첨부파일 저장 경로를 divcd값으로 불러온다.
-        ub = xu.getUploadInfo("FileAttach.xml", "upload" + divcd);
-
-        // int uploadsize = Integer.parseInt(ub.getMaxsize().substring(0, ub.getMaxsize().indexOf("MB")));
-        SimpleDateFormat fromat1 = new SimpleDateFormat("yyyy");
-        SimpleDateFormat fromat2 = new SimpleDateFormat("MMdd");
-
-        Date time = new Date();
-
-        String year = fromat1.format(time);
-        String day = fromat2.format(time);
-
-        String upDir = ub.getUpdir() + File.separator + year + File.separator + day;
-
-        // String realpath = ub.getDest() + File.separator + upDir;
-
-        if (yh_attc_file_vo_list != null && yh_attc_file_vo_list.size() > 0) {
-
-            if (divcd.equals("07")) {
-                deleteYonhapFile(yh_artcl_id);
-
-            } /*else if (divcd.equals("06")) {
-                deleteYonhapPhotoFile(yh_artcl_id);
-
-            } else if (divcd.equals("08")) {
-                deleteYonhapAptnFile(yh_artcl_id);
-
-            }*/
-
-            for (YonhapAttachFileCreateDTO file : yh_attc_file_vo_list) {
-
-
-                //파일등록을 로컬에 안해준다?
-                //MultipartFile multipartFile = new MockMultipartFile(file.getFile_titl(), new FileInputStream(new File(upDir)));
-
-                int fileSize = file.getFile_size();
-
-                // 업로드 파일 명
-                String fileName = file.getFile_nm();
-                // 파일 아이디 생성.
-                //String file_id = attachFileDAO.getFileId();
-                //확장자 파싱
-                String ext = cutExtension(fileName);
-
-                // 파일 리네임 [파일아이디.확장자]
-                //String rname = file_id + "." + ext;
-                // 파일 리네임 [파일아이디.확장자]
-
-                //String rname = yonhapAttchFile.getId() + "." + ext;
-
-                AttachFileDTO fb = new AttachFileDTO();
-
-                //fb.setFile_id(file_id); 아이디 jpa자동생성
-                fb.setOrgFileNm(fileName);
-                //fb.setFile_nm(rname); 아이디생성 아직 안됫으므로 인설트이후 다시 업데이트
-                fb.setFileDivCd(divcd);
-                //fb.setFile_ext(utils.cutExtension(fileName)); 확장자 따로 저장 안함
-                fb.setFileSize(fileSize);
-                fb.setFileLoc(upDir);
-                fb.setInputrId("system");
-
-                AttachFile attachFile = attachFileMapper.toEntity(fb);
-
-                attachFileRepository.save(attachFile);
-
-                Long fileId = attachFile.getFileId();
-
-                String rname = fileId + "." + ext; //파일 네임 재생성 아이디+확장자 ex) 123.jpg
-
-                fb.setFileNm(rname);
-                
-                attachFileMapper.updateFromDto(fb, attachFile);
-                
-                attachFileRepository.save(attachFile);// fileNm재등록 업데이트
-
-                file.setFile_id(fileId);
-                file.setYh_artcl_id(yh_artcl_id);
-
-                if (divcd.equals("07")) {
-                    postYonhapFile(file);
-
-                } /*else if (divcd.equals("06")) {
-                    postYonhapPhotoFile(file);
-
-                } else if (divcd.equals("08")) {
-                    postYonhapAptnFile(file);
-
-                }*/
-
-
-            }
-        }
 
     }
 

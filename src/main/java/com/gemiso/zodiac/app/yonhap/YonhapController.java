@@ -1,7 +1,9 @@
 package com.gemiso.zodiac.app.yonhap;
 
+import com.gemiso.zodiac.app.file.dto.StatusCodeFileDTO;
 import com.gemiso.zodiac.app.yonhap.dto.YonhapCreateDTO;
 import com.gemiso.zodiac.app.yonhap.dto.YonhapDTO;
+import com.gemiso.zodiac.app.yonhap.dto.YonhapFileResponseDTO;
 import com.gemiso.zodiac.app.yonhap.dto.YonhapResponseDTO;
 import com.gemiso.zodiac.app.yonhapPhoto.dto.YonhapExceptionDomain;
 import com.gemiso.zodiac.core.helper.SearchDate;
@@ -14,9 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
@@ -93,5 +97,15 @@ public class YonhapController {
 
         return new ResponseEntity<>(yonhapResponseDTO, HttpStatus.CREATED);
 
+    }
+
+    @Operation(summary = "파일 업로드", description = "파일 업로드")
+    @PostMapping(path = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public AnsApiResponse<YonhapFileResponseDTO> fileCreate(@RequestPart MultipartFile file, @RequestParam String fileDivCd) {
+
+        YonhapFileResponseDTO DTO = yonhapService.fileCreate(file, fileDivCd);
+
+        return new AnsApiResponse<>(DTO);
     }
 }

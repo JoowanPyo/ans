@@ -78,6 +78,11 @@ public class AuthService {
         User userEntity = userService.userFindOrFail(userId);
 
         UserDTO userDTO = userMapper.toDto(userEntity); //tb_user_login 테이블에 정보를 저장하기위한 DTO생성
+        userDTO.setLastLoginDtm(new Date()); //로그인 시간 set
+
+        userMapper.updateFromDto(userDTO, userEntity);
+
+        userRepository.save(userEntity);
 
         //아리랑 pwd sha256해싱 [ pwd + salt ]
         EncodingHelper encodingHelper = new EncodingHelper(password, saltKey);

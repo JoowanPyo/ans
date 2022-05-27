@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.user;
 
 import com.gemiso.zodiac.app.user.dto.UserCreateDTO;
 import com.gemiso.zodiac.app.user.dto.UserDTO;
+import com.gemiso.zodiac.app.user.dto.UserDeleteUpdateDTO;
 import com.gemiso.zodiac.app.userGroupUser.QUserGroupUser;
 import com.gemiso.zodiac.app.userGroupUser.UserGroupUserService;
 import com.gemiso.zodiac.app.userGroupUser.dto.UserGroupUserDTO;
@@ -17,6 +18,7 @@ import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
 import com.gemiso.zodiac.app.userGroupUser.UserGroupUserRepository;
 import com.gemiso.zodiac.core.helper.EncodingHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.exception.PasswordFailedException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -285,7 +287,53 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void passwordConfirm(String comfirmPwd) throws NoSuchAlgorithmException {
 
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String tokenUserId = userAuthService.authUser.getUserId();
+
+        User user = userFindOrFail(tokenUserId);
+
+        String password = user.getPwd();
+
+        //아리랑 pwd sha256해싱 [ pwd + salt ]
+        EncodingHelper encodingHelper = new EncodingHelper(comfirmPwd, saltKey);
+        String hexPwd = encodingHelper.getHex();
+        //String encodePassword = encodePassword(hexPwd); //패스워드 비크립트
+
+        //log.info(" 패스워드 확인 : "+ hexPwd.toString());
+
+        if (!passwordEncoder.matches(hexPwd, password)) {
+            throw new PasswordFailedException("Password failed.");
+        }
+
+    }
+
+    public void deleteUserUpdate(UserDeleteUpdateDTO userDeleteUpdateDTO, String userId){
+
+        String delYn = userDeleteUpdateDTO.getDelYn();
+
+        User user = deleteUserFind(userId);
+
+        UserDTO userDTO = userMapper.toDto(user);
+        userDTO.setDelYn(delYn);
+
+        userMapper.updateFromDto(userDTO, user);
+
+        userRepository.save(user);
+
+    }
+
+    public User deleteUserFind(String userId){
+
+        Optional<User> userEntity = userRepository.findDeleteUser(userId);
+
+        if (!userEntity.isPresent()){
+            throw new ResourceNotFoundException("Delete User not found. userId : " + userId);
+        }
+
+        return userEntity.get();
+    }
 
     public User userFindOrFail(String userId) {
         Optional<User> userEntity = userRepository.findByUserId(userId);

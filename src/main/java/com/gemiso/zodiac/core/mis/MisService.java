@@ -215,7 +215,7 @@ public class MisService {
                 //.memo() //메모
                 //.rmk() //비고
                 //.userStCd() //사용자 상태 코드
-                //.useStartDtm() //사용시작 일시
+                .useStartDtm(new Date()) //사용시작 일시
                 //.useEndDtm() //사용 종료 일시
                 //.useYn() //사용 여부
                 //.inputrId() //등록자

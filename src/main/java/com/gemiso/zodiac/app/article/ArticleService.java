@@ -31,17 +31,21 @@ import com.gemiso.zodiac.app.articleHist.ArticleHistRepository;
 import com.gemiso.zodiac.app.articleHist.dto.ArticleHistSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
+import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaCreateDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
+import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaCreateMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.issue.Issue;
 import com.gemiso.zodiac.app.issue.IssueService;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
+import com.gemiso.zodiac.app.lbox.LboxService;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.user.QUser;
@@ -66,6 +70,7 @@ import com.gemiso.zodiac.exception.UserFailException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -79,6 +84,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
+import springfox.documentation.spring.web.json.Json;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -108,6 +114,7 @@ public class ArticleService {
     private final AnchorCapHistRepository anchorCapHistRepository;
     private final ArticleActionLogRepository articleActionLogRepository;
     private final ArticleMediaRepository articleMediaRepository;
+    private final CueSheetRepository cueSheetRepository;
 
     private final ArticleMapper articleMapper;
     private final ArticleCreateMapper articleCreateMapper;
@@ -119,6 +126,7 @@ public class ArticleService {
     private final AnchorCapHistCreateMapper anchorCapHistCreateMapper;
     private final ArticleMediaMapper articleMediaMapper;
     private final ArticleMediaSimpleMapper articleMediaSimpleMapper;
+    private final ArticleMediaCreateMapper articleMediaCreateMapper;
 
     //private final UserAuthService userAuthService;
     private final UserAuthChkService userAuthChkService;
@@ -130,6 +138,7 @@ public class ArticleService {
     private final MarshallingJsonHelper marshallingJsonHelper;
 
     private final TopicService topicService;
+    private final LboxService lboxService;
 
     //기사 목록조회
     public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
@@ -224,7 +233,6 @@ public class ArticleService {
     // 기사등록[기사 이력, 자막]
     public Long create(ArticleCreateDTO articleCreateDTO, String userId) throws Exception {
 
-
         articleCreateDTO.setInputrId(userId); //등록자 아이디 추가.
         articleCreateDTO.setArtclOrd(0);//기사 순번 등록(0)set
         articleCreateDTO.setApprvDivCd(FixEnum.FIX_NONE.getFixeum(FixEnum.FIX_NONE));//기사픽스 상태 None set[null 상태가면 fix 구분 및 셋팅시 문제.]
@@ -302,6 +310,7 @@ public class ArticleService {
         //기사이력 등록.
         Long articleHistId = updateArticleHist(article);
 
+
         //기사 자막 Update
         articleCapUpdate(article, articleUpdateDTO, articleHistId);
         anchorCapUpdate(article, articleUpdateDTO, articleHistId);
@@ -351,6 +360,10 @@ public class ArticleService {
                         copyArticleActionLogUpdate(updateCopyArticle, article, userId);
                         //기사이력 등록.
                         Long articleHistId = updateArticleHist(updateCopyArticle);
+
+                        //기사 미디어 update
+                        copyarticleMediaUpdate(updateCopyArticle, article, articleHistId,userId);
+
                         //기사 자막 Update
                         copyArticleCapUpdate(updateCopyArticle, article, articleHistId);
                         copyAnchorCapUpdate(updateCopyArticle, article, articleHistId);
@@ -361,6 +374,89 @@ public class ArticleService {
                     }
                 }
 
+            }
+        }
+
+    }
+
+    //기사 미디어 update
+    public void copyarticleMediaUpdate(Article updateArticle, Article article, Long articleHistId, String userId) throws JsonProcessingException {
+
+        Long artclId = updateArticle.getArtclId();
+
+        List<ArticleMedia> articleMediaList = articleMediaRepository.findArticleMediaList(artclId);
+
+        for (ArticleMedia articleMedia : articleMediaList ){
+
+            Long artclMediaId = articleMedia.getArtclMediaId();
+
+            String mediaTypCd = articleMedia.getMediaTypCd();
+
+            if ("media_typ_001".equals(mediaTypCd)) {
+                articleRepository.deleteById(artclMediaId);
+            }
+
+        }
+
+        Set<ArticleMedia> articleMedias = article.getArticleMedia();
+
+        //기사 매칭후 전송할 부조값 구하기
+        CueSheet cueSheet = updateArticle.getCueSheet();
+        String subrmNm = "";
+        if(ObjectUtils.isEmpty(cueSheet) == false){
+
+            Long cueId = cueSheet.getCueId();
+
+            Optional<CueSheet> getCueSheet = cueSheetRepository.findByCue(cueId);
+
+            if (getCueSheet.isPresent()){
+
+                CueSheet cueSheetEntity = getCueSheet.get();
+
+                subrmNm = cueSheetEntity.getSubrmNm();
+            }
+
+        }
+
+        ArticleSimpleDTO articleSimpleDTO = ArticleSimpleDTO.builder().artclId(artclId).build();
+
+        for (ArticleMedia setArticleMedia : articleMedias){
+
+            String mediaTypCd = setArticleMedia.getMediaTypCd();
+
+            if ("media_typ_001".equals(mediaTypCd)) {
+
+                ArticleMediaCreateDTO articleMediaCreateDTO = ArticleMediaCreateDTO.builder()
+                        .mediaTypCd(setArticleMedia.getMediaTypCd())
+                        .mediaOrd(setArticleMedia.getMediaOrd())
+                        .contId(setArticleMedia.getContId())
+                        .trnsfFileNm(setArticleMedia.getTrnsfFileNm())
+                        .mediaDurtn(setArticleMedia.getMediaDurtn())
+                        .mediaMtchDtm(setArticleMedia.getMediaMtchDtm())
+                        .trnsfStCd(setArticleMedia.getTrnsfStCd())
+                        .assnStCd(setArticleMedia.getAssnStCd())
+                        .assnStCd(setArticleMedia.getAssnStCd())
+                        .videoEdtrNm(setArticleMedia.getVideoEdtrNm())
+                        .inputrId(userId)
+                        .videoEdtrId(setArticleMedia.getVideoEdtrId())
+                        .artclMediaTitl(setArticleMedia.getArtclMediaTitl())
+                        .videoId(setArticleMedia.getVideoId())
+                        .trnasfVal(setArticleMedia.getTrnasfVal())
+                        .article(articleSimpleDTO)
+                        .build();
+
+                ArticleMedia articleMedia = articleMediaCreateMapper.toEntity(articleMediaCreateDTO);
+
+                articleMediaRepository.save(articleMedia);
+
+                Long mediaId = articleMedia.getArtclMediaId();
+                Integer contentId = articleMedia.getContId();
+
+                //추후에 T는 클라우드 콘피그 교체
+                //부조전송
+                if (subrmNm != null && subrmNm.trim().isEmpty() == false) {
+                    lboxService.mediaTransfer(mediaId, contentId, subrmNm, "T", false, false);
+                }
             }
         }
 
@@ -378,6 +474,75 @@ public class ArticleService {
         copyArticle.setArtclDivCd(article.getArtclDivCd());
         copyArticle.setArtclFldCd(article.getArtclFldCd());
         copyArticle.setApprvDivCd(article.getApprvDivCd());
+        copyArticle.setPrdDivCd(article.getPrdDivCd());
+        copyArticle.setArtclTypCd(article.getArtclTypCd());
+        copyArticle.setArtclTypDtlCd(article.getArtclTypDtlCd());
+        copyArticle.setArtclCateCd(article.getArtclCateCd());
+        copyArticle.setArtclTitl(article.getArtclTitl());
+        copyArticle.setArtclTitlEn(article.getArtclTitlEn());
+        copyArticle.setArtclCtt(article.getArtclCtt());
+        copyArticle.setAncMentCtt(article.getAncMentCtt());
+        copyArticle.setUserGrpId(article.getUserGrpId());
+        copyArticle.setArtclReqdSecDivYn(article.getArtclReqdSecDivYn());
+        copyArticle.setArtclReqdSec(article.getArtclReqdSec());
+        //copyArticle.setLckYn();
+        //copyArticle.setLckDtm();
+        copyArticle.setApprvDtm(article.getApprvDtm());
+        //copyArticle.setArtclOrd();
+        copyArticle.setBrdcCnt(article.getBrdcCnt());
+        copyArticle.setUrgYn(article.getUrgYn());
+        copyArticle.setFrnotiYn(article.getFrnotiYn());
+        copyArticle.setEmbgYn(article.getEmbgYn());
+        copyArticle.setEmbgDtm(article.getEmbgDtm());
+        //copyArticle.setDelDtm();
+        //copyArticle.setDelYn();
+        copyArticle.setNotiYn(article.getNotiYn());
+        copyArticle.setRegAppTyp(article.getRegAppTyp());
+        copyArticle.setBrdcPgmId(article.getBrdcPgmId());
+        copyArticle.setBrdcSchdDtm(article.getBrdcSchdDtm());
+        //copyArticle.setInputrId();
+        //copyArticle.setUpdtrId();
+        //copyArticle.setDelrId();
+        copyArticle.setApprvrId(article.getApprvrId());
+        //copyArticle.setLckrId();
+        copyArticle.setRptrId(article.getRptrId());
+        copyArticle.setArtclCttTime(article.getArtclCttTime());
+        copyArticle.setAncMentCttTime(article.getAncMentCttTime());
+        copyArticle.setArtclExtTime(article.getArtclExtTime());
+        copyArticle.setVideoTime(article.getVideoTime());
+        copyArticle.setDeptCd(article.getDeptCd());
+        //copyArticle.setDeviceCd(article.getDeviceCd());
+        //copyArticle.setParentArtlcId();
+        copyArticle.setMemo(article.getMemo());
+        copyArticle.setEditorId(article.getEditorId());
+        copyArticle.setArtclFixUser(article.getArtclFixUser());
+        copyArticle.setEditorFixUser(article.getEditorFixUser());
+        copyArticle.setAnchorFixUser(article.getAnchorFixUser());
+        copyArticle.setDeskFixUser(article.getDeskFixUser());
+        copyArticle.setArtclFixDtm(article.getArtclFixDtm());
+        copyArticle.setEditorFixDtm(article.getEditorFixDtm());
+        copyArticle.setAnchorFixDtm(article.getAnchorFixDtm());
+        copyArticle.setDeskFixDtm(article.getDeskFixDtm());
+        copyArticle.setIssue(getIssue);
+        copyArticle.setCueSheet(cueSheet);
+
+        articleRepository.save(copyArticle);
+
+        return copyArticle;
+    }
+
+    // 수정할 기사 빌드 후 업데이트 save
+    public Article fixCopyArticleBuild(Article copyArticle, Article article) {
+
+        Issue getIssue = article.getIssue();
+        CueSheet cueSheet = article.getCueSheet();
+
+        copyArticle.setChDivCd(article.getChDivCd());
+        copyArticle.setArtclKindCd(article.getArtclKindCd());
+        copyArticle.setArtclFrmCd(article.getArtclFrmCd());
+        copyArticle.setArtclDivCd(article.getArtclDivCd());
+        copyArticle.setArtclFldCd(article.getArtclFldCd());
+        copyArticle.setApprvDivCd(FixEnum.ARTICLE_FIX.getFixeum(FixEnum.ARTICLE_FIX));
         copyArticle.setPrdDivCd(article.getPrdDivCd());
         copyArticle.setArtclTypCd(article.getArtclTypCd());
         copyArticle.setArtclTypDtlCd(article.getArtclTypDtlCd());
@@ -1013,9 +1178,9 @@ public class ArticleService {
     }
 
     //복사된 기사자막 수정.
-    private void copyArticleCapUpdate(Article article, Article updateArticle, Long articleHistId) {
+    private void copyArticleCapUpdate(Article updateArticle, Article article, Long articleHistId) {
 
-        Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
+        Long articleId = updateArticle.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
         List<ArticleCap> articleCapList = articleCapRepository.findArticleCap(articleId);
 
         for (ArticleCap articleCap : articleCapList) {
@@ -1024,7 +1189,7 @@ public class ArticleService {
         }
 
 
-        Set<ArticleCap> capSimpleList = updateArticle.getArticleCap(); //update로 들어온 기사 등록
+        Set<ArticleCap> capSimpleList = article.getArticleCap(); //update로 들어온 기사 등록
         List<ArticleCapCreateDTO> capSimpleDTOList = new ArrayList<>();
         for (ArticleCap articleCap : capSimpleList) {
 
@@ -1075,9 +1240,9 @@ public class ArticleService {
     }
 
     //복사된 앵커자막 수정.
-    private void copyAnchorCapUpdate(Article article, Article updateArticle, Long articleHistId) {
+    private void copyAnchorCapUpdate(Article updateArticle, Article article, Long articleHistId) {
 
-        Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
+        Long articleId = updateArticle.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
         List<AnchorCap> anchorCaps = anchorCapRepository.findAnchorCapList(articleId);
 
         for (AnchorCap anchorCap : anchorCaps) {
@@ -1085,7 +1250,7 @@ public class ArticleService {
             anchorCapRepository.deleteById(anchorCapId);
         }
 
-        Set<AnchorCap> capSimpleList = updateArticle.getAnchorCap(); //update로 들어온 기사 등록
+        Set<AnchorCap> capSimpleList = article.getAnchorCap(); //update로 들어온 기사 등록
         List<AnchorCapCreateDTO> capSimpleDTOList = new ArrayList<>();
         for (AnchorCap anchorCap : capSimpleList) {
 
@@ -1560,6 +1725,7 @@ public class ArticleService {
 
         ArticleDTO articleDTO = articleMapper.toDto(article);
 
+        apprvDivCd = confirmApprvDivCd(apprvDivCd, articleDTO);
 
         articleDTO.setApprvDivCd(apprvDivCd); //픽스 구분코드 변경.
         //articleDTO.setApprvrId(userId);//픽스 승인자 변경.
@@ -1572,8 +1738,67 @@ public class ArticleService {
         articleActionLogfix(apprvDivCd, orgApprvDivcd, userId, article);
     }
 
+    //픽스 단계 맞추기
+    public String confirmApprvDivCd(String apprvDivCd, ArticleDTO articleDTO){
+
+        String artclFixUser = articleDTO.getArtclFixUser();
+        String editorFixUser = articleDTO.getEditorFixUser();
+        String anchorFixUser = articleDTO.getAnchorFixUser();
+        String deskFixUser = articleDTO.getDeskFixUser();
+
+
+
+        if ("article_fix".equals(apprvDivCd)){
+            if (artclFixUser == null || artclFixUser.trim().isEmpty()){
+                return "fix_none";
+            }else {
+                return "article_fix";
+            }
+
+        }
+        else if ("editor_fix".equals(apprvDivCd)){
+
+            if (editorFixUser == null || editorFixUser.trim().isEmpty()){
+
+                if (artclFixUser == null || artclFixUser.trim().isEmpty()){
+                    return "fix_none";
+                }else {
+                    return "article_fix";
+                }
+
+            }else {
+                return "editor_fix";
+            }
+
+        }
+        else if ("anchor_fix".equals(apprvDivCd)){
+
+            if (anchorFixUser == null || anchorFixUser.trim().isEmpty()){
+
+                if (editorFixUser == null || editorFixUser.trim().isEmpty()){
+
+                    if (artclFixUser == null || artclFixUser.trim().isEmpty()){
+                        return "fix_none";
+                    }else {
+                        return "article_fix";
+                    }
+
+                }else {
+                    return "editor_fix";
+                }
+
+            }else {
+                return "anchor_fix";
+            }
+
+        }
+
+
+        return apprvDivCd;
+    }
+
     //픽스단계대로 픽스자, 픽스일시 set
-    public Article fixUserInfoSet(String apprvDivCd, String orgApprvDivcd, Article article, String userId) {
+    public Article fixUserInfoSet(String apprvDivCd, String orgApprvDivcd, Article article, String userId) throws Exception {
 
         //픽스 fix_none으로 들어온경우
         if ("fix_none".equals(apprvDivCd)) {
@@ -1614,14 +1839,35 @@ public class ArticleService {
 
                     if ("fix_none".equals(apprvDicCd)) { //복사된 기사가 fix_none일경우 article_fix로 업데이트
 
-                        ArticleDTO articleDTO = articleMapper.toDto(articleEntity);
-                        articleDTO.setApprvDivCd("article_fix");
-                        articleDTO.setArtclFixUser(userId);
-                        articleDTO.setArtclFixDtm(new Date());
+                        Long orgArtclId = article.getOrgArtclId();
+                        if (ObjectUtils.isEmpty(orgArtclId) ){//원본 기사일 경우 기사내용전부 업데이트
 
-                        articleMapper.updateFromDto(articleDTO, articleEntity);
+                            // 수정할 기사 빌드 후 업데이트 save
+                            Article updateCopyArticle = fixCopyArticleBuild(articleEntity, article);
 
-                        articleRepository.save(articleEntity);
+                            //기사 로그 등록.
+                            copyArticleActionLogUpdate(updateCopyArticle, article, userId);
+                            //기사이력 등록.
+                            Long articleHistId = updateArticleHist(updateCopyArticle);
+                            //기사 자막 Update
+                            copyArticleCapUpdate(updateCopyArticle, article, articleHistId);
+                            copyAnchorCapUpdate(updateCopyArticle, article, articleHistId);
+
+                            Long updateArtclId = updateCopyArticle.getArtclId();
+                            //MQ메세지 전송
+                            sendTopic("CopyAarticle Update", updateArtclId);
+
+                        }else {
+
+                            ArticleDTO articleDTO = articleMapper.toDto(articleEntity);
+                            articleDTO.setApprvDivCd("article_fix");
+                            articleDTO.setArtclFixUser(userId);
+                            articleDTO.setArtclFixDtm(new Date());
+
+                            articleMapper.updateFromDto(articleDTO, articleEntity);
+
+                            articleRepository.save(articleEntity);
+                        }
                     }
                 }
 
@@ -1751,11 +1997,11 @@ public class ArticleService {
         String inputr = article.getInputrId();
 
         if (inputr.equals(userId) == false) { //기사입력자 확인, 본인기사만 삭제 가능.
-            if (userAuthChkService.authChk(FixAuth.DESK.name())) {
+            if (userAuthChkService.authChk(AuthEnum.DeskFix.getAuth())) {
                 throw new UserFailException("기사를 입력한 사용자가 아닙니다. 기사 입력자 아이디 : " + inputr);
             }
         } else {
-            if (userAuthChkService.authChk(FixAuth.DESK.name())) {//관리자 권한 확인. 본인기사가 아니더라도 관리자면 삭제가능
+            if (userAuthChkService.authChk(AuthEnum.DeskFix.getAuth())) {//관리자 권한 확인. 본인기사가 아니더라도 관리자면 삭제가능
                 throw new UserFailException("관리자 권한 이거나 기사를 입력한 사용자만 기사 삭제가 가능 합니다.");
             }
         }

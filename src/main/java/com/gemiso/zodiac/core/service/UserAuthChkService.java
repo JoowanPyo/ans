@@ -75,7 +75,6 @@ public class UserAuthChkService {
             appAuthArr[i] = groupId;
         }
 
-        log.info("User Auth Check : UserId : " + userId + " User Auths : " + appAuthArr.toString());
 
         List<UserGroupAuth> findUserGroupAuthList = userGroupAuthRepository.findByUserGrpIdArr(appAuthArr);
 
@@ -86,6 +85,7 @@ public class UserAuthChkService {
                 appAuthList.add(appAuthCD);
             }
         }
+        log.info("User Auth Check : UserId : " + userId + " User Auths : " + appAuthList.toString());
 
         if (appAuthList.contains(auth1)) {
             return false; //조회된 사용자 권한에 해당 api에 맞는 권한이 있을 경우 false를 return해 예외처리를 빠져나간다.

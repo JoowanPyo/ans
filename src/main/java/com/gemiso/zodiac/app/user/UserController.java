@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.user;
 
 import com.gemiso.zodiac.app.user.dto.UserCreateDTO;
 import com.gemiso.zodiac.app.user.dto.UserDTO;
+import com.gemiso.zodiac.app.user.dto.UserDeleteUpdateDTO;
 import com.gemiso.zodiac.app.user.dto.UserUpdateDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import com.gemiso.zodiac.exception.UserAlreadyExistException;
@@ -76,7 +77,7 @@ public class UserController {
         String userId = userCreateDTO.getUserId();
         if (userService.checkUser(userId)) {
             //return AnsApiResponse.aleadyExist();
-            throw new UserAlreadyExistException("사용자가 이미 존재합니다. UserId : " + userId);
+            throw new UserAlreadyExistException("사용자가 이미 존재합니다. ");
         }
 
         userService.create(userCreateDTO);
@@ -111,4 +112,26 @@ public class UserController {
         return AnsApiResponse.noContent();
     }
 
-}
+    @Operation(summary = "사용자 비밀번호 확인", description = "사용자 비밀번호 확인")
+    @GetMapping(path = "/confirm")
+    public AnsApiResponse<?> passwordConfirm(@Parameter(name = "comfirmPwd", description = "확인 패스워드", in = ParameterIn.QUERY)
+                                            @RequestParam(value = "comfirmPwd", required = false) String comfirmPwd) throws NoSuchAlgorithmException {
+
+        userService.passwordConfirm(comfirmPwd);
+
+        return AnsApiResponse.ok();
+    }
+
+    @Operation(summary = "삭제된 사용자 복구", description = "삭제된 사용자 복구")
+    @PutMapping(path = "/{userId}/delete")
+    public AnsApiResponse<UserDTO> deleteUserUpdate(@Parameter(name = "userDto", required = true, description = "필수값<br>") @Valid @RequestBody UserDeleteUpdateDTO userDeleteUpdateDTO,
+                                          @Parameter(name = "userId", required = true) @PathVariable("userId") String userId) throws NoSuchAlgorithmException {
+
+        userService.deleteUserUpdate(userDeleteUpdateDTO, userId);
+
+        UserDTO userDto = userService.find(userId);
+
+        return new AnsApiResponse<>(userDto);
+    }
+
+    }

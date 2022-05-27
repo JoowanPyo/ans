@@ -13,7 +13,7 @@ public interface ArticleMediaRepository extends JpaRepository<ArticleMedia, Long
     @Query("select a from ArticleMedia a where a.artclMediaId = :artclMediaId and a.delYn = 'N'")
     Optional<ArticleMedia> findByArticleMedia(@Param("artclMediaId")Long artclMediaId);
 
-    @Query("select a from ArticleMedia a where a.article.artclId = :artclId and a.delYn='N'")
+    @Query("select a from ArticleMedia a where a.article.artclId = :artclId and a.delYn='N' ")
     List<ArticleMedia> findArticleMediaList(@Param("artclId")Long artclId);
 
     @Query("select a from ArticleMedia a where a.contId =:contentId and a.delYn='N'")

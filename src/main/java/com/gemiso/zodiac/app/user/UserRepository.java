@@ -18,6 +18,9 @@ public interface UserRepository extends JpaRepository<User, String> , QuerydslPr
     @Query("select a from User a where a.userId =:userId and a.delYn = 'N'")
     Optional<User> findByUserId(@Param("userId")String userId);
 
+    @Query("select a from User a where a.userId =:userId and a.delYn ='Y'")
+    Optional<User> findDeleteUser(@Param("userId")String userId);
+
     @Query("select b from UserGroupUser a left outer join User b on b.userId = a.user.userId " +
             "where a.userGroup.userGrpId = :userGrpId")
     List<User> findByUser(@Param("userGrpId")Long userGrpId);

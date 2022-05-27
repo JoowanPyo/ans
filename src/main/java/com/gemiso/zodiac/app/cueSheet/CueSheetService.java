@@ -162,9 +162,9 @@ public class CueSheetService {
     }
 
     //큐시트 목록조회 + 유니온 일일편성 [큐시트 인터페이스+큐시트 아이템추가 목록]
-    public List<CueSheetDTO> takerFindAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String searchWord){
+    public List<CueSheetDTO> takerFindAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, Integer deptCd, String searchWord){
 
-        BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm, null,  searchWord);
+        BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm, deptCd,   searchWord);
 
         //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
         List<Sort.Order> orders = new ArrayList<>();
@@ -462,8 +462,8 @@ public class CueSheetService {
 
         CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
 
-        /*List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);*/
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
 
         //기사 미디어 있을경우 set
         //List<CueSheetItem> cueSheetItemList = cueSheetItemFindAll(cueId);
@@ -473,7 +473,7 @@ public class CueSheetService {
 
         //cueSheetItemDTOList = setSymbol(cueSheetItemDTOList);
 
-        //cueSheetDTO.setCueSheetItem(cueSheetItemDTOList);
+        cueSheetDTO.setCueSheetItem(cueSheetItemDTOList);
 
         return cueSheetDTO;
 
