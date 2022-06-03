@@ -91,7 +91,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         log.error(" Exception : "+ ApiErrorResponse.makeExceptionHandlerErrorResponse(ex));
 
         ApiErrorResponse.Error error =
-                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.InternalServerError, ex.getLocalizedMessage());
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.InternalServerError, ex.getMessage());
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
 
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR);

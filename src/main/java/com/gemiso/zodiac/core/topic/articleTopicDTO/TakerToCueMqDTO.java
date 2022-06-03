@@ -17,4 +17,5 @@ public class TakerToCueMqDTO {
     private int cueOderVer;
     private Long artclId;
     private Long cueItemId;
+    private String status;
 }

@@ -2,11 +2,18 @@ package com.gemiso.zodiac.app.yonhapWire;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.file.AttachFileRepository;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.mapper.AttachFileMapper;
+import com.gemiso.zodiac.app.user.UserService;
+import com.gemiso.zodiac.app.yonhap.Yonhap;
 import com.gemiso.zodiac.app.yonhap.YonhapService;
+import com.gemiso.zodiac.app.yonhapAssign.YonhapAssign;
+import com.gemiso.zodiac.app.yonhapAssign.YonhapAssignRepository;
+import com.gemiso.zodiac.app.yonhapAssign.dto.YonhapAssignSimpleDTO;
 import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileCreateDTO;
 import com.gemiso.zodiac.app.yonhapPhoto.dto.YonhapExceptionDomain;
 import com.gemiso.zodiac.app.yonhapWire.dto.*;
@@ -17,11 +24,15 @@ import com.gemiso.zodiac.app.yonhapWireAttchFile.YonhapWireAttchFileRepository;
 import com.gemiso.zodiac.app.yonhapWireAttchFile.dto.YonhapWireAttchFileDTO;
 import com.gemiso.zodiac.app.yonhapWireAttchFile.mapper.YonhapWireAttchFileMapper;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
+import com.gemiso.zodiac.core.helper.PageHelper;
+import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -34,8 +45,10 @@ import org.springframework.web.client.RestTemplate;
 import javax.persistence.EntityExistsException;
 import javax.persistence.PersistenceException;
 import java.nio.charset.Charset;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 
 @Service
 @Slf4j
@@ -47,6 +60,7 @@ public class YonhapWireService {
     private String namUrl;
 
     private final YonhapWireRepository yonhapWireRepository;
+    private final YonhapAssignRepository yonhapAssignRepository;
     //private final AttachFileRepository attachFileRepository;
     //private final YonhapWireAttchFileRepository yonhapWireAttchFileRepository;
 
@@ -56,18 +70,25 @@ public class YonhapWireService {
 
 
     private final DateChangeHelper dateChangeHelper;
+    private final UserService userService;
 
 
-    public List<YonhapWireDTO> findAll(Date sdate, Date edate, String agcyCd,
-                                             String searchWord, List<String> imprtList){
+    public PageResultDTO<YonhapWireDTO, YonhapWire> findAll(Date sdate, Date edate, String agcyCd, String agcyNm,  String source,
+                                       String svcTyp,  String searchWord, List<String> imprtList, Integer page, Integer limit){
 
-        BooleanBuilder booleanBuilder = getSearch(sdate, edate, agcyCd, searchWord, imprtList);
+        //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
+        PageHelper pageHelper = new PageHelper(page, limit);
+        Pageable pageable = pageHelper.getYonhapPage();
 
-        List<YonhapWire> yonhapWireList = (List<YonhapWire>) yonhapWireRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "inputDtm"));
+        BooleanBuilder booleanBuilder = getSearch(sdate, edate, agcyCd, agcyNm, source, svcTyp, searchWord, imprtList);
 
-        List<YonhapWireDTO> yonhapWireDTOList = yonhapWireMapper.toDtoList(yonhapWireList);
+        Page<YonhapWire> yonhapWireList = yonhapWireRepository.findYonhapWireList(sdate, edate, agcyCd, agcyNm, source,
+                svcTyp, searchWord, imprtList, pageable);
 
-        return yonhapWireDTOList;
+        Function<YonhapWire, YonhapWireDTO> fn = (entity -> yonhapWireMapper.toDto(entity));
+        //List<YonhapWireDTO> yonhapWireDTOList = yonhapWireMapper.toDtoList(yonhapWireList);
+
+        return new PageResultDTO<YonhapWireDTO, YonhapWire>(yonhapWireList, fn);
 
     }
 
@@ -81,6 +102,16 @@ public class YonhapWireService {
 
         //기존연합이 있을경우 updqte
         if (CollectionUtils.isEmpty(yonhapWireList) == false) {
+
+            /*String getCmnt = yonhapWireCreateDTO.getVideo_nm();
+
+            //Nam에 미디어 등록 후 id값을 받아온다.
+            YonhapNamResponseDTO mamCont = mamCreateReuterMedia(getCmnt, yonhapReuterCreateDTO);
+            NamResponseDTO data = mamCont.getData();
+            Long mamContId = null;
+            if (ObjectUtils.isEmpty(data) == false){
+                mamContId = data.getId();
+            }*/
 
             Long OrgYhArtclId = yonhapWireList.get(0).getWireId();
             yonhapWireCreateDTO.setWire_id(OrgYhArtclId);
@@ -367,7 +398,7 @@ public class YonhapWireService {
 
     }
 
-    public YonhapExceptionDomain createReuter(YonhapReuterCreateDTO yonhapReuterCreateDTO) throws JsonProcessingException {
+    public YonhapExceptionDomain createReuter(YonhapReuterCreateDTO yonhapReuterCreateDTO) throws JsonProcessingException, ParseException {
 
         Long reuterId = null;
 
@@ -377,12 +408,15 @@ public class YonhapWireService {
 
         if (CollectionUtils.isEmpty(yonhapWireList) == false){
 
+            Date trnsfDtm = dateChangeHelper.stringToDateNoComma(yonhapReuterCreateDTO.getArtcl_lcal_dtm());
+
             reuterId = yonhapWireList.get(0).getWireId();
 
             String getCmnt = yonhapReuterCreateDTO.getVideo_nm();
 
 
-            YonhapNamResponseDTO mamCont = mamCreateMedia(getCmnt, yonhapReuterCreateDTO);
+            //Nam에 미디어 등록 후 id값을 받아온다.
+            YonhapNamResponseDTO mamCont = mamCreateReuterMedia(getCmnt, yonhapReuterCreateDTO);
             NamResponseDTO data = mamCont.getData();
             Long mamContId = null;
             if (ObjectUtils.isEmpty(data) == false){
@@ -405,6 +439,7 @@ public class YonhapWireService {
                     .source("REUTERS")
                     .svcTyp("R")
                     .agcyCd("R")
+                    .trnsfDtm(trnsfDtm)
                     .mamContId(mamContId)
                     .build();
 
@@ -416,11 +451,14 @@ public class YonhapWireService {
 
         }else {
 
+            Date trnsfDtm = dateChangeHelper.stringToDateNoComma(yonhapReuterCreateDTO.getArtcl_lcal_dtm());
+
             String getCmnt = yonhapReuterCreateDTO.getVideo_nm();
             int lenth = getCmnt.length();
             String cmnt = getCmnt.substring(0, getCmnt.lastIndexOf(".") );
 
-            YonhapNamResponseDTO mamCont = mamCreateMedia(getCmnt, yonhapReuterCreateDTO);
+            //Nam에 미디어 등록 후 id값을 받아온다.
+            YonhapNamResponseDTO mamCont = mamCreateReuterMedia(getCmnt, yonhapReuterCreateDTO);
             NamResponseDTO data = mamCont.getData();
             Long mamContId = null;
             if (ObjectUtils.isEmpty(data) == false){
@@ -439,6 +477,7 @@ public class YonhapWireService {
                     .source("REUTERS")
                     .svcTyp("R")
                     .agcyCd("R")
+                    .trnsfDtm(trnsfDtm)
                     .mamContId(mamContId)
                     .build();
 
@@ -453,7 +492,7 @@ public class YonhapWireService {
         return new YonhapExceptionDomain(reuterId, "2000", "yonhapPhoto", "", "");
     }
 
-    public YonhapNamResponseDTO mamCreateMedia(String mediaNm, YonhapReuterCreateDTO yonhapReuterCreateDTO) throws JsonProcessingException {
+    public YonhapNamResponseDTO mamCreateReuterMedia(String mediaNm, YonhapReuterCreateDTO yonhapReuterCreateDTO) throws JsonProcessingException {
 
         //헤더 설정
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -533,8 +572,35 @@ public class YonhapWireService {
 
     }
 
+    public YonhapAssignSimpleDTO createWireAssign(YonhapWireAssignCreateDTO yonhapWireAssignCreateDTO, String userId){
+
+        YonhapWireSimpleDTO yonhapWireSimpleDTO = yonhapWireAssignCreateDTO.getYonhapWire();
+        Long yonhapWireId = yonhapWireSimpleDTO.getWireId();
+        YonhapWire yonhapWire = findYonhapWire(yonhapWireId);
+
+        //지정자 아이디
+        String designatorId = yonhapWireAssignCreateDTO.getDesignatorId();
+
+        userService.userFindOrFail(designatorId);//사용자 아이디 확인
+
+        YonhapAssign yonhapAssign = YonhapAssign.builder()
+                .yonhapWire(yonhapWire)
+                .designatorId(designatorId)
+                .assignerId(userId)
+                .build();
+
+        yonhapAssignRepository.save(yonhapAssign);
+
+        Long assignId = yonhapAssign.getAssignId();
+
+        YonhapAssignSimpleDTO yonhapAssignSimpleDTO = new YonhapAssignSimpleDTO();
+        yonhapAssignSimpleDTO.setAssignId(assignId);
+
+        return yonhapAssignSimpleDTO;
+    }
+
     private BooleanBuilder getSearch(Date sdate, Date edate, String agcyCd,
-                                     String searchWord, List<String> imprtList){
+                                     String agcyNm,  String source,  String svcTyp,  String searchWord, List<String> imprtList){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 

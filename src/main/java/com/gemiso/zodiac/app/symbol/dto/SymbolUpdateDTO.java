@@ -1,8 +1,6 @@
 package com.gemiso.zodiac.app.symbol.dto;
 
-import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,6 +31,6 @@ public class SymbolUpdateDTO {
     //private String delrNm;
     private String typCd;
     //private String typCdNm;
-    private int symbolOrd;
+    private Integer symbolOrd;
     private AttachFileDTO attachFile;
 }

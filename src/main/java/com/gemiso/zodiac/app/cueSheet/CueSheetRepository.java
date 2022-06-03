@@ -1,10 +1,12 @@
 package com.gemiso.zodiac.app.cueSheet;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
+import javax.persistence.LockModeType;
 import java.util.Optional;
 
 public interface CueSheetRepository extends JpaRepository<CueSheet, Long>, QuerydslPredicateExecutor<CueSheet> {
@@ -17,6 +19,10 @@ public interface CueSheetRepository extends JpaRepository<CueSheet, Long>, Query
 
     @Query("select count(a) from CueSheet a where a.brdcDt =:brdcDt and a.program.brdcPgmId =:brdcPgmId and a.delYn = 'N'")
     int findCueProgram(@Param("brdcDt")String brdcDt,@Param("brdcPgmId")String brdcPgmId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select a from CueSheet a where a.cueId =:cueId and a.delYn ='N' ")
+    Optional<CueSheet> findCueLock(@Param("cueId")Long cueId);
 
 
 }

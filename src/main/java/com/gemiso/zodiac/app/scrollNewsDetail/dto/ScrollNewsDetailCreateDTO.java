@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class ScrollNewsDetailCreateDTO {
 
     private String titl;
-    private int cttOrd;
-    private String cttJson;
+    private Integer cttOrd;
+    private List<ScrollNewsDetailCttJsonDTO> cttJsons;
     private ScrollNewsSimpleDTO scrollNews;
 }

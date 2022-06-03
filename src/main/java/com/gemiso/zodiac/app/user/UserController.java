@@ -36,10 +36,12 @@ public class UserController {
                                                  @RequestParam(value = "userNm", required = false) String userNm,
                                                  @Parameter(name = "searchWord", description = "검색키워드")
                                                  @RequestParam(value = "searchWord", required = false) String searchWord,
+                                                 @Parameter(name = "email", description = "이메일")
+                                                 @RequestParam(value = "email", required = false) String email,
                                                  @Parameter(name = "delYn", description = "삭제 여부", in = ParameterIn.QUERY)
                                                  @RequestParam(value = "delYn", required = false) String delYn) {
 
-        List<UserDTO> result = userService.findAll(userId, userNm, searchWord, delYn);
+        List<UserDTO> result = userService.findAll(userId, userNm, searchWord, email, delYn);
 
 
         return new AnsApiResponse<>(result);
@@ -115,7 +117,7 @@ public class UserController {
     @Operation(summary = "사용자 비밀번호 확인", description = "사용자 비밀번호 확인")
     @GetMapping(path = "/confirm")
     public AnsApiResponse<?> passwordConfirm(@Parameter(name = "comfirmPwd", description = "확인 패스워드", in = ParameterIn.QUERY)
-                                            @RequestParam(value = "comfirmPwd", required = false) String comfirmPwd) throws NoSuchAlgorithmException {
+                                             @RequestParam(value = "comfirmPwd", required = false) String comfirmPwd) throws NoSuchAlgorithmException {
 
         userService.passwordConfirm(comfirmPwd);
 
@@ -125,7 +127,7 @@ public class UserController {
     @Operation(summary = "삭제된 사용자 복구", description = "삭제된 사용자 복구")
     @PutMapping(path = "/{userId}/delete")
     public AnsApiResponse<UserDTO> deleteUserUpdate(@Parameter(name = "userDto", required = true, description = "필수값<br>") @Valid @RequestBody UserDeleteUpdateDTO userDeleteUpdateDTO,
-                                          @Parameter(name = "userId", required = true) @PathVariable("userId") String userId) throws NoSuchAlgorithmException {
+                                                    @Parameter(name = "userId", required = true) @PathVariable("userId") String userId) throws NoSuchAlgorithmException {
 
         userService.deleteUserUpdate(userDeleteUpdateDTO, userId);
 
@@ -134,4 +136,4 @@ public class UserController {
         return new AnsApiResponse<>(userDto);
     }
 
-    }
+}

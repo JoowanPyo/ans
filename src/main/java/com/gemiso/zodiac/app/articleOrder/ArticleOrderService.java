@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.articleOrder;
 
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderCreateDTO;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderDTO;
+import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderStatusDTO;
 import com.gemiso.zodiac.app.articleOrderFile.dto.ArticleOrderFileDTO;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderUpdateDTO;
 import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderCreateMapper;
@@ -140,6 +141,20 @@ public class ArticleOrderService {
         
         articleOrderRepository.deleteById(orderId);//기사의뢰 삭제.
         
+    }
+
+    public void updateStatus(ArticleOrderStatusDTO articleOrderStatusDTO, Long orderId, String userId){
+
+        ArticleOrder articleOrder = articleOrderFindOrFail(orderId);
+
+        ArticleOrderDTO articleOrderDTO = articleOrderMapper.toDto(articleOrder);
+        articleOrderDTO.setOrderStatus(articleOrderStatusDTO.getOrderStatus());
+        articleOrderDTO.setWorkrId(userId);
+
+        articleOrderMapper.updateFromDto(articleOrderDTO, articleOrder);
+
+        articleOrderRepository.save(articleOrder);
+
     }
 
     private ArticleOrder articleOrderFindOrFail(Long orderId){

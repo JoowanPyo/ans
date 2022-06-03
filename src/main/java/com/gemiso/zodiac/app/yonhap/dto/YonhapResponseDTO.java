@@ -44,5 +44,5 @@ public class YonhapResponseDTO {
     private String action;
 
     private List<AttachFileDTO> files = new ArrayList<AttachFileDTO>();
-    private List<YonhapAttachFileDTO> upload_files;
+    private List<YonhapAttachFileDTO> yonhapAttchFiles;
 }

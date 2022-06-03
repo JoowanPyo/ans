@@ -129,7 +129,7 @@ public class CueSheetMediaService {
                 }
 
 
-                sendCueTopicCreate(cueSheet, cueId, cueItemId, null, null, "CueSheet Media Create",
+                sendCueTopicCreate(cueSheet, cueId, cueItemId, 0L, null, "CueSheet Media Create",
                         spareYn, "Y", "Y", null);
             }
         }
@@ -185,51 +185,62 @@ public class CueSheetMediaService {
     public void sendCueTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
                                    String spareYn, String prompterFlag, String videoTakerFlag, Article article) throws JsonProcessingException {
 
-        Integer cueVer = 0;
-        Integer cueOderVer = 0;
-        if (ObjectUtils.isEmpty(cueSheet) == false){
+        try {
 
-            cueVer = cueSheet.getCueVer();
-            cueOderVer = cueSheet.getCueOderVer();
+            Integer cueVer = 0;
+            Integer cueOderVer = 0;
+            if (ObjectUtils.isEmpty(cueSheet) == false) {
+
+                cueVer = cueSheet.getCueVer();
+                cueOderVer = cueSheet.getCueOderVer();
+
+            }
+
+            Long orgArtclId = null;
+            if (ObjectUtils.isEmpty(article) == false) {
+                orgArtclId = article.getOrgArtclId();
+            }
+
+            if (artclId.equals(orgArtclId) == false) {
+
+                //토픽메세지 ArticleTopicDTO Json으로 변환후 send
+                TakerCueSheetTopicDTO takerCueSheetTopicDTO = new TakerCueSheetTopicDTO();
+                //모델부분은 안넣어줘도 될꺼같음.
+                takerCueSheetTopicDTO.setEvent_id(eventId);
+                takerCueSheetTopicDTO.setCue_id(cueId);
+                takerCueSheetTopicDTO.setCue_ver(cueVer);
+                takerCueSheetTopicDTO.setCue_oder_ver(cueOderVer);
+                takerCueSheetTopicDTO.setCue_item_id(cueItemId); //변경된 내용 추가
+                takerCueSheetTopicDTO.setArtcl_id(artclId);
+                takerCueSheetTopicDTO.setCue_tmplt_id(cueTmpltId);
+                takerCueSheetTopicDTO.setSpare_yn(spareYn);
+                takerCueSheetTopicDTO.setPrompter(prompterFlag);
+                takerCueSheetTopicDTO.setVideo_taker(videoTakerFlag);
+                String interfaceJson = marshallingJsonHelper.MarshallingJson(takerCueSheetTopicDTO);
+
+                //interface에 큐메세지 전송
+                topicService.topicInterface(interfaceJson);
+            }
+
+            WebTopicDTO webTopicDTO = new WebTopicDTO();
+            webTopicDTO.setEventId("Article Media Create");
+            webTopicDTO.setCueId(cueId);
+            webTopicDTO.setCueItemId(cueItemId);
+            webTopicDTO.setArtclId(artclId);
+            webTopicDTO.setCueVer(cueVer);
+            webTopicDTO.setCueOderVer(cueOderVer);
+            webTopicDTO.setSpareYn(spareYn);
+            String webJson = marshallingJsonHelper.MarshallingJson(webTopicDTO);
+            //web에 큐메세지 전송
+            topicService.topicWeb(webJson);
+
+        } catch (Exception e) {
+
+            log.error("CueSheetMedia Topic Errer : CueSheet - "+cueSheet.toString()+" CueItemId - "+cueItemId +" Message - " +eventId);
 
         }
-
-        Long orgArtclId = article.getOrgArtclId();
-
-        if (ObjectUtils.isEmpty(orgArtclId) == false) {
-
-            //토픽메세지 ArticleTopicDTO Json으로 변환후 send
-            TakerCueSheetTopicDTO takerCueSheetTopicDTO = new TakerCueSheetTopicDTO();
-            //모델부분은 안넣어줘도 될꺼같음.
-            takerCueSheetTopicDTO.setEvent_id(eventId);
-            takerCueSheetTopicDTO.setCue_id(cueId);
-            takerCueSheetTopicDTO.setCue_ver(cueVer);
-            takerCueSheetTopicDTO.setCue_oder_ver(cueOderVer);
-            takerCueSheetTopicDTO.setCue_item_id(cueItemId); //변경된 내용 추가
-            takerCueSheetTopicDTO.setArtcl_id(artclId);
-            takerCueSheetTopicDTO.setCue_tmplt_id(cueTmpltId);
-            takerCueSheetTopicDTO.setSpare_yn(spareYn);
-            takerCueSheetTopicDTO.setPrompter(prompterFlag);
-            takerCueSheetTopicDTO.setVideo_taker(videoTakerFlag);
-            String interfaceJson = marshallingJsonHelper.MarshallingJson(takerCueSheetTopicDTO);
-
-            //interface에 큐메세지 전송
-            topicService.topicInterface(interfaceJson);
-        }
-
-        WebTopicDTO webTopicDTO = new WebTopicDTO();
-        webTopicDTO.setEventId("Article Media Create");
-        webTopicDTO.setCueId(cueId);
-        webTopicDTO.setCueItemId(cueItemId);
-        webTopicDTO.setArtclId(artclId);
-        webTopicDTO.setCueVer(cueVer);
-        webTopicDTO.setCueOderVer(cueOderVer);
-        webTopicDTO.setSpareYn(spareYn);
-        String webJson = marshallingJsonHelper.MarshallingJson(webTopicDTO);
-        //web에 큐메세지 전송
-        topicService.topicWeb(webJson);
-
     }
+
 
 
 }

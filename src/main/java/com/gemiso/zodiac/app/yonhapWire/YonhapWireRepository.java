@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface YonhapWireRepository extends JpaRepository<YonhapWire, Long> , QuerydslPredicateExecutor<YonhapWire> {
+public interface YonhapWireRepository extends JpaRepository<YonhapWire, Long> , QuerydslPredicateExecutor<YonhapWire>, YonhapWireRepositoryCustom {
 
 
     @Query("select a from YonhapWire a where a.contId = :contId")

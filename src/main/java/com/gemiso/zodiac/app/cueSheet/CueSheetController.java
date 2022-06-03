@@ -155,7 +155,7 @@ public class CueSheetController {
     public AnsApiResponse<CueSheetDTO> cueSheetOrderLock(@Parameter(name = "cueSheetOrderLockDTO", required = true, description = "필수값<br>")
                                                          @Valid @RequestBody CueSheetOrderLockDTO cueSheetOrderLockDTO,
                                                          @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                                         @PathVariable("cueId") Long cueId) {
+                                                         @PathVariable("cueId") Long cueId) throws JsonProcessingException {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();

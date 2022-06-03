@@ -17,4 +17,5 @@ public class TakerToCueBodyDTO {
     private Long rd_id;
     private Long cue_id;
     private String playout_id;
+    private String status; // play and cue
 }

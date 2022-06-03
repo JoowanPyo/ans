@@ -133,6 +133,7 @@ public class UserGroupService {
 
         QUserGroup qUserGroup = QUserGroup.userGroup;
 
+        booleanBuilder.and(qUserGroup.delYn.eq("N"));
         if(useYn != null && useYn.trim().isEmpty() == false){
             booleanBuilder.and(qUserGroup.useYn.eq(useYn));
         }

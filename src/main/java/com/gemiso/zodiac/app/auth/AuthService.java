@@ -195,7 +195,7 @@ public class AuthService {
         }
 
         String refreshToken = jwtParser.refreshTokenVerification(userToken.getRefreshToken()); //리플레시 토큰이 만료되었는지 검증
-        if (StringUtils.isEmpty(refreshToken)) { //만료되었으면 재생성
+        if (refreshToken == null && refreshToken.trim().isEmpty()) { //만료되었으면 재생성
             //throw new TokenFailedException("리플레시 토큰 기간이 만료되었습니다 다시 로그인 해주세요" );
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }

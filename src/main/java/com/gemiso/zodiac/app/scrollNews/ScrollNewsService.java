@@ -10,6 +10,7 @@ import com.gemiso.zodiac.app.scrollNews.mapper.ScrollNewsUpdateMapper;
 import com.gemiso.zodiac.app.scrollNewsDetail.ScrollNewsDetail;
 import com.gemiso.zodiac.app.scrollNewsDetail.ScrollNewsDetailRepository;
 import com.gemiso.zodiac.app.scrollNewsDetail.dto.ScrollNewsDetailCreateDTO;
+import com.gemiso.zodiac.app.scrollNewsDetail.dto.ScrollNewsDetailCttJsonDTO;
 import com.gemiso.zodiac.app.scrollNewsDetail.mapper.ScrollNewsDetailCreateMapper;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
@@ -20,9 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -84,7 +87,7 @@ public class ScrollNewsService {
 
         Long scrlNewsId = scrollNews.getScrlNewsId(); //스크롤 뉴스 상세에 set && 리턴해줄 스크롤 뉴스 아이디
         //스크롤 뉴스 상세 등록 리스트 get
-        List<ScrollNewsDetailCreateDTO> scrollNewsDetailCreateDTO = scrollNewsCreateDTO.getScrollNewsDetail();
+        List<ScrollNewsDetailCreateDTO> scrollNewsDetailCreateDTO = scrollNewsCreateDTO.getScrollNewsDetails();
 
         createDetail(scrollNewsDetailCreateDTO, scrlNewsId); //스크럴 뉴스 상세 등록.
 
@@ -152,15 +155,16 @@ public class ScrollNewsService {
         for (ScrollNewsDetailCreateDTO dto : scrollNewsDetailCreateDTO) {
 
             //내용 Json타입으로 변환
-            String ctt = dto.getCttJson();
+            List<ScrollNewsDetailCttJsonDTO> ctts = dto.getCttJsons();
             String returnCtt = "";
-            if (ctt != null && ctt.trim().isEmpty() == false){
-                returnCtt = marshallingJsonHelper.MarshallingJson(ctt);
+            if (CollectionUtils.isEmpty(ctts) == false){
+                returnCtt = marshallingJsonHelper.MarshallingJson(ctts);
             }
 
-            dto.setCttJson(returnCtt);//내용 Json타입으로 변환
+           //dto.setCttJson(returnCtt);//내용 Json타입으로 변환
             dto.setScrollNews(scrollNewsSimpleDTO);//스크롤 뉴스 아이디 set
             ScrollNewsDetail scrollNewsDetail = scrollNewsDetailCreateMapper.toEntity(dto);//스크롤 뉴스 상세DTO 엔티티 변환
+            scrollNewsDetail.setCttJson(returnCtt);
             scrollNewsDetailRepository.save(scrollNewsDetail);//스크롤 뉴스 상세 등록
 
         }

@@ -1999,6 +1999,7 @@ public class InterfaceService {
 
         Long rdId = takerToCueBodyDTO.getRd_id();
         Long cueId = takerToCueBodyDTO.getCue_id();
+        String status = takerToCueBodyDTO.getStatus();
 
         CueSheetItem cueSheetItem = cueSheetItemService.cueItemFindOrFail(rdId);
 
@@ -2006,6 +2007,7 @@ public class InterfaceService {
         takerToCueMqDTO.setEventId("CueSheetItem Start From The Taker");
         takerToCueMqDTO.setCueItemId(rdId);
         takerToCueMqDTO.setCueId(cueId);
+        takerToCueMqDTO.setStatus(status);
 
         String json = marshallingJsonHelper.MarshallingJson(takerToCueMqDTO);
 

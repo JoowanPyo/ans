@@ -151,13 +151,13 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
         if (copyYn != null && copyYn.trim().isEmpty() == false) {
 
             if ("N".equals(copyYn)) {
-                jpaQuery.where(qArticle.orgArtclId.isNull());
+                jpaQuery.where(qArticle.orgArtclId.eq(qArticle.artclId));
             } else {
-                jpaQuery.where(qArticle.orgArtclId.isNotNull());
+                jpaQuery.where(qArticle.orgArtclId.ne(qArticle.artclId));
             }
         }
 
-        jpaQuery.orderBy(qArticle.inputDtm.desc(), qArticle.orgArtclId.desc());
+        jpaQuery.orderBy(qArticle.orgArtclId.desc(), qArticle.artclOrd.asc());
 
         Long totalCount = jpaQuery.fetchCount();
         jpaQuery.offset(pageable.getOffset());
@@ -259,7 +259,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
             jpaQuery.where(qArticle.apprvDivCd.in(apprvDivCdList));
         }
 
-        jpaQuery.orderBy(qArticle.inputDtm.desc(), qArticle.orgArtclId.desc());
+        jpaQuery.orderBy(qArticle.orgArtclId.desc(), qArticle.artclOrd.asc());
 
         Long totalCount = jpaQuery.fetchCount();
         jpaQuery.offset(pageable.getOffset());
@@ -271,7 +271,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
     }
 
     @Override
-    public Page<Article> findByArticleCue(Date sdate, Date edate, String searchWord, Long cueId, String brdcPgmId,
+    public Page<Article> findByArticleCue(Date sdate, Date edate, String searchWord, Long cueId, String brdcPgmId, String artclTypCd,
                                           String artclTypDtlCd, String copyYn, Integer deptCd, Pageable pageable) {
 
 
@@ -299,12 +299,17 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
 
         //기사제목 기준으로 조회
         if (searchWord != null && searchWord.trim().isEmpty() == false) {
-            jpaQuery.where(qArticle.artclTitl.contains(searchWord));
+            jpaQuery.where(qArticle.artclTitl.contains(searchWord).or(qArticle.artclTitlEn.contains(searchWord)));
         }
 
         //검색조건 = 방송 프로그램 아이디
         if (ObjectUtils.isEmpty(brdcPgmId) == false) {
             jpaQuery.where(qArticle.brdcPgmId.eq(brdcPgmId));
+        }
+
+        //기사 유형 코드
+        if (artclTypCd != null && artclTypCd.trim().isEmpty() == false){
+            jpaQuery.where(qArticle.artclTypCd.eq(artclTypCd));
         }
 
         //검색조건 = 기상 유형 상세 코드
@@ -321,13 +326,13 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
         if (copyYn != null && copyYn.trim().isEmpty() == false) {
 
             if ("N".equals(copyYn)) {
-                jpaQuery.where(qArticle.orgArtclId.isNull());
+                jpaQuery.where(qArticle.orgArtclId.eq(qArticle.artclId));
             } else {
-                jpaQuery.where(qArticle.orgArtclId.isNotNull());
+                jpaQuery.where(qArticle.orgArtclId.ne(qArticle.artclId));
             }
         }
 
-        jpaQuery.orderBy(qArticle.inputDtm.desc(), qArticle.orgArtclId.desc());
+        jpaQuery.orderBy(qArticle.inputDtm.desc(), qArticle.orgArtclId.asc());
 
         Long totalCount = jpaQuery.fetchCount();
         jpaQuery.offset(pageable.getOffset());

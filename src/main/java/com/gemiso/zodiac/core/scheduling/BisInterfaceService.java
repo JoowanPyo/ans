@@ -121,30 +121,34 @@ public class BisInterfaceService {
         if (CollectionUtils.isEmpty(dsProgramDTOList) == false) { //BIS에서 새로들오온 프로그램의 정보를 엔티티 빌드후 등록한다.
             for (DsProgramDTO dsProgramDTO : dsProgramDTOList) {
 
-                String chanTp = dsProgramDTO.getChanTp(); //Bis에서 조회된 채널정보 get
-                String jenreClf1 = dsProgramDTO.getJenreClf1();//Bis에서 조회된 장르구분 get
-                String productClf = dsProgramDTO.getProductClf();//Bis에서 조회된 제작구분 get
+                String newsYn = dsProgramDTO.getNewsYn();
+                if ("Y".equals(newsYn)) {
+                    String chanTp = dsProgramDTO.getChanTp(); //Bis에서 조회된 채널정보 get
+                    String jenreClf1 = dsProgramDTO.getJenreClf1();//Bis에서 조회된 장르구분 get
+                    String productClf = dsProgramDTO.getProductClf();//Bis에서 조회된 제작구분 get
 
-                //채널유형 01:TV 02:라디오
-                String chDivCd = getChannelCd(chanTp);
-                //장르구분 100 보도, 200:교양, 300:오락
-                String gneDivCd = getGenreCd(jenreClf1);
-                //제작구분 100:자체제작, 200:외주제작, 300:국내구매, 400:해외구매, 500리패키지, 999:기타
-                String prdDivCd = getProduceCd(productClf);
+                    //채널유형 01:TV 02:라디오
+                    String chDivCd = getChannelCd(chanTp);
+                    //장르구분 100 보도, 200:교양, 300:오락
+                    String gneDivCd = getGenreCd(jenreClf1);
+                    //제작구분 100:자체제작, 200:외주제작, 300:국내구매, 400:해외구매, 500리패키지, 999:기타
+                    String prdDivCd = getProduceCd(productClf);
 
-                Program program = Program.builder()
-                        .brdcPgmId(dsProgramDTO.getPgmCd())//프로그램 아이디
-                        .brdcPgmNm(dsProgramDTO.getPgmNm())//프로그램 명
-                        .chDivCd(chDivCd)//채널구분
-                        .gneDivCd(gneDivCd)//장르구분
-                        .prdDivCd(prdDivCd)//제작구분
-                        /*.inputrId(userId)*/
-                        .build();
+                    Program program = Program.builder()
+                            .brdcPgmId(dsProgramDTO.getPgmCd())//프로그램 아이디
+                            .brdcPgmNm(dsProgramDTO.getPgmNm())//프로그램 명
+                            .chDivCd(chDivCd)//채널구분
+                            .gneDivCd(gneDivCd)//장르구분
+                            .prdDivCd(prdDivCd)//제작구분
+                            /*.inputrId(userId)*/
+                            .build();
 
 
-                programRepository.save(program);
+                    programRepository.save(program);
 
-                log.info("Program Create sucess : program Id -"+program.getBrdcPgmId());
+
+                    log.info("Program Create sucess : program Id -" + program.getBrdcPgmId());
+                }
             }
         }
     }

@@ -1,9 +1,6 @@
 package com.gemiso.zodiac.app.articleOrder;
 
-import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderCreateDTO;
-import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderDTO;
-import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderResponseDTO;
-import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderUpdateDTO;
+import com.gemiso.zodiac.app.articleOrder.dto.*;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import com.gemiso.zodiac.core.service.UserAuthService;
@@ -103,7 +100,7 @@ public class ArticleOrderController {
     public AnsApiResponse<ArticleOrderResponseDTO> update(@Parameter(description = "필수값<br>", required = true)
                                                           @RequestBody @Valid ArticleOrderUpdateDTO articleOrderUpdateDTO,
                                                           @Parameter(name = "orderId", required = true, description = "의뢰 아이디")
-                                                          @PathVariable("orderId") long orderId) {
+                                                          @PathVariable("orderId") Long orderId) {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
@@ -123,7 +120,7 @@ public class ArticleOrderController {
     @DeleteMapping(path = "/{orderId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "orderId", required = true, description = "의뢰 아이디")
-                                    @PathVariable("orderId") long orderId) {
+                                    @PathVariable("orderId") Long orderId) {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
@@ -132,6 +129,26 @@ public class ArticleOrderController {
         articleOrderService.delete(orderId);
 
         return AnsApiResponse.noContent();
+    }
+
+    @Operation(summary = "기사의뢰 상태 수정", description = "기사의뢰 상태 수정")
+    @PutMapping(path = "/{orderId}/updatest")
+    public AnsApiResponse<ArticleOrderResponseDTO> updateStatus(@Parameter(description = "필수값<br>", required = true)
+                                                          @RequestBody @Valid ArticleOrderStatusDTO articleOrderStatusDTO,
+                                                          @Parameter(name = "orderId", required = true, description = "의뢰 아이디")
+                                                          @PathVariable("orderId") Long orderId) {
+
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        String userId = userAuthService.authUser.getUserId();
+        log.info(" Update Article Order : User Id - "+userId+" Order Status -"+articleOrderStatusDTO.getOrderStatus());
+
+        ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();
+
+        articleOrderService.updateStatus(articleOrderStatusDTO, orderId, userId);
+
+        responseDTO.setOrderId(orderId); //Id set[ response =  id]
+
+        return new AnsApiResponse<>(responseDTO);
     }
 
 

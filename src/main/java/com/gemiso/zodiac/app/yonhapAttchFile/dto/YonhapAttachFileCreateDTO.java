@@ -21,9 +21,8 @@ public class YonhapAttachFileCreateDTO {
     private String yh_url;*/
 
 
-    // "파일 목록"
-    @JsonIgnore
-    private MultipartFile file;
+    // "등록된 파일 아이디"
+    private Long update_file_id;
     // "파일아이디"
     private Long file_id;
     // "연합 기사 아이디"

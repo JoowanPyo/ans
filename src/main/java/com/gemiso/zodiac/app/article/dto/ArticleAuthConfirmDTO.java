@@ -18,6 +18,7 @@ public class ArticleAuthConfirmDTO {
     private String lckYn;
     private Date lckDtm;
     private String lckrId;
+    private String lckrNm;
     private String msg;
     private String authCode;
     private HttpStatus httpStatus;

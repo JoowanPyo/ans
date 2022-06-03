@@ -4,6 +4,7 @@ import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolCreateDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
+import com.gemiso.zodiac.app.symbol.dto.SymbolOrdUpdateDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolUpdateDTO;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolCreateMapper;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolMapper;
@@ -73,7 +74,7 @@ public class SymbolService {
     public SymbolDTO find(String symbolId){ //방송 아이콘 상세(단건) 조회
 
         //수정! 1:1관계에서 조인이 잘 되지 않음.
-        Symbol symbol = userFindOrFail(symbolId);
+        Symbol symbol = symbolFindOrFail(symbolId);
 
         SymbolDTO symbolDTO = symbolMapper.toDto(symbol);
 
@@ -103,7 +104,7 @@ public class SymbolService {
 
     public void update(SymbolUpdateDTO symbolUpdateDTO, String symbolId){
 
-        Symbol symbol = userFindOrFail(symbolId);
+        Symbol symbol = symbolFindOrFail(symbolId);
 
         String userId = userAuthService.authUser.getUserId();
         symbolUpdateDTO.setUpdtrId(userId); // 수정자 추가.
@@ -125,7 +126,7 @@ public class SymbolService {
 
     public void delete(String symbolId){
 
-        Symbol symbol = userFindOrFail(symbolId);
+        Symbol symbol = symbolFindOrFail(symbolId);
 
         SymbolDTO symbolDTO = symbolMapper.toDto(symbol);
 
@@ -143,8 +144,50 @@ public class SymbolService {
 
     }
 
+    public void ordupdate(SymbolOrdUpdateDTO symbolOrdUpdateDTO, String symbolId){
 
-    public Symbol userFindOrFail(String symbolId){ //방송 아이콘 Id로 등록된 방송아이콘 유무 검증.
+        Symbol symbol = symbolFindOrFail(symbolId);
+
+        Integer symbolOrd = symbolOrdUpdateDTO.getSymbolOrd();
+
+        SymbolDTO symbolDTO = symbolMapper.toDto(symbol);
+        symbolDTO.setSymbolOrd(symbolOrd);
+
+        symbolMapper.updateFromDto(symbolDTO, symbol);
+        symbolRepository.save(symbol);
+
+        String typCd = symbolOrdUpdateDTO.getTypCd();
+
+        List<Symbol> symbolList = symbolRepository.findSymbolList(typCd);
+
+        for (int i = symbolList.size()-1; i >= 0; i-- ){
+
+            String id = symbolList.get(i).getSymbolId();
+
+            if (id.equals(symbolId)){
+                symbolList.remove(i);
+            }
+        }
+
+        symbolList.add(symbolOrd, symbol);
+
+        //조회된 방송아이콘 리스트 Ord 업데이트
+        int index = 0;
+        for (Symbol symbolEntity : symbolList){
+
+            SymbolDTO updateSymbolDTO = symbolMapper.toDto(symbolEntity);
+            updateSymbolDTO.setSymbolOrd(index);
+
+            Symbol symbolSave = symbolMapper.toEntity(updateSymbolDTO);
+
+            symbolRepository.save(symbolSave);
+
+            index++;
+        }
+
+    }
+
+    public Symbol symbolFindOrFail(String symbolId){ //방송 아이콘 Id로 등록된 방송아이콘 유무 검증.
 
         Optional<Symbol> symbol = symbolRepository.findBySymbolId(symbolId);
 

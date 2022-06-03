@@ -33,6 +33,6 @@ public class SymbolCreateDTO {
     //private String delrNm;
     private String typCd;
     //private String typCdNm;
-    private int symbolOrd;
+    private Integer symbolOrd;
     private AttachFileDTO attachFile;
 }

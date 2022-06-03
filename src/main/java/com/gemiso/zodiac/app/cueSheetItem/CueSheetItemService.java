@@ -344,32 +344,33 @@ public class CueSheetItemService {
         cueSheetItemDTO.setDelYn("Y");
         cueSheetItemDTO.setDelDtm(new Date());
 
+        cueSheetItemMapper.updateFromDto(cueSheetItemDTO, cueSheetItem);
+        cueSheetItemRepository.save(cueSheetItem);
 
         //큐시트 아이템 삭제시 포함된 기사(복사된 기사)도 삭제
         Article article = cueSheetItem.getArticle();
 
         if (ObjectUtils.isEmpty(article) == false) {
             Long artclId = article.getArtclId();
-            Article chkArticle = articleService.articleFindOrFailCueItem(artclId);
 
-            if (ObjectUtils.isEmpty(chkArticle) == false) {
+            //articleService.delete(artclId, userId);
 
-                ArticleDTO articleDTO = articleMapper.toDto(chkArticle);
-                articleDTO.setDelYn("Y");
-                articleDTO.setDelrId(userId);
+            //Article chkArticle = articleService.articleFindOrFailCueItem(artclId);
 
-                articleMapper.updateFromDto(articleDTO, chkArticle);
+            if (ObjectUtils.isEmpty(article) == false) {
 
-                articleRepository.save(chkArticle);
+                article.setDelrId(userId);
+                article.setDelYn("Y");
+                article.setDelDtm(new Date());
+
+                articleRepository.save(article);
 
                 //기사가 삭제될때 포함된 미디어정보도 같이 삭제처리 ( delYn = "Y")
-                Set<ArticleMedia> articleMedia = chkArticle.getArticleMedia();
+                Set<ArticleMedia> articleMedia = article.getArticleMedia();
                 deleteArticleMedia(articleMedia, userId);
             }
         }
 
-        cueSheetItemMapper.updateFromDto(cueSheetItemDTO, cueSheetItem);
-        cueSheetItemRepository.save(cueSheetItem);
 
         //삭제되 아이템이 포함된 미디어정보 삭제 플레그 처리 ( delYn = "Y")
         Set<CueSheetMedia> cueSheetMedia = cueSheetItem.getCueSheetMedia();
@@ -1316,22 +1317,12 @@ public class CueSheetItemService {
 
 
     //기사시퀀스값 get
-    public int getArticleOrd(Article article, Long artclId) {
+    public Integer getArticleOrd(Article article, Long artclId) {
 
         Long orgArtclId = article.getOrgArtclId();
 
-        if (ObjectUtils.isEmpty(orgArtclId) == false) {
 
-            Optional<Integer> getMaxOrd = articleRepository.findArticleOrd(orgArtclId);
-
-            if (getMaxOrd.isPresent() == false) {
-
-                return 0;
-            }
-
-            return getMaxOrd.get();
-        } else {
-
+        if (artclId.equals(orgArtclId)) { //원본일경우
 
             Optional<Integer> getMaxOrd = articleRepository.findArticleOrd(artclId);
 
@@ -1340,7 +1331,18 @@ public class CueSheetItemService {
                 return 0;
             }
 
-            return getMaxOrd.get();
+            return getMaxOrd.get() + 1;
+        } else {
+
+
+            Optional<Integer> getMaxOrd = articleRepository.findArticleOrd(orgArtclId);
+
+            if (getMaxOrd.isPresent() == false) {
+
+                return 0;
+            }
+
+            return getMaxOrd.get() + 1;
 
 
         }
@@ -1368,7 +1370,7 @@ public class CueSheetItemService {
         Article article = getArticle.get();
 
         //기사 시퀀스[오리지널 기사 0 = 그밑으로 복사된 기사 + 1 증가]
-        int maxArtclOrd = getArticleOrd(article, artclId);
+        Integer maxArtclOrd = getArticleOrd(article, artclId);
 
         // 기사 저장하기 위한 기사복사 엔터티 생성
         Article articleEntity = getArticleEntity(article, maxArtclOrd, cueSheet);
@@ -1474,7 +1476,7 @@ public class CueSheetItemService {
     }
 
     // 기사 저장하기 위한 엔터티 만들기 2021-10-27
-    private Article getArticleEntity(Article article, int maxArtclOrd, CueSheet cueSheet) {
+    private Article getArticleEntity(Article article, Integer maxArtclOrd, CueSheet cueSheet) {
 
         Program program = cueSheet.getProgram();
         String brdcPgmId = "";
@@ -1487,6 +1489,7 @@ public class CueSheetItemService {
             //brdcSchdDtm = program.
         }
 
+        Long artclId = article.getArtclId();
         Long orgArtclId = article.getOrgArtclId();//원본기사 아이디
 
         String getOrgApprvDivCd = article.getApprvDivCd(); //원본 픽스구분 코드를 가져온다.
@@ -1496,19 +1499,15 @@ public class CueSheetItemService {
 
         //원본 픽스구분값이 앵커픽스,데이커 픽스일 경우 article_fix, editor_fix 로변경
         //에디터 픽스자가 있을경우 에디터픽스로, 아닐경우 기사픽스로 셋팅
-        if ("anchor_fix".equals(getOrgApprvDivCd) || "desk_fix".equals(getOrgApprvDivCd)) {
-
-            if (editorFixUser != null && editorFixUser.trim().isEmpty() == false) {
-                newApprvDivCd = "editor_fix";
-            } else {
+        if ("anchor_fix".equals(getOrgApprvDivCd) || "desk_fix".equals(getOrgApprvDivCd) || "editor_fix".equals(getOrgApprvDivCd)) {
+           
                 newApprvDivCd = "article_fix";
-            }
 
         } else {
-            newApprvDivCd = getOrgApprvDivCd; //앵커픽스나, 데스커 픽스가 아닐경우엔 원본 픽스값 그래도 대입
+            newApprvDivCd = getOrgApprvDivCd; //none_fix값 처리
         }
 
-        if (ObjectUtils.isEmpty(orgArtclId)) { //원본기사가 아이디가없고 최초 복사일시
+        if (artclId.equals(orgArtclId)) { //원본기사가 아이디가없고 최초 복사일시
 
             return Article.builder()
                     .chDivCd(article.getChDivCd())
@@ -1530,7 +1529,7 @@ public class CueSheetItemService {
                     .artclReqdSecDivYn(article.getArtclReqdSecDivYn())
                     .artclReqdSec(article.getArtclReqdSec())
                     .apprvDtm(article.getApprvDtm())
-                    .artclOrd(maxArtclOrd + 1)//기사 시퀀스 +1
+                    .artclOrd(maxArtclOrd)//기사 시퀀스 +1
                     .brdcCnt(article.getBrdcCnt())
                     .orgArtclId(article.getArtclId())//원본기사 아이디set
                     .urgYn(article.getUrgYn())
@@ -1585,7 +1584,7 @@ public class CueSheetItemService {
                     .artclReqdSecDivYn(article.getArtclReqdSecDivYn())
                     .artclReqdSec(article.getArtclReqdSec())
                     .apprvDtm(article.getApprvDtm())
-                    .artclOrd(maxArtclOrd + 1)//기사 시퀀스 +1
+                    .artclOrd(maxArtclOrd )//기사 시퀀스 +1
                     .brdcCnt(article.getBrdcCnt())
                     .orgArtclId(article.getOrgArtclId())//원본기사 아이디set
                     .urgYn(article.getUrgYn())

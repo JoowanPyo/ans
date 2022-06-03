@@ -102,6 +102,8 @@ public class ArticleController {
                                                                       @RequestParam(value = "cueId") Long cueId,
                                                                       @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디")
                                                                       @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
+                                                                      @Parameter(name = "artclTypCd", description = "기사유형코드(01:스트레이트, 02:리포트, 03:C/T, 04:하단롤, 05:긴급자막)")
+                                                                      @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
                                                                       @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드")
                                                                       @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
                                                                       @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]")
@@ -117,7 +119,7 @@ public class ArticleController {
         SearchDate searchDate = new SearchDate(sdate, edate);
 
         PageResultDTO<ArticleDTO, Article> pageList = articleService.findCue(searchDate.getStartDate(), searchDate.getEndDate(),
-                searchWord, cueId, brdcPgmId, artclTypDtlCd, copyYn, deptCd, page, limit);
+                searchWord, cueId, brdcPgmId, artclTypCd, artclTypDtlCd, copyYn, deptCd, page, limit);
 
         pageList = articleService.confirmArticleList(pageList, cueId);
 
@@ -265,7 +267,7 @@ public class ArticleController {
             @ApiResponse(responseCode = "403", description = "FORBIDDEN(사용자 권한이 없다.)"),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN(잠금사용자가 다르다)")})
     @PutMapping(path = "/{artclId}/lock")
-    public AnsApiResponse<ArticleDTO> articleLock(@Parameter(name = "artclId", required = true, description = "기사 아이디")
+    public AnsApiResponse<?> articleLock(@Parameter(name = "artclId", required = true, description = "기사 아이디")
                                                   @PathVariable("artclId") Long artclId,
                                                   @Parameter(description = "필수값<br> lckYn ", required = true)
                                                   @RequestBody @Valid ArticleLockDTO articleLockDTO) throws Exception {
@@ -279,7 +281,11 @@ public class ArticleController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        articleService.articleLock(artclId, articleLockDTO, userId);
+        ArticleAuthConfirmDTO articleAuthConfirmDTO = articleService.articleLock(artclId, articleLockDTO, userId);
+
+        if (ObjectUtils.isEmpty(articleAuthConfirmDTO) == false){
+            return new AnsApiResponse<>(articleAuthConfirmDTO);
+        }
 
         ArticleDTO articleDTO = articleService.find(artclId);
 

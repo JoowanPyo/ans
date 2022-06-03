@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.code;
 
 import com.gemiso.zodiac.app.code.dto.CodeCreateDTO;
 import com.gemiso.zodiac.app.code.dto.CodeDTO;
+import com.gemiso.zodiac.app.code.dto.CodeOrdUpdateDTO;
 import com.gemiso.zodiac.app.code.dto.CodeUpdateDTO;
 import com.gemiso.zodiac.app.code.mapper.CodeCreateMapper;
 import com.gemiso.zodiac.app.code.mapper.CodeMapper;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -151,6 +151,43 @@ public class CodeService {
         codeMapper.updateFromDto(codeDTO, code);
 
         codeRepository.save(code);
+    }
+
+    public void updateOrd(CodeOrdUpdateDTO codeOrdUpdateDTO, Long cdId){
+
+        Code code = codeFindOrFail(cdId);
+
+        Integer cdOrd = codeOrdUpdateDTO.getCdOrd();
+        String hrnkCdId = codeOrdUpdateDTO.getHrnkCdId();
+
+        CodeDTO codeDTO = codeMapper.toDto(code);
+        codeDTO.setCdOrd(cdOrd);
+        codeMapper.updateFromDto(codeDTO, code);
+        codeRepository.save(code);
+
+        List<Code> codeList = codeRepository.findCodeList(hrnkCdId);
+
+        for (int i = codeList.size()-1; i >= 0; i-- ){
+
+            Long newCdId = codeList.get(i).getCdId();
+
+            if (newCdId.equals(cdId)){
+                codeList.remove(i);
+            }
+        }
+
+        codeList.add(cdOrd, code);
+
+        int index = 0;
+        for (Code codeEntity : codeList){
+
+            CodeDTO updateCodeDTO = codeMapper.toDto(codeEntity);
+            updateCodeDTO.setCdOrd(index);
+            Code updateCode = codeMapper.toEntity(updateCodeDTO);
+            codeRepository.save(updateCode);
+            index++;
+        }
+
     }
 
     public Code codeFindOrFail(Long cdId) {

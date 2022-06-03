@@ -209,7 +209,7 @@ public class CueSheetItem extends BaseEntity {
     private CueSheet cueSheet;
 
     @BatchSize(size = 100)
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY/*, cascade = CascadeType.ALL*/)
     @JoinColumn(name = "artcl_id")
     @JsonBackReference
     private Article article;
@@ -220,12 +220,14 @@ public class CueSheetItem extends BaseEntity {
     private CueSheetTemplate cueSheetTemplate;
 
     @BatchSize(size = 100)
+    @OrderBy(value = "inputDtm DESC")
     @OneToMany(mappedBy = "cueSheetItem", fetch = FetchType.LAZY)
     @Where(clause = "del_yn = 'N'")
     @JsonManagedReference
     private Set<CueSheetMedia> cueSheetMedia = Collections.emptySet();
 
     @BatchSize(size = 100)
+    @OrderBy(value = "capOrd ASC")
     @OneToMany(mappedBy = "cueSheetItem", fetch = FetchType.LAZY)
     @Where(clause = "del_yn = 'N'")
     @JsonManagedReference
@@ -235,6 +237,7 @@ public class CueSheetItem extends BaseEntity {
     private String artclId;*/
 
     @BatchSize(size = 100)
+    @OrderBy(value = "ord ASC")
     @OneToMany(mappedBy = "cueSheetItem", fetch = FetchType.LAZY)
     @JsonManagedReference
     private Set<CueSheetItemSymbol> cueSheetItemSymbol = Collections.emptySet();

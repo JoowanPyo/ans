@@ -209,10 +209,10 @@ public class ProcessArticleFix {
         if (IsUnfix( DbApprove, newApprove) )
         {
             if (userId.equals(editorFixUser)) {
-                confirmList.add(FixEnum.FIX_NONE);
+                //confirmList.add(FixEnum.FIX_NONE);
                 confirmList.add(FixEnum.ARTICLE_FIX);
             }
-            confirmList.add(FixEnum.FIX_NONE);
+            //confirmList.add(FixEnum.FIX_NONE);
         }
         else
         {
@@ -235,12 +235,14 @@ public class ProcessArticleFix {
                 confirmList.add(FixEnum.ARTICLE_FIX);
                 confirmList.add(FixEnum.EDITOR_FIX);
             }else {
-                confirmList.add(FixEnum.FIX_NONE);
+                //confirmList.add(FixEnum.FIX_NONE);
                 confirmList.add(FixEnum.ARTICLE_FIX);
+                confirmList.add(FixEnum.EDITOR_FIX);
             }
         }
         else
         {
+            confirmList.add(FixEnum.ARTICLE_FIX);
             confirmList.add(FixEnum.EDITOR_FIX);
             confirmList.add(FixEnum.ANCHOR_FIX);
         }

@@ -42,6 +42,10 @@ import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
+import com.gemiso.zodiac.app.facilityManage.FacilityManage;
+import com.gemiso.zodiac.app.facilityManage.FacilityManageRepository;
+import com.gemiso.zodiac.app.facilityManage.FacilityManageService;
+import com.gemiso.zodiac.app.facilityManage.dto.FacilityManageDTO;
 import com.gemiso.zodiac.app.issue.Issue;
 import com.gemiso.zodiac.app.issue.IssueService;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
@@ -132,6 +136,7 @@ public class ArticleService {
     private final UserAuthChkService userAuthChkService;
     private final UserService userService;
     private final IssueService issueService;
+    private final FacilityManageService facilityManageService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -188,7 +193,8 @@ public class ArticleService {
 
     // 큐시트에서 기사 목록 조회
     public PageResultDTO<ArticleDTO, Article> findCue(Date sdate, Date edate, String searchWord, Long cueId,
-                                                      String brdcPgmId, String artclTypDtlCd, String copyYn, Integer deptCd, Integer page, Integer limit) {
+                                                      String brdcPgmId, String artclTypCd,String artclTypDtlCd,
+                                                      String copyYn, Integer deptCd, Integer page, Integer limit) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
@@ -198,7 +204,7 @@ public class ArticleService {
 
         //전체조회[page type]
         Page<Article> result = articleRepository.findByArticleCue(sdate, edate, searchWord, cueId,
-                brdcPgmId, artclTypDtlCd, copyYn, deptCd, pageable);
+                brdcPgmId, artclTypCd,artclTypDtlCd, copyYn, deptCd, pageable);
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
 
@@ -238,13 +244,17 @@ public class ArticleService {
         articleCreateDTO.setApprvDivCd(FixEnum.FIX_NONE.getFixeum(FixEnum.FIX_NONE));//기사픽스 상태 None set[null 상태가면 fix 구분 및 셋팅시 문제.]
 
         //PD나 앵커가 기사 작성시 기사픽스상태로 등록된다.
-        if (userAuthChkService.authChk(AuthEnum.AnchorFix.getAuth()) == false) { //수정.
+        /*if (userAuthChkService.authChk(AuthEnum.AnchorFix.getAuth()) == false) { //수정.
             articleCreateDTO.setApprvDivCd(FixEnum.ARTICLE_FIX.getFixeum(FixEnum.ARTICLE_FIX));
             articleCreateDTO.setArtclFixUser(userId);
             articleCreateDTO.setArtclFixDtm(new Date());
-        }
+        }*/
 
         Article article = articleCreateMapper.toEntity(articleCreateDTO);
+        articleRepository.save(article);
+        //원본일 경우 orgArticleId에 articleId와 같은 값을 입력 시켜줘야 한다.
+        Long articleId = article.getArtclId();//기사 자막등록 및 리턴시켜줄 기사아이디
+        article.setOrgArtclId(articleId);
         articleRepository.save(article);
 
         articleActionLogCreate(article, userId);//기사 액션 로그 등록
@@ -252,7 +262,6 @@ public class ArticleService {
         //기사 이력 create
         Long articleHistId = createArticleHist(article);
 
-        Long articleId = article.getArtclId();//기사 자막등록 및 리턴시켜줄 기사아이디
 
         //기사자막, 앵커자막 create
         List<ArticleCapCreateDTO> articleCapDTOS = articleCreateDTO.getArticleCap();
@@ -302,7 +311,7 @@ public class ArticleService {
         articleRepository.save(article);
 
         //원본기사이고 fix가 fix_none일경우 copy된 기사들도 업데이트
-        updateCopyArticle(article, userId);
+        updateCopyArticle(article, userId, articleUpdateDTO);
 
         //기사 로그 등록.
         articleActionLogUpdate(article, articleUpdateDTO, userId);
@@ -335,19 +344,26 @@ public class ArticleService {
 
     }
 
-    public void updateCopyArticle(Article article, String userId) throws Exception {
+    public void updateCopyArticle(Article article, String userId, ArticleUpdateDTO articleUpdateDTO) throws Exception {
 
         //복사된 기사인 경우
+        Long articleId = article.getArtclId();
         Long orgArtclId = article.getOrgArtclId();
         String apprvDivCd = article.getApprvDivCd();
         //원본기사인경우.
-        if (ObjectUtils.isEmpty(orgArtclId)) {
+        if (articleId.equals(orgArtclId)) {
             //원본기사가 fix_none인경우
             if ("fix_none".equals(apprvDivCd)) {
 
-                List<Article> copyArticleList = articleRepository.findCopyArticle(orgArtclId);
+                List<Article> copyArticleList = articleRepository.findCopyArticle(articleId);
 
                 for (Article copyArticle : copyArticleList) {
+
+                    Long copyArticleId = copyArticle.getArtclId();
+                    Long copyOrgArticleId = copyArticle.getOrgArtclId();
+                    if (copyArticleId.equals(copyOrgArticleId)){
+                        continue;
+                    }
 
                     //사본기사가 픽스구분이 fix_none인경우
                     String copyApprvDivCd = copyArticle.getApprvDivCd();
@@ -362,11 +378,11 @@ public class ArticleService {
                         Long articleHistId = updateArticleHist(updateCopyArticle);
 
                         //기사 미디어 update
-                        copyarticleMediaUpdate(updateCopyArticle, article, articleHistId,userId);
+                        copyarticleMediaUpdate(updateCopyArticle, articleId, articleHistId,userId);
 
                         //기사 자막 Update
-                        copyArticleCapUpdate(updateCopyArticle, article, articleHistId);
-                        copyAnchorCapUpdate(updateCopyArticle, article, articleHistId);
+                        copyArticleCapUpdate(updateCopyArticle, articleUpdateDTO, articleHistId);
+                        copyAnchorCapUpdate(updateCopyArticle, articleUpdateDTO, articleHistId);
 
                         Long artclId = updateCopyArticle.getArtclId();
                         //MQ메세지 전송
@@ -380,7 +396,7 @@ public class ArticleService {
     }
 
     //기사 미디어 update
-    public void copyarticleMediaUpdate(Article updateArticle, Article article, Long articleHistId, String userId) throws JsonProcessingException {
+    public void copyarticleMediaUpdate(Article updateArticle, Long orgArticleId, Long articleHistId, String userId) throws JsonProcessingException {
 
         Long artclId = updateArticle.getArtclId();
 
@@ -393,12 +409,12 @@ public class ArticleService {
             String mediaTypCd = articleMedia.getMediaTypCd();
 
             if ("media_typ_001".equals(mediaTypCd)) {
-                articleRepository.deleteById(artclMediaId);
+                articleMediaRepository.deleteById(artclMediaId);
             }
 
         }
 
-        Set<ArticleMedia> articleMedias = article.getArticleMedia();
+        List<ArticleMedia> articleMedias = articleMediaRepository.findArticleMediaList(orgArticleId);
 
         //기사 매칭후 전송할 부조값 구하기
         CueSheet cueSheet = updateArticle.getCueSheet();
@@ -413,7 +429,12 @@ public class ArticleService {
 
                 CueSheet cueSheetEntity = getCueSheet.get();
 
-                subrmNm = cueSheetEntity.getSubrmNm();
+                Long subrmId = cueSheetEntity.getSubrmId();
+
+                FacilityManageDTO facilityManage = facilityManageService.find(subrmId);
+
+                subrmNm = facilityManage.getFcltyDivCd();
+
             }
 
         }
@@ -466,7 +487,7 @@ public class ArticleService {
     public Article copyArticleBuild(Article copyArticle, Article article) {
 
         Issue getIssue = article.getIssue();
-        CueSheet cueSheet = article.getCueSheet();
+        //CueSheet cueSheet = article.getCueSheet();
 
         copyArticle.setChDivCd(article.getChDivCd());
         copyArticle.setArtclKindCd(article.getArtclKindCd());
@@ -524,7 +545,7 @@ public class ArticleService {
         copyArticle.setAnchorFixDtm(article.getAnchorFixDtm());
         copyArticle.setDeskFixDtm(article.getDeskFixDtm());
         copyArticle.setIssue(getIssue);
-        copyArticle.setCueSheet(cueSheet);
+        //copyArticle.setCueSheet(cueSheet);
 
         articleRepository.save(copyArticle);
 
@@ -532,10 +553,10 @@ public class ArticleService {
     }
 
     // 수정할 기사 빌드 후 업데이트 save
-    public Article fixCopyArticleBuild(Article copyArticle, Article article) {
+    public Article fixCopyArticleBuild(Article copyArticle, Article article, String userId) {
 
         Issue getIssue = article.getIssue();
-        CueSheet cueSheet = article.getCueSheet();
+        //CueSheet cueSheet = article.getCueSheet();
 
         copyArticle.setChDivCd(article.getChDivCd());
         copyArticle.setArtclKindCd(article.getArtclKindCd());
@@ -583,17 +604,17 @@ public class ArticleService {
         //copyArticle.setDeviceCd(article.getDeviceCd());
         //copyArticle.setParentArtlcId();
         copyArticle.setMemo(article.getMemo());
-        copyArticle.setEditorId(article.getEditorId());
-        copyArticle.setArtclFixUser(article.getArtclFixUser());
-        copyArticle.setEditorFixUser(article.getEditorFixUser());
-        copyArticle.setAnchorFixUser(article.getAnchorFixUser());
-        copyArticle.setDeskFixUser(article.getDeskFixUser());
-        copyArticle.setArtclFixDtm(article.getArtclFixDtm());
-        copyArticle.setEditorFixDtm(article.getEditorFixDtm());
-        copyArticle.setAnchorFixDtm(article.getAnchorFixDtm());
-        copyArticle.setDeskFixDtm(article.getDeskFixDtm());
+        //copyArticle.setEditorId(article.getEditorId());
+        copyArticle.setArtclFixUser(userId);
+        //copyArticle.setEditorFixUser(article.getEditorFixUser());
+        //copyArticle.setAnchorFixUser(article.getAnchorFixUser());
+        //copyArticle.setDeskFixUser(article.getDeskFixUser());
+        copyArticle.setArtclFixDtm(new Date());
+        //copyArticle.setEditorFixDtm(article.getEditorFixDtm());
+        //copyArticle.setAnchorFixDtm(article.getAnchorFixDtm());
+        //copyArticle.setDeskFixDtm(article.getDeskFixDtm());
         copyArticle.setIssue(getIssue);
-        copyArticle.setCueSheet(cueSheet);
+        //copyArticle.setCueSheet(cueSheet);
 
         articleRepository.save(copyArticle);
 
@@ -1086,6 +1107,7 @@ public class ArticleService {
 
                 articleCapRepository.save(articleCap); //저장.
 
+
                 createArticleCapHist(articleCap, articleHistId); //기사자막 이력 저장.
             }
         }
@@ -1178,7 +1200,7 @@ public class ArticleService {
     }
 
     //복사된 기사자막 수정.
-    private void copyArticleCapUpdate(Article updateArticle, Article article, Long articleHistId) {
+    private void copyArticleCapUpdate(Article updateArticle, ArticleUpdateDTO articleUpdateDTO, Long articleHistId) {
 
         Long articleId = updateArticle.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
         List<ArticleCap> articleCapList = articleCapRepository.findArticleCap(articleId);
@@ -1189,7 +1211,58 @@ public class ArticleService {
         }
 
 
-        Set<ArticleCap> capSimpleList = article.getArticleCap(); //update로 들어온 기사 등록
+        List<ArticleCapCreateDTO> capSimpleList = articleUpdateDTO.getArticleCap(); //update로 들어온 기사 등록
+
+        createArticleCap(capSimpleList, articleId, articleHistId);
+
+        /*log.info("org cap list : "+ capSimpleList.toString());
+        List<ArticleCapCreateDTO> capSimpleDTOList = new ArrayList<>();
+        for (ArticleCapCreateDTO articleCap : capSimpleList) {
+
+            Long capTemplateId = articleCap.getCapTmpltId();
+            Long capTmpltId = null;
+            if (ObjectUtils.isEmpty(capTemplateId) == false) {
+                capTmpltId = capTemplateId;
+            }
+            Symbol symbol = articleCap.getSymbol();
+            String symbolId = "";
+            if (ObjectUtils.isEmpty(symbol) == false) {
+                symbolId = symbol.getSymbolId();
+            }
+
+            ArticleCapCreateDTO articleCapCreateDTO = ArticleCapCreateDTO.builder()
+                    .capDivCd(articleCap.getCapDivCd())
+                    .lnNo(articleCap.getLnNo())
+                    .capCtt(articleCap.getCapCtt())
+                    .capRmk(articleCap.getCapRmk())
+                    .lnOrd(articleCap.getLnOrd())
+                    .articleId(articleId)
+                    .capTmpltId(capTmpltId)
+                    .symbolId(symbolId)
+                    .build();
+
+            capSimpleDTOList.add(articleCapCreateDTO);
+        }
+        createArticleCap(capSimpleDTOList, articleId, articleHistId); //기사자막 등록*/
+
+
+    }
+
+    //복사된 기사자막 수정.
+    private void fixCopyArticleCapUpdate(Article updateArticle, Long orgArticleId, Long articleHistId) {
+
+        Long articleId = updateArticle.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
+        List<ArticleCap> articleCapList = articleCapRepository.findArticleCap(articleId);
+
+        for (ArticleCap articleCap : articleCapList) {
+            Long artclCapId = articleCap.getArtclCapId();
+            articleCapRepository.deleteById(artclCapId);
+        }
+
+
+        List<ArticleCap> capSimpleList = articleCapRepository.findArticleCap(orgArticleId); //update로 들어온 기사 등록
+
+        log.info("org cap list : "+ capSimpleList.toString());
         List<ArticleCapCreateDTO> capSimpleDTOList = new ArrayList<>();
         for (ArticleCap articleCap : capSimpleList) {
 
@@ -1239,8 +1312,8 @@ public class ArticleService {
 
     }
 
-    //복사된 앵커자막 수정.
-    private void copyAnchorCapUpdate(Article updateArticle, Article article, Long articleHistId) {
+    //복사된 앵커자막 수정 fix.
+    private void copyAnchorCapUpdate(Article updateArticle, ArticleUpdateDTO articleUpdateDTO, Long articleHistId) {
 
         Long articleId = updateArticle.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
         List<AnchorCap> anchorCaps = anchorCapRepository.findAnchorCapList(articleId);
@@ -1250,7 +1323,56 @@ public class ArticleService {
             anchorCapRepository.deleteById(anchorCapId);
         }
 
-        Set<AnchorCap> capSimpleList = article.getAnchorCap(); //update로 들어온 기사 등록
+       // Long orgArticleId = article.getArtclId();
+
+        List<AnchorCapCreateDTO> capSimpleList = articleUpdateDTO.getAnchorCap(); //update로 들어온 기사 등록
+        createAnchorCap(capSimpleList, articleId, articleHistId);
+       /* List<AnchorCapCreateDTO> capSimpleDTOList = new ArrayList<>();
+        for (AnchorCapCreateDTO anchorCap : capSimpleList) {
+
+            Long capTemplate = anchorCap.getCapTemplate();
+            Long capTmpltId = null;
+            if (ObjectUtils.isEmpty(capTemplate) == false) {
+                capTmpltId = capTemplate.getCapTmpltId();
+            }
+            Symbol symbol = anchorCap.getSymbol();
+            String symbolId = "";
+            if (ObjectUtils.isEmpty(symbol) == false) {
+                symbolId = symbol.getSymbolId();
+            }
+
+            AnchorCapCreateDTO articleCapCreateDTO = AnchorCapCreateDTO.builder()
+                    .capDivCd(anchorCap.getCapDivCd())
+                    .lnNo(anchorCap.getLnNo())
+                    .capCtt(anchorCap.getCapCtt())
+                    .capRmk(anchorCap.getCapRmk())
+                    .lnOrd(anchorCap.getLnOrd())
+                    .articleId(articleId)
+                    .capTemplateId(capTmpltId)
+                    .symbolId(symbolId)
+                    .build();
+
+            capSimpleDTOList.add(articleCapCreateDTO);
+        }
+
+        createAnchorCap(capSimpleDTOList, articleId, articleHistId);//앵커자막 등록*/
+
+    }
+
+    //복사된 앵커자막 수정 fix.
+    private void fixCopyAnchorCapUpdate(Article updateArticle, Long orgArticleId, Long articleHistId) {
+
+        Long articleId = updateArticle.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
+        List<AnchorCap> anchorCaps = anchorCapRepository.findAnchorCapList(articleId);
+
+        for (AnchorCap anchorCap : anchorCaps) {
+            Long anchorCapId = anchorCap.getAnchorCapId();
+            anchorCapRepository.deleteById(anchorCapId);
+        }
+
+        // Long orgArticleId = article.getArtclId();
+
+        List<AnchorCap> capSimpleList = anchorCapRepository.findAnchorCapList(orgArticleId); //update로 들어온 기사 등록
         List<AnchorCapCreateDTO> capSimpleDTOList = new ArrayList<>();
         for (AnchorCap anchorCap : capSimpleList) {
 
@@ -1300,15 +1422,44 @@ public class ArticleService {
     }
 
     // 기사 잠금
-    public void articleLock(Long artclId, ArticleLockDTO articleLockDTO, String userId) throws Exception {
+    public ArticleAuthConfirmDTO articleLock(Long artclId, ArticleLockDTO articleLockDTO, String userId) throws Exception {
 
-        Article article = articleFindOrFail(artclId);
+        ArticleAuthConfirmDTO articleAuthConfirmDTO = null;
+
+        //Lock모드로 조회
+        Optional<Article> articleLockEntity = articleRepository.findLockArticle(artclId);
+
+        if (articleLockEntity.isPresent() == false){
+
+            articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
+                    .artclId(artclId)
+                    .msg("삭제되었거나 존재하지 않는 기사입니다.")
+                    .authCode("Not find article")
+                    .httpStatus(HttpStatus.METHOD_NOT_ALLOWED)
+                    .build();
+            return articleAuthConfirmDTO;
+            //throw new ResourceNotFoundException("기사를 찾을 수 없습니다. 기사 아아디 : "+artclId);
+        }
+
+        Article article = articleLockEntity.get();
 
         String lockYn = article.getLckYn();//잠금여부값 get
         String lckrId = article.getLckrId();
 
         if ("Y".equals(lockYn) && userId.equals(lckrId) == false) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN); // 잠금 사용자가 다르다.
+            articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
+                    .artclId(article.getArtclId())
+                    .lckYn(article.getLckYn())
+                    .lckDtm(article.getLckDtm())
+                    .lckrId(article.getLckrId())
+                    .lckrNm(article.getLckrNm())
+                    .msg("다른 사용자가 수정중 입니다.")
+                    .authCode("Locked article")
+                    .httpStatus(HttpStatus.METHOD_NOT_ALLOWED)
+                    .build();
+
+            return articleAuthConfirmDTO;
+            //throw new ResponseStatusException(HttpStatus.FORBIDDEN); // 잠금 사용자가 다르다.
         }
 
         String locMessage = "";
@@ -1349,13 +1500,14 @@ public class ArticleService {
 
         Long orgArticleId = article.getOrgArtclId();
 
-        if (ObjectUtils.isEmpty(orgArticleId) == false) {
+        if (artclId.equals(orgArticleId) == false) {
             topicService.topicInterface(json);
         }
         topicService.topicWeb(json);
 
         log.info("Article Lock : UserId : " + userId + "Lock Value : " + lockYn);
 
+        return articleAuthConfirmDTO;
     }
 
     //기사 잠금 해제
@@ -1400,7 +1552,7 @@ public class ArticleService {
         Optional<Article> article = articleRepository.findArticle(artclId);
 
         Article emptyArticle = null;
-        if (!article.isPresent()) {
+        if (article.isPresent() == false) {
             return emptyArticle;
         }
 
@@ -1701,6 +1853,17 @@ public class ArticleService {
         //기사 조회.
         Article article = articleFindOrFail(artclId);
 
+        String lckrId = article.getLckrId();
+        String lckYn = article.getLckYn();
+
+        if ("Y".equals(lckYn)){
+
+            if (userId.equals(lckrId) == false){
+                throw new ResourceNotFoundException(" 다른 사용자가 수정중 입니다.  수정중인 사용자 : "+lckrId);
+            }
+
+        }
+
         String orgApprvDivcd = article.getApprvDivCd(); //조회된 기사픽스 구분코드 get
         // 조회된 기사픽스 구분코드와 새로들어온 구분코드가 같으면 return
         //에러를 내지않고 유지하기 위해.
@@ -1723,15 +1886,15 @@ public class ArticleService {
         //픽스단계대로 픽스자, 픽스일시 set[원본이 픽스가 된경우, 복사본이 픽스가 안됫을 경우 복사본도 같이 픽스]
         article = fixUserInfoSet(apprvDivCd, orgApprvDivcd, article, userId);
 
-        ArticleDTO articleDTO = articleMapper.toDto(article);
+        //ArticleDTO articleDTO = articleMapper.toDto(article);
 
-        apprvDivCd = confirmApprvDivCd(apprvDivCd, articleDTO);
+        apprvDivCd = confirmApprvDivCd(apprvDivCd, article);
 
-        articleDTO.setApprvDivCd(apprvDivCd); //픽스 구분코드 변경.
+        article.setApprvDivCd(apprvDivCd); //픽스 구분코드 변경.
         //articleDTO.setApprvrId(userId);//픽스 승인자 변경.
-        articleDTO.setApprvDtm(new Date());
+        article.setApprvDtm(new Date());
 
-        articleMapper.updateFromDto(articleDTO, article);
+        //articleMapper.updateFromDto(articleDTO, article);
         articleRepository.save(article);
 
         //기사로그 등록.
@@ -1739,12 +1902,12 @@ public class ArticleService {
     }
 
     //픽스 단계 맞추기
-    public String confirmApprvDivCd(String apprvDivCd, ArticleDTO articleDTO){
+    public String confirmApprvDivCd(String apprvDivCd, Article article){
 
-        String artclFixUser = articleDTO.getArtclFixUser();
-        String editorFixUser = articleDTO.getEditorFixUser();
-        String anchorFixUser = articleDTO.getAnchorFixUser();
-        String deskFixUser = articleDTO.getDeskFixUser();
+        String artclFixUser = article.getArtclFixUser();
+        String editorFixUser = article.getEditorFixUser();
+        String anchorFixUser = article.getAnchorFixUser();
+        String deskFixUser = article.getDeskFixUser();
 
 
 
@@ -1800,20 +1963,27 @@ public class ArticleService {
     //픽스단계대로 픽스자, 픽스일시 set
     public Article fixUserInfoSet(String apprvDivCd, String orgApprvDivcd, Article article, String userId) throws Exception {
 
+        String artclFixUser = article.getArtclFixUser();
+        String editorFixUser = article.getEditorFixUser();
+        String anchorFixUser = article.getAnchorFixUser();
+        String deskFixUser = article.getDeskFixUser();
+
+
         //픽스 fix_none으로 들어온경우
         if ("fix_none".equals(apprvDivCd)) {
 
             // article_fix에서 fix_none으로 픽스를 풀 경우 등록된 기자,일시 삭제
-            if ("article_fix".equals(orgApprvDivcd)) {
+            //if ("article_fix".equals(orgApprvDivcd)) {
                 article.setArtclFixUser("");
                 article.setArtclFixDtm(null);
                 article.setEditorFixUser("");
                 article.setEditorFixDtm(null);
+                article.setEditorId("");
                 article.setAnchorFixUser("");
                 article.setAnchorFixDtm(null);
                 article.setDeskFixUser("");
                 article.setDeskFixDtm(null);
-            }
+            //}
         }
 
         //픽스 article_fix으로 들어온경우
@@ -1823,6 +1993,7 @@ public class ArticleService {
                 article.setArtclFixUser(userId);
                 article.setArtclFixDtm(new Date());
                 article.setEditorFixUser("");
+                article.setEditorId("");
                 article.setEditorFixDtm(null);
                 article.setAnchorFixUser("");
                 article.setAnchorFixDtm(null);
@@ -1835,29 +2006,36 @@ public class ArticleService {
 
                 for (Article articleEntity : articleList) {
 
+                    Long getArticleId = articleEntity.getArtclId();
+                    Long getOrgArticleId = articleEntity.getOrgArtclId();
+
+                    if (getArticleId.equals(getOrgArticleId)){
+                        continue;
+                    }
+
                     String apprvDicCd = articleEntity.getApprvDivCd();
 
                     if ("fix_none".equals(apprvDicCd)) { //복사된 기사가 fix_none일경우 article_fix로 업데이트
 
                         Long orgArtclId = article.getOrgArtclId();
-                        if (ObjectUtils.isEmpty(orgArtclId) ){//원본 기사일 경우 기사내용전부 업데이트
+                        if (artclId.equals(orgArtclId) ){//원본 기사일 경우 기사내용전부 업데이트
 
                             // 수정할 기사 빌드 후 업데이트 save
-                            Article updateCopyArticle = fixCopyArticleBuild(articleEntity, article);
+                            Article updateCopyArticle = fixCopyArticleBuild(articleEntity, article, userId);
 
                             //기사 로그 등록.
                             copyArticleActionLogUpdate(updateCopyArticle, article, userId);
                             //기사이력 등록.
                             Long articleHistId = updateArticleHist(updateCopyArticle);
                             //기사 자막 Update
-                            copyArticleCapUpdate(updateCopyArticle, article, articleHistId);
-                            copyAnchorCapUpdate(updateCopyArticle, article, articleHistId);
+                            fixCopyArticleCapUpdate(updateCopyArticle, artclId, articleHistId);
+                            fixCopyAnchorCapUpdate(updateCopyArticle, artclId, articleHistId);
 
                             Long updateArtclId = updateCopyArticle.getArtclId();
                             //MQ메세지 전송
                             sendTopic("CopyAarticle Update", updateArtclId);
 
-                        }else {
+                        }/*else {
 
                             ArticleDTO articleDTO = articleMapper.toDto(articleEntity);
                             articleDTO.setApprvDivCd("article_fix");
@@ -1867,7 +2045,7 @@ public class ArticleService {
                             articleMapper.updateFromDto(articleDTO, articleEntity);
 
                             articleRepository.save(articleEntity);
-                        }
+                        }*/
                     }
                 }
 
@@ -1875,6 +2053,7 @@ public class ArticleService {
 
                 article.setEditorFixUser("");
                 article.setEditorFixDtm(null);
+                article.setEditorId("");
                 article.setAnchorFixUser("");
                 article.setAnchorFixDtm(null);
                 article.setDeskFixUser("");
@@ -1897,10 +2076,25 @@ public class ArticleService {
 
             } else { // editor_fix 으로 픽스를 풀 경우 등록된 앵커, 데스커 기록 삭제
 
-                article.setAnchorFixUser("");
-                article.setAnchorFixDtm(null);
-                article.setDeskFixUser("");
-                article.setDeskFixDtm(null);
+                if("fix_none".equals(orgApprvDivcd)){
+
+                    article.setArtclFixUser(userId);
+                    article.setArtclFixDtm(new Date());
+                    article.setEditorFixUser(userId);
+                    article.setEditorFixDtm(new Date());
+                    article.setEditorId(userId);
+                    article.setAnchorFixUser("");
+                    article.setAnchorFixDtm(null);
+                    article.setDeskFixUser("");
+                    article.setDeskFixDtm(null);
+                }else {
+
+                    article.setAnchorFixUser("");
+                    article.setAnchorFixDtm(null);
+                    article.setDeskFixUser("");
+                    article.setDeskFixDtm(null);
+                }
+
             }
         }
         //앵커 픽스일 경우 픽스한 앵커 set
@@ -1912,16 +2106,76 @@ public class ArticleService {
                 article.setDeskFixDtm(null);
 
             } else {
-                article.setAnchorFixUser(userId);
-                article.setAnchorFixDtm(new Date());
+
+                if("fix_none".equals(orgApprvDivcd)){
+
+                    article.setArtclFixUser(userId);
+                    article.setArtclFixDtm(new Date());
+                    article.setEditorFixUser(userId);
+                    article.setEditorFixDtm(new Date());
+                    article.setEditorId(userId);
+                    article.setAnchorFixUser(userId);
+                    article.setAnchorFixDtm(new Date());
+                    article.setDeskFixUser("");
+                    article.setDeskFixDtm(null);
+                }else if ("article_fix".equals(orgApprvDivcd)){
+
+                    article.setEditorFixUser(userId);
+                    article.setEditorFixDtm(new Date());
+                    article.setEditorId(userId);
+                    article.setAnchorFixUser(userId);
+                    article.setAnchorFixDtm(new Date());
+                    article.setDeskFixUser("");
+                    article.setDeskFixDtm(null);
+
+                }else if ("editor_fix".equals(orgApprvDivcd)){
+
+                    article.setAnchorFixUser(userId);
+                    article.setAnchorFixDtm(new Date());
+
+                }
+
             }
 
         }
         //데스커 픽스일 경우 픽스한 데스커 set
         if ("desk_fix".equals(apprvDivCd)) {
 
-            article.setDeskFixUser(userId);
-            article.setDeskFixDtm(new Date());
+            if("fix_none".equals(orgApprvDivcd)){
+
+                article.setArtclFixUser(userId);
+                article.setArtclFixDtm(new Date());
+                article.setEditorFixUser(userId);
+                article.setEditorFixDtm(new Date());
+                article.setEditorId(userId);
+                article.setAnchorFixUser(userId);
+                article.setAnchorFixDtm(new Date());
+                article.setDeskFixUser(userId);
+                article.setDeskFixDtm(new Date());
+            }else if ("article_fix".equals(orgApprvDivcd)){
+
+                article.setEditorFixUser(userId);
+                article.setEditorFixDtm(new Date());
+                article.setEditorId(userId);
+                article.setAnchorFixUser(userId);
+                article.setAnchorFixDtm(new Date());
+                article.setDeskFixUser(userId);
+                article.setDeskFixDtm(new Date());
+
+            }else if ("editor_fix".equals(orgApprvDivcd)){
+
+                article.setAnchorFixUser(userId);
+                article.setAnchorFixDtm(new Date());
+                article.setDeskFixUser(userId);
+                article.setDeskFixDtm(new Date());
+
+            }else if ("anchor_fix".equals(orgApprvDivcd)){
+
+                article.setDeskFixUser(userId);
+                article.setDeskFixDtm(new Date());
+            }
+
+
 
         }
 
@@ -2026,6 +2280,7 @@ public class ArticleService {
                     .lckYn(article.getLckYn())
                     .lckDtm(article.getLckDtm())
                     .lckrId(article.getLckrId())
+                    .lckrNm(article.getLckrNm())
                     .msg("다른 사용자가 수정중 입니다.")
                     .authCode("Locked article")
                     .httpStatus(HttpStatus.METHOD_NOT_ALLOWED)

@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.yonhap;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.yonhapAttchFile.YonhapAttchFile;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -112,7 +113,8 @@ public class Yonhap {
     @Column(name = "action", columnDefinition = "bpchar(1)")
     private String action;
 
-    @OneToMany(mappedBy="yonhap")//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제
+    @OneToMany(mappedBy="yonhap", fetch = FetchType.LAZY)//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제
+    @JsonManagedReference
     private List<YonhapAttchFile> yonhapAttchFiles = new ArrayList<>();
 
     @PrePersist

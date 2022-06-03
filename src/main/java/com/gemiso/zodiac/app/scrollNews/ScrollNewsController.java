@@ -106,4 +106,16 @@ public class ScrollNewsController {
         return AnsApiResponse.noContent();
     }
 
+   /* @Operation(summary = "스크롤 뉴스 상세조회", description = "스크롤 뉴스 상세조회")
+    @GetMapping(path = "/{scrlNewsId}")
+    public AnsApiResponse<ScrollNewsDTO> findTextFileDownload(@Parameter(name = "scrlNewsId", required = true, description = "스크롤 뉴스 아이디", in = ParameterIn.PATH)
+                                              @PathVariable("scrlNewsId") Long scrlNewsId) {
+
+        ScrollNewsDTO scrollNewsDTO = scrollNewsService.find(scrlNewsId);
+
+
+
+        return new AnsApiResponse<>(scrollNewsDTO);
+    }*/
+
 }

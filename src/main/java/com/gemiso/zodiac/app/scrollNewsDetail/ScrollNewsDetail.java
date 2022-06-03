@@ -35,7 +35,7 @@ public class ScrollNewsDetail {
     private String titl;
 
     @Column(name = "ctt_ord")
-    private int cttOrd;
+    private Integer cttOrd;
 
     @Type(type = "json")
     @Column(name = "ctt_json", columnDefinition = "json")

@@ -38,5 +38,5 @@ public class ScrollNewsCreateDTO {
     //private String delrId;
     //private String delrNm;
     private String cgText;
-    private List<ScrollNewsDetailCreateDTO> scrollNewsDetail = new ArrayList<>();
+    private List<ScrollNewsDetailCreateDTO> scrollNewsDetails = new ArrayList<>();
 }

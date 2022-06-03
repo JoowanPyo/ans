@@ -159,7 +159,7 @@ public class ArticleMediaService {
 
         Long orgArtclId = article.getOrgArtclId();
 
-        if (ObjectUtils.isEmpty(orgArtclId) == false) {
+        if (artclId.equals(orgArtclId) == false) {
 
             //토픽메세지 ArticleTopicDTO Json으로 변환후 send
             TakerCueSheetTopicDTO takerCueSheetTopicDTO = new TakerCueSheetTopicDTO();

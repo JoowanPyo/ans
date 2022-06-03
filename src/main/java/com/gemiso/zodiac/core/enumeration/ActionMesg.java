@@ -14,7 +14,7 @@ public enum ActionMesg {
     articleLOCK("article Lock"),
     articleUNLOCK("article UnLock"),
     articleForcedLock("article forced Lock"),
-    fixM("the news fix staus changed");
+    fixM("the news fix status changed");
 
     String mesg;
 

@@ -85,7 +85,7 @@ public class Symbol extends BaseEntity {
     private String typCdNm;
 
     @Column(name = "symbol_ord")
-    private int symbolOrd;
+    private Integer symbolOrd;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id")

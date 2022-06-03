@@ -1,10 +1,14 @@
 package com.gemiso.zodiac.app.yonhapWire;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gemiso.zodiac.app.yonhap.dto.YonhapAssignCreateDTO;
+import com.gemiso.zodiac.app.yonhapAssign.dto.YonhapAssignSimpleDTO;
 import com.gemiso.zodiac.app.yonhapPhoto.dto.YonhapExceptionDomain;
 import com.gemiso.zodiac.app.yonhapWire.dto.*;
 import com.gemiso.zodiac.core.helper.SearchDate;
+import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.UserAuthService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +22,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,30 +37,44 @@ public class YonhapWireController {
 
     private final YonhapWireService yonhapWireService;
 
+    private final UserAuthService userAuthService;
+
     @Operation(summary = "연합외신 목록조회", description = "연합외신 목록조회")
     @GetMapping(path = "")
-    public AnsApiResponse<List<YonhapWireDTO>> findAll(@Parameter(name = "sdate", description = "검색시작일[yyyy-MM-dd]", required = false)
-                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
-                                                       @Parameter(name = "edate", description = "검색종료일[yyyy-MM-dd]", required = false)
-                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                       @Parameter(name = "agcyCd", description = "통신사코드")
-                                                       @RequestParam(value = "agcyCd", required = false) String agcyCd,
-                                                       @Parameter(name = "searchWord", description = "검색어")
-                                                       @RequestParam(value = "searchWord", required = false) String searchWord,
-                                                       @Parameter(name = "imprt", description = "중요도 List<String>", required = false)
-                                                       @RequestParam(value = "imprt", required = false) List<String> imprtList) throws Exception {
+    public AnsApiResponse<?> findAll(@Parameter(name = "sdate", description = "검색시작일[yyyy-MM-dd]", required = false)
+                                     @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                     @Parameter(name = "edate", description = "검색종료일[yyyy-MM-dd]", required = false)
+                                     @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                     @Parameter(name = "agcyCd", description = "통신사코드")
+                                     @RequestParam(value = "agcyCd", required = false) String agcyCd,
+                                     @Parameter(name = "agcyNm", description = "통신사 명")
+                                     @RequestParam(value = "agcyNm", required = false) String agcyNm,
+                                     @Parameter(name = "source", description = "소스( REUTERS, APTN)")
+                                     @RequestParam(value = "source", required = false) String source,
+                                     @Parameter(name = "svcTyp", description = "서비스 유형")
+                                     @RequestParam(value = "svcTyp", required = false) String svcTyp,
+                                     @Parameter(name = "searchWord", description = "검색어")
+                                     @RequestParam(value = "searchWord", required = false) String searchWord,
+                                     @Parameter(name = "imprt", description = "중요도 List<String>", required = false)
+                                     @RequestParam(value = "imprt", required = false) List<String> imprtList,
+                                     @Parameter(name = "page", description = "시작페이지")
+                                     @RequestParam(value = "page", required = false) Integer page,
+                                     @Parameter(name = "limit", description = "한 페이지에 데이터 수")
+                                     @RequestParam(value = "limit", required = false) Integer limit) throws Exception {
 
-        List<YonhapWireDTO> yonhapWireDTOList = new ArrayList<>();
+        PageResultDTO<YonhapWireDTO, YonhapWire> yonhapWireDTOList = null;
 
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
             //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
             SearchDate searchDate = new SearchDate(sdate, edate);
 
-            yonhapWireDTOList = yonhapWireService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), agcyCd, searchWord, imprtList);
+            yonhapWireDTOList = yonhapWireService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), agcyCd,
+                    agcyNm, source, svcTyp, searchWord, imprtList, page, limit);
 
         } else {
 
-            yonhapWireDTOList = yonhapWireService.findAll(null, null, agcyCd, searchWord, imprtList);
+            yonhapWireDTOList = yonhapWireService.findAll(null, null, agcyCd,
+                    agcyNm, source, svcTyp, searchWord, imprtList, page, limit);
         }
         return new AnsApiResponse<>(yonhapWireDTOList);
     }
@@ -116,7 +135,7 @@ public class YonhapWireController {
     @PostMapping(path = "/reuter")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> createReuter(@Parameter(description = "필수값<br> ", required = true)
-                                          @RequestBody YonhapReuterCreateDTO yonhapReuterCreateDTO) throws JsonProcessingException {
+                                          @RequestBody YonhapReuterCreateDTO yonhapReuterCreateDTO) throws JsonProcessingException, ParseException {
 
         YonhapExceptionDomain yonhapExceptionDomain = yonhapWireService.createReuter(yonhapReuterCreateDTO);
 
@@ -125,6 +144,21 @@ public class YonhapWireController {
 
 
         return new ResponseEntity<>(yonhapReuterDTO, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "연합외신 어싸인 등록", description = "여합외신 어싸인 등록")
+    @PostMapping(path = "/assign")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AnsApiResponse<YonhapAssignSimpleDTO> createWireAssign(@Parameter(description = "필수값<br> ", required = true)
+                                                                  @RequestBody YonhapWireAssignCreateDTO yonhapWireAssignCreateDTO) throws Exception {
+
+        String userId = userAuthService.authUser.getUserId();
+
+        log.info(" Yonhap Assign : UserId - " + userId + " Yonhap Assign DTO - " + yonhapWireAssignCreateDTO.toString());
+
+        YonhapAssignSimpleDTO yonhapAssignSimpleDTO = yonhapWireService.createWireAssign(yonhapWireAssignCreateDTO, userId);
+
+        return new AnsApiResponse<>(yonhapAssignSimpleDTO);
     }
 
 }

@@ -311,6 +311,7 @@ public class Article extends BaseEntity {
     @Where(clause = "del_yn = 'N'")*/
 
     @BatchSize(size = 100)
+    @OrderBy(value = "inputDtm DESC")
     @Where(clause = "del_yn = 'N'")
     @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     @JsonManagedReference
@@ -325,11 +326,13 @@ public class Article extends BaseEntity {
     private List<ArticleHist> articleHist = new ArrayList<>();*/
 
     @BatchSize(size = 100)
+    @OrderBy(value = "lnOrd ASC")
     @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     @JsonManagedReference
     private Set<ArticleCap> articleCap =  Collections.emptySet();
 
     @BatchSize(size = 100)
+    @OrderBy(value = "lnOrd ASC")
     @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     @JsonManagedReference
     private Set<AnchorCap> anchorCap =  Collections.emptySet();

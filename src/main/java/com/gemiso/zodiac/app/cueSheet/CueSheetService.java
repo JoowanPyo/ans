@@ -15,6 +15,7 @@ import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
+import com.gemiso.zodiac.app.baseProgram.dto.BaseProgramSimpleDTO;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.cueCapTmplt.CueCapTmplt;
 import com.gemiso.zodiac.app.cueCapTmplt.CueCapTmpltRepository;
@@ -71,10 +72,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -870,11 +873,24 @@ public class CueSheetService {
     }
     
     //큐시트 락
-    public void cueSheetOrderLock(CueSheetOrderLockDTO cueSheetOrderLockDTO, Long cueId, String userId){
+    public void cueSheetOrderLock(CueSheetOrderLockDTO cueSheetOrderLockDTO, Long cueId, String userId) throws JsonProcessingException {
 
-        CueSheet cueSheet = cueSheetFindOrFail(cueId);
+        Optional<CueSheet> cueSheetEntity = cueSheetRepository.findCueLock(cueId);
+
+        if (cueSheetEntity.isPresent() == false){
+            throw new ResourceNotFoundException("큐시트를 찾을 수 없습니다. 큐시트 아이디 : "+cueId);
+        }
+
+        CueSheet cueSheet = cueSheetEntity.get();
 
         String lckYn = cueSheetOrderLockDTO.getLckYn();
+
+        String lockYn = cueSheet.getLckYn();
+        String lckrId = cueSheet.getLckrId();
+
+        if ("Y".equals(lockYn) && userId.equals(lckrId) == false) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN); // 잠금 사용자가 다르다.
+        }
 
         if (lckYn != null && lckYn.equals("Y")) { //락 여부값이 Y 가 아닐경우 lck값 초기화
             //String userId = userAuthService.authUser.getUserId();
@@ -894,6 +910,10 @@ public class CueSheetService {
 
         cueSheetRepository.save(cueSheet);
 
+        String updateLockYn = cueSheet.getLckYn();
+
+        sendCueTopic(cueSheet, "CueSheet Lock Update - "+updateLockYn, null);
+
     }
 
     //큐시트 잠금 해제
@@ -905,7 +925,7 @@ public class CueSheetService {
         cueSheet.setLckrId(null);
         cueSheet.setLckDtm(null);
         cueSheet.setLckYn("N");
-        cueSheet.setCueStCd(null);
+        //cueSheet.setCueStCd(null);
 
         cueSheetRepository.save(cueSheet);
 
@@ -1193,6 +1213,7 @@ public class CueSheetService {
         }
 
         Long orgArtclId = article.getOrgArtclId();//원본기사 아이디
+        Long artclId = article.getOrgArtclId();
 
         String getOrgApprvDivCd = article.getApprvDivCd(); //원본 픽스구분 코드를 가져온다.
         String artclFixUser = article.getArtclFixUser(); // 원본 기사 픽스자를 가져온다
@@ -1201,17 +1222,18 @@ public class CueSheetService {
 
         //원본 픽스구분값이 앵커픽스,데이커 픽스일 경우 article_fix, editor_fix 로변경
         //에디터 픽스자가 있을경우 에디터픽스로, 아닐경우 기사픽스로 셋팅
-        if ("anchor_fix".equals(getOrgApprvDivCd) || "desk_fix".equals(getOrgApprvDivCd)){
+        if (editorFixUser != null && editorFixUser.trim().isEmpty() == false){
+            newApprvDivCd = "editor_fix";
+        }else if (artclFixUser != null && artclFixUser.trim().isEmpty() == false){
+            newApprvDivCd = "article_fix";
+        } else if (editorFixUser == null || editorFixUser.trim().isEmpty() ){
 
-            if (editorFixUser != null && editorFixUser.trim().isEmpty() == false){
-                newApprvDivCd = "editor_fix";
-            }else {
-                newApprvDivCd = "article_fix";
+            if (artclFixUser == null || editorFixUser.trim().isEmpty()){
+                newApprvDivCd = "fix_none";
             }
-
         }
 
-        if (ObjectUtils.isEmpty(orgArtclId)) { //원본기사가 아이디가없고 최초 복사일시
+        if (artclId.equals(orgArtclId)) { // 최초 복사일시
 
             return Article.builder()
                     .chDivCd(article.getChDivCd())
@@ -1265,12 +1287,12 @@ public class CueSheetService {
                     .cueSheet(cueSheet)//큐시트 아이디 set
                     .artclFixUser(article.getArtclFixUser())
                     .editorFixUser(article.getEditorFixUser())
-                    .anchorFixUser(article.getAnchorFixUser())
-                    .deskFixUser(article.getDeskFixUser())
+                    //.anchorFixUser(article.getAnchorFixUser())
+                    //.deskFixUser(article.getDeskFixUser())
                     .artclFixDtm(article.getArtclFixDtm())
                     .editorFixDtm(article.getEditorFixDtm())
-                    .anchorFixDtm(article.getAnchorFixDtm())
-                    .deskFixDtm(article.getDeskFixDtm())
+                    //.anchorFixDtm(article.getAnchorFixDtm())
+                    //.deskFixDtm(article.getDeskFixDtm())
                     .build();
         }else { //원본기사 아이디가 있을시[복사된 기사 다시 복사일시]
 
@@ -1326,12 +1348,12 @@ public class CueSheetService {
                     .cueSheet(cueSheet)//큐시트 아이디 set
                     .artclFixUser(article.getArtclFixUser())
                     .editorFixUser(article.getEditorFixUser())
-                    .anchorFixUser(article.getAnchorFixUser())
-                    .deskFixUser(article.getDeskFixUser())
+                    //.anchorFixUser(article.getAnchorFixUser())
+                    //.deskFixUser(article.getDeskFixUser())
                     .artclFixDtm(article.getArtclFixDtm())
                     .editorFixDtm(article.getEditorFixDtm())
-                    .anchorFixDtm(article.getAnchorFixDtm())
-                    .deskFixDtm(article.getDeskFixDtm())
+                    //.anchorFixDtm(article.getAnchorFixDtm())
+                    //.deskFixDtm(article.getDeskFixDtm())
                     .build();
         }
     }

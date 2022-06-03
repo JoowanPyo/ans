@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.yonhapAttchFile;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.yonhap.Yonhap;
@@ -16,12 +17,10 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString
+@ToString(exclude = {"attachFile", "yonhap"})
 @Setter
 @DynamicUpdate
 public class YonhapAttchFile {
-
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +32,8 @@ public class YonhapAttchFile {
     private AttachFile attachFile;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "yh_artcl_id")
+    @JoinColumn(name = "yonhap_id")
+    @JsonBackReference
     private Yonhap yonhap;
 
     @Column(name = "file_ord")
@@ -45,7 +45,7 @@ public class YonhapAttchFile {
     @Column(name = "mime_type", length = 100)
     private String mimeType;
 
-    @Column(name = "capTemplate", length = 4000)
+    @Column(name = "cap_template", length = 4000)
     private String cap;
 
     @Column(name = "yh_url", length = 2000)

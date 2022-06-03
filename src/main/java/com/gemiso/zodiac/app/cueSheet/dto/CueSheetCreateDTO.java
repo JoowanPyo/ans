@@ -20,7 +20,6 @@ public class CueSheetCreateDTO {
 
     //private Long cueId;
     private String cueDivCd;
-    @NotNull
     private String chDivCd;
     private String brdcDt;
     private String brdcStartTime;

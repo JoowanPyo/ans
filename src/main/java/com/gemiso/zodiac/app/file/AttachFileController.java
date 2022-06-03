@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,12 +43,12 @@ public class AttachFileController {
 
     @Operation(summary = "파일 다운로드", description = "파일 다운로드")
     @GetMapping(path = "/{fileId}")
-    public Response find(HttpServletRequest request, HttpServletResponse response,
-                         @Parameter(name = "fileId", description = "파일 아이디") @PathVariable Long fileId,
-                         @Parameter(name = "fileDivCd", description = "파일 구분코드")
+    public ResponseEntity find(HttpServletRequest request, HttpServletResponse response,
+                               @Parameter(name = "fileId", description = "파일 아이디") @PathVariable Long fileId,
+                               @Parameter(name = "fileDivCd", description = "파일 구분코드")
                          @RequestParam(value = "fileDivCd", required = false) String fileDivCd) throws Exception {
 
-        Response rep = null;
+        ResponseEntity rep = null;
         AttachFileDTO attachFileDTO = attachFileService.strFilefind(fileId);
 
         if (attachFileDTO.getFileDivCd().equals(fileDivCd)) {

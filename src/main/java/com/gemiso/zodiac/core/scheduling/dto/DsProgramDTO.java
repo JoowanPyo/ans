@@ -20,5 +20,6 @@ public class DsProgramDTO {
     private String productClf;//100:자체제작, 200:외주제작, 300:국내구매, 400:해외구매, 500리패키지, 999:기타
     private String regDt; //입력일시
     private String updDt; //수정일시
+    private String newsYn; //뉴스 여부
     /*private String chanId;*/
 }

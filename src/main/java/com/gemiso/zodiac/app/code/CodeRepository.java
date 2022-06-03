@@ -17,7 +17,7 @@ public interface CodeRepository extends JpaRepository<Code, Long> , QuerydslPred
     @Query("select max(a.cdOrd) from Code a where a.hrnkCdId =:hrnkCd")
     Optional<Integer> findOrd(@Param("hrnkCd")String hrnkCd);
 
-    @Query("select a from Code a where a.cdId =:cdId and a.delYn = 'N'")
+    @Query("select a from Code a where a.cdId =:cdId and a.delYn = 'N' ")
     Optional<Code> findByCodeId(@Param("cdId")Long cdId);
 
     @Query("select a from Code a where a.hrnkCdId = :artclTypCd and a.delYn = 'N'")
@@ -28,4 +28,7 @@ public interface CodeRepository extends JpaRepository<Code, Long> , QuerydslPred
 
     @Query("select a from Code a where a.hrnkCdId = :hrnkCd and a.useYn = 'Y'")
     List<Code> findTakerCode(@Param("hrnkCd")String hrnkCd);
+
+    @Query("select a from Code a where a.hrnkCdId = :hrnkCd and a.useYn = 'Y' and a.delYn = 'N' order by a.cdOrd asc ")
+    List<Code> findCodeList(@Param("hrnkCd")String hrnkCd);
 }

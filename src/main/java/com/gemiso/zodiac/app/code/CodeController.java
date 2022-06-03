@@ -1,8 +1,6 @@
 package com.gemiso.zodiac.app.code;
 
-import com.gemiso.zodiac.app.code.dto.CodeCreateDTO;
-import com.gemiso.zodiac.app.code.dto.CodeDTO;
-import com.gemiso.zodiac.app.code.dto.CodeUpdateDTO;
+import com.gemiso.zodiac.app.code.dto.*;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -101,5 +99,23 @@ public class CodeController {
         codeService.delete(cdId);
 
         return AnsApiResponse.noContent();
+    }
+
+    @Operation(summary = "코드 순번 수정", description = "코드 순번 수정")
+    @PutMapping(path = "/{cdId}/updateord")
+    public AnsApiResponse<CodeResponseDTO> updateOrd(@Parameter(name = "codeOrdUpdateDTO", required = true, description = "필수값<br>")
+                                          @Valid @RequestBody CodeOrdUpdateDTO codeOrdUpdateDTO,
+                                          @Parameter(name = "cdId", required = true) @PathVariable("cdId") Long cdId) {
+
+        codeService.updateOrd(codeOrdUpdateDTO, cdId);
+
+        //코드 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        //CodeDTO codeDTO = new CodeDTO();
+        //codeDTO.setCdId(cdId);
+
+        CodeResponseDTO codeDTO = new CodeResponseDTO();
+        codeDTO.setCdId(cdId);
+
+        return new AnsApiResponse<>(codeDTO);
     }
 }

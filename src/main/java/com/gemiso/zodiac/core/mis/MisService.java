@@ -24,6 +24,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -141,22 +142,31 @@ public class MisService {
 
         List<User> userList = userRepository.findAll();
 
+        List<String> ansUserIds = new ArrayList<>();
+        for (User user : userList){
+
+            String ansUserId = user.getUserId();
+
+            ansUserIds.add(ansUserId);
+        }
+
+
         //mis조회정보에서 ans조회정보 검사
-        loof1:
-        for (MisUser misUser : misUserList){
+        for (MisUser misUser : misUserList) {
 
             MisUserId misUserIdDTO = misUser.getId();
             String misUserId = misUserIdDTO.getUserIdxx(); //Mis사용자 아이디
             String misPassword = misUser.getScrtNumb(); //Mis사용자 비밀번호
             String misDeptCode = Optional.ofNullable(misUser.getDeptCode()).orElse(""); //Mis사용자 부서코트
-            
-            loof2:
+
+
             for (User user : userList){
-                
+
                 String ansUserId = user.getUserId(); //Ans사용자 아이디
                 String ansPassword = user.getPwd(); // Ans사용자 비밀번호
                 String ansDeptCode = Optional.ofNullable(user.getDeptCd()).orElse(""); //Ans사용자 부서코드
-                
+
+
                 if (misUserId.equals(ansUserId)){ //사용자 아디디가 같으면
 
                     // 패스워드 변경시
@@ -172,12 +182,15 @@ public class MisService {
                         log.info("Mis User Dept Code Update : userId - "+ ansUserId+" Dept Code - "+misDeptCode);
                     }
 
-                  continue loof1;  
                 }
+
             }
 
-            createUser(misUser); //사용자 신규 등록
+            if (ansUserIds.contains(misUserId) == false) {
+                createUser(misUser); //사용자 신규 등록
+            }
         }
+
         
     }
 
@@ -259,6 +272,8 @@ public class MisService {
     public void updateUserPwd(User user, String misPassword){
 
         String password = encodePassword(misPassword); //패스워드 비크립트
+
+        System.out.println(password);
 
         UserDTO userDTO = userMapper.toDto(user);
         user.setPwd(password);
