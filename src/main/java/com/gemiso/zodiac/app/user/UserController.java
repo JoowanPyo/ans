@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -79,7 +80,14 @@ public class UserController {
         String userId = userCreateDTO.getUserId();
         if (userService.checkUser(userId)) {
             //return AnsApiResponse.aleadyExist();
-            throw new UserAlreadyExistException("사용자가 이미 존재합니다. ");
+            User user = userService.deleteChkUserFind(userId);
+            
+            if (ObjectUtils.isEmpty(user)){
+                throw new UserAlreadyExistException("사용자가 이미 존재합니다. 사용자 아이디 : "+userId);
+
+            }else {
+                throw new UserAlreadyExistException("삭제된 사용자입니다. 사용자 아이디 : "+userId);
+            }
         }
 
         userService.create(userCreateDTO);

@@ -230,10 +230,10 @@ public class LboxService {
                 clipInfoDTO = data.getClip_info(); //이미 전송된 영상이거나 전송완료인 영상 데이터DTO
                 List<TasksDTO> tasksDTO = data.getTasks(); //전송시작시 데이터
 
-                if (CollectionUtils.isEmpty(tasksDTO) == false) {
+                if (CollectionUtils.isEmpty(tasksDTO) == false && "NS".equals(dest)) {
                     ++tasksCount; //전송중이 한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
                 }
-                if (ObjectUtils.isEmpty(clipInfoDTO) == false) {
+                if (ObjectUtils.isEmpty(clipInfoDTO) == false && "NS".equals(dest)) {
                     ++clipInfoCount;//이미전송된 파일이  한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
                 }
 
@@ -258,6 +258,7 @@ public class LboxService {
             //기사 미디어 부조 전송 시작.
 
             articleMediaDTO.setTrnsfStCd("match_ready"); //전송시작 코드
+            articleMediaDTO.setTrnasfVal(0);
             articleMediaMapper.updateFromDto(articleMediaDTO, articleMedia); //기존 기사미디어 정보에 업데이트 정보 업데이트
             articleMediaRepository.save(articleMedia); //수정
 
@@ -268,6 +269,7 @@ public class LboxService {
             //기사 미디어 부조 전송 완료(이미 전송된 영상)
             articleMediaDTO.setTrnsfFileNm(clipInfoDTO.getFilename()); //전송완료된 파일네임(0001 ~ 9999 + .mxf)
             articleMediaDTO.setTrnsfStCd("match_completed"); //전송완료 코드
+            articleMediaDTO.setTrnasfVal(100);
             articleMediaMapper.updateFromDto(articleMediaDTO, articleMedia); //기존 기사미디어 정보에 업데이트 정보 업데이트
             articleMediaRepository.save(articleMedia); //수정
 
@@ -481,10 +483,10 @@ public class LboxService {
                 clipInfoDTO = data.getClip_info(); //이미 전송된 영상이거나 전송완료인 영상 데이터DTO
                 List<TasksDTO> tasksDTO = data.getTasks(); //전송시작시 데이터
 
-                if (CollectionUtils.isEmpty(tasksDTO) == false) {
+                if (CollectionUtils.isEmpty(tasksDTO) == false && "NS".equals(dest)) {
                     ++tasksCount; //전송중이 한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
                 }
-                if (ObjectUtils.isEmpty(clipInfoDTO) == false) {
+                if (ObjectUtils.isEmpty(clipInfoDTO) == false && "NS".equals(dest)) {
                     ++clipInfoCount;//이미전송된 파일이  한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
                 }
 

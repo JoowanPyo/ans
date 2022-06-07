@@ -430,6 +430,19 @@ public class InterfaceController {
         return AnsApiResponse.ok();
     }
 
+   /* @Operation(summary = "방송중 테이커 큐시트 동기화 test", description = "방송중 테이커 큐시트 동기화 test")
+    @PostMapping(path = "/takersetcuetest")
+    public AnsApiResponse<?> takerSetCueTest(@Parameter(description = "필수값<br> ", required = true)
+                                         @RequestBody @Valid TakerToCueBodyDTO takerToCueBodyDTO,
+                                         @RequestHeader(value = "securityKey") String securityKey) throws JsonProcessingException {
+
+        log.info("Taker On Air status  : rd_id - " + takerToCueBodyDTO.toString());
+
+        interfaceService.takerSetCue(takerToCueBodyDTO);
+
+        return AnsApiResponse.ok();
+    }*/
+
     @Operation(summary = "S MAM 큐시트 목록조회", description = "S MAM 큐시트 목록조회")
     @GetMapping(path = "/smamfindallcue")
     public AnsApiResponse<List<CueSheetDTO>> smamFindAllCue(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)

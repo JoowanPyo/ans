@@ -275,7 +275,7 @@ public class BisInterfaceService {
         httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
         httpHeaders.add("Session_user_id", "ans");
 
-        for (int i = 3; i < 10; i++) {
+        for (/*int i = 3; i < 10; i++*/int i = 0; i < 7; i++) {
             Calendar cal = Calendar.getInstance();
             //현재 날짜 구하기
             Date now = new Date();
@@ -521,10 +521,9 @@ public class BisInterfaceService {
         String day = formatDayCd(dayOfWeekNumber); // 1 - 7 까지 나온 요일숫자를 String 형식의 월~일 로 변환
 
         //기본편성
-        Program program = Program.builder().brdcPgmId(brdcPgmId).build();
 
         //프로그램 아이디, 시작날짜, 요일로 검색조건 [ 같은 기본편성이 있는지 확인 ]
-        Optional<BaseProgram> baseProgramEntity = baseProgramRepository.findByBasePropram(brdcPgmId, formatBoradHm/*, day*/);
+        Optional<BaseProgram> baseProgramEntity = baseProgramRepository.findByBasePropram(brdcPgmId, formatBoradHm);
 
         //검색조건으로 조회한 기본편성이 있을경우 리턴, 없을경우 생성.
         if (baseProgramEntity.isPresent()){
@@ -532,13 +531,16 @@ public class BisInterfaceService {
 
             return baseProgram.getBasePgmschId();
         }else {
+
+            Program program = Program.builder().brdcPgmId(brdcPgmId).build();
+
             BaseProgram baseProgram = BaseProgram.builder()
                     .brdcStartClk(formatBoradHm)
                     .brdcEndClk(endTime)
-                    .brdcDay("")//day - 2022-05-10 성민효과장이 배제하라고함
+                    .brdcDay("")//day - 2022-05-10 성민효과장님이 배제하라고함
                     .program(program)
                     .build();
-            
+
             baseProgramRepository.save(baseProgram);
 
             return baseProgram.getBasePgmschId();

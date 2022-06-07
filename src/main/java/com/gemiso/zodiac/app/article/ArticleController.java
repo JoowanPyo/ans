@@ -59,6 +59,7 @@ public class ArticleController {
             @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
             @Parameter(name = "delYn", description = "삭제 여부") @RequestParam(value = "delYn", required = false) String delYn,
             @Parameter(name = "artclId", description = "기사아이디") @RequestParam(value = "artclId", required = false) Long artclId,
+            @Parameter(name = "orgArtclId", description = "원본기사 아이디") @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,
             @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]") @RequestParam(value = "copyYn", required = false) String copyYn) throws Exception {
 
         PageResultDTO<ArticleDTO, Article> pageList = null;
@@ -77,13 +78,13 @@ public class ArticleController {
 
             pageList = articleService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), rcvDt, rptrId, inputrId,
                     brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd,
-                    artclCateCd, artclTypDtlCd, delYn, artclId, copyYn);
+                    artclCateCd, artclTypDtlCd, delYn, artclId, copyYn, orgArtclId);
             //검색조건 날짜형식이 안들어왔을경우
         } else {
 
             pageList = articleService.findAll(null, null, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd,
                     artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd, artclCateCd,
-                    artclTypDtlCd, delYn, artclId, copyYn);
+                    artclTypDtlCd, delYn, artclId, copyYn, orgArtclId);
 
         }
 
@@ -184,7 +185,7 @@ public class ArticleController {
 
         String userId = userAuthService.authUser.getUserId();
 
-        log.debug("Article Create : User Id - " + userId + "<br>" + "Create Model - " + articleCreateDTO);
+        log.info("Article Create : User Id - " + userId + "<br>" + "Create Model - " + articleCreateDTO);
 
         Long artclId = articleService.create(articleCreateDTO, userId);
 
@@ -205,7 +206,7 @@ public class ArticleController {
                                                    @PathVariable("artclId") Long artclId) throws Exception {
 
         String userId = userAuthService.authUser.getUserId();
-        log.debug("Article Update : User Id - " + userId + "<br>" +
+        log.info("Article Update : User Id - " + userId + "<br>" +
                 " Article Model -" + articleUpdateDTO);
 
         //수정. 잠금사용자확인

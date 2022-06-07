@@ -19,7 +19,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = "program")
+@ToString(exclude = {"program","baseProgram"})
 @DynamicUpdate
 public class DailyProgram{
 
@@ -92,11 +92,11 @@ public class DailyProgram{
     @Column(name = "brdc_run_time", length = 8)
     private String brdcRunTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brdc_pgm_id")
     private Program program;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bas_pgmsch_id")
     private BaseProgram baseProgram;
 

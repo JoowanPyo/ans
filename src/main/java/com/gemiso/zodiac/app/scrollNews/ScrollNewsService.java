@@ -205,7 +205,7 @@ public class ScrollNewsService {
 
         //조회조건이 날짜로 들어온 경우
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
-            booleanBuilder.and(qScrollNews.inputDtm.between(sdate, edate));
+            booleanBuilder.and(qScrollNews.brdcDtm.between(sdate, edate));
         }
 
         //조회조건이 삭제 여부값으로 들어온 경우

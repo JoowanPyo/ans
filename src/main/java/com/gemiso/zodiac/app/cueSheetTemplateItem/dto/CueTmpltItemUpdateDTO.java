@@ -20,8 +20,8 @@ public class CueTmpltItemUpdateDTO {
     private String cueItemTitl;
     private String cueItemTitlEn;
     private String cueItemCtt;
-    private int cueItemOrd;
-    private String cueItemOrdCd;
+    //private int cueItemOrd;
+    //private String cueItemOrdCd;
     private int cueItemTime;
     private String cueItemFrmCd;
     //private String cueItemFrmCdNm;

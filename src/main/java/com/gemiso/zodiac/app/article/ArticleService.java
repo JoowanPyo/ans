@@ -52,6 +52,11 @@ import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import com.gemiso.zodiac.app.lbox.LboxService;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
+import com.gemiso.zodiac.app.tagArticle.ArticleTag;
+import com.gemiso.zodiac.app.tagArticle.ArticleTagRepository;
+import com.gemiso.zodiac.app.tagArticle.ArticleTagService;
+import com.gemiso.zodiac.app.tagArticle.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.tagArticle.mapper.ArticleTagMapper;
 import com.gemiso.zodiac.app.user.QUser;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserService;
@@ -119,6 +124,7 @@ public class ArticleService {
     private final ArticleActionLogRepository articleActionLogRepository;
     private final ArticleMediaRepository articleMediaRepository;
     private final CueSheetRepository cueSheetRepository;
+    private final ArticleTagRepository articleTagRepository;
 
     private final ArticleMapper articleMapper;
     private final ArticleCreateMapper articleCreateMapper;
@@ -131,6 +137,7 @@ public class ArticleService {
     private final ArticleMediaMapper articleMediaMapper;
     private final ArticleMediaSimpleMapper articleMediaSimpleMapper;
     private final ArticleMediaCreateMapper articleMediaCreateMapper;
+    private final ArticleTagMapper articleTagMapper;
 
     //private final UserAuthService userAuthService;
     private final UserAuthChkService userAuthChkService;
@@ -149,7 +156,8 @@ public class ArticleService {
     public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
                                                       String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
                                                       Integer page, Integer limit, List<String> apprvDivCdList, Integer deptCd,
-                                                      String artclCateCd, String artclTypDtlCd, String delYn, Long artclId, String copyYn) {
+                                                      String artclCateCd, String artclTypDtlCd, String delYn, Long artclId, String copyYn,
+                                                      Long orgArtclId) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
@@ -157,7 +165,7 @@ public class ArticleService {
 
         //전체조회[page type]
         Page<Article> result = articleRepository.findByArticleList(sdate, edate, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd, artclTypCd,
-                searchDivCd, searchWord, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd, delYn, artclId, copyYn, pageable);
+                searchDivCd, searchWord, apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd, delYn, artclId, copyYn, orgArtclId, pageable);
 
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
@@ -221,6 +229,8 @@ public class ArticleService {
 
         List<ArticleMedia> articleMedia = articleMediaRepository.findArticleMediaList(artclId);
         List<ArticleMediaSimpleDTO> articleMediaDTOList = articleMediaSimpleMapper.toDtoList(articleMedia);
+        List<ArticleTag> articleTagList = articleTagRepository.findArticleTag(artclId);
+        List<ArticleTagDTO> articleTagDTOList = articleTagMapper.toDtoList(articleTagList);
 
 
         //방송아이콘 이미지 Url 추가. 기사자막 방송아이콘 url set
@@ -230,6 +240,7 @@ public class ArticleService {
         articleDTO.setArticleCap(setArticleCapDTOList);
         articleDTO.setAnchorCap(setAnchorCapDTOList);
         articleDTO.setArticleMedia(articleMediaDTOList);
+        articleDTO.setArticleTag(articleTagDTOList);
 
 
         return articleDTO;
@@ -344,6 +355,7 @@ public class ArticleService {
 
     }
 
+    //원본 기사일 경우, fix_none 상태에서 수정할 시, fix_none상태의 사본기사 내용도 수정된다.
     public void updateCopyArticle(Article article, String userId, ArticleUpdateDTO articleUpdateDTO) throws Exception {
 
         //복사된 기사인 경우

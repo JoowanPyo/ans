@@ -132,9 +132,9 @@ public class ProcessArticleFix {
         if( auth.equals( AuthEnum.ArticleFix) )
             return articleFix(DbApprove, newApprove, articleFixUser, userId, inputrId);
         else if( auth.equals( AuthEnum.EditorFix) )
-            return editorFix(DbApprove, newApprove,  editorFixUser,  userId);
+            return editorFix(DbApprove, newApprove,  editorFixUser, articleFixUser, userId);
         else if (auth.equals(AuthEnum.AnchorFix))
-            return anchorFix(DbApprove, newApprove,  anchorFixUser,  userId);
+            return anchorFix(DbApprove, newApprove,  editorFixUser, articleFixUser, anchorFixUser,  userId);
         else if (auth.equals(AuthEnum.DeskFix))
             return deskFix(DbApprove, newApprove);
         //else if (auth.equals(AuthEnum.PD)) //수정.
@@ -202,13 +202,16 @@ public class ProcessArticleFix {
         return confirmList.contains(newApprove);
     }
 
-    public  boolean editorFix( FixEnum DbApprove , FixEnum newApprove, String editorFixUser, String userId )
+    public  boolean editorFix( FixEnum DbApprove , FixEnum newApprove, String editorFixUser,String articleFixUser, String userId )
     {
         List<FixEnum> confirmList = new ArrayList<>();
 
         if (IsUnfix( DbApprove, newApprove) )
         {
-            if (userId.equals(editorFixUser)) {
+            if (userId.equals(articleFixUser)){
+                confirmList.add(FixEnum.FIX_NONE);
+                confirmList.add(FixEnum.ARTICLE_FIX);
+            } else if (userId.equals(editorFixUser)) {
                 //confirmList.add(FixEnum.FIX_NONE);
                 confirmList.add(FixEnum.ARTICLE_FIX);
             }
@@ -223,7 +226,8 @@ public class ProcessArticleFix {
         return confirmList.contains(newApprove);
     }
 
-    public boolean anchorFix( FixEnum DbApprove , FixEnum newApprove, String anchorFixUser, String userId )
+    public boolean anchorFix( FixEnum DbApprove , FixEnum newApprove, String editorFixUser, String articleFixUser,
+                              String anchorFixUser, String userId )
     {
 
         List<FixEnum> confirmList = new ArrayList<>();
@@ -231,9 +235,18 @@ public class ProcessArticleFix {
         if (IsUnfix( DbApprove, newApprove) )
         {
             if (userId.equals(anchorFixUser)) {
-                confirmList.add(FixEnum.FIX_NONE);
-                confirmList.add(FixEnum.ARTICLE_FIX);
-                confirmList.add(FixEnum.EDITOR_FIX);
+
+                if (userId.equals(articleFixUser)) {
+                    confirmList.add(FixEnum.FIX_NONE);
+                    confirmList.add(FixEnum.ARTICLE_FIX);
+                    confirmList.add(FixEnum.EDITOR_FIX);
+                }else {
+
+                    //confirmList.add(FixEnum.FIX_NONE);
+                    confirmList.add(FixEnum.ARTICLE_FIX);
+                    confirmList.add(FixEnum.EDITOR_FIX);
+                }
+
             }else {
                 //confirmList.add(FixEnum.FIX_NONE);
                 confirmList.add(FixEnum.ARTICLE_FIX);

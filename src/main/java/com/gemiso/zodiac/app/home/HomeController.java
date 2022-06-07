@@ -53,12 +53,12 @@ public class HomeController {
             SearchDate searchDate = new SearchDate(sdate, edate);
             pageList = articleService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), null, rptrId, inputrId,
                     null, null, null, null, null, null, null,
-                    null, null, null, null, null, null, null);
+                    null, null, null, null, null, null, null, null);
         } else {
 
             pageList = articleService.findAll(null, null, null, rptrId, inputrId,
                     null, null, null, null, null, null, null,
-                    null, null, null, null, null, null, null);
+                    null, null, null, null, null, null, null, null);
 
         }
 

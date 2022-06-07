@@ -98,7 +98,7 @@ dependencies {
 }*/
 bootJar {
     archiveBaseName = 'ans'
-    archiveVersion = "0.3_06-03"
+    archiveVersion = "0.1_06-07"
 }
 
 

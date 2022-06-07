@@ -83,7 +83,7 @@ public class User extends BaseEntity {
     @Column(name = "rmk", length = 500)
     private String rmk;
 
-    @LastModifiedDate
+    //@LastModifiedDate
     @Column(name = "last_login_dtm")
     private Date lastLoginDtm;
 

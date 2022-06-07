@@ -222,19 +222,15 @@ public class AttachFileService {
             log.debug("file id : " +attachFileDTO.getFileId());
         }
 
-
         //xml파일에서 파일구분코드로 파일경로추가
         ub = xu.getUploadInfo("FileAttach.xml", fileDivCd);
         //dest(파일경로)/file_loc(divcd:04일 경우)jebo/2021/0415/file_name.확장자
         _rname=ub.getDest()+File.separator+attachFileDTO.getFileLoc()+File.separator+attachFileDTO.getFileNm();
 
-
-
         if(log.isDebugEnabled()){
 
             log.debug("download file name: " +_rname);
         }
-
 
         File file = null;
         // file에 파일경로 및 파일네임.확장자
@@ -312,7 +308,6 @@ public class AttachFileService {
 
         //response객체  return
         return  res.build();*/
-
 
         String fileName = URLEncoder.encode(_org_file_nm, "UTF-8");
         HttpHeaders header = new HttpHeaders();

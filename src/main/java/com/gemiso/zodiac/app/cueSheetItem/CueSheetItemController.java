@@ -114,7 +114,7 @@ public class CueSheetItemController {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
         String userId = userAuthService.authUser.getUserId();
-        log.info("CueSheet Item Create : userId - " + userId + " CueId - " + cueId + " CueItemDivCd - " + cueItemDivCd
+        log.info("CueSheet Item Update : userId - " + userId + " CueId - " + cueId + " CueItemDivCd - " + cueItemDivCd
                 + "CueItemId - " + cueItemId + "<br>" +
                 " CueSheet Item Model - " + cueSheetItemUpdateDTO.toString());
 

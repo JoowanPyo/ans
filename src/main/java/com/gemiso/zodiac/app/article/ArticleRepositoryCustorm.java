@@ -12,7 +12,7 @@ public interface ArticleRepositoryCustorm {
     Page<Article> findByArticleList(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
                         String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
                         List<String> apprvDivCdList, Integer deptCd, String artclCateCd, String artclTypDtlCd,
-                        String delYn, Long artclId, String copyYn, Pageable pageable);
+                        String delYn, Long artclId, String copyYn, Long orgArtclId, Pageable pageable);
 
     Page<Article> findByArticleIssue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd,
                                      String artclTypDtlCd, String artclCateCd, Integer deptCd, String inputrId,

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
 
@@ -19,14 +20,14 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"program"})
 @DynamicUpdate
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class BaseProgram {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="bas_pgmsch_id",length = 50, nullable = false )
+    @Column(name="bas_pgmsch_id", nullable = false )
     private Long basePgmschId;
 
     @Column(name = "bas_dt", length = 10/*, nullable = false*/)
@@ -164,7 +165,7 @@ public class BaseProgram {
     @Column(name = "brdc_run_time", length = 8)
     private String brdcRunTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brdc_pgm_id")
     private Program program;
 

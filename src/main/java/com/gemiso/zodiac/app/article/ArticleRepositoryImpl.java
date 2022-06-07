@@ -47,6 +47,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
                                            String delYn,
                                            Long artclId,
                                            String copyYn,
+                                           Long orgArtclId,
                                            Pageable pageable) {
 
         QArticle qArticle = QArticle.article;
@@ -146,6 +147,10 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
         //기사 아이디
         if (ObjectUtils.isEmpty(artclId) == false) {
             jpaQuery.where(qArticle.artclId.eq(artclId));
+        }
+        //원본기사 아이디
+        if (ObjectUtils.isEmpty(orgArtclId) == false){
+            jpaQuery.where(qArticle.orgArtclId.eq(orgArtclId));
         }
         //원본 기사 및 복사된 기사 검색조건
         if (copyYn != null && copyYn.trim().isEmpty() == false) {

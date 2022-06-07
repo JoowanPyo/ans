@@ -335,10 +335,24 @@ public class UserService {
         return userEntity.get();
     }
 
+    //삭제처리된 사용자인지 확인.
+    public User deleteChkUserFind(String userId){
+
+        User user = null;
+
+        Optional<User> userEntity = userRepository.findChkDeleteUser(userId);
+
+        if (userEntity.isPresent() == false){
+            return user;
+        }
+
+        return userEntity.get();
+    }
+
     public User userFindOrFail(String userId) {
         Optional<User> userEntity = userRepository.findByUserId(userId);
 
-        if (!userEntity.isPresent()){
+        if (userEntity.isPresent() == false){
             throw new ResourceNotFoundException("MisUser not found. userId : " + userId);
         }
 
