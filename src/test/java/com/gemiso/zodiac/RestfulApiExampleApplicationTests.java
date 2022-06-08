@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gemiso.zodiac.core.scheduling.BisInterfaceService;
 import com.gemiso.zodiac.core.topic.TopicService;
 import com.mysema.commons.lang.Assert;
-import jdk.nashorn.internal.parser.JSONParser;
-import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

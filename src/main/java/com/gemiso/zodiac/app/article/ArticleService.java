@@ -202,7 +202,7 @@ public class ArticleService {
     // 큐시트에서 기사 목록 조회
     public PageResultDTO<ArticleDTO, Article> findCue(Date sdate, Date edate, String searchWord, Long cueId,
                                                       String brdcPgmId, String artclTypCd,String artclTypDtlCd,
-                                                      String copyYn, Integer deptCd, Integer page, Integer limit) {
+                                                      String copyYn, Integer deptCd, Long orgArtclId, Integer page, Integer limit) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
@@ -212,7 +212,7 @@ public class ArticleService {
 
         //전체조회[page type]
         Page<Article> result = articleRepository.findByArticleCue(sdate, edate, searchWord, cueId,
-                brdcPgmId, artclTypCd,artclTypDtlCd, copyYn, deptCd, pageable);
+                brdcPgmId, artclTypCd,artclTypDtlCd, copyYn, deptCd, orgArtclId, pageable);
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
 
@@ -1866,12 +1866,13 @@ public class ArticleService {
         Article article = articleFindOrFail(artclId);
 
         String lckrId = article.getLckrId();
+        String lckrNm = article.getLckrNm();
         String lckYn = article.getLckYn();
 
         if ("Y".equals(lckYn)){
 
             if (userId.equals(lckrId) == false){
-                throw new ResourceNotFoundException(" 다른 사용자가 수정중 입니다.  수정중인 사용자 : "+lckrId);
+                throw new ResourceNotFoundException(" 다른 사용자가 수정중 입니다.  수정중인 사용자 : " + lckrNm+" ( "+lckrId+" )");
             }
 
         }

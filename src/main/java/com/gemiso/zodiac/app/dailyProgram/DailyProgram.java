@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.dailyProgram;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.baseProgram.BaseProgram;
 import com.gemiso.zodiac.app.program.Program;
 import lombok.*;
@@ -21,6 +22,7 @@ import javax.persistence.*;
 @Setter
 @ToString(exclude = {"program","baseProgram"})
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class DailyProgram{
 
     @Id

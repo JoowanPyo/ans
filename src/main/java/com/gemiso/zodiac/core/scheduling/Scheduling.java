@@ -57,9 +57,12 @@ public class Scheduling {
 
         log.info("Dailly Program Create Start");
 
+        //bis에서 프로그램 정보를 가져온다.
+        BisProgramDTO bisProgramDTO = bisInterfaceService.bisProgramfindAll();
+
         BisDailyScheduleDTO bisDailyScheduleDTO = bisInterfaceService.bisDailyScheduleFindAll();
 
-        bisInterfaceService.bisDailyScheduleCreate(bisDailyScheduleDTO);
+        bisInterfaceService.bisDailyScheduleCreate(bisDailyScheduleDTO, bisProgramDTO);
 
     }
 
@@ -71,9 +74,12 @@ public class Scheduling {
 
         log.info("Dailly Program Week Create Start");
 
+        //bis에서 프로그램 정보를 가져온다.
+        BisProgramDTO bisProgramDTO = bisInterfaceService.bisProgramfindAll();
+
         List<BisDailyScheduleDTO> bisDailyScheduleDTOList = bisInterfaceService.bisDailyScheduleFindAllFri();
 
-        bisInterfaceService.bisDailyScheduleCreateFri(bisDailyScheduleDTOList);
+        bisInterfaceService.bisDailyScheduleCreateFri(bisDailyScheduleDTOList, bisProgramDTO);
 
     }
 

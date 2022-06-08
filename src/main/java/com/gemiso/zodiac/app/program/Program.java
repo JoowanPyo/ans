@@ -1,12 +1,15 @@
 package com.gemiso.zodiac.app.program;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.gemiso.zodiac.app.dailyProgram.DailyProgram;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_brdc_pgm",
@@ -16,7 +19,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "dailyProgram")
 @DynamicUpdate
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Program {
@@ -98,7 +101,9 @@ public class Program {
    /* @OneToMany(mappedBy = "program")
     private List<CueSheetTemplate> cueSheetTemplate;*/
 
-    /*@OneToMany(mappedBy = "program")
+    //@OrderBy(value = "lnOrd ASC")
+    /*@OneToMany(mappedBy = "program", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JsonManagedReference
     private List<DailyProgram> dailyProgram;*/
 
     /*@OneToMany(mappedBy = "program")

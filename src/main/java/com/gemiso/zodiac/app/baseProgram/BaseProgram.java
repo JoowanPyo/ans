@@ -2,9 +2,7 @@ package com.gemiso.zodiac.app.baseProgram;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.program.Program;
-import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Formula;
 
@@ -20,7 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"program"})
+@ToString(exclude = "program")
 @DynamicUpdate
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class BaseProgram {

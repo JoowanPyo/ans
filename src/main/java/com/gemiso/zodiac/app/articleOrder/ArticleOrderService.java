@@ -43,11 +43,11 @@ public class ArticleOrderService {
 
 
 
-    public List<ArticleOrderDTO> findAll(Date sdate, Date edate,
-                                         String orderDivCd, String orderStatus, String workrId, String inputrId, Long artclId){
+    public List<ArticleOrderDTO> findAll(Date sdate, Date edate, String orderDivCd, String orderStatus, String workrId,
+                                         String inputrId, Long artclId, Long orgArtclId){
 
         //목록조회 조건 build
-        BooleanBuilder booleanBuilder = getSearch(sdate, edate, orderDivCd, orderStatus, workrId, inputrId, artclId);
+        BooleanBuilder booleanBuilder = getSearch(sdate, edate, orderDivCd, orderStatus, workrId, inputrId, artclId, orgArtclId);
 
         //조회조건으로 전체조회
         List<ArticleOrder> articleOrderList = (List<ArticleOrder>) articleOrderRepository.findAll(booleanBuilder,
@@ -165,8 +165,8 @@ public class ArticleOrderService {
     }
 
     //목록조회 조건 build
-    public BooleanBuilder getSearch(Date sdate, Date edate,
-                                    String orderDivCd, String orderStatus, String workrId, String inputrId, Long artclId){
+    public BooleanBuilder getSearch(Date sdate, Date edate, String orderDivCd, String orderStatus, String workrId,
+                                    String inputrId, Long artclId, Long orgArtclId){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -195,6 +195,10 @@ public class ArticleOrderService {
         //작업자 아이디로 조회
         if (ObjectUtils.isEmpty(artclId) == false) {
             booleanBuilder.and(qArticleOrder.article.artclId.eq(artclId));
+        }
+        //원본기사 아이디
+        if (ObjectUtils.isEmpty(orgArtclId) == false){
+            booleanBuilder.and(qArticleOrder.article.orgArtclId.eq(orgArtclId));
         }
 
         return booleanBuilder;

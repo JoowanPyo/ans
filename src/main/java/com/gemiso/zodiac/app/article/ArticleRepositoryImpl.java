@@ -277,7 +277,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
 
     @Override
     public Page<Article> findByArticleCue(Date sdate, Date edate, String searchWord, Long cueId, String brdcPgmId, String artclTypCd,
-                                          String artclTypDtlCd, String copyYn, Integer deptCd, Pageable pageable) {
+                                          String artclTypDtlCd, String copyYn, Integer deptCd, Long orgArtclId, Pageable pageable) {
 
 
         QArticle qArticle = QArticle.article;
@@ -325,6 +325,11 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
         //검색조건 = 부서 코드
         if (deptCd != null && deptCd != 0) {
             jpaQuery.where(qArticle.deptCd.eq(deptCd));
+        }
+
+        //원본기사 아이디
+        if (ObjectUtils.isEmpty(orgArtclId) == false){
+            jpaQuery.where(qArticle.orgArtclId.eq(orgArtclId));
         }
 
         //원본 기사 및 복사된 기사 검색조건

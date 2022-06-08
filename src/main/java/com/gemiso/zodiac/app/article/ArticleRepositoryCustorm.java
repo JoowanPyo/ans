@@ -20,5 +20,5 @@ public interface ArticleRepositoryCustorm {
                                      String searchWord, List<String> apprvDivCdList, Pageable pageable);
 
     Page<Article> findByArticleCue(Date sdate, Date edate, String searchWord, Long cueId, String brdcPgmId, String artclTypCd,
-                                   String artclTypDtlCd, String copyYn, Integer deptCd, Pageable pageable);
+                                   String artclTypDtlCd, String copyYn, Integer deptCd, Long orgArtclId, Pageable pageable);
 }

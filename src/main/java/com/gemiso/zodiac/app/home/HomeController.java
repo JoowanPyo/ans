@@ -67,15 +67,34 @@ public class HomeController {
 
     @Operation(summary = "홈화면 내기사 목록", description = "홈화면 내기사 목록")
     @GetMapping(path = "/myorder")
-    public AnsApiResponse<List<ArticleOrderDTO>> findMyOrder(@Parameter(name = "workrId", description = "작업자 아이디")
+    public AnsApiResponse<List<ArticleOrderDTO>> findMyOrder(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
+                                                             @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                             @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
+                                                             @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                             @Parameter(name = "workrId", description = "작업자 아이디")
                                                              @RequestParam(value = "workrId", required = false) String workrId,
                                                              @Parameter(name = "inputrId", description = "등록자 아이디")
-                                                             @RequestParam(value = "inputrId", required = false) String inputrId) {
+                                                             @RequestParam(value = "inputrId", required = false) String inputrId,
+                                                             @Parameter(name = "orgArtclId", description = "원본기사 아이디")
+                                                             @RequestParam(value = "orgArtclId", required = false) Long orgArtclId) throws Exception {
 
-        List<ArticleOrderDTO> articleOrderDTOList = articleOrderService.findAll(null, null,
-                null, null, workrId, inputrId, null);
+        List<ArticleOrderDTO> articleOrderDTOList = new ArrayList<>();
+
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
+
+            //날짜 파싱 startDate yyyy-MM-dd 00:00:00 , endDate yyyy-MM-dd 24:00:00
+            SearchDate searchDate = new SearchDate(sdate, edate);
+
+            articleOrderDTOList = articleOrderService.findAll(searchDate.getStartDate(), searchDate.getEndDate(),
+                    null, null, workrId, inputrId, null, orgArtclId);
+        } else {
+
+            articleOrderDTOList = articleOrderService.findAll(null, null,
+                    null, null, workrId, inputrId, null, orgArtclId);
+        }
 
         return new AnsApiResponse<>(articleOrderDTOList);
+
     }
 
     /*private final HomeService homeService;

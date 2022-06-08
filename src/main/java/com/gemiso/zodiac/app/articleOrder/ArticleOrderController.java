@@ -46,7 +46,9 @@ public class ArticleOrderController {
                                                          @Parameter(name = "inputrId", description = "등록자 아이디")
                                                          @RequestParam(value = "inputrId", required = false) String inputrId,
                                                          @Parameter(name = "artclId", description = "기사 아이디")
-                                                         @RequestParam(value = "artclId", required = false) Long artclId) throws Exception {
+                                                         @RequestParam(value = "artclId", required = false) Long artclId,
+                                                         @Parameter(name = "orgArtclId", description = "원본기사 아이디")
+                                                         @RequestParam(value = "orgArtclId", required = false) Long orgArtclId) throws Exception {
 
         List<ArticleOrderDTO> articleOrderDTOList = new ArrayList<>();
 
@@ -56,11 +58,11 @@ public class ArticleOrderController {
             SearchDate searchDate = new SearchDate(sdate, edate);
 
             articleOrderDTOList = articleOrderService.findAll(searchDate.getStartDate(), searchDate.getEndDate(),
-                    orderDivCd, orderStatus, workrId, inputrId, artclId);
+                    orderDivCd, orderStatus, workrId, inputrId, artclId, orgArtclId);
         } else {
 
             articleOrderDTOList = articleOrderService.findAll(null, null,
-                    orderDivCd, orderStatus, workrId, inputrId, artclId);
+                    orderDivCd, orderStatus, workrId, inputrId, artclId, orgArtclId);
         }
 
         return new AnsApiResponse<>(articleOrderDTOList);
@@ -84,7 +86,7 @@ public class ArticleOrderController {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        log.info(" Update Article Order : User Id - "+userId+" Order Id -"+articleOrderCreateDTO.toString());
+        log.info(" Update Article Order : User Id - " + userId + " Order Id -" + articleOrderCreateDTO.toString());
 
         ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();
 
@@ -104,7 +106,7 @@ public class ArticleOrderController {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        log.info(" Update Article Order : User Id - "+userId+" Order Id -"+articleOrderUpdateDTO.toString());
+        log.info(" Update Article Order : User Id - " + userId + " Order Id -" + articleOrderUpdateDTO.toString());
 
         ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();
 
@@ -124,7 +126,7 @@ public class ArticleOrderController {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        log.info(" Delete Article Order : User Id - "+userId+" Order Id -"+orderId);
+        log.info(" Delete Article Order : User Id - " + userId + " Order Id -" + orderId);
 
         articleOrderService.delete(orderId);
 
@@ -134,13 +136,13 @@ public class ArticleOrderController {
     @Operation(summary = "기사의뢰 상태 수정", description = "기사의뢰 상태 수정")
     @PutMapping(path = "/{orderId}/updatest")
     public AnsApiResponse<ArticleOrderResponseDTO> updateStatus(@Parameter(description = "필수값<br>", required = true)
-                                                          @RequestBody @Valid ArticleOrderStatusDTO articleOrderStatusDTO,
-                                                          @Parameter(name = "orderId", required = true, description = "의뢰 아이디")
-                                                          @PathVariable("orderId") Long orderId) {
+                                                                @RequestBody @Valid ArticleOrderStatusDTO articleOrderStatusDTO,
+                                                                @Parameter(name = "orderId", required = true, description = "의뢰 아이디")
+                                                                @PathVariable("orderId") Long orderId) {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
-        log.info(" Update Article Order : User Id - "+userId+" Order Status -"+articleOrderStatusDTO.getOrderStatus());
+        log.info(" Update Article Order : User Id - " + userId + " Order Status -" + articleOrderStatusDTO.getOrderStatus());
 
         ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();
 

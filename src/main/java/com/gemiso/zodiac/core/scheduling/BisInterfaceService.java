@@ -371,7 +371,7 @@ public class BisInterfaceService {
 
     }
 
-    public void bisDailyScheduleCreateFri(List<BisDailyScheduleDTO> bisDailyScheduleDTOList) throws ParseException {
+    public void bisDailyScheduleCreateFri(List<BisDailyScheduleDTO> bisDailyScheduleDTOList, BisProgramDTO bisProgramDTO) throws ParseException {
 
 
         for (BisDailyScheduleDTO bisDailyScheduleDTO : bisDailyScheduleDTOList) {
@@ -380,20 +380,20 @@ public class BisInterfaceService {
             List<DschWeekDTO> dschWeekDTOList = bisDailyScheduleDTO.getDsSchWeek();
 
 
-            createDailyProgram(dschWeekDTOList);
+            createDailyProgram(dschWeekDTOList, bisProgramDTO);
 
         }
 
     }
 
     //주간편성 조회조건 빌드
-    public BooleanBuilder getSearch(String nowDate){
+    public BooleanBuilder getSearch(String nowDate) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         QDailyProgram qDailyProgram = QDailyProgram.dailyProgram;
 
-        if (nowDate != null && nowDate.trim().isEmpty() == false){
+        if (nowDate != null && nowDate.trim().isEmpty() == false) {
 
             booleanBuilder.and(qDailyProgram.brdcDt.eq(nowDate));
         }
@@ -402,7 +402,7 @@ public class BisInterfaceService {
     }
 
     //Bis에서 조회한 주간편성 정보와 ANS에 이미 등록되어 있는 일일편성 정보와 비교하여 새로들어온 data가 있으면 재등록
-    public void bisDailyScheduleCreate(BisDailyScheduleDTO bisDailyScheduleDTO) throws ParseException {
+    public void bisDailyScheduleCreate(BisDailyScheduleDTO bisDailyScheduleDTO, BisProgramDTO bisProgramDTO) throws ParseException {
 
         //Bis에서 조회하여 담아온 DTO에서 데이터 주간편성 데이터 리스트를 가져온다.
         List<DschWeekDTO> dschWeekDTOList = bisDailyScheduleDTO.getDsSchWeek();
@@ -420,7 +420,7 @@ public class BisInterfaceService {
         //Ans등록되어 있는 일일편성이 없을 경우
         if (CollectionUtils.isEmpty(dailyProgramList)) {
             if (CollectionUtils.isEmpty(dschWeekDTOList) == false) { //ANS에 등록되어있는 일일편성이 없고, Bis에서 조회된 일일편성이 있을 경우
-                createDailyProgram(dschWeekDTOList);
+                createDailyProgram(dschWeekDTOList, bisProgramDTO);
             }
         }
 
@@ -461,7 +461,7 @@ public class BisInterfaceService {
     }
 
     //일일편성 신규등록
-    public void createDailyProgram(List<DschWeekDTO> dschWeekDTOList) throws ParseException {
+    public void createDailyProgram(List<DschWeekDTO> dschWeekDTOList,  BisProgramDTO bisProgramDTO) throws ParseException {
 
         for (DschWeekDTO dschWeekDTO : dschWeekDTOList) {
 
@@ -480,13 +480,15 @@ public class BisInterfaceService {
 
                 String endTime = getEndTime(broadRun, formatBoradHm);
 
+                Program program = findProgram(brdcPgmId, bisProgramDTO);
+
                 //기본편성 생성 및 업데이트 return value = 기본편성 아이디
-                Long basePgmId = createBaseProgram(boroadYmd, formatBoradHm, endTime, brdcPgmId);
+                Long basePgmId = createBaseProgram(boroadYmd, formatBoradHm, endTime, /*brdcPgmId*/program);
 
                 //기본편성 아이디 빌드
                 BaseProgram baseProgram = BaseProgram.builder().basePgmschId(basePgmId).build();
                 //방송프로그램 아이디 빌드
-                Program program = Program.builder().brdcPgmId(brdcPgmId).build();
+                //Program programEntity = Program.builder().brdcPgmId(brdcPgmId).build();
 
                 DailyProgram dailyProgram = DailyProgram.builder()
                         .brdcDt(boroadYmd) //방송일자
@@ -509,7 +511,57 @@ public class BisInterfaceService {
 
     }
 
-    public Long createBaseProgram(String boroadYmd, String formatBoradHm, String endTime, String brdcPgmId) throws ParseException {
+    public Program findProgram(String brdcPgmId, BisProgramDTO bisProgramDTO){
+
+        Optional<Program> programEntity = programRepository.findByProgramId(brdcPgmId);
+
+        Program program = new Program();
+
+        if (programEntity.isPresent() == false) {
+
+            //Bis에서 조회된 프로그램 정보 리스트를 받는다.
+            List<DsProgramDTO> dsProgramDTOList = bisProgramDTO.getDsProgram();
+
+            for (DsProgramDTO dsProgramDTO : dsProgramDTOList) {
+
+                String bisBrdcPgmId = dsProgramDTO.getPgmCd();
+                if (brdcPgmId.equals(bisBrdcPgmId)) {
+                    String chanTp = dsProgramDTO.getChanTp(); //Bis에서 조회된 채널정보 get
+                    String jenreClf1 = dsProgramDTO.getJenreClf1();//Bis에서 조회된 장르구분 get
+                    String productClf = dsProgramDTO.getProductClf();//Bis에서 조회된 제작구분 get
+
+                    //채널유형 01:TV 02:라디오
+                    String chDivCd = getChannelCd(chanTp);
+                    //장르구분 100 보도, 200:교양, 300:오락
+                    String gneDivCd = getGenreCd(jenreClf1);
+                    //제작구분 100:자체제작, 200:외주제작, 300:국내구매, 400:해외구매, 500리패키지, 999:기타
+                    String prdDivCd = getProduceCd(productClf);
+
+                    program = Program.builder()
+                            .brdcPgmId(dsProgramDTO.getPgmCd())//프로그램 아이디
+                            .brdcPgmNm(dsProgramDTO.getPgmNm())//프로그램 명
+                            .chDivCd(chDivCd)//채널구분
+                            .gneDivCd(gneDivCd)//장르구분
+                            .prdDivCd(prdDivCd)//제작구분
+                            /*.inputrId(userId)*/
+                            .build();
+
+                    programRepository.save(program);
+
+                    log.debug("Program Create sucess By Base Program : program Id -" + program.getBrdcPgmId());
+                    return program;
+                }
+            }
+
+        } else {
+             return programEntity.get();
+        }
+
+
+        return program;
+    }
+
+    public Long createBaseProgram(String boroadYmd, String formatBoradHm, String endTime, Program program) throws ParseException {
 
         //방송일자로 요일 구하기
         Date ymd = dateChangeHelper.StringToDateNoTime(boroadYmd);
@@ -520,34 +572,36 @@ public class BisInterfaceService {
         Integer dayOfWeekNumber = calendar.get(Calendar.DAY_OF_WEEK);
         String day = formatDayCd(dayOfWeekNumber); // 1 - 7 까지 나온 요일숫자를 String 형식의 월~일 로 변환
 
-        //기본편성
+        String brdcPgmId = program.getBrdcPgmId();
 
         //프로그램 아이디, 시작날짜, 요일로 검색조건 [ 같은 기본편성이 있는지 확인 ]
         Optional<BaseProgram> baseProgramEntity = baseProgramRepository.findByBasePropram(brdcPgmId, formatBoradHm);
 
         //검색조건으로 조회한 기본편성이 있을경우 리턴, 없을경우 생성.
-        if (baseProgramEntity.isPresent()){
+        if (baseProgramEntity.isPresent()) {
+
             BaseProgram baseProgram = baseProgramEntity.get();
-
             return baseProgram.getBasePgmschId();
-        }else {
 
-            Program program = Program.builder().brdcPgmId(brdcPgmId).build();
+        } else {
 
-            BaseProgram baseProgram = BaseProgram.builder()
-                    .brdcStartClk(formatBoradHm)
-                    .brdcEndClk(endTime)
-                    .brdcDay("")//day - 2022-05-10 성민효과장님이 배제하라고함
-                    .program(program)
-                    .build();
+        Program programEntity = Program.builder().brdcPgmId(brdcPgmId).build();
 
-            baseProgramRepository.save(baseProgram);
-
-            return baseProgram.getBasePgmschId();
-        }
+        BaseProgram baseProgram = BaseProgram.builder()
+                .brdcStartClk(formatBoradHm)
+                .brdcEndClk(endTime)
+                .brdcDay("")//day - 2022-05-10 성민효과장님이 배제하라고함
+                .program(programEntity)
+                .build();
 
 
+        baseProgramRepository.save(baseProgram);
+
+        return baseProgram.getBasePgmschId();
     }
+
+
+}
 
     //Ans 일일편성 재등록.
     public void regenerateDailyProgram(List<DailyProgram> dailyProgramList, List<DschWeekDTO> dschWeekDTOList) throws ParseException {
@@ -575,7 +629,7 @@ public class BisInterfaceService {
                 String endTime = getEndTime(broadRun, formatBoradHm);
 
                 //기본편성 생성 및 업데이트 return value = 기본편성 아이디
-                Long basePgmId = createBaseProgram(boroadYmd, formatBoradHm, endTime, brdcPgmId);
+                Long basePgmId = createBaseProgram(boroadYmd, formatBoradHm, endTime, /*brdcPgmId*/null);
 
                 //기본편성 아이디 빌드
                 BaseProgram baseProgram = BaseProgram.builder().basePgmschId(basePgmId).build();
