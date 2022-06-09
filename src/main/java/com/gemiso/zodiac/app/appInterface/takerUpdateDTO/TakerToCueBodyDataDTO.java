@@ -6,19 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TakerToCueBodyDTO {
+public class TakerToCueBodyDataDTO {
 
-    private Long cue_id;
-    private List<TakerToCueBodyDataDTO> body;
-    /*@NotNull
+    @NotNull
     private Long rd_id;
     private String playout_id;
-    private String status; // play and cue*/
-
+    private String status; // play and cue
 }

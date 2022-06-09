@@ -16,7 +16,7 @@ import java.util.concurrent.TimeoutException;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class TopicService {
+public class TopicSendService {
 
     @Value("${topic.routing-key:routiongKey}")
     private String routingKey;

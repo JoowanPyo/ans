@@ -27,7 +27,7 @@ public class InterfaceFilter implements Filter {
         String excludePattern = ",/interface,/interface/dailypgm,/interface/cuesheet,/interface/code,/interface/mediatransrate" +
                 ",/interface/getmstlistservice,/interface/getcuesheetservice,/interface/pstakerlist,/interface/pstaker," +
                 "/interface/takerrefresh,/interface/mediatransfer/updatestate,/interface/cuestcdupdate,/interface/takersetcue," +
-                "/interface/smamfindcue,/interface/smamfindallcue";
+                "/interface/smamfindcue,/interface/smamfindallcue,/interface/homepagecd";
         excludedUrls = Arrays.asList(excludePattern.split(","));
     }
 

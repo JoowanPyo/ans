@@ -42,8 +42,6 @@ import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
-import com.gemiso.zodiac.app.facilityManage.FacilityManage;
-import com.gemiso.zodiac.app.facilityManage.FacilityManageRepository;
 import com.gemiso.zodiac.app.facilityManage.FacilityManageService;
 import com.gemiso.zodiac.app.facilityManage.dto.FacilityManageDTO;
 import com.gemiso.zodiac.app.issue.Issue;
@@ -54,7 +52,6 @@ import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.tagArticle.ArticleTag;
 import com.gemiso.zodiac.app.tagArticle.ArticleTagRepository;
-import com.gemiso.zodiac.app.tagArticle.ArticleTagService;
 import com.gemiso.zodiac.app.tagArticle.dto.ArticleTagDTO;
 import com.gemiso.zodiac.app.tagArticle.mapper.ArticleTagMapper;
 import com.gemiso.zodiac.app.user.QUser;
@@ -65,13 +62,16 @@ import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuthRepository;
 import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
 import com.gemiso.zodiac.app.userGroupUser.UserGroupUserRepository;
 import com.gemiso.zodiac.core.enumeration.*;
+import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.helper.EncodingHelper;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.helper.PageHelper;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.service.ProcessArticleFix;
 import com.gemiso.zodiac.core.service.UserAuthChkService;
-import com.gemiso.zodiac.core.topic.TopicService;
+import com.gemiso.zodiac.core.topic.ArticleTopicService;
+import com.gemiso.zodiac.core.topic.InterfaceTopicService;
+import com.gemiso.zodiac.core.topic.TopicSendService;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.ArticleTopicDTO;
 import com.gemiso.zodiac.exception.PasswordFailedException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -79,12 +79,9 @@ import com.gemiso.zodiac.exception.UserFailException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -93,7 +90,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
-import springfox.documentation.spring.web.json.Json;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -148,8 +144,11 @@ public class ArticleService {
     private final PasswordEncoder passwordEncoder;
 
     private final MarshallingJsonHelper marshallingJsonHelper;
+    private final DateChangeHelper dateChangeHelper;
 
-    private final TopicService topicService;
+    //private final TopicSendService topicSendService;
+    private final ArticleTopicService articleTopicService;
+    private final InterfaceTopicService interfaceTopicService;
     private final LboxService lboxService;
 
     //기사 목록조회
@@ -280,7 +279,10 @@ public class ArticleService {
         createArticleCap(articleCapDTOS, articleId, articleHistId);//기사자막 create
         createAnchorCap(anchorCapDTOS, articleId, articleHistId);//앵커자막 create.
 
-        ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
+
+        //send topic
+        articleTopicService.articleCreateSendTopic(articleId);
+        /*ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
         articleTopicDTO.setEventId("AC");
         //이부분은 안보내줘도 될듯
         articleTopicDTO.setArtclId(articleId);
@@ -288,7 +290,7 @@ public class ArticleService {
         //String json = marshallingJson(articleTopicDTO);
         //System.out.println(json);
 
-        topicService.topicWeb(json);
+        topicSendService.topicWeb(json);*/
 
         return articleId;
     }
@@ -336,14 +338,15 @@ public class ArticleService {
         anchorCapUpdate(article, articleUpdateDTO, articleHistId);
 
         //MQ메세지 전송
-        sendTopic("Aarticle Update", artclId);
+        articleTopicService.articleTopic("Aarticle Update", artclId);
+        /*sendTopic("Aarticle Update", artclId);*/
 
 
     }
 
 
     //MQ메세지 전송
-    public void sendTopic(String eventId, Long artclId) throws JsonProcessingException {
+    /*public void sendTopic(String eventId, Long artclId) throws JsonProcessingException {
 
         //토픽메세지 ArticleTopicDTO Json으로 변환후 send
         ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
@@ -351,9 +354,9 @@ public class ArticleService {
         articleTopicDTO.setArtclId(artclId);
         String json = marshallingJsonHelper.MarshallingJson(articleTopicDTO);
 
-        topicService.topicWeb(json);
+        topicSendService.topicWeb(json);
 
-    }
+    }*/
 
     //원본 기사일 경우, fix_none 상태에서 수정할 시, fix_none상태의 사본기사 내용도 수정된다.
     public void updateCopyArticle(Article article, String userId, ArticleUpdateDTO articleUpdateDTO) throws Exception {
@@ -398,7 +401,8 @@ public class ArticleService {
 
                         Long artclId = updateCopyArticle.getArtclId();
                         //MQ메세지 전송
-                        sendTopic("CopyAarticle Update", artclId);
+                        articleTopicService.articleTopic("CopyAarticle Update", artclId);
+                        //sendTopic("CopyAarticle Update", artclId);
                     }
                 }
 
@@ -666,8 +670,11 @@ public class ArticleService {
         //기사이력 등록.
         updateArticleHist(article);
 
+        //MQ메세지 전송
+        articleTopicService.articleTopic("Aarticle Delete", artclId);
+
         //토픽메세지 ArticleTopicDTO Json으로 변환후 send
-        ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
+       /* ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
         articleTopicDTO.setEventId("AD");
         articleTopicDTO.setArtclId(artclId);
         //모델부분은 안넣어줘도 될꺼같음.
@@ -677,10 +684,10 @@ public class ArticleService {
         Long orgArticleId = article.getOrgArtclId();
 
         //복사된 기사(큐시트에 포함된 기사)인 경우 interface쪽에도 큐메세지 send
-        /*if (ObjectUtils.isEmpty(orgArticleId) == false){
+        *//*if (ObjectUtils.isEmpty(orgArticleId) == false){
             topicService.topicInterface(json);
-        }*/
-        topicService.topicWeb(json);
+        }*//*
+        topicSendService.topicWeb(json);*/
     }
 
     //기사가 삭제될때 포함된 미디어정보도 같이 삭제처리 ( delYn = "Y")
@@ -1519,20 +1526,27 @@ public class ArticleService {
         //기사 이력 create
         //Long articleHistId = createArticleHist(article);
 
+        User user = userService.userFindOrFail(userId);
+        String userNm = user.getUserNm();
+
+        //MQ메세지 전송
+        articleTopicService.articleLockTopic("Article Lock", artclId, " Lock User Name : " +userNm+" ( "+userId+" )");
+
         //토픽메세지 ArticleTopicDTO Json으로 변환후 send
-        ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
+        /*ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
         articleTopicDTO.setEventId("Article Lock");
         articleTopicDTO.setArtclId(artclId);
         //모델부분은 안넣어줘도 될꺼같음.
         articleTopicDTO.setArticle(articleLockDTO);
-        String json = marshallingJsonHelper.MarshallingJson(articleTopicDTO);
+        String json = marshallingJsonHelper.MarshallingJson(articleTopicDTO);*/
 
         Long orgArticleId = article.getOrgArtclId();
 
         if (artclId.equals(orgArticleId) == false) {
-            topicService.topicInterface(json);
+            //topicSendService.topicInterface(json);
+            interfaceTopicService.articleLock("Article Lock", artclId);
         }
-        topicService.topicWeb(json);
+        //topicSendService.topicWeb(json);
 
         log.info("Article Lock : UserId : " + userId + "Lock Value : " + lockYn);
 
@@ -1543,6 +1557,9 @@ public class ArticleService {
     public void articleUnlock(Long artclId, ArticleLockDTO articleLockDTO, String userId) throws Exception {
 
         Article article = articleFindOrFail(artclId); //기사아이디로 기사정보조회 및 기사유무 확인.
+
+        User user = userService.userFindOrFail(userId);
+        String userNm = user.getUserNm();
 
         String locMessage = "";
         String locAction = "";
@@ -1559,6 +1576,9 @@ public class ArticleService {
         articleRepository.save(article);
 
         articleActionLogLock(article, userId, locMessage, locAction);//기사 액션 로그 등록
+
+        //MQ메세지 전송
+        articleTopicService.articleLockTopic("Article UnLock", artclId, " Unlock User Name : " +userNm+" ( "+userId+" )");
 
     }
 
@@ -2063,7 +2083,8 @@ public class ArticleService {
 
                             Long updateArtclId = updateCopyArticle.getArtclId();
                             //MQ메세지 전송
-                            sendTopic("CopyAarticle Update", updateArtclId);
+                            articleTopicService.articleTopic("CopyAarticle Update", updateArtclId);
+                            //sendTopic("CopyAarticle Update", updateArtclId);
 
                         }/*else {
 
@@ -2464,6 +2485,42 @@ public class ArticleService {
                 .build();
 
         return articleAuthConfirmDTO;
+
+    }
+
+    //기사 락이 6시간이상 걸려있는 기사 체크후 락 해제
+    public void articleLockChk(){
+
+        /*Date nowDate = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(nowDate);
+
+        cal.add(Calendar.HOUR, -6);
+
+        Date formatDate = cal.getTime();*/
+
+        //현재시간에서 -6시간 뺀 Date값을 가져온다
+        Date formatDate = dateChangeHelper.LockChkTime();
+
+        List<Article> articleList = articleRepository.findLockChkList(formatDate, "Y");
+
+        for (Article article : articleList){
+
+            Long artclId = article.getArtclId();
+            String lckrNm = article.getLckrNm();
+            String lckrId = article.getLckrId();
+
+            ArticleDTO articleDTO = articleMapper.toDto(article);
+            articleDTO.setLckYn("N");
+            articleDTO.setLckDtm(null);
+            articleDTO.setLckrId(null);
+
+            articleMapper.updateFromDto(articleDTO, article);
+            articleRepository.save(article);
+
+            log.info("Article UnLock From Server. Article Id : "+ artclId+" Lock User Name : "+lckrNm+" ( "+lckrId+" )");
+        }
 
     }
 

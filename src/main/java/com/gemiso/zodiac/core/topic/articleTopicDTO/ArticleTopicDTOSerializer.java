@@ -21,8 +21,8 @@ public class ArticleTopicDTOSerializer extends JsonSerializer<ArticleTopicDTO> {
         gen.writeFieldName("artclId");
         gen.writeString(String.valueOf(value.getArtclId()));
 
-        gen.writeFieldName("article");
-        gen.writeString(String.valueOf(value.getArticle()));
+        //gen.writeFieldName("article");
+        //gen.writeString(String.valueOf(value.getArticle()));
 
         gen.writeEndObject();
     }

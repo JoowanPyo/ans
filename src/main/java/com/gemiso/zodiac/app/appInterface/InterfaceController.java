@@ -16,6 +16,8 @@ import com.gemiso.zodiac.app.article.dto.ArticleCreateDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleDeleteConfirmDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
+import com.gemiso.zodiac.app.code.CodeService;
+import com.gemiso.zodiac.app.code.dto.CodeDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetFindAllDTO;
@@ -48,6 +50,7 @@ public class InterfaceController {
     private final InterfaceService interfaceService;
 
     private final CueSheetService cueSheetService;
+    private final CodeService codeService;
     private final CueSheetItemService cueSheetItemService;
 
 
@@ -473,7 +476,6 @@ public class InterfaceController {
         }
 
 
-
         return new AnsApiResponse<>(cueSheetDTOList);
     }
 
@@ -487,11 +489,26 @@ public class InterfaceController {
 
         CueSheetDTO cueSheetDTO = cueSheetService.find(cueId);
 
-        if ("Y".equals(articleYn)){
+        if ("Y".equals(articleYn)) {
 
             cueSheetDTO = interfaceService.getCueSheetItemArticle(cueSheetDTO);
         }
 
         return new AnsApiResponse<>(cueSheetDTO);
+    }
+
+    @Operation(summary = "홈페이지 코드( 카테고리 코드 ) 조회", description = "홈페이지 코드( 카테고리 코드 ) 조회")
+    @GetMapping(path = "/homepagecd")
+    public AnsApiResponse<List<CodeDTO>> homePageCd(@Parameter(name = "hrnkCdId", description = "카테고리 조회 코드( value : categories )")
+                                                    @RequestParam(value = "hrnkCdId", required = false) String hrnkCdId,
+                                                    @RequestHeader(value = "securityKey") String securityKey) {
+
+
+        List<String> hrnkCdIds = new ArrayList<>();
+        hrnkCdIds.add(hrnkCdId);
+
+        List<CodeDTO> codeDTOList = codeService.findAll(null, "Y", hrnkCdIds);
+
+        return new AnsApiResponse<>(codeDTOList);
     }
 }

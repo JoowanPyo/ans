@@ -10,6 +10,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 import javax.persistence.LockModeType;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +43,12 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Queryds
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select a from Article a where a.artclId=:artclId and a.delYn = 'N'")
     Optional<Article> findLockArticle(@Param("artclId") Long artclId);
+
+    @Query("select a from Article a where a.lckrId =:userId and a.lckYn =:lckYn and a.delYn = 'N'")
+    List<Article> findLockArticleList(@Param("userId") String userId, @Param("lckYn") String lckYn);
+
+    @Query("select a from Article a where a.lckDtm <:formatDate and a.lckYn =:lckYn ")
+    List<Article> findLockChkList(@Param("formatDate") Date formatDate, @Param("lckYn")String lckYn);
 
 
 }

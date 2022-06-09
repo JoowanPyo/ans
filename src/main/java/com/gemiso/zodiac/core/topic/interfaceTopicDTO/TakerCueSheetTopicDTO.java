@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.core.topic.articleTopicDTO;
+package com.gemiso.zodiac.core.topic.interfaceTopicDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

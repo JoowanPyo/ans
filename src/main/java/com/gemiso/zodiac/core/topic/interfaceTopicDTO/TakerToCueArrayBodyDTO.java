@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.core.topic.articleTopicDTO;
+package com.gemiso.zodiac.core.topic.interfaceTopicDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,13 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TakerToCueMqDTO {
+public class TakerToCueArrayBodyDTO {
 
-    private String eventId;
-    private Long cueId;
-    private int cueVer;
-    private int cueOderVer;
-    private Long artclId;
     private Long cueItemId;
     private String status;
 }

@@ -258,14 +258,14 @@ public class AttachFileService {
         response.setContentType(mimeType);
 
         //다운로드시 한글깨짐 방지처리, msie타입 지정
-        /*String browser = getBrowser(request);*/
+        String browser = getBrowser(request);
 
         //원본파일 아이디(원래값)
         String _org_file_nm = attachFileDTO.getOrgFileNm();
         String encodedFilename = "";
 
         //다운로드시 한글깨짐 방지처리
-        /*if (browser.equals("MSIE")) {
+        if (browser.equals("MSIE")) {
             encodedFilename = URLEncoder.encode(_org_file_nm, "UTF-8").replaceAll("\\+", "%20");
             log.info(encodedFilename + " 최종 받아질 파일 이름 MSIE에서 테스트  ."  );
         } else if (browser.equals("Trident")) { // IE11 문자열 깨짐 방지
@@ -276,38 +276,57 @@ public class AttachFileService {
         } else if (browser.equals("Opera")) {
             encodedFilename = "\"" + new String(_org_file_nm.getBytes("UTF-8"), "8859_1") + "\"";
         } else if (browser.equals("Chrome")) {
-            encodedFilename = "\"" + new String(_org_file_nm.getBytes("UTF-8"), "8859_1") + "\"";
+			/*StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < _org_file_nm.length(); i++) {
+				char c = _org_file_nm.charAt(i);
+				if (c > '~') {
+					sb.append(URLEncoder.encode("" + c, "UTF-8"));
+				} else {
+					sb.append(c);
+				}
+			}
+			/*
+			 * 정규식 변환.
+			 * 한글, 영어, 숫자, 한자 외 문자 _(언더바)로 replace 했습니다.
+			 */
+//			encodedFilename = new String(_org_file_nm.getBytes("UTF-8"),"ISO-8859-1");
+            encodedFilename = _org_file_nm;
 
+            encodedFilename = removeExtension(encodedFilename);
+            String _file_ext = cutExtension(_org_file_nm);
+
+            String RegularExpression =  "^[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9一-龥\\s]*$";
+            StringBuffer stringbuffer = new StringBuffer();
+            for(int i = 0; i < encodedFilename.length() ; i++ ) {
+                char c = encodedFilename.charAt(i);
+                if(Character.toString(c).matches(RegularExpression)) {
+                    stringbuffer = stringbuffer.append(c);
+                } else {
+                    stringbuffer = stringbuffer.append('_');
+                }
+            }
+
+            //encodedFilename.replace(".", "_");
+
+            encodedFilename = stringbuffer.toString()+"."+_file_ext;
         } else if (browser.equals("Safari")) {
             encodedFilename = "\"" + new String(_org_file_nm.getBytes("UTF-8"), "8859_1") + "\"";
             encodedFilename = URLDecoder.decode(encodedFilename);
         }
         else {
             encodedFilename = "\"" + new String(_org_file_nm.getBytes("UTF-8"), "8859_1") + "\"";
-        }*/
+        }
+
+        log.info("[browser: " + browser + "][org_file_nm: " + _org_file_nm + "][encodedFilename: " + encodedFilename + "][mimeType: " + mimeType + "]");
+        log.info("lencodedFilename : " + encodedFilename + " : regularExpressioned ");
 
         //log.info("[browser: " + browser + "][org_file_nm: " + _org_file_nm + "][encodedFilename: " + encodedFilename + "][mimeType: " + mimeType + "]");
 
         //수정중중
-       /*log.info("lencodedFilename : " + encodedFilename + " : regularExpressioned ");
+       log.info("lencodedFilename : " + encodedFilename + " : regularExpressioned ");
 
-        String fileName = URLEncoder.encode(_org_file_nm, "UTF-8");
+        //String fileName = URLEncoder.encode(_org_file_nm, "UTF-8");
 
-        //Content-Disposition "attachment; filename="+encodedFilename
-        //response.setHeader("Content-Disposition", dispositionPrefix + encodedFilename);
-        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-
-        //File(_rname).length
-        response.setContentLength((int) file.length());
-
-        InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
-
-        FileCopyUtils.copy(inputStream, response.getOutputStream());
-
-        ResponseBuilder res = Response.ok((Object) file);
-
-        //response객체  return
-        return  res.build();*/
 
         String fileName = URLEncoder.encode(_org_file_nm, "UTF-8");
         HttpHeaders header = new HttpHeaders();
@@ -325,6 +344,19 @@ public class AttachFileService {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .body(resource);
 
+    }
+
+    public static String removeExtension(String s) {
+        String returnValue = null;
+        if (s != null) {
+            int index = s.lastIndexOf('.');
+            if (index != -1) {
+                returnValue = s.substring(0, index);
+            } else {
+                returnValue = s;
+            }
+        }
+        return returnValue;
     }
 
     public boolean isMakeDir(String sdir)
@@ -357,7 +389,7 @@ public class AttachFileService {
 
     public String getBrowser(HttpServletRequest request) {
 
-        String header = request.getHeader("MisUser-Agent");
+        String header = request.getHeader("user-agent");
 
         log.info("MisUser-Agent: " + header);
 

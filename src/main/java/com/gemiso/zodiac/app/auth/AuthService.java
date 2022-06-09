@@ -3,12 +3,20 @@ package com.gemiso.zodiac.app.auth;
 import com.gemiso.zodiac.app.appAuth.AppAuth;
 import com.gemiso.zodiac.app.appAuth.dto.AppAuthUserDTO;
 import com.gemiso.zodiac.app.appAuth.mapper.AppAuthUserMapper;
+import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.article.ArticleRepository;
+import com.gemiso.zodiac.app.article.dto.ArticleDTO;
+import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
 import com.gemiso.zodiac.app.auth.dto.AuthDTO;
 import com.gemiso.zodiac.app.auth.dto.AuthRequestDTO;
 import com.gemiso.zodiac.app.auth.dto.JwtDTO;
 import com.gemiso.zodiac.app.auth.dto.UserTokenDTO;
 import com.gemiso.zodiac.app.auth.mapper.AuthMapper;
 import com.gemiso.zodiac.app.auth.mapper.UserTokenMapper;
+import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
+import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserRepository;
 import com.gemiso.zodiac.app.user.UserService;
@@ -56,11 +64,15 @@ public class AuthService {
     private final AuthRepository authRepository;
     private final UserGroupUserRepository userGroupUserRepository;
     private final UserGroupAuthRepository userGroupAuthRepository;
+    private final ArticleRepository articleRepository;
+    private final CueSheetRepository cueSheetRepository;
 
     private final UserMapper userMapper;
     private final UserTokenMapper userTokenMapper;
     private final AuthMapper authMapper;
     private final AppAuthUserMapper appAuthUserMapper;
+    private final ArticleMapper articleMapper;
+    private final CueSheetMapper cueSheetMapper;
 
     private final PasswordEncoder passwordEncoder;
     private final JWTBuilder jwtBuilder;
@@ -247,6 +259,33 @@ public class AuthService {
         authDTO.setToken(null);
         Auth authEntity = authMapper.toEntity(authDTO);
         authRepository.save(authEntity);
+
+        /************로그아웃시 큐시트, 기사에 락이 걸려있으면 언락 시켜준다. ************/
+        List<Article> articleList = articleRepository.findLockArticleList(userId, "Y");
+
+        for (Article article : articleList){
+
+            ArticleDTO articleDTO = articleMapper.toDto(article);
+            articleDTO.setLckDtm(null);
+            articleDTO.setLckrId(null);
+            articleDTO.setLckYn("N");
+
+            articleMapper.updateFromDto(articleDTO, article);
+            articleRepository.save(article);
+        }
+
+        List<CueSheet> cueSheetList = cueSheetRepository.findLockCueList(userId, "Y");
+
+        for (CueSheet cueSheet : cueSheetList){
+
+            CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
+            cueSheetDTO.setLckDtm(null);
+            cueSheetDTO.setLckrId(null);
+            cueSheetDTO.setLckYn("N");
+
+            cueSheetMapper.updateFromDto(cueSheetDTO, cueSheet);
+            cueSheetRepository.save(cueSheet);
+        }
 
     }
 

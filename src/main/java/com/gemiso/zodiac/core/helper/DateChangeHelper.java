@@ -6,6 +6,7 @@ import org.springframework.util.ObjectUtils;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 @Component
@@ -96,5 +97,22 @@ public class DateChangeHelper {
         }
 
         return returnDate;
+    }
+
+    //Lock체크시 사용
+    //현재시간에서 -6시간 빼기
+    public Date LockChkTime(){
+
+        Date nowDate = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(nowDate);
+
+        cal.add(Calendar.HOUR, -6);
+
+        Date formatDate = cal.getTime();
+
+        return formatDate;
+
     }
 }

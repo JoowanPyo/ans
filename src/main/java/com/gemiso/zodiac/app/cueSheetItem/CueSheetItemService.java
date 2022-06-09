@@ -1,33 +1,22 @@
 package com.gemiso.zodiac.app.cueSheetItem;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.ArticleRepository;
 import com.gemiso.zodiac.app.article.ArticleService;
-import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
-import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
-import com.gemiso.zodiac.app.articleActionLog.ArticleActionLog;
 import com.gemiso.zodiac.app.articleActionLog.ArticleActionLogRepository;
 import com.gemiso.zodiac.app.articleActionLog.ArticleActionLogService;
-import com.gemiso.zodiac.app.articleActionLog.dto.ArticleActionLogDTO;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
-import com.gemiso.zodiac.app.articleHist.ArticleHist;
-import com.gemiso.zodiac.app.articleHist.ArticleHistService;
-import com.gemiso.zodiac.app.articleHist.dto.ArticleHistDTO;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
-import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
-import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
-import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
@@ -59,7 +48,6 @@ import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaMapper;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplateService;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
-import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItemRepository;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItemService;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.CueTmpltItemCap;
 import com.gemiso.zodiac.app.cueSheetTemplateMedia.CueTmpltMedia;
@@ -71,15 +59,14 @@ import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
-import com.gemiso.zodiac.core.topic.TopicService;
-import com.gemiso.zodiac.core.topic.articleTopicDTO.TakerCueSheetTopicDTO;
-import com.gemiso.zodiac.core.topic.articleTopicDTO.WebTopicDTO;
+import com.gemiso.zodiac.core.topic.CueSheetTopicService;
+import com.gemiso.zodiac.core.topic.TopicSendService;
+import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerCueSheetTopicDTO;
+import com.gemiso.zodiac.core.topic.cueSheetTopicDTO.CueSheetWebTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Where;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -87,8 +74,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
 import java.util.*;
 
 @Service
@@ -129,11 +114,13 @@ public class CueSheetItemService {
 
     private final CueSheetService cueSheetService;
     private final CueTmpltItemService cueTmpltItemService;
-    private final TopicService topicService;
+    //private final TopicSendService topicSendService;
+    private final CueSheetTopicService cueSheetTopicService;
     private final LboxService lboxService;
     private final CueSheetTemplateService cueSheetTemplateService;
     private final ArticleActionLogService articleActionLogService;
     private final ArticleService articleService;
+
     //private final UserAuthService userAuthService;
 
     private final MarshallingJsonHelper marshallingJsonHelper;
@@ -225,7 +212,7 @@ public class CueSheetItemService {
             cueItemId = cueSheetTemplate.getCueTmpltId();
         }
 
-        sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Create CueSheetItem",
+        cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Create CueSheetItem",
                 spareYn, "Y", "Y");
 
         return cueItemId;//return 큐시트 아이템 아이디
@@ -273,7 +260,7 @@ public class CueSheetItemService {
 
         cueSheet = addCueVer(cueSheet);
 
-        sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Update CueSheetItem-NonArticle",
+        cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Update CueSheetItem-NonArticle",
                 spareYn, "Y", "N");
     }
 
@@ -326,7 +313,7 @@ public class CueSheetItemService {
 
         cueSheet = addCueVer(cueSheet);
 
-        sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Update CueSheetItem-Article",
+        cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Update CueSheetItem-Article",
                 spareYn, "Y", "N");
     }
 
@@ -404,7 +391,7 @@ public class CueSheetItemService {
 
         cueSheet = addCueVer(cueSheet);
 
-        sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Update CueSheetItem-Article",
+        cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Update CueSheetItem-Article",
                 spareYn, "Y", "Y");
     }
 
@@ -565,27 +552,56 @@ public class CueSheetItemService {
             cueSheetTemplateEntity = cueSheetTemplateService.cueSheetTemplateFindOrFail(cueTmpltId);
         }
 
-        CueSheetItem cueSheetItemEntity = CueSheetItem.builder()
-                .cueItemTitl(cueTmpltItem.getCueItemTitl())
-                .cueItemTitlEn(cueTmpltItem.getCueItemTitlEn())
-                .cueItemCtt(cueTmpltItem.getCueItemCtt())
-                .cueItemOrd(cueTmpltItem.getCueItemOrd())
-                .cueItemOrdCd(cueTmpltItem.getCueItemOrdCd())
-                .cueItemTime(cueTmpltItem.getCueItemTime())
-                .cueItemFrmCd(cueTmpltItem.getCueItemFrmCd())
-                .cueItemDivCd(cueTmpltItem.getCueItemDivCd())
-                //.brdcStCd(cueTmpltItem.)
-                .lckYn(cueTmpltItem.getLckYn())
-                .delYn(cueTmpltItem.getDelYn())
-                .delDtm(cueTmpltItem.getDelDtm())
-                .lckDtm(cueTmpltItem.getLckDtm())
-                .mediaChCd(cueTmpltItem.getMediaChCd())
-                .mediaDurtn(cueTmpltItem.getMediaDurtn())
-                .inputrId(userId)
-                .spareYn(spareYn)
-                .cueSheet(cueSheet)
-                .cueSheetTemplate(cueSheetTemplateEntity)
-                .build();
+        CueSheetItem cueSheetItemEntity = null;
+
+        if ("Y".equals(spareYn)) {
+            cueSheetItemEntity = CueSheetItem.builder()
+                    .cueItemTitl(cueTmpltItem.getCueItemTitl())
+                    .cueItemTitlEn(cueTmpltItem.getCueItemTitlEn())
+                    .cueItemCtt(cueTmpltItem.getCueItemCtt())
+                    .cueItemOrd(cueTmpltItem.getCueItemOrd())
+                    .cueItemOrdCd(cueTmpltItem.getCueItemOrdCd())
+                    .cueItemTime(cueTmpltItem.getCueItemTime())
+                    .cueItemFrmCd(cueTmpltItem.getCueItemFrmCd())
+                    .cueItemDivCd(cueTmpltItem.getCueItemDivCd())
+                    //.brdcStCd(cueTmpltItem.)
+                    .lckYn(cueTmpltItem.getLckYn())
+                    .delYn(cueTmpltItem.getDelYn())
+                    .delDtm(cueTmpltItem.getDelDtm())
+                    .lckDtm(cueTmpltItem.getLckDtm())
+                    .mediaChCd(cueTmpltItem.getMediaChCd())
+                    .mediaDurtn(cueTmpltItem.getMediaDurtn())
+                    .inputrId(userId)
+                    .spareYn(spareYn)
+                    .cueSheet(cueSheet)
+                    .cueSheetTemplate(cueSheetTemplateEntity)
+                    .rmk(userId)
+                    .build();
+        }else {
+
+            cueSheetItemEntity = CueSheetItem.builder()
+                    .cueItemTitl(cueTmpltItem.getCueItemTitl())
+                    .cueItemTitlEn(cueTmpltItem.getCueItemTitlEn())
+                    .cueItemCtt(cueTmpltItem.getCueItemCtt())
+                    .cueItemOrd(cueTmpltItem.getCueItemOrd())
+                    .cueItemOrdCd(cueTmpltItem.getCueItemOrdCd())
+                    .cueItemTime(cueTmpltItem.getCueItemTime())
+                    .cueItemFrmCd(cueTmpltItem.getCueItemFrmCd())
+                    .cueItemDivCd(cueTmpltItem.getCueItemDivCd())
+                    //.brdcStCd(cueTmpltItem.)
+                    .lckYn(cueTmpltItem.getLckYn())
+                    .delYn(cueTmpltItem.getDelYn())
+                    .delDtm(cueTmpltItem.getDelDtm())
+                    .lckDtm(cueTmpltItem.getLckDtm())
+                    .mediaChCd(cueTmpltItem.getMediaChCd())
+                    .mediaDurtn(cueTmpltItem.getMediaDurtn())
+                    .inputrId(userId)
+                    .spareYn(spareYn)
+                    .cueSheet(cueSheet)
+                    .cueSheetTemplate(cueSheetTemplateEntity)
+                    .build();
+
+        }
 
         cueSheetItemRepository.save(cueSheetItemEntity);
 
@@ -746,46 +762,91 @@ public class CueSheetItemService {
 
         CueSheet cueSheet = CueSheet.builder().cueId(cueId).build();
 
-        CueSheetItem cueSheetItemEntity = CueSheetItem.builder()
-                .cueItemTitl(cueSheetItem.getCueItemTitl())
-                .cueItemTitlEn(cueSheetItem.getCueItemTitlEn())
-                .cueItemCtt(cueSheetItem.getCueItemCtt())
-                .cueItemOrd(cueSheetItem.getCueItemOrd())
-                .cueItemOrdCd(cueSheetItem.getCueItemOrdCd())
-                .cueItemTime(cueSheetItem.getCueItemTime())
-                .cueItemFrmCd(cueSheetItem.getCueItemFrmCd())
-                .cueItemDivCd(cueSheetItem.getCueItemDivCd())
-                .brdcStCd(cueSheetItem.getBrdcStCd())
-                .brdcClk(cueSheetItem.getBrdcClk())
-                .chrgrId(cueSheetItem.getChrgrId())
-                .chrgrNm(cueSheetItem.getChrgrNm())
-                .artclCapStCd(cueSheetItem.getArtclCapStCd())
-                .cueArtclCapChgYn(cueSheetItem.getCueArtclCapChgYn())
-                .cueArtclCapChgDtm(cueSheetItem.getCueArtclCapChgDtm())
-                .cueArtclCapStCd(cueSheetItem.getCueArtclCapStCd())
-                .rmk(cueSheetItem.getRmk())
-                .lckYn(cueSheetItem.getLckYn())
-                .delYn(cueSheetItem.getDelYn())
-                .delDtm(cueSheetItem.getDelDtm())
-                .lckDtm(cueSheetItem.getLckDtm())
-                .cueItemTypCd(cueSheetItem.getCueItemTypCd())
-                .mediaChCd(cueSheetItem.getMediaChCd())
-                .cueItemBrdcDtm(cueSheetItem.getCueItemBrdcDtm())
-                .capChgYn(cueSheetItem.getCapChgYn())
-                .capChgDtm(cueSheetItem.getCapChgDtm())
-                .capStCd(cueSheetItem.getCapStCd())
-                .artclStCd(cueSheetItem.getArtclStCd())
-                .mediaDurtn(cueSheetItem.getMediaDurtn())
-                .newsBreakYn(cueSheetItem.getNewsBreakYn())
-                .inputrId(userId)
-                .artclTop(cueSheetItem.getArtclTop())
-                .headLn(cueSheetItem.getHeadLn())
-                .artclRef(cueSheetItem.getArtclRef())
-                .spareYn(spareYn)
-                .cueSheet(cueSheet)
-                .article(article)
-                .cueSheetTemplate(cueSheetTemplate)
-                .build();
+        CueSheetItem cueSheetItemEntity = null;
+
+        if ("Y".equals(spareYn)) {
+            cueSheetItemEntity = CueSheetItem.builder()
+                    .cueItemTitl(cueSheetItem.getCueItemTitl())
+                    .cueItemTitlEn(cueSheetItem.getCueItemTitlEn())
+                    .cueItemCtt(cueSheetItem.getCueItemCtt())
+                    .cueItemOrd(cueSheetItem.getCueItemOrd())
+                    .cueItemOrdCd(cueSheetItem.getCueItemOrdCd())
+                    .cueItemTime(cueSheetItem.getCueItemTime())
+                    .cueItemFrmCd(cueSheetItem.getCueItemFrmCd())
+                    .cueItemDivCd(cueSheetItem.getCueItemDivCd())
+                    .brdcStCd(cueSheetItem.getBrdcStCd())
+                    .brdcClk(cueSheetItem.getBrdcClk())
+                    .chrgrId(cueSheetItem.getChrgrId())
+                    .chrgrNm(cueSheetItem.getChrgrNm())
+                    .artclCapStCd(cueSheetItem.getArtclCapStCd())
+                    .cueArtclCapChgYn(cueSheetItem.getCueArtclCapChgYn())
+                    .cueArtclCapChgDtm(cueSheetItem.getCueArtclCapChgDtm())
+                    .cueArtclCapStCd(cueSheetItem.getCueArtclCapStCd())
+                    .rmk(userId)
+                    .lckYn(cueSheetItem.getLckYn())
+                    .delYn(cueSheetItem.getDelYn())
+                    .delDtm(cueSheetItem.getDelDtm())
+                    .lckDtm(cueSheetItem.getLckDtm())
+                    .cueItemTypCd(cueSheetItem.getCueItemTypCd())
+                    .mediaChCd(cueSheetItem.getMediaChCd())
+                    .cueItemBrdcDtm(cueSheetItem.getCueItemBrdcDtm())
+                    .capChgYn(cueSheetItem.getCapChgYn())
+                    .capChgDtm(cueSheetItem.getCapChgDtm())
+                    .capStCd(cueSheetItem.getCapStCd())
+                    .artclStCd(cueSheetItem.getArtclStCd())
+                    .mediaDurtn(cueSheetItem.getMediaDurtn())
+                    .newsBreakYn(cueSheetItem.getNewsBreakYn())
+                    .inputrId(userId)
+                    .artclTop(cueSheetItem.getArtclTop())
+                    .headLn(cueSheetItem.getHeadLn())
+                    .artclRef(cueSheetItem.getArtclRef())
+                    .spareYn(spareYn)
+                    .cueSheet(cueSheet)
+                    .article(article)
+                    .cueSheetTemplate(cueSheetTemplate)
+                    .build();
+        }else {
+            cueSheetItemEntity = CueSheetItem.builder()
+                    .cueItemTitl(cueSheetItem.getCueItemTitl())
+                    .cueItemTitlEn(cueSheetItem.getCueItemTitlEn())
+                    .cueItemCtt(cueSheetItem.getCueItemCtt())
+                    .cueItemOrd(cueSheetItem.getCueItemOrd())
+                    .cueItemOrdCd(cueSheetItem.getCueItemOrdCd())
+                    .cueItemTime(cueSheetItem.getCueItemTime())
+                    .cueItemFrmCd(cueSheetItem.getCueItemFrmCd())
+                    .cueItemDivCd(cueSheetItem.getCueItemDivCd())
+                    .brdcStCd(cueSheetItem.getBrdcStCd())
+                    .brdcClk(cueSheetItem.getBrdcClk())
+                    .chrgrId(cueSheetItem.getChrgrId())
+                    .chrgrNm(cueSheetItem.getChrgrNm())
+                    .artclCapStCd(cueSheetItem.getArtclCapStCd())
+                    .cueArtclCapChgYn(cueSheetItem.getCueArtclCapChgYn())
+                    .cueArtclCapChgDtm(cueSheetItem.getCueArtclCapChgDtm())
+                    .cueArtclCapStCd(cueSheetItem.getCueArtclCapStCd())
+                    .rmk(cueSheetItem.getRmk())
+                    .lckYn(cueSheetItem.getLckYn())
+                    .delYn(cueSheetItem.getDelYn())
+                    .delDtm(cueSheetItem.getDelDtm())
+                    .lckDtm(cueSheetItem.getLckDtm())
+                    .cueItemTypCd(cueSheetItem.getCueItemTypCd())
+                    .mediaChCd(cueSheetItem.getMediaChCd())
+                    .cueItemBrdcDtm(cueSheetItem.getCueItemBrdcDtm())
+                    .capChgYn(cueSheetItem.getCapChgYn())
+                    .capChgDtm(cueSheetItem.getCapChgDtm())
+                    .capStCd(cueSheetItem.getCapStCd())
+                    .artclStCd(cueSheetItem.getArtclStCd())
+                    .mediaDurtn(cueSheetItem.getMediaDurtn())
+                    .newsBreakYn(cueSheetItem.getNewsBreakYn())
+                    .inputrId(userId)
+                    .artclTop(cueSheetItem.getArtclTop())
+                    .headLn(cueSheetItem.getHeadLn())
+                    .artclRef(cueSheetItem.getArtclRef())
+                    .spareYn(spareYn)
+                    .cueSheet(cueSheet)
+                    .article(article)
+                    .cueSheetTemplate(cueSheetTemplate)
+                    .build();
+        }
 
         cueSheetItemRepository.save(cueSheetItemEntity);
 
@@ -850,14 +911,31 @@ public class CueSheetItemService {
         //큐시트아이디 큐시트엔티티로 빌드 :: 큐시트아이템에 큐시트 아이디set해주기 위해
         //CueSheet cueSheet = CueSheet.builder().cueId(cueId).build();
         //큐시트아이템create 빌드
-        CueSheetItem cueSheetItem = CueSheetItem.builder()
-                .cueSheet(cueSheet)
-                .cueItemOrd(cueItemOrd)
-                .cueItemDivCd(cueItemDivCd)
-                .inputrId(userId)
-                .article(copyArtcl)
-                .spareYn(spareYn)//예비큐시트 값
-                .build();
+
+        CueSheetItem cueSheetItem = null;
+
+        if ("Y".equals(spareYn)) {
+            cueSheetItem = CueSheetItem.builder()
+                    .cueSheet(cueSheet)
+                    .cueItemOrd(cueItemOrd)
+                    .cueItemDivCd(cueItemDivCd)
+                    .inputrId(userId)
+                    .article(copyArtcl)
+                    .spareYn(spareYn)//예비큐시트 값
+                    .rmk(userId)
+                    .build();
+        }else{
+
+            cueSheetItem = CueSheetItem.builder()
+                    .cueSheet(cueSheet)
+                    .cueItemOrd(cueItemOrd)
+                    .cueItemDivCd(cueItemDivCd)
+                    .inputrId(userId)
+                    .article(copyArtcl)
+                    .spareYn(spareYn)//예비큐시트 값
+                    .build();
+
+        }
 
 
         //빌드된 큐시트아이템 등록
@@ -874,7 +952,7 @@ public class CueSheetItemService {
         //String cueItemDivCd = cueSheetItem.getCueItemDivCd();
         /************ MQ messages *************/
 
-        sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, null, "Create CueSheetItem",
+        cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, null, "Create CueSheetItem",
                 spareYn, "Y", "Y");
 
     }
@@ -917,7 +995,7 @@ public class CueSheetItemService {
 
         cueSheet = addCueVer(cueSheet);
 
-        sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Update SpareCueSheetItem",
+        cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Update SpareCueSheetItem",
                 spareYn, "Y", "N");
 
         return cueSheetItemSimpleDTO;
@@ -1021,7 +1099,7 @@ public class CueSheetItemService {
         }
         //String spareYn = cueSheetItem.getSpareYn();
 
-        sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, null, "Restore CueSheetItem",
+        cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, null, "Restore CueSheetItem",
                 spareYn, "Y", "Y");
 
         return cueSheetItemSimpleDTO;
@@ -1826,7 +1904,7 @@ public class CueSheetItemService {
         articleRepository.save(article); //기사 삭제 플레그 N으로 수정등록
     }
 
-    //큐시트 토픽 메세지 전송
+   /* //큐시트 토픽 메세지 전송
     public void sendCueTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
                                    String spareYn, String prompterFlag, String videoTakerFlag) throws JsonProcessingException {
 
@@ -1846,22 +1924,22 @@ public class CueSheetItemService {
         String json = marshallingJsonHelper.MarshallingJson(takerCueSheetTopicDTO);
 
         //interface에 큐메세지 전송
-        topicService.topicInterface(json);
+        topicSendService.topicInterface(json);
 
 
-        WebTopicDTO webTopicDTO = new WebTopicDTO();
-        webTopicDTO.setEventId(eventId);
-        webTopicDTO.setCueId(cueId);
-        webTopicDTO.setCueItemId(cueItemId);
-        webTopicDTO.setArtclId(artclId);
-        webTopicDTO.setCueVer(cueSheet.getCueVer());
-        webTopicDTO.setCueOderVer(cueSheet.getCueOderVer());
-        webTopicDTO.setSpareYn(spareYn);
-        String webJson = marshallingJsonHelper.MarshallingJson(webTopicDTO);
+        CueSheetWebTopicDTO cueSheetWebTopicDTO = new CueSheetWebTopicDTO();
+        cueSheetWebTopicDTO.setEventId(eventId);
+        cueSheetWebTopicDTO.setCueId(cueId);
+        cueSheetWebTopicDTO.setCueItemId(cueItemId);
+        cueSheetWebTopicDTO.setArtclId(artclId);
+        cueSheetWebTopicDTO.setCueVer(cueSheet.getCueVer());
+        cueSheetWebTopicDTO.setCueOderVer(cueSheet.getCueOderVer());
+        cueSheetWebTopicDTO.setSpareYn(spareYn);
+        String webJson = marshallingJsonHelper.MarshallingJson(cueSheetWebTopicDTO);
         //web에 큐메세지 전송
-        topicService.topicWeb(webJson);
+        topicSendService.topicWeb(webJson);
 
-    }
+    }*/
 
     //큐시트아이템 순서 update
     public void ordUpdateDrop(CueSheetItem cueSheetItem, Long cueId, Integer cueItemOrd, String spareYn) {

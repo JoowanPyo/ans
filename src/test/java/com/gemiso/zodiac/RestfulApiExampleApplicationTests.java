@@ -2,7 +2,7 @@ package com.gemiso.zodiac;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gemiso.zodiac.core.scheduling.BisInterfaceService;
-import com.gemiso.zodiac.core.topic.TopicService;
+import com.gemiso.zodiac.core.topic.TopicSendService;
 import com.mysema.commons.lang.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +65,7 @@ class RestfulApiExampleApplicationTests {
 
     @Test
     void topicTest() throws IOException, TimeoutException {
-        TopicService topicService = new TopicService();
+        TopicSendService topicSendService = new TopicSendService();
 
         while (true)
         {

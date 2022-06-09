@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.core.scheduling;
 
+import com.gemiso.zodiac.app.article.ArticleService;
+import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.core.mis.MisService;
 import com.gemiso.zodiac.core.scheduling.dto.BisDailyScheduleDTO;
 import com.gemiso.zodiac.core.scheduling.dto.BisProgramDTO;
@@ -20,6 +22,8 @@ public class Scheduling {
 
     private final BisInterfaceService bisInterfaceService;
     private final MisService misService;
+    private final ArticleService articleService;
+    private final CueSheetService cueSheetService;
 
     //BIS프로그램 조회 및 등록
     @Scheduled(cron = "0 0 5 * * ?")//매일 새벽 5시에 한번씩
@@ -102,6 +106,22 @@ public class Scheduling {
         log.info("Mis User Create Start");
 
         misService.findUser();
+
+    }
+
+    //@Scheduled(cron = "0 * * * * *")
+    //@Scheduled(cron = "0 0 0/1 * * *")//한시간마다
+    public void cueSheetLockScheduled(){
+
+        cueSheetService.cueSheetLockChk();
+
+    }
+
+    //@Scheduled(cron = "0 0 0/1 * * *")//한시간마다
+    //@Scheduled(cron = "0 * * * * *")
+    public void articleLockScheduled(){
+
+        articleService.articleLockChk();
 
     }
 

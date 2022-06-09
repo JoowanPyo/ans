@@ -51,6 +51,10 @@ public class PrompterProgramDTO {
     @XmlElement(name="cue_id")
     private Long cueId; // 방송 상태값
 
+    @XmlElement(name="article_count")
+    private Integer articleCount; // 방송 상태값
+
+
 
 
     /*@XmlElement(name="CS_SPEND_TIME")

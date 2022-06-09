@@ -20,9 +20,9 @@ import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
-import com.gemiso.zodiac.core.topic.TopicService;
-import com.gemiso.zodiac.core.topic.articleTopicDTO.TakerCueSheetTopicDTO;
-import com.gemiso.zodiac.core.topic.articleTopicDTO.WebTopicDTO;
+import com.gemiso.zodiac.core.topic.TopicSendService;
+import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerCueSheetTopicDTO;
+import com.gemiso.zodiac.core.topic.cueSheetTopicDTO.CueSheetWebTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +58,7 @@ public class ArticleMediaService {
 
     //private final UserAuthService userAuthService;
 
-    private final TopicService topicService;
+    private final TopicSendService topicSendService;
 
     private final MarshallingJsonHelper marshallingJsonHelper;
 
@@ -177,20 +177,20 @@ public class ArticleMediaService {
             String interfaceJson = marshallingJsonHelper.MarshallingJson(takerCueSheetTopicDTO);
 
             //interface에 큐메세지 전송
-            topicService.topicInterface(interfaceJson);
+            topicSendService.topicInterface(interfaceJson);
         }
 
-        WebTopicDTO webTopicDTO = new WebTopicDTO();
-        webTopicDTO.setEventId("Article Media Create");
-        webTopicDTO.setCueId(cueId);
-        webTopicDTO.setCueItemId(cueItemId);
-        webTopicDTO.setArtclId(artclId);
-        webTopicDTO.setCueVer(cueVer);
-        webTopicDTO.setCueOderVer(cueOderVer);
-        webTopicDTO.setSpareYn(spareYn);
-        String webJson = marshallingJsonHelper.MarshallingJson(webTopicDTO);
+        CueSheetWebTopicDTO cueSheetWebTopicDTO = new CueSheetWebTopicDTO();
+        cueSheetWebTopicDTO.setEventId("Article Media Create");
+        cueSheetWebTopicDTO.setCueId(cueId);
+        cueSheetWebTopicDTO.setCueItemId(cueItemId);
+        cueSheetWebTopicDTO.setArtclId(artclId);
+        cueSheetWebTopicDTO.setCueVer(cueVer);
+        cueSheetWebTopicDTO.setCueOderVer(cueOderVer);
+        cueSheetWebTopicDTO.setSpareYn(spareYn);
+        String webJson = marshallingJsonHelper.MarshallingJson(cueSheetWebTopicDTO);
         //web에 큐메세지 전송
-        topicService.topicWeb(webJson);
+        topicSendService.topicWeb(webJson);
 
     }
 

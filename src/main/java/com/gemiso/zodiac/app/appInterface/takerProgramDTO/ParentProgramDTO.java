@@ -97,5 +97,8 @@ public class ParentProgramDTO {
     private String endpgmYn; // new 몬지모름.
     @XmlElement(name="cue_id")
     private Long cueId; //큐시트 아이디
+    @XmlElement(name="article_count")
+    private Integer articleCount; //큐시트 아이디
+
 
 }

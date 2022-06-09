@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.core.topic.articleTopicDTO;
+package com.gemiso.zodiac.core.topic.cueSheetTopicDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CueSheetTopicDTO {
+public class CueSheetTakerTopicDTO {
 
     private String eventId;
     private Long cueId;

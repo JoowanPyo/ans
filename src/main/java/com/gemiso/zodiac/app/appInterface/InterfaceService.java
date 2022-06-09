@@ -3,7 +3,6 @@ package com.gemiso.zodiac.app.appInterface;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
-import com.gemiso.zodiac.app.anchorCap.AnchorCapService;
 import com.gemiso.zodiac.app.appInterface.codeDTO.*;
 import com.gemiso.zodiac.app.appInterface.mediaTransferDTO.MediaTransferDTO;
 import com.gemiso.zodiac.app.appInterface.prompterCueDTO.*;
@@ -22,12 +21,11 @@ import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramResultDTO;
 import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerCdUpdateDTO;
 import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerToCueBodyDTO;
+import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerToCueBodyDataDTO;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
-import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
-import com.gemiso.zodiac.app.articleCap.ArticleCapService;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
@@ -38,13 +36,11 @@ import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
-import com.gemiso.zodiac.app.cueSheet.dto.CueSheetFindAllDTO;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
-import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
@@ -59,9 +55,11 @@ import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
 import com.gemiso.zodiac.core.helper.ListSortHelper;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
-import com.gemiso.zodiac.core.topic.TopicService;
-import com.gemiso.zodiac.core.topic.articleTopicDTO.TakerToCueMqDTO;
-import io.swagger.models.auth.In;
+import com.gemiso.zodiac.core.topic.InterfaceTopicService;
+import com.gemiso.zodiac.core.topic.TopicSendService;
+import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerToCueArrayBodyDTO;
+import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerToCueTopicArrayDTO;
+import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerToCueTopicDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -69,7 +67,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import javax.xml.bind.annotation.XmlElement;
 import java.text.ParseException;
 import java.util.*;
 
@@ -97,7 +94,8 @@ public class InterfaceService {
     private final DateChangeHelper dateChangeHelper;
     private final MarshallingJsonHelper marshallingJsonHelper;
 
-    private final TopicService topicService;
+    private final InterfaceTopicService interfaceTopicService;
+    private final TopicSendService topicSendService;
 
 
 
@@ -308,6 +306,7 @@ public class InterfaceService {
                 .rdEdtYn("") //수정.
                 .endpgmYn("") //수정.
                 .cueId(cueSheet.getCueId())
+                .articleCount(cueSheet.getArticleCount())
                 .build();
 
         return pcsDto;
@@ -970,8 +969,9 @@ public class InterfaceService {
 
             String delYn = cueSheetMedia.getDelYn(); //엔티티 조회로 인해 연관관계 미디어쪽 삭제 플레그를 검출하지않고 출력
             String mediaTypeCd = cueSheetMedia.getMediaTypCd();
+            String trnsfStCd = cueSheetMedia.getTrnsfStCd();
 
-            if ("N".equals(delYn) && "media_typ_001".equals(mediaTypeCd)) {
+            if ("N".equals(delYn) && "media_typ_001".equals(mediaTypeCd) && "match_completed".equals(trnsfStCd)) {
                 //테이커 비디오 정보 빌드
                 TakerCueSheetVideoClipDTO takerCueSheetVideoDTO = TakerCueSheetVideoClipDTO.builder()
                         .title(cueSheetMedia.getCueMediaTitl()) //미디어 제목
@@ -1018,8 +1018,9 @@ public class InterfaceService {
 
             String delYn = articleMedia.getDelYn();
             String mediaTypeCd = articleMedia.getMediaTypCd();
+            String trnsfStCd = articleMedia.getTrnsfStCd();
 
-            if ("N".equals(delYn) && "media_typ_001".equals(mediaTypeCd)) {
+            if ("N".equals(delYn) && "media_typ_001".equals(mediaTypeCd) && "match_completed".equals(trnsfStCd)) {
 
                 //테이커 비디오 정보 빌드
                 TakerCueSheetVideoClipDTO takerCueSheetVideoDTO = TakerCueSheetVideoClipDTO.builder()
@@ -1235,6 +1236,7 @@ public class InterfaceService {
                 .brdcStCd(cueSheet.getCueStCd())
                 .rdEditYn("")
                 .cueId(cueSheet.getCueId())
+                .articleCount(cueSheet.getArticleCount())
                 .build();
         return program;
     }
@@ -2003,15 +2005,17 @@ public class InterfaceService {
 
         ParentProgramDTO parentProgramDTO = cueToTaker(cueSheetDTO);
 
-        //클로아이언트로 MQ메세지 전송
-        TakerToCueMqDTO takerToCueMqDTO = new TakerToCueMqDTO();
-        takerToCueMqDTO.setEventId("CueSheet cueStCd "+cueStCd+" update");
-        //takerToCueMqDTO.setCueItemId(rdId);
-        takerToCueMqDTO.setCueId(cueId);
 
-        String json = marshallingJsonHelper.MarshallingJson(takerToCueMqDTO);
+        interfaceTopicService.cueStatusUpdate(cueId, cueStCd);
+        /*//클로아이언트로 MQ메세지 전송
+        TakerToCueTopicDTO takerToCueTopicDTO = new TakerToCueTopicDTO();
+        takerToCueTopicDTO.setEventId("CueSheet cueStCd "+cueStCd+" update");
+        //takerToCueTopicDTO.setCueItemId(rdId);
+        takerToCueTopicDTO.setCueId(cueId);
 
-        topicService.topicWeb(json);
+        String json = marshallingJsonHelper.MarshallingJson(takerToCueTopicDTO);
+
+        topicSendService.topicWeb(json);*/
 
         return parentProgramDTO;
     }
@@ -2019,21 +2023,24 @@ public class InterfaceService {
     //방송중 테이커 큐시트 동기화
     public void takerSetCue(TakerToCueBodyDTO takerToCueBodyDTO) throws JsonProcessingException {
 
-        Long rdId = takerToCueBodyDTO.getRd_id();
+        interfaceTopicService.takerStatusUpdate(takerToCueBodyDTO);
+
+
+      /*  Long rdId = takerToCueBodyDTO.getRd_id();
         Long cueId = takerToCueBodyDTO.getCue_id();
         String status = takerToCueBodyDTO.getStatus();
 
         CueSheetItem cueSheetItem = cueSheetItemService.cueItemFindOrFail(rdId);
 
-        TakerToCueMqDTO takerToCueMqDTO = new TakerToCueMqDTO();
-        takerToCueMqDTO.setEventId("CueSheetItem Start From The Taker");
-        takerToCueMqDTO.setCueItemId(rdId);
-        takerToCueMqDTO.setCueId(cueId);
-        takerToCueMqDTO.setStatus(status);
+        TakerToCueTopicDTO takerToCueTopicDTO = new TakerToCueTopicDTO();
+        takerToCueTopicDTO.setEventId("CueSheetItem Start From The Taker");
+        takerToCueTopicDTO.setCueItemId(rdId);
+        takerToCueTopicDTO.setCueId(cueId);
+        takerToCueTopicDTO.setStatus(status);
 
-        String json = marshallingJsonHelper.MarshallingJson(takerToCueMqDTO);
+        String json = marshallingJsonHelper.MarshallingJson(takerToCueTopicDTO);
 
-        topicService.topicWeb(json);
+        topicService.topicWeb(json);*/
     }
 
     //큐시트 아이템중 기사아이템만 get
