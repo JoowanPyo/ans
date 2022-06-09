@@ -1195,7 +1195,9 @@ public class ArticleService {
     }
 
     //기사 오더락 체크[다른 사용자가 기사 수정중일 경우 수정 불가.]
-    public Boolean chkOrderLock(Long artclId, String userId) {
+    public ArticleAuthConfirmDTO chkOrderLock(Long artclId, String userId) {
+
+        ArticleAuthConfirmDTO articleAuthConfirmDTO = null;
 
         Article article = articleFindOrFail(artclId); //해당 기사 조회.
 
@@ -1203,11 +1205,26 @@ public class ArticleService {
         String lckrId = article.getLckrId();
         //String userId = userAuthService.authUser.getUserId();
 
-        if (lckYn.equals("Y") && userId.equals(lckrId) == false) {
+        /*if (lckYn.equals("Y") && userId.equals(lckrId) == false) {
             return true;
+        }*/
+
+        if (lckYn.equals("Y") && userId.equals(lckrId) == false) {
+            articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
+                    .artclId(article.getArtclId())
+                    .lckYn(article.getLckYn())
+                    .lckDtm(article.getLckDtm())
+                    .lckrId(article.getLckrId())
+                    .lckrNm(article.getLckrNm())
+                    .msg("다른 사용자가 수정중 입니다.")
+                    .authCode("Locked article")
+                    .httpStatus(HttpStatus.METHOD_NOT_ALLOWED)
+                    .build();
+
+            return articleAuthConfirmDTO;
         }
 
-        return false;
+        return articleAuthConfirmDTO;
 
     }
 

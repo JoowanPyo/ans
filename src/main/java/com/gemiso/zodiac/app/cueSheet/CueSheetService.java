@@ -691,13 +691,15 @@ public class CueSheetService {
 
         String brdcDt = cueSheetCreateDTO.getBrdcDt();
 
+        String brdcStartTime = cueSheetCreateDTO.getBrdcStartTime();
+
         ProgramSimpleDTO program = cueSheetCreateDTO.getProgram();
 
         if (ObjectUtils.isEmpty(program) == false){
 
             String brdcPgmId = program.getBrdcPgmId();
 
-            cueCnt = cueSheetRepository.findCueProgram(brdcDt, brdcPgmId);
+            cueCnt = cueSheetRepository.findCueProgram(brdcDt, brdcPgmId, brdcStartTime);
 
         }
 
@@ -712,7 +714,7 @@ public class CueSheetService {
 
         if (brdcPgmId != null && brdcPgmId.trim().isEmpty() == false){
 
-            cueCnt = cueSheetRepository.findCueProgram(brdcDt, brdcPgmId);
+            cueCnt = cueSheetRepository.findCueProgram2(brdcDt, brdcPgmId);
 
         }
 

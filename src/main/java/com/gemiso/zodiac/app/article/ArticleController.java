@@ -202,7 +202,7 @@ public class ArticleController {
 
     @Operation(summary = "기사 수정", description = "기사 수정")
     @PutMapping(path = "/{artclId}")
-    public AnsApiResponse<ArticleSimpleDTO> update(@Parameter(description = "필수값<br> ", required = true)
+    public AnsApiResponse<?> update(@Parameter(description = "필수값<br> ", required = true)
                                                    @RequestBody @Valid ArticleUpdateDTO articleUpdateDTO,
                                                    @Parameter(name = "artclId", required = true, description = "기사 아이디")
                                                    @PathVariable("artclId") Long artclId) throws Exception {
@@ -212,8 +212,10 @@ public class ArticleController {
                 " Article Model -" + articleUpdateDTO);
 
         //수정. 잠금사용자확인
-        if (articleService.chkOrderLock(artclId, userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND); //해당기사 잠금여부가 Y일 경우 NOT_FOUND EXPCEPTION.
+        ArticleAuthConfirmDTO articleAuthConfirmDTO = articleService.chkOrderLock(artclId, userId);
+
+        if (ObjectUtils.isEmpty(articleAuthConfirmDTO) == false){
+            return new AnsApiResponse<>(articleAuthConfirmDTO);
         }
 
         articleService.update(articleUpdateDTO, artclId, userId);
