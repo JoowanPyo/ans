@@ -163,11 +163,11 @@ public class CueSheetController {
                 "<br>" + "CueSheet Model - " + cueSheetOrderLockDTO.toString());
 
 
-        cueSheetService.cueSheetOrderLock(cueSheetOrderLockDTO, cueId, userId);
+        CueSheetDTO cueSheetDTO = cueSheetService.cueSheetOrderLock(cueSheetOrderLockDTO, cueId, userId);
 
         //큐시트 오더락 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
-        CueSheetDTO cueSheetDTO = new CueSheetDTO();
-        cueSheetDTO.setCueId(cueId);
+        /*CueSheetDTO cueSheetDTO = new CueSheetDTO();
+        cueSheetDTO.setCueId(cueId);*/
 
         return new AnsApiResponse<>(cueSheetDTO);
 

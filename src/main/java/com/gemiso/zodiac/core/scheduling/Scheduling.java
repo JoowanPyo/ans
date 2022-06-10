@@ -118,7 +118,7 @@ public class Scheduling {
     }
 
     //@Scheduled(cron = "0 0 0/1 * * *")//한시간마다
-    //@Scheduled(cron = "0 * * * * *")
+    //@Scheduled(cron = "30 * * * * *")
     public void articleLockScheduled(){
 
         articleService.articleLockChk();

@@ -876,7 +876,7 @@ public class CueSheetService {
     }
     
     //큐시트 락
-    public void cueSheetOrderLock(CueSheetOrderLockDTO cueSheetOrderLockDTO, Long cueId, String userId) throws JsonProcessingException {
+    public CueSheetDTO cueSheetOrderLock(CueSheetOrderLockDTO cueSheetOrderLockDTO, Long cueId, String userId) throws JsonProcessingException {
 
         Optional<CueSheet> cueSheetEntity = cueSheetRepository.findCueLock(cueId);
 
@@ -917,6 +917,15 @@ public class CueSheetService {
 
         //sendCueTopic(cueSheet, "CueSheet Lock Update - "+updateLockYn, null);
         cueSheetTopicService.sendCueTopic(cueSheet, "CueSheet Lock Update - "+updateLockYn, null);
+
+        CueSheetDTO cueSheetDTO = new CueSheetDTO();
+        cueSheetDTO.setCueId(cueId);
+        cueSheetDTO.setLckYn(updateLockYn);
+        cueSheetDTO.setLckDtm(cueSheet.getLckDtm());
+        cueSheetDTO.setLckrId(cueSheet.getLckrId());
+        cueSheetDTO.setLckrNm(cueSheet.getLckrNm());
+
+        return cueSheetDTO;
     }
 
     //큐시트 잠금 해제
