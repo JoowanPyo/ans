@@ -65,7 +65,7 @@ public class CueSheetTopicService {
         //모델부분은 안넣어줘도 될꺼같음.
         cueSheetTakerTopicDTO.setEventId(eventId);
         cueSheetTakerTopicDTO.setCueId(cueId);
-        cueSheetTakerTopicDTO.setCueVer(cueSheet.getCueVer());
+        //cueSheetTakerTopicDTO.setCueVer(cueSheet.getCueVer());
         //takerCueSheetTopicDTO.setCueSheet(object);
         String json = marshallingJsonHelper.MarshallingJson(cueSheetTakerTopicDTO);
 

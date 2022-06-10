@@ -1767,7 +1767,7 @@ public class CueSheetItemService {
         List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemListSpareYn(cueId, spareYn);
 
         for (int i = cueSheetItemList.size() - 1; i >= 0; i--) {
-            if (!cueItemId.equals(cueSheetItemList.get(i).getCueItemId())) {
+            if (cueItemId.equals(cueSheetItemList.get(i).getCueItemId()) == false) {
                 continue;
             }
             cueSheetItemList.remove(i);//신규 등록된 큐시트 아이템 리스트에서 삭제

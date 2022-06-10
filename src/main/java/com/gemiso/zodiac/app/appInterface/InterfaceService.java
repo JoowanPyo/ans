@@ -46,6 +46,8 @@ import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMediaRepository;
+import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaDTO;
+import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaMapper;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
 import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
 import com.gemiso.zodiac.app.issue.Issue;
@@ -89,6 +91,7 @@ public class InterfaceService {
 
     private final ArticleMediaMapper articleMediaMapper;
     private final CueSheetMapper cueSheetMapper;
+    private final CueSheetMediaMapper cueSheetMediaMapper;
 
     private final CueSheetService cueSheetService;
     private final CueSheetItemService cueSheetItemService;
@@ -1986,6 +1989,20 @@ public class InterfaceService {
 
             articleMediaRepository.save(articleMedia);
 
+        }
+
+        List<CueSheetMedia> cueSheetMediaList = cueSheetMediaRepository.findCueMediaListByCont(contentId);
+
+        for (CueSheetMedia cueSheetMedia : cueSheetMediaList){
+
+            CueSheetMediaDTO cueSheetMediaDTO = cueSheetMediaMapper.toDto(cueSheetMedia);
+            cueSheetMediaDTO.setTrnsfStCd(trnsfStCd);
+            cueSheetMediaDTO.setMediaMtchDtm(new Date());
+            cueSheetMediaDTO.setTrnasfVal(trnasfVal);
+
+            cueSheetMediaMapper.updateFromDto(cueSheetMediaDTO, cueSheetMedia);
+
+            cueSheetMediaRepository.save(cueSheetMedia);
         }
 
     }

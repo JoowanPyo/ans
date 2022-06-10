@@ -20,15 +20,16 @@ public interface CodeRepository extends JpaRepository<Code, Long> , QuerydslPred
     @Query("select a from Code a where a.cdId =:cdId and a.delYn = 'N' ")
     Optional<Code> findByCodeId(@Param("cdId")Long cdId);
 
-    @Query("select a from Code a where a.hrnkCdId = :artclTypCd and a.delYn = 'N'")
+    @Query("select a from Code a where a.hrnkCdId = :artclTypCd and a.delYn = 'N' and a.useYn = 'Y' ")
     List<Code> findArticleTypeCD(@Param("artclTypCd")String artclTypCd);
 
-    @Query("select a from Code a where a.hrnkCdId IN (:underArtclTypCd)")
+    @Query("select a from Code a where a.hrnkCdId IN (:underArtclTypCd) and a.useYn = 'Y' ")
     List<Code> findUnderArticleTypeCD(@Param("underArtclTypCd")String[] underArtclTypCd);
 
     @Query("select a from Code a where a.hrnkCdId = :hrnkCd and a.useYn = 'Y'")
     List<Code> findTakerCode(@Param("hrnkCd")String hrnkCd);
 
-    @Query("select a from Code a where a.hrnkCdId = :hrnkCd and a.useYn = 'Y' and a.delYn = 'N' order by a.cdOrd asc ")
+    //and a.useYn = 'Y'뺌 이유는 어차피 관리자밖에 사용안함.
+    @Query("select a from Code a where a.hrnkCdId = :hrnkCd and a.delYn = 'N' order by a.cdOrd asc ")
     List<Code> findCodeList(@Param("hrnkCd")String hrnkCd);
 }

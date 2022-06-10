@@ -21,7 +21,7 @@ public class CodeUpdateDTO {
     private String hrnkCdId;
     private String useYn;
     //private String delYn;
-    private Integer cdOrd;
+    //private Integer cdOrd;
     //private Date inputDtm;
     private Date updtDtm;
     //private Date delDtm;

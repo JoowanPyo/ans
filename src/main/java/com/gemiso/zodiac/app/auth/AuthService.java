@@ -239,7 +239,7 @@ public class AuthService {
 
         Auth auth = authRepository.findByLogin(userId);//로그인정보를 불러온다.
         String token = auth.getToken();//저장된 사용자 토큰 get
-        if (StringUtils.isEmpty(token)){ //저장된 사용자 토큰이 없는경우 이미 로그아웃되어 있기때문에 에러없이 처리. return;
+        if (token == null || token.trim().isEmpty()){ //저장된 사용자 토큰이 없는경우 이미 로그아웃되어 있기때문에 에러없이 처리. return;
             return;
         }
 
@@ -265,12 +265,12 @@ public class AuthService {
 
         for (Article article : articleList){
 
-            ArticleDTO articleDTO = articleMapper.toDto(article);
-            articleDTO.setLckDtm(null);
-            articleDTO.setLckrId(null);
-            articleDTO.setLckYn("N");
+            //ArticleDTO articleDTO = articleMapper.toDto(article);
+            article.setLckDtm(null);
+            article.setLckrId(null);
+            article.setLckYn("N");
 
-            articleMapper.updateFromDto(articleDTO, article);
+            //articleMapper.updateFromDto(articleDTO, article);
             articleRepository.save(article);
         }
 
@@ -278,12 +278,12 @@ public class AuthService {
 
         for (CueSheet cueSheet : cueSheetList){
 
-            CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
-            cueSheetDTO.setLckDtm(null);
-            cueSheetDTO.setLckrId(null);
-            cueSheetDTO.setLckYn("N");
+            //CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
+            cueSheet.setLckDtm(null);
+            cueSheet.setLckrId(null);
+            cueSheet.setLckYn("N");
 
-            cueSheetMapper.updateFromDto(cueSheetDTO, cueSheet);
+            //cueSheetMapper.updateFromDto(cueSheetDTO, cueSheet);
             cueSheetRepository.save(cueSheet);
         }
 

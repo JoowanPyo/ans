@@ -1,8 +1,5 @@
 package com.gemiso.zodiac.app.cueSheet.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gemiso.zodiac.app.program.dto.ProgramDTO;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

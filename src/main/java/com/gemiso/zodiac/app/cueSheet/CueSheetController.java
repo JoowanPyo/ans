@@ -152,7 +152,7 @@ public class CueSheetController {
 
     @Operation(summary = "큐시트 오더락", description = "큐시트 오더락")
     @PutMapping(path = "/{cueId}/orderLock")
-    public AnsApiResponse<CueSheetDTO> cueSheetOrderLock(@Parameter(name = "cueSheetOrderLockDTO", required = true, description = "필수값<br>")
+    public AnsApiResponse<CueSheetOrderLockResponsDTO> cueSheetOrderLock(@Parameter(name = "cueSheetOrderLockDTO", required = true, description = "필수값<br>")
                                                          @Valid @RequestBody CueSheetOrderLockDTO cueSheetOrderLockDTO,
                                                          @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
                                                          @PathVariable("cueId") Long cueId) throws JsonProcessingException {
@@ -163,7 +163,7 @@ public class CueSheetController {
                 "<br>" + "CueSheet Model - " + cueSheetOrderLockDTO.toString());
 
 
-        CueSheetDTO cueSheetDTO = cueSheetService.cueSheetOrderLock(cueSheetOrderLockDTO, cueId, userId);
+        CueSheetOrderLockResponsDTO cueSheetDTO = cueSheetService.cueSheetOrderLock(cueSheetOrderLockDTO, cueId, userId);
 
         //큐시트 오더락 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         /*CueSheetDTO cueSheetDTO = new CueSheetDTO();
