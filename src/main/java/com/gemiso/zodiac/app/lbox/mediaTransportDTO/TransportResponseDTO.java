@@ -17,4 +17,5 @@ public class TransportResponseDTO {
 
     private ArticleMediaDTO articleMediaDTO;
     private List<TransportFaildDTO> transportFaild;
+    private Boolean clipInfo;
 }

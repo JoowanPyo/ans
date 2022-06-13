@@ -14,14 +14,14 @@ public interface CueSheetMediaRepository extends JpaRepository<CueSheetMedia, Lo
             " where a.cueMediaId = :cueMediaId and a.delYn ='N'")
     Optional<CueSheetMedia> findByCueSheetMedia(@Param("cueMediaId")Long cueMediaId);
 
-    @Query("select a from CueSheetMedia a where a.cueSheetItem.cueItemId =:cueItemId and a.delYn = 'N' ")
+    @Query("select a from CueSheetMedia a where a.cueSheetItem.cueItemId =:cueItemId and a.delYn = 'N' order by a.cueMediaId desc ")
     List<CueSheetMedia> findCueMediaList(@Param("cueItemId")Long cueItemId);
 
-    @Query("select a from CueSheetMedia a where a.contId =:contentId and a.delYn = 'N' ")
+    @Query("select a from CueSheetMedia a where a.contId =:contentId and a.delYn = 'N' order by a.cueMediaId desc ")
     List<CueSheetMedia> findCueMediaListByCont(@Param("contentId")Integer contentId);
 
 
-    @Query("select a from CueSheetMedia a where a.cueSheetItem.cueItemId =:cueItemId and a.delYn = 'Y' ")
+    @Query("select a from CueSheetMedia a where a.cueSheetItem.cueItemId =:cueItemId and a.delYn = 'Y' order by a.cueMediaId desc ")
     List<CueSheetMedia> findDeleteCueMediaList(@Param("cueItemId")Long cueItemId);
 
 }

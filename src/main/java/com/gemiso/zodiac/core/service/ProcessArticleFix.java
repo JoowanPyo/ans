@@ -221,7 +221,7 @@ public class ProcessArticleFix {
         }
         else
         {
-            if (articleFixUser.trim().isEmpty() == false && anchorFixUser == null ) {
+            if (articleFixUser != null && anchorFixUser == null ) {
                 confirmList.add(FixEnum.EDITOR_FIX);
             }
         }

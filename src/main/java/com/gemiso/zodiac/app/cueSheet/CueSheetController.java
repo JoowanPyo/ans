@@ -153,9 +153,9 @@ public class CueSheetController {
     @Operation(summary = "큐시트 오더락", description = "큐시트 오더락")
     @PutMapping(path = "/{cueId}/orderLock")
     public AnsApiResponse<CueSheetOrderLockResponsDTO> cueSheetOrderLock(@Parameter(name = "cueSheetOrderLockDTO", required = true, description = "필수값<br>")
-                                                         @Valid @RequestBody CueSheetOrderLockDTO cueSheetOrderLockDTO,
-                                                         @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                                         @PathVariable("cueId") Long cueId) throws JsonProcessingException {
+                                                                         @Valid @RequestBody CueSheetOrderLockDTO cueSheetOrderLockDTO,
+                                                                         @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
+                                                                         @PathVariable("cueId") Long cueId) throws JsonProcessingException {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
@@ -228,8 +228,8 @@ public class CueSheetController {
     @PostMapping(path = "/{cueId}/cuesheetitemcopy")
     public AnsApiResponse<CueSheetSimpleDTO> cueSheetCopy(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
                                                           @PathVariable("cueId") Long cueId,
-                                                          @Parameter(name = "newCueId", required = true, description = "새로운 큐시트 아이디")
-                                                          @PathVariable("newCueId") Long newCueId) throws Exception {
+                                                          @Parameter(name = "newCueId", description = "새로운 큐시트 아이디")
+                                                          @RequestParam(value = "newCueId", required = false) Long newCueId) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();

@@ -240,7 +240,7 @@ public class LboxService {
             } catch (Exception e) { //부조 전송오류가 있을시,
 
                 TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
-                transportFaildDTO.setMessage(e.getLocalizedMessage()); //오류 메시지
+                transportFaildDTO.setMessage(e.getMessage()); //오류 메시지
                 transportFaildDTO.setSubrmNm(subrmNm); //부조 명
                 transportFaildDTO.setDestination(faildDest); // 전송대상
 
@@ -363,16 +363,37 @@ public class LboxService {
 
                 MediaTransportDataDTO data = responsBody.getData();
 
+                clipInfoDTO = data.getClip_info(); //이미 전송된 영상이거나 전송완료인 영상 데이터DTO
+                List<TasksDTO> tasksDTO = data.getTasks(); //전송시작시 데이터
+
+                if (CollectionUtils.isEmpty(tasksDTO) == false && "NS".equals(dest)) {
+                    ++tasksCount; //전송중이 한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
+                }
+                if (ObjectUtils.isEmpty(clipInfoDTO) == false && "NS".equals(dest)) {
+                    ++clipInfoCount;//이미전송된 파일이  한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
+                }
+
             } catch (Exception e) { //부조 전송오류가 있을시,
 
                 TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
-                transportFaildDTO.setMessage(e.getLocalizedMessage()); //오류 메시지
+                transportFaildDTO.setMessage(e.getMessage()); //오류 메시지
                 transportFaildDTO.setSubrmNm(subrmNm); //부조 명
                 transportFaildDTO.setDestination(faildDest); // 전송대상
 
                 transportFaildDTOList.add(transportFaildDTO);
 
             }
+        }
+
+        //전송중 완료값이 1개라도 있는경우
+        if (clipInfoCount > 0) {
+
+            transportResponseDTO.setClipInfo(true);
+
+
+        } else{ //전송완료값이 없는 경우
+
+            transportResponseDTO.setClipInfo(false);
         }
 
         transportResponseDTO.setTransportFaild(transportFaildDTOList);
