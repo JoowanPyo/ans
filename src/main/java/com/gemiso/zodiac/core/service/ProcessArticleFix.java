@@ -130,13 +130,13 @@ public class ProcessArticleFix {
             }
 
         if( auth.equals( AuthEnum.ArticleFix) )
-            return articleFix(DbApprove, newApprove, articleFixUser, userId, inputrId);
+            return articleFix(DbApprove, newApprove, articleFixUser, editorFixUser, anchorFixUser, deskFixUser, userId, inputrId);
         else if( auth.equals( AuthEnum.EditorFix) )
-            return editorFix(DbApprove, newApprove,  editorFixUser, articleFixUser, userId);
+            return editorFix(DbApprove, newApprove,  editorFixUser, anchorFixUser, anchorFixUser, deskFixUser, userId);
         else if (auth.equals(AuthEnum.AnchorFix))
-            return anchorFix(DbApprove, newApprove,  editorFixUser, articleFixUser, anchorFixUser,  userId);
+            return anchorFix(DbApprove, newApprove,  articleFixUser, editorFixUser, anchorFixUser , deskFixUser,  userId, inputrId);
         else if (auth.equals(AuthEnum.DeskFix))
-            return deskFix(DbApprove, newApprove);
+            return deskFix(DbApprove, newApprove, articleFixUser, editorFixUser, anchorFixUser , deskFixUser);
         //else if (auth.equals(AuthEnum.PD)) //수정.
         //    return pdFix(DbApprove, newApprove);
         //else if (auth.equals(AuthEnum.AdminMode))
@@ -181,20 +181,21 @@ public class ProcessArticleFix {
         return newf.ordinal() > oldf.ordinal();
     }
 
-    public static boolean articleFix( FixEnum DbApprove , FixEnum newApprove ,String articleFixUser, String userId, String inputrId )
+    public static boolean articleFix( FixEnum DbApprove , FixEnum newApprove ,String articleFixUser,
+                                      String editorFixUser, String anchorFixUser, String deskFixUser, String userId, String inputrId )
     {
         List<FixEnum> confirmList = new ArrayList<>();
 
         if( IsUnfix( DbApprove, newApprove) )//비교값넣기 맵index로 FixEnum.valueOf(DbApprove.toString()) < newApprove
         {   // 해제
-            if (userId.equals(articleFixUser)) {
+            if (userId.equals(articleFixUser) && editorFixUser == null) {
                 confirmList.add(FixEnum.FIX_NONE);
             }
 
         }
         else
         {   // Fix 하기
-            if (inputrId.equals(userId)) {
+            if (inputrId.equals(userId) && editorFixUser == null) {
                 confirmList.add(FixEnum.ARTICLE_FIX);
             }
         }
@@ -202,16 +203,17 @@ public class ProcessArticleFix {
         return confirmList.contains(newApprove);
     }
 
-    public  boolean editorFix( FixEnum DbApprove , FixEnum newApprove, String editorFixUser,String articleFixUser, String userId )
+    public  boolean editorFix( FixEnum DbApprove , FixEnum newApprove, String editorFixUser, String articleFixUser,
+                               String anchorFixUser, String deskFixUser, String userId )
     {
         List<FixEnum> confirmList = new ArrayList<>();
 
         if (IsUnfix( DbApprove, newApprove) )
         {
-            if (userId.equals(articleFixUser)){
+            if (userId.equals(articleFixUser) && anchorFixUser == null){
                 confirmList.add(FixEnum.FIX_NONE);
                 confirmList.add(FixEnum.ARTICLE_FIX);
-            } else if (userId.equals(editorFixUser)) {
+            } else if (userId.equals(editorFixUser) && anchorFixUser == null) {
                 //confirmList.add(FixEnum.FIX_NONE);
                 confirmList.add(FixEnum.ARTICLE_FIX);
             }
@@ -219,15 +221,17 @@ public class ProcessArticleFix {
         }
         else
         {
-            confirmList.add(FixEnum.EDITOR_FIX);
+            if (articleFixUser.trim().isEmpty() == false && anchorFixUser == null ) {
+                confirmList.add(FixEnum.EDITOR_FIX);
+            }
         }
 
 
         return confirmList.contains(newApprove);
     }
 
-    public boolean anchorFix( FixEnum DbApprove , FixEnum newApprove, String editorFixUser, String articleFixUser,
-                              String anchorFixUser, String userId )
+    public boolean anchorFix( FixEnum DbApprove , FixEnum newApprove, String articleFixUser, String editorFixUser,
+                              String anchorFixUser, String deskFixUser, String userId ,String inputrId)
     {
 
         List<FixEnum> confirmList = new ArrayList<>();
@@ -236,35 +240,81 @@ public class ProcessArticleFix {
         {
             if (userId.equals(anchorFixUser)) {
 
-                if (userId.equals(articleFixUser)) {
+                if (userId.equals(articleFixUser) && deskFixUser == null) {
+
                     confirmList.add(FixEnum.FIX_NONE);
                     confirmList.add(FixEnum.ARTICLE_FIX);
                     confirmList.add(FixEnum.EDITOR_FIX);
-                }else {
 
-                    //confirmList.add(FixEnum.FIX_NONE);
+                }else if (userId.equals(articleFixUser) && anchorFixUser == null){
+
+                    confirmList.add(FixEnum.FIX_NONE);
+                    confirmList.add(FixEnum.ARTICLE_FIX);
+
+                }else if (userId.equals(articleFixUser) && editorFixUser == null){
+                    confirmList.add(FixEnum.FIX_NONE);
+
+                }else if (anchorFixUser != null && deskFixUser == null){
+
                     confirmList.add(FixEnum.ARTICLE_FIX);
                     confirmList.add(FixEnum.EDITOR_FIX);
+
+                }else if (editorFixUser != null && anchorFixUser == null){
+
+                    confirmList.add(FixEnum.ARTICLE_FIX);
+
                 }
 
             }else {
-                //confirmList.add(FixEnum.FIX_NONE);
-                confirmList.add(FixEnum.ARTICLE_FIX);
-                confirmList.add(FixEnum.EDITOR_FIX);
+
+                if (anchorFixUser != null && deskFixUser == null){
+
+                    confirmList.add(FixEnum.ARTICLE_FIX);
+                    confirmList.add(FixEnum.EDITOR_FIX);
+
+                }else if (editorFixUser != null && anchorFixUser == null){
+
+                    confirmList.add(FixEnum.ARTICLE_FIX);
+
+                }
+
             }
         }
+        //픽스를 하는경우.[ 앵커,PD인 경우 본인이 작성한 기사는 ARTICLE_FIX, EDITOR_FIX, ANCHOR_FIX 가능
+        //본인이 작성한 기사가 아닐 경우 EDITOR_FIX, ANCHOR_FIX 가능
         else
         {
-            confirmList.add(FixEnum.ARTICLE_FIX);
-            confirmList.add(FixEnum.EDITOR_FIX);
-            confirmList.add(FixEnum.ANCHOR_FIX);
+            if (inputrId.equals(userId)) {
+                if (articleFixUser == null){
+
+                    confirmList.add(FixEnum.ARTICLE_FIX);
+                    confirmList.add(FixEnum.EDITOR_FIX);
+                    confirmList.add(FixEnum.ANCHOR_FIX);
+                }else if (articleFixUser != null && editorFixUser == null){
+                    confirmList.add(FixEnum.EDITOR_FIX);
+                    confirmList.add(FixEnum.ANCHOR_FIX);
+                }else if (articleFixUser != null && editorFixUser != null  && anchorFixUser == null){
+                    confirmList.add(FixEnum.ANCHOR_FIX);
+                }
+
+            }else{
+
+                if (articleFixUser != null && editorFixUser == null){
+                    confirmList.add(FixEnum.EDITOR_FIX);
+                    confirmList.add(FixEnum.ANCHOR_FIX);
+                }else if (articleFixUser != null && editorFixUser != null && anchorFixUser == null){
+                    confirmList.add(FixEnum.ANCHOR_FIX);
+                }
+
+            }
         }
 
         return confirmList.contains(newApprove);
 
     }
 
-    public boolean deskFix( FixEnum DbApprove , FixEnum newApprove )
+    public boolean deskFix( FixEnum DbApprove , FixEnum newApprove, String articleFixUser, String editorFixUser,
+                            String anchorFixUser, String deskFixUser )
     {
         List<FixEnum> confirmList = new ArrayList<>();
 
@@ -277,10 +327,22 @@ public class ProcessArticleFix {
         }
         else
         {
-            confirmList.add(FixEnum.ARTICLE_FIX); //desk는 에디터 이후 픽스 걸기 가능.
-            confirmList.add(FixEnum.EDITOR_FIX);
-            confirmList.add(FixEnum.ANCHOR_FIX);
-            confirmList.add(FixEnum.DESK_FIX);
+
+            if (articleFixUser == null){
+                confirmList.add(FixEnum.ARTICLE_FIX); //desk는 에디터 이후 픽스 걸기 가능.
+                confirmList.add(FixEnum.EDITOR_FIX);
+                confirmList.add(FixEnum.ANCHOR_FIX);
+                confirmList.add(FixEnum.DESK_FIX);
+            }else if (editorFixUser == null){
+                confirmList.add(FixEnum.EDITOR_FIX);
+                confirmList.add(FixEnum.ANCHOR_FIX);
+                confirmList.add(FixEnum.DESK_FIX);
+            }else if (anchorFixUser == null){
+                confirmList.add(FixEnum.ANCHOR_FIX);
+                confirmList.add(FixEnum.DESK_FIX);
+            }else if (deskFixUser == null){
+                confirmList.add(FixEnum.DESK_FIX);
+            }
         }
 
         return confirmList.contains(newApprove);

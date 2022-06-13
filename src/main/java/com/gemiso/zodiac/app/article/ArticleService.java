@@ -2024,14 +2024,14 @@ public class ArticleService {
 
             // article_fix에서 fix_none으로 픽스를 풀 경우 등록된 기자,일시 삭제
             //if ("article_fix".equals(orgApprvDivcd)) {
-                article.setArtclFixUser("");
+                article.setArtclFixUser(null);
                 article.setArtclFixDtm(null);
-                article.setEditorFixUser("");
+                article.setEditorFixUser(null);
                 article.setEditorFixDtm(null);
-                article.setEditorId("");
-                article.setAnchorFixUser("");
+                article.setEditorId(null);
+                article.setAnchorFixUser(null);
                 article.setAnchorFixDtm(null);
-                article.setDeskFixUser("");
+                article.setDeskFixUser(null);
                 article.setDeskFixDtm(null);
             //}
         }
@@ -2042,12 +2042,12 @@ public class ArticleService {
             if ("fix_none".equals(orgApprvDivcd)) {
                 article.setArtclFixUser(userId);
                 article.setArtclFixDtm(new Date());
-                article.setEditorFixUser("");
-                article.setEditorId("");
+                article.setEditorFixUser(null);
+                article.setEditorId(null);
                 article.setEditorFixDtm(null);
-                article.setAnchorFixUser("");
+                article.setAnchorFixUser(null);
                 article.setAnchorFixDtm(null);
-                article.setDeskFixUser("");
+                article.setDeskFixUser(null);
                 article.setDeskFixDtm(null);
 
                 Long artclId = article.getArtclId();
@@ -2102,12 +2102,12 @@ public class ArticleService {
 
             } else { // article_fix 으로 픽스를 풀 경우 등록된 에디터, 앵커 기록 삭제
 
-                article.setEditorFixUser("");
+                article.setEditorFixUser(null);
                 article.setEditorFixDtm(null);
-                article.setEditorId("");
-                article.setAnchorFixUser("");
+                article.setEditorId(null);
+                article.setAnchorFixUser(null);
                 article.setAnchorFixDtm(null);
-                article.setDeskFixUser("");
+                article.setDeskFixUser(null);
                 article.setDeskFixDtm(null);
 
             }
@@ -2120,9 +2120,9 @@ public class ArticleService {
                 article.setEditorFixUser(userId);
                 article.setEditorFixDtm(new Date());
                 article.setEditorId(userId);
-                article.setAnchorFixUser("");
+                article.setAnchorFixUser(null);
                 article.setAnchorFixDtm(null);
-                article.setDeskFixUser("");
+                article.setDeskFixUser(null);
                 article.setDeskFixDtm(null);
 
             } else { // editor_fix 으로 픽스를 풀 경우 등록된 앵커, 데스커 기록 삭제
@@ -2134,15 +2134,15 @@ public class ArticleService {
                     article.setEditorFixUser(userId);
                     article.setEditorFixDtm(new Date());
                     article.setEditorId(userId);
-                    article.setAnchorFixUser("");
+                    article.setAnchorFixUser(null);
                     article.setAnchorFixDtm(null);
-                    article.setDeskFixUser("");
+                    article.setDeskFixUser(null);
                     article.setDeskFixDtm(null);
                 }else {
 
-                    article.setAnchorFixUser("");
+                    article.setAnchorFixUser(null);
                     article.setAnchorFixDtm(null);
-                    article.setDeskFixUser("");
+                    article.setDeskFixUser(null);
                     article.setDeskFixDtm(null);
                 }
 
@@ -2153,7 +2153,7 @@ public class ArticleService {
 
             if ("desk_fix".equals(orgApprvDivcd)) { // anchor_fix 으로 픽스를 풀 경우 등록된 데스커 기록 삭제
 
-                article.setDeskFixUser("");
+                article.setDeskFixUser(null);
                 article.setDeskFixDtm(null);
 
             } else {
@@ -2167,7 +2167,7 @@ public class ArticleService {
                     article.setEditorId(userId);
                     article.setAnchorFixUser(userId);
                     article.setAnchorFixDtm(new Date());
-                    article.setDeskFixUser("");
+                    article.setDeskFixUser(null);
                     article.setDeskFixDtm(null);
                 }else if ("article_fix".equals(orgApprvDivcd)){
 
@@ -2176,7 +2176,7 @@ public class ArticleService {
                     article.setEditorId(userId);
                     article.setAnchorFixUser(userId);
                     article.setAnchorFixDtm(new Date());
-                    article.setDeskFixUser("");
+                    article.setDeskFixUser(null);
                     article.setDeskFixDtm(null);
 
                 }else if ("editor_fix".equals(orgApprvDivcd)){

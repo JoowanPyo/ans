@@ -704,6 +704,17 @@ public class InterfaceService {
             }
         }
 
+        //시퀀스 0번째 예비큐시트 빈값 셋팅
+        for (TakerCueSheetSpareDTO takerCueSheetSpareDTO : takerCueSheetSpareDTOList){
+
+            Integer seq = takerCueSheetSpareDTO.getRdSeq();
+
+            if (seq == 0){
+                takerCueSheetSpareDTO.setAncReqdSec(null);
+            }
+
+        }
+
         return takerCueSheetSpareDTOList;
     }
 

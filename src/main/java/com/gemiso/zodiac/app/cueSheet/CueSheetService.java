@@ -980,6 +980,21 @@ public class CueSheetService {
 
     }
 
+    //큐시트 복사[ 큐시트 아이템만 ]
+    public Long cueItemcopy(Long cueId, Long newCueId, String userId) throws Exception {
+
+        CueSheet getCueSheet = cueSheetFindOrFail(cueId);//원본 큐시트 get
+        CueSheet newCueSheet = cueSheetFindOrFail(newCueId);//원본 큐시트 get
+
+        //Long newCueId = cueSheet.getCueId(); //복사된 큐시트 아이디 get
+
+        copyCueItem(cueId, newCueId, userId, getCueSheet);//복사된 큐시트의 아이템 리스트 복사
+
+
+        return newCueId;
+
+    }
+
     //큐시트 아이템 복사.
     public void copyCueItem( Long orgCueId, Long newCueId, String userId, CueSheet CueSheet) throws Exception { //복사된 큐시트의 아이템 리스트 복사
 

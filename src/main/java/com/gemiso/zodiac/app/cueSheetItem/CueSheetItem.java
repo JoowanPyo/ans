@@ -202,6 +202,9 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "spare_yn", columnDefinition = "bpchar(1) default 'N'")
     private String spareYn;
 
+    @Column(name = "artcl_ext_time")
+    private Integer artclExtTime;
+
     @BatchSize(size = 100)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cue_id", nullable = false)

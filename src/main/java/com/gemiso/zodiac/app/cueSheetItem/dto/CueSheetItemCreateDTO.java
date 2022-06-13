@@ -62,6 +62,7 @@ public class CueSheetItemCreateDTO {
     private String artclRef;
     @NotNull
     private String spareYn;
+    private Integer artclExtTime;
     private CueSheetSimpleDTO cueSheet;
     private ArticleSimpleDTO article;
     private CueSheetTemplateSimpleDTO cueSheetTemplate;

@@ -102,7 +102,7 @@ public class LboxController {
     }
 
     @Operation(summary = "PS 긴급전송", description = "PS 긴급전송")
-    @PutMapping(path = "/mediatransfer/{mediaId}/psemergency")
+    @PutMapping(path = "/mediatransfer/psemergency")
     public AnsApiResponse<TransportResponseDTO> psEmergencyTransfer(@Parameter(name = "contentId", description = "콘텐츠 아이디")
                                                                     @RequestParam(value = "contentId", required = true) Integer contentId,
                                                                     @Parameter(name = "subrmNm", description = "부조명")
@@ -125,7 +125,7 @@ public class LboxController {
     }
 
     @Operation(summary = "NS 긴급전송", description = "NS 긴급전송")
-    @PutMapping(path = "/mediatransfer/{mediaId}/nsemergency")
+    @PutMapping(path = "/mediatransfer/nsemergency")
     public AnsApiResponse<TransportResponseDTO> nsEmergencyTransfer(@Parameter(name = "contentId", description = "콘텐츠 아이디")
                                                                     @RequestParam(value = "contentId", required = true) Integer contentId,
                                                                     @Parameter(name = "subrmNm", description = "부조명")

@@ -76,6 +76,7 @@ public class CueSheetItemUpdateDTO {
     private String headLn;
     private String artclRef;
     private String spareYn;
+    private Integer artclExtTime;
     private CueSheetSimpleDTO cueSheet;
     private ArticleUpdateDTO article;
     private CueSheetTemplateSimpleDTO cueSheetTemplate;
