@@ -54,7 +54,7 @@ public class ArticleHistService {
         Optional<ArticleHist> articleHist = articleHistRepository.findByArticleHist(artclHistId);
 
         if (!articleHist.isPresent()){
-            throw new ResourceNotFoundException("ArticleHistId not found. ArticleHistId : " + artclHistId);
+            throw new ResourceNotFoundException("기사 이력을 찾을 수 없습니다. 기사이력 아이디 : " + artclHistId);
         }
 
         return articleHist.get();

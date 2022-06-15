@@ -174,8 +174,7 @@ public class CueSheetItemController {
                                                              @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
                                                              @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd,
                                                              @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
-                                                             @RequestParam(value = "spareYn", required = true) String spareYn
-    ) {
+                                                             @RequestParam(value = "spareYn", required = true) String spareYn) throws JsonProcessingException {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();

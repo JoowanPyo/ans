@@ -127,9 +127,13 @@ public class CueSheetMediaService {
 
                 }
 
+                String mediaTypCd = cueSheetMediaCreateDTO.getMediaTypCd();
 
-                sendCueTopicCreate(cueSheet, cueId, cueItemId, 0L, null, "CueSheet Media Create",
-                        spareYn, "Y", "Y", null);
+               /* if ("media_typ_001".equals(mediaTypCd)) {
+
+                    sendCueTopicCreate(cueSheet, cueId, cueItemId, 0L, null, "CueSheet Media Create",
+                            spareYn, "Y", "Y", null);
+                }*/
             }
         }
 
@@ -150,7 +154,7 @@ public class CueSheetMediaService {
 
     }
 
-    public void delete(Long cueMediaId){
+    public void delete(Long cueMediaId) throws JsonProcessingException {
 
         CueSheetMedia cueSheetMedia = cueSheetMediaFindOrFail(cueMediaId);
 
@@ -166,6 +170,36 @@ public class CueSheetMediaService {
 
         cueSheetMediaRepository.save(cueSheetMedia);
 
+        CueSheetItem cueSheetItem = cueSheetMedia.getCueSheetItem();
+
+        if (ObjectUtils.isEmpty(cueSheetItem) == false){
+
+            Long cueItemId = cueSheetItem.getCueItemId();
+
+            Optional<CueSheetItem> cueSheetItemEntity = cueSheetItemRepository.findByCueItem(cueItemId);
+
+            if (cueSheetItemEntity.isPresent()){
+
+                CueSheetItem getCueSheetItem = cueSheetItemEntity.get();
+                String spareYn = getCueSheetItem.getSpareYn();
+
+                CueSheet cueSheet = getCueSheetItem.getCueSheet();
+                Long cueId = 0L;
+                if (ObjectUtils.isEmpty(cueSheet) == false){
+                    cueId = cueSheet.getCueId();
+
+                }
+
+                String mediaTypCd = cueSheetMedia.getMediaTypCd();
+
+                if ("media_typ_001".equals(mediaTypCd)) {
+
+                    sendCueTopicCreate(cueSheet, cueId, cueItemId, 0L, null, "CueSheet Media Delete",
+                            spareYn, "N", "Y", null);
+                }
+            }
+        }
+
     }
 
     public CueSheetMedia cueSheetMediaFindOrFail(Long cueMediaId){
@@ -173,7 +207,7 @@ public class CueSheetMediaService {
         Optional<CueSheetMedia> cueSheetMedia = cueSheetMediaRepository.findByCueSheetMedia(cueMediaId);
 
         if (!cueSheetMedia.isPresent()){
-            throw new ResourceNotFoundException("해당 큐시트영상이 없습니다.");
+            throw new ResourceNotFoundException("큐시트 영상을 찾을 수 없습니다. 큐시트 영상 아이디 : "+ cueMediaId);
         }
 
         return cueSheetMedia.get();

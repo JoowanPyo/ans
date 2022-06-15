@@ -192,7 +192,7 @@ public class SymbolService {
         Optional<Symbol> symbol = symbolRepository.findBySymbolId(symbolId);
 
         if (symbol.isPresent() == false){
-            throw new ResourceNotFoundException("방송아이콘에 등록된 방송아이콘 아이디가 없습니다. : " + symbolId);
+            throw new ResourceNotFoundException("방송아이콘을 찾을 수 없습니다. 방송아이콘 아이디 : " + symbolId);
         }
 
         return symbol.get();

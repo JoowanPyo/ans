@@ -132,7 +132,7 @@ public class DictionaryService {
         Optional<Dictionary> dictionary = dictionaryRepository.findByDicId(dicId);
 
         if (dictionary.isPresent() == false){
-            throw new ResourceNotFoundException("해당 아이디로 단어사전 정보를 찾을 수 없습니다.");
+            throw new ResourceNotFoundException("해당 아이디로 단어사전 정보를 찾을 수 없습니다. 단어사전 아이디 : "+dicId);
         }
 
         return dictionary.get();

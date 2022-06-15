@@ -145,7 +145,7 @@ public class IssueService {
         Optional<Issue> issue = issueRepositoy.findByIssuId(issuId);
 
         if (!issue.isPresent()){
-            throw new ResourceNotFoundException("Issue not found. issueId : " + issuId);
+            throw new ResourceNotFoundException("이슈를 찾을 수 없습니다. 이슈 아이디 : " + issuId);
         }
 
         return issue.get();
@@ -345,7 +345,7 @@ public class IssueService {
         Optional<Issue> issue = issueRepositoy.findDelIssue(issuId); //이슈아이디로 삭제된 이슈 조회
 
         if (issue.isPresent() == false){//조회된 이슈가 없으면 exception.
-            throw new ResourceNotFoundException("Issue not found. issueId : " + issuId);
+            throw new ResourceNotFoundException("이슈를 찾을 수 없습니다. 이슈 아이디 : " + issuId);
         }
 
         return issue.get();

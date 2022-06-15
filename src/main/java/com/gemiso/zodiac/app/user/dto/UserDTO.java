@@ -36,7 +36,7 @@ public class UserDTO {
     private String rmk;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date lastLoginDtm;
-    private int loginErrCnt;
+    private Integer loginErrCnt;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date pwdChgDtm;
     private String userStCd;

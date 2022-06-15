@@ -110,15 +110,15 @@ public class Scheduling {
     }
 
     //@Scheduled(cron = "0 * * * * *")
-    //@Scheduled(cron = "0 0 0/1 * * *")//한시간마다
+    @Scheduled(cron = "0 0 0/1 * * *")//한시간마다
     public void cueSheetLockScheduled(){
 
         cueSheetService.cueSheetLockChk();
 
     }
 
-    //@Scheduled(cron = "0 0 0/1 * * *")//한시간마다
     //@Scheduled(cron = "30 * * * * *")
+    @Scheduled(cron = "0 0 0/1 * * *")//한시간마다
     public void articleLockScheduled(){
 
         articleService.articleLockChk();

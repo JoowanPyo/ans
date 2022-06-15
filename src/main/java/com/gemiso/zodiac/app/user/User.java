@@ -88,7 +88,7 @@ public class User extends BaseEntity {
     private Date lastLoginDtm;
 
     @Column(name = "login_err_cnt", length = 4)
-    private int loginErrCnt;
+    private Integer loginErrCnt;
 
     @Column(name = "pwd_chg_dtm")
     private Date pwdChgDtm;

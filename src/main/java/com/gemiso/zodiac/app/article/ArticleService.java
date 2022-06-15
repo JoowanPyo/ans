@@ -70,6 +70,7 @@ import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.service.ProcessArticleFix;
 import com.gemiso.zodiac.core.service.UserAuthChkService;
 import com.gemiso.zodiac.core.topic.ArticleTopicService;
+import com.gemiso.zodiac.core.topic.CueSheetTopicService;
 import com.gemiso.zodiac.core.topic.InterfaceTopicService;
 import com.gemiso.zodiac.core.topic.TopicSendService;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.ArticleTopicDTO;
@@ -148,6 +149,7 @@ public class ArticleService {
 
     //private final TopicSendService topicSendService;
     private final ArticleTopicService articleTopicService;
+    private final CueSheetTopicService cueSheetTopicService;
     private final InterfaceTopicService interfaceTopicService;
     private final LboxService lboxService;
 
@@ -339,8 +341,49 @@ public class ArticleService {
 
         //MQ메세지 전송
         articleTopicService.articleTopic("Aarticle Update", artclId);
+
+        CueSheet getCueSheet = article.getCueSheet();
+
+        if (ObjectUtils.isEmpty(getCueSheet) == false) {
+
+            Long cueId = getCueSheet.getCueId();
+
+            CueSheet cueSheet  = findArticleCue(cueId);
+
+            CueSheetItem cueSheetItem = findArticleCueItem(artclId);
+
+            Long cueItemId = cueSheetItem.getCueItemId();
+            String spareYn = cueSheetItem.getSpareYn();
+
+            cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, null, "Update CueSheetItem-Article",
+                    spareYn, "Y", "N");
+
+        }
         /*sendTopic("Aarticle Update", artclId);*/
 
+
+    }
+
+    public CueSheetItem findArticleCueItem(Long artclId){
+
+        Optional<CueSheetItem> cueSheetItem = cueSheetItemRepository.findByCueItemArticle(artclId);
+
+        if (cueSheetItem.isPresent() == false){
+            throw new ResourceNotFoundException("큐시트 아이템을 찾을 수 없습니다. 기사 아아디 : "+ artclId);
+        }
+
+        return cueSheetItem.get();
+    }
+
+    public CueSheet findArticleCue(Long cueId){
+
+        Optional<CueSheet> cueSheet = cueSheetRepository.findByCue(cueId);
+
+        if (cueSheet.isPresent() == false){
+            throw new ResourceNotFoundException("큐시트를 찾을 수 없습니다. 큐시트 아이디 : " + cueId);
+        }
+
+        return cueSheet.get();
 
     }
 

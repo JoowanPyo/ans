@@ -76,7 +76,7 @@ public class FacilityManageService {
         Optional<FacilityManage> facilityManage = facilityManageRepository.findById(fcltyId);
 
         if (facilityManage.isPresent() == false){
-            throw new ResourceNotFoundException("등록된 시설이 없습니다. 시설 아이디 : "+ fcltyId);
+            throw new ResourceNotFoundException("등록된 시설을 찾을 수 없습니다. 시설 아이디 : "+ fcltyId);
         }
 
         return facilityManage.get();

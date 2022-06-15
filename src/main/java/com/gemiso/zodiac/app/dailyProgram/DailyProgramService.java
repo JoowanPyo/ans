@@ -88,7 +88,7 @@ public class DailyProgramService {
         Optional<DailyProgram> dailyProgram = dailyProgramRepository.findById(id);
 
         if (dailyProgram.isPresent() == false){
-            throw new ResourceNotFoundException("큐시트 아이템이 없습니다.");
+            throw new ResourceNotFoundException("일일편성을 찾을 수 없습니다. 일일편성 아이디 : "+id);
         }
 
         return dailyProgram.get();

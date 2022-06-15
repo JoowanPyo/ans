@@ -97,7 +97,7 @@ public class YonhapService {
         Optional<Yonhap> yonhapEntity = yonhapRepository.findByYonhapId(yonhapId);
 
         if (yonhapEntity.isPresent() == false){
-            throw new ResourceNotFoundException("연합기사를 찾을수 없습니다. 연합기사 아이디 : "+yonhapId);
+            throw new ResourceNotFoundException("연합기사를 찾을 수 없습니다. 연합기사 아이디 : "+yonhapId);
         }
 
         Yonhap yonhap = yonhapEntity.get();

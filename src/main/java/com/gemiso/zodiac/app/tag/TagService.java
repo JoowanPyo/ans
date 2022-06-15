@@ -82,7 +82,7 @@ public class TagService {
         Optional<Tag> tag = tagRepository.findByTag(tagId);
 
         if (tag.isPresent() ==false){
-            throw new ResourceNotFoundException("테그 아이디가 잘못 되었습니다. 테그아이디 :"+tagId);
+            throw new ResourceNotFoundException("테그를 찾을 수 없습니다. 테그 아이디 :"+tagId);
         }
 
         return tag.get();

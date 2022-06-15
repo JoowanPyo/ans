@@ -114,7 +114,7 @@ public class ArticleMediaController {
     @DeleteMapping(path = "/{artclMediaId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "artclMediaId", description = "기사미디어 아이디")
-                                    @PathVariable("artclMediaId") Long artclMediaId) {
+                                    @PathVariable("artclMediaId") Long artclMediaId) throws JsonProcessingException {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();

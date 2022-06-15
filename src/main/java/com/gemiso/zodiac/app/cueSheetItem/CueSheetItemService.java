@@ -1339,7 +1339,7 @@ public class CueSheetItemService {
         Optional<CueSheetItem> cueSheetItem = cueSheetItemRepository.findByCueItem(cueItemId);
 
         if (cueSheetItem.isPresent() == false) {
-            throw new ResourceNotFoundException("CueSheetItem not found. CueSheet Item Id : " + cueItemId);
+            throw new ResourceNotFoundException("큐시트 아이템을 찾을 수 없습니다. 큐시트 아이템 아이디 : " + cueItemId);
         }
 
         return cueSheetItem.get();
@@ -1756,7 +1756,7 @@ public class CueSheetItemService {
                 .build();
     }
 
-    public void ordUpdate(Long cueId, Long cueItemId, Integer cueItemOrd, String spareYn) {
+    public void ordUpdate(Long cueId, Long cueItemId, Integer cueItemOrd, String spareYn) throws JsonProcessingException {
 
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
@@ -1793,6 +1793,29 @@ public class CueSheetItemService {
             cueSheetItemRepository.save(setCueSheetItem);//순번 업데이트
             index++;//순번 + 1
         }
+
+        //큐시트 아이디로 큐시트 조회 및 존재유무 확인.
+        CueSheet cueSheet = cueSheetService.cueSheetFindOrFail(cueId);
+
+        /************ ORDERVER UP *************/
+        cueSheet = addOrdVer(cueSheet); // 큐시트 버전 정보 업데이트
+
+        //String cueItemDivCd = cueSheetItem.getCueItemDivCd();
+        /************ MQ messages *************/
+        //기사, 템플릿 이 포함되어 있는 경우 아이디를 TOPIC전송
+        Article article = cueSheetItem.getArticle();
+        CueSheetTemplate cueSheetTemplate = cueSheetItem.getCueSheetTemplate();
+        Long artclId = null;
+        Long cueTmpltId = null;
+        if (ObjectUtils.isEmpty(article) == false) {
+            artclId = article.getArtclId();
+        }
+        if (ObjectUtils.isEmpty(cueSheetTemplate) == false) {
+            cueItemId = cueSheetTemplate.getCueTmpltId();
+        }
+
+        cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "CueSheetItem Order Update",
+                spareYn, "Y", "Y");
 
     }
 
@@ -1856,6 +1879,20 @@ public class CueSheetItemService {
 
         return cueSheet;
         //sendCueTopic(cueSheet, eventCd, object);
+
+    }
+
+    //큐시트 순번버전 카운트 증가
+    public CueSheet addOrdVer(CueSheet cueSheet){
+
+        CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
+        cueSheetDTO.setCueOderVer(cueSheet.getCueOderVer() + 1);
+
+        cueSheetMapper.updateFromDto(cueSheetDTO, cueSheet); //큐시트 버전+1 된 정보를 엔티티정보에 업데이트
+
+        cueSheetRepository.save(cueSheet); //큐시트 버전업 수정
+
+        return cueSheet;
 
     }
 

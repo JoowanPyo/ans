@@ -42,6 +42,7 @@ import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
+import com.gemiso.zodiac.app.cueSheetItemCap.CueSheetItemCap;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
@@ -54,16 +55,11 @@ import com.gemiso.zodiac.app.issue.Issue;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.symbol.Symbol;
-import com.gemiso.zodiac.core.helper.DateChangeHelper;
-import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
-import com.gemiso.zodiac.core.helper.ListSortHelper;
-import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
+import com.gemiso.zodiac.core.helper.*;
 import com.gemiso.zodiac.core.topic.InterfaceTopicService;
 import com.gemiso.zodiac.core.topic.TopicSendService;
-import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerToCueArrayBodyDTO;
-import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerToCueTopic2DTO;
-import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerToCueTopicArrayDTO;
-import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerToCueTopicDTO;
+import com.gemiso.zodiac.core.topic.cueSheetTopicDTO.CueSheetWebTopicDTO;
+import com.gemiso.zodiac.core.topic.interfaceTopicDTO.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -103,13 +99,12 @@ public class InterfaceService {
     private final TopicSendService topicSendService;
 
 
-
     public List<ParentProgramDTO> dailyPgmFindAll(Date sdate, Date edate, String brdc_pgm_id, String pgm_nm) throws ParseException {
 
         /*Date formatSdate = stringToDate(sdate);
         Date formatEdate = stringToDate(edate);*/
 
-        List<CueSheetDTO> cueSheetDTOList = cueSheetService.takerFindAll(sdate, edate, brdc_pgm_id, pgm_nm, null,"");
+        List<CueSheetDTO> cueSheetDTOList = cueSheetService.takerFindAll(sdate, edate, brdc_pgm_id, pgm_nm, null, "");
 
         List<ParentProgramDTO> parentProgramDTOList = toTakerCueSheetList(cueSheetDTOList);
 
@@ -129,7 +124,7 @@ public class InterfaceService {
 
         //List<CueSheetDTO> cueSheetDTOList = cueSheetFindAllDTO.getCueSheetDTO();
 
-        for (CueSheetDTO cueSheetDTO: cueSheetDTOList) {
+        for (CueSheetDTO cueSheetDTO : cueSheetDTOList) {
 
             //프롬프터 큐시트목록 xml변환[ 큐시트 ]
             parentProgramDTOList.add(cueToTaker(cueSheetDTO));
@@ -571,7 +566,7 @@ public class InterfaceService {
             if (ObjectUtils.isEmpty(article)) { //기사가 포함이 안된 큐시트 아이템 일시
 
                 //큐시트 아이템 비디오 정보 get
-                List<CueSheetMedia> cueSheetMediaList =  cueSheetMediaRepository.findCueMediaList(cueItemId);
+                List<CueSheetMedia> cueSheetMediaList = cueSheetMediaRepository.findCueMediaList(cueItemId);
                 //큐시트 아이템 비디오 정보를 큐시트 테이커 비디오 DTO로 set
                 TakerCueSheetVideoDTO takerCueSheetVideoDTOList = getVideoDTOList(cueSheetMediaList);
 
@@ -705,11 +700,11 @@ public class InterfaceService {
         }
 
         //시퀀스 0번째 예비큐시트 빈값 셋팅
-        for (TakerCueSheetSpareDTO takerCueSheetSpareDTO : takerCueSheetSpareDTOList){
+        for (TakerCueSheetSpareDTO takerCueSheetSpareDTO : takerCueSheetSpareDTOList) {
 
             Integer seq = takerCueSheetSpareDTO.getRdSeq();
 
-            if (seq == 0){
+            if (seq == 0) {
                 takerCueSheetSpareDTO.setAncReqdSec(null);
             }
 
@@ -1186,7 +1181,7 @@ public class InterfaceService {
 
         List<PrompterProgramDTO> prompterProgramDTOList = new ArrayList<>(); //리턴시켜줄 프롬프터 프로그램 리스트 생성
 
-        for(CueSheetDTO cueSheetDTO : cueSheetDTOList) {
+        for (CueSheetDTO cueSheetDTO : cueSheetDTOList) {
 
             prompterProgramDTOList.add(cueToPrompter(cueSheetDTO));
 
@@ -1399,6 +1394,9 @@ public class InterfaceService {
                     cueTmpltId = cueSheetTemplate.getCueTmpltId();
                 }
 
+                Set<CueSheetItemCap> cueSheetItemCapList = cueSheetItem.getCueSheetItemCap();
+                PrompterArticleCaps prompterArticleCap = getPrompterCueItemCap(cueSheetItemCapList);
+
 
                 //조회된 cueSheetItem정보로 PrompterCueSheetDTO생성
                 PrompterCueSheetDTO prompterCueSheetDTO = PrompterCueSheetDTO.builder()
@@ -1411,6 +1409,8 @@ public class InterfaceService {
                         .artclTitlEn(cueSheetItem.getCueItemTitlEn()) // 영문제목
                         .artclCtt(cueSheetItem.getCueItemCtt())
                         //.newsAcumTime(newsAcumTime) //누적시간
+                        //.anchorCaps(prompterAnchorCap)//앵커자막
+                        .articleCaps(prompterArticleCap)//기사자막
                         .cueId(cueSheet.getCueId()) //Topic 사용 큐시트 아이디
                         .cueItemId(cueSheetItem.getCueItemId()) //Topic 사용 큐시트 아이템 아이디
                         .cueTmpltId(cueTmpltId)
@@ -1589,6 +1589,47 @@ public class InterfaceService {
         return prompterSpareCueSheetDTOList;
     }
 
+    //프롬프터 기사 자막정보 빌드후 리턴
+    public PrompterArticleCaps getPrompterCueItemCap(Set<CueSheetItemCap> cueSheetItemCapList ) {
+
+        PrompterArticleCaps prompterArticleCaps = new PrompterArticleCaps();
+        List<PrompterArticleCapDTO> prompterArticleCapDTOList = new ArrayList<>();
+
+        //들어온 리스트가 비어있으면 빈 어레이 리스트 리턴.
+        if (CollectionUtils.isEmpty(cueSheetItemCapList)) {
+            return prompterArticleCaps;
+        }
+
+        List<CueSheetItemCap> cueSheetItemCaps = new ArrayList<>(cueSheetItemCapList);
+
+        Collections.sort(cueSheetItemCaps, new CueItemListSortHelper());
+
+        //기사자막&방송아이콘 정보로 프롬프터에 사용되는 자막정보 빌드
+        for (CueSheetItemCap itemCap : cueSheetItemCaps) {
+
+            String symbolId = "";
+            Symbol symbol = itemCap.getSymbol();
+            if (ObjectUtils.isEmpty(symbol) == false) {
+
+                symbolId = symbol.getSymbolId();
+            }
+
+            PrompterArticleCapDTO prompterArticleCapDTO = PrompterArticleCapDTO.builder()
+                    .artclCapId(itemCap.getCueItemCapId())
+                    .symbolId(symbolId)
+                    .capCtt(itemCap.getCapCtt())
+                    .lnNo(itemCap.getLnNo())
+                    .lnOrd(itemCap.getCapOrd())
+                    .build();
+
+            prompterArticleCapDTOList.add(prompterArticleCapDTO);
+        }
+        prompterArticleCaps.setArticleCapList(prompterArticleCapDTOList);
+
+        return prompterArticleCaps;
+
+    }
+
     //프롬프터 기사 자막정보 빌드후 리턴 
     public PrompterArticleCaps getPrompterArticleCap(List<ArticleCap> articleCapList) {
 
@@ -1609,7 +1650,7 @@ public class InterfaceService {
 
             String symbolId = "";
             Symbol symbol = articleCap.getSymbol();
-            if (ObjectUtils.isEmpty(symbol) == false){
+            if (ObjectUtils.isEmpty(symbol) == false) {
 
                 symbolId = symbol.getSymbolId();
             }
@@ -1647,7 +1688,7 @@ public class InterfaceService {
 
             String symbolId = "";
             Symbol symbol = anchorCap.getSymbol();
-            if (ObjectUtils.isEmpty(symbol) == false){
+            if (ObjectUtils.isEmpty(symbol) == false) {
 
                 symbolId = symbol.getSymbolId();
             }
@@ -1977,7 +2018,7 @@ public class InterfaceService {
     }
 
     //전송상태 업데이트
-    public void stateChange(MediaTransferDTO mediaTransferDTO){
+    public void stateChange(MediaTransferDTO mediaTransferDTO) throws JsonProcessingException {
 
         Integer contentId = mediaTransferDTO.getContentId();
         String trnsfStCd = mediaTransferDTO.getTrnsfStCd();
@@ -1986,9 +2027,9 @@ public class InterfaceService {
         //검색조건으로 부조전송날짜 mediaMtchDtm 에 당일로? 아니면 그냥 오늘당일콘텐츠만 조회하여 업데이트
         //콘텐츠아이디 + 비디오아이디 로 기사 미디어 검색.
         List<ArticleMedia> articleMediaList = articleMediaRepository.findArticleMediaListByContentId(contentId);
-        
+
         //검색된 기사 미디어 값 업데이트
-        for (ArticleMedia articleMedia : articleMediaList){
+        for (ArticleMedia articleMedia : articleMediaList) {
 
             ArticleMediaDTO articleMediaDTO = articleMediaMapper.toDto(articleMedia);
             articleMediaDTO.setTrnsfStCd(trnsfStCd); //변경코드 업데이트
@@ -2000,11 +2041,38 @@ public class InterfaceService {
 
             articleMediaRepository.save(articleMedia);
 
+            String mediaTypCd = articleMedia.getMediaTypCd();
+            Article article = articleMedia.getArticle();
+            Long articleId = article.getArtclId();
+            Optional<CueSheetItem> cueSheetItemEntity = cueSheetItemRepository.findByCueItemArticle(articleId);
+            if (cueSheetItemEntity.isPresent()) {
+
+                CueSheetItem cueSheetItem = cueSheetItemEntity.get();
+                CueSheet cueSheet = cueSheetItem.getCueSheet();
+                Long cueSheetItemId = cueSheetItem.getCueItemId();
+                String spareYn = cueSheetItem.getSpareYn();
+                Long cueId = cueSheet.getCueId();
+                Optional<CueSheet> getCueSheet = cueSheetRepository.findByCue(cueId);
+
+                if (getCueSheet.isPresent()) {
+
+                    CueSheet cuesheetEntity = getCueSheet.get();
+
+                    if ("media_typ_001".equals(mediaTypCd) && "match_completed".equals(trnsfStCd)) {
+
+                        sendCueTopicCreate(cuesheetEntity, cuesheetEntity.getCueId(), cueSheetItemId, articleId, null, "Article Media Create",
+                                spareYn, "N", "Y", article);
+                    }
+                }
+
+
+            }
+
         }
 
         List<CueSheetMedia> cueSheetMediaList = cueSheetMediaRepository.findCueMediaListByCont(contentId);
 
-        for (CueSheetMedia cueSheetMedia : cueSheetMediaList){
+        for (CueSheetMedia cueSheetMedia : cueSheetMediaList) {
 
             CueSheetMediaDTO cueSheetMediaDTO = cueSheetMediaMapper.toDto(cueSheetMedia);
             cueSheetMediaDTO.setTrnsfStCd(trnsfStCd);
@@ -2014,7 +2082,86 @@ public class InterfaceService {
             cueSheetMediaMapper.updateFromDto(cueSheetMediaDTO, cueSheetMedia);
 
             cueSheetMediaRepository.save(cueSheetMedia);
+
+            String mediaTypCd = cueSheetMedia.getMediaTypCd();
+
+            CueSheetItem getCueSheetItem = cueSheetMedia.getCueSheetItem();
+            Long cueSheetItemId = getCueSheetItem.getCueItemId();
+            Optional<CueSheetItem> cueSheetItemEntity = cueSheetItemRepository.findByCueItem(cueSheetItemId);
+
+            if (cueSheetItemEntity.isPresent()) {
+
+                CueSheetItem cueSheetItem = cueSheetItemEntity.get();
+                CueSheet cueSheet = cueSheetItem.getCueSheet();
+                Article article = cueSheetItem.getArticle();
+                Long articleId = null;
+                if (ObjectUtils.isEmpty(article) == false){
+                    articleId = article.getArtclId();
+                }
+                String spareYn = cueSheetItem.getSpareYn();
+                Long cueId = cueSheet.getCueId();
+                Optional<CueSheet> getCueSheet = cueSheetRepository.findByCue(cueId);
+                if (getCueSheet.isPresent()) {
+
+                    CueSheet cuesheetEntity = getCueSheet.get();
+
+                    if ("media_typ_001".equals(mediaTypCd) && "match_completed".equals(trnsfStCd)) {
+
+                        sendCueTopicCreate(cuesheetEntity, cuesheetEntity.getCueId(), cueSheetItemId, articleId, null, "Article Media Create",
+                                spareYn, "N", "Y", null);
+                    }
+                }
+
+
+            }
         }
+
+
+    }
+
+    //큐시트 토픽 메세지 전송
+    public void sendCueTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
+                                   String spareYn, String prompterFlag, String videoTakerFlag, Article article) throws JsonProcessingException {
+
+        Integer cueVer = 0;
+        Integer cueOderVer = 0;
+        if (ObjectUtils.isEmpty(cueSheet) == false) {
+
+            cueVer = cueSheet.getCueVer();
+            cueOderVer = cueSheet.getCueOderVer();
+
+        }
+
+
+        //토픽메세지 ArticleTopicDTO Json으로 변환후 send
+        TakerCueSheetTopicDTO takerCueSheetTopicDTO = new TakerCueSheetTopicDTO();
+        //모델부분은 안넣어줘도 될꺼같음.
+        takerCueSheetTopicDTO.setEvent_id(eventId);
+        takerCueSheetTopicDTO.setCue_id(cueId);
+        takerCueSheetTopicDTO.setCue_ver(cueVer);
+        takerCueSheetTopicDTO.setCue_oder_ver(cueOderVer);
+        takerCueSheetTopicDTO.setCue_item_id(cueItemId); //변경된 내용 추가
+        takerCueSheetTopicDTO.setArtcl_id(artclId);
+        takerCueSheetTopicDTO.setCue_tmplt_id(cueTmpltId);
+        takerCueSheetTopicDTO.setSpare_yn(spareYn);
+        takerCueSheetTopicDTO.setPrompter(prompterFlag);
+        takerCueSheetTopicDTO.setVideo_taker(videoTakerFlag);
+        String interfaceJson = marshallingJsonHelper.MarshallingJson(takerCueSheetTopicDTO);
+
+        //interface에 큐메세지 전송
+        topicSendService.topicInterface(interfaceJson);
+
+        //CueSheetWebTopicDTO cueSheetWebTopicDTO = new CueSheetWebTopicDTO();
+        //cueSheetWebTopicDTO.setEventId("Article Media Create");
+        //cueSheetWebTopicDTO.setCueId(cueId);
+        //cueSheetWebTopicDTO.setCueItemId(cueItemId);
+        //cueSheetWebTopicDTO.setArtclId(artclId);
+        //cueSheetWebTopicDTO.setCueVer(cueVer);
+        //cueSheetWebTopicDTO.setCueOderVer(cueOderVer);
+        //cueSheetWebTopicDTO.setSpareYn(spareYn);
+        //String webJson = marshallingJsonHelper.MarshallingJson(cueSheetWebTopicDTO);
+        //web에 큐메세지 전송
+        //topicSendService.topicWeb(webJson);
 
     }
 
@@ -2097,16 +2244,16 @@ public class InterfaceService {
     }
 
     //큐시트 아이템중 기사아이템만 get
-    public CueSheetDTO getCueSheetItemArticle(CueSheetDTO cueSheetDTO){
+    public CueSheetDTO getCueSheetItemArticle(CueSheetDTO cueSheetDTO) {
 
         List<CueSheetItemDTO> setItemList = new ArrayList<>();
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetDTO.getCueSheetItem();
 
-        for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList){
+        for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList) {
 
             ArticleCueItemDTO articleCueItemDTO = cueSheetItemDTO.getArticle();
 
-            if (ObjectUtils.isEmpty(articleCueItemDTO) == false){
+            if (ObjectUtils.isEmpty(articleCueItemDTO) == false) {
 
                 setItemList.add(cueSheetItemDTO);
             }

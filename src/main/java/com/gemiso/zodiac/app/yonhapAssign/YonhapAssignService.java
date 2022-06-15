@@ -119,7 +119,7 @@ public class YonhapAssignService {
         Optional<YonhapAssign> yonhapAssign = yonhapAssignRepository.findById(assignId);
 
         if (yonhapAssign.isPresent() == false){
-            throw new ResourceNotFoundException("연합승인 정보를 찾을수 없습니다. 연합 승인 아이디: " + assignId);
+            throw new ResourceNotFoundException("연합승인 정보를 찾을 수 없습니다. 연합 승인 아이디: " + assignId);
         }
 
         return yonhapAssign.get();

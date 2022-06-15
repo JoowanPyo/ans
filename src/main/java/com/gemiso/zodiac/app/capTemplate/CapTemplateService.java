@@ -197,7 +197,7 @@ public class CapTemplateService {
         Optional<CapTemplate> cap = capTemplateRepository.finByCap(capTmpltId);
 
         if (!cap.isPresent()){
-            throw new ResourceNotFoundException("CapTemplate capTemplateGrp not found. CapTemplate capTemplateGrp Id : " + capTmpltId);
+            throw new ResourceNotFoundException("자막 템플릿을 찾을 수 없습니다. 자막 템플릿 아이디 : " + capTmpltId);
         }
 
         return cap.get();

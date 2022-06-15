@@ -141,7 +141,7 @@ public class CueSheetItemCapService {
 
         Optional<CueSheetItemCap> cueItemCap = cueSheetItemCapRepotitory.findByCueItemCap(cueItemCapId);
         if (!cueItemCap.isPresent()){
-            throw new ResourceNotFoundException("Cuesheet item caption not found. Cuesheet Item caation Id :" + cueItemCapId);
+            throw new ResourceNotFoundException("큐시트 아이템 자막을 찾을 수 없습니다. 큐시트 아이템 자막 아이디 :" + cueItemCapId);
         }
 
         return cueItemCap.get();

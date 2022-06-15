@@ -121,7 +121,7 @@ public class UserGroupService {
         Optional<UserGroup> userGroup = userGroupRepository.findByUserGroupId(userGrpId);
 
         if (!userGroup.isPresent()){
-            throw new ResourceNotFoundException("UserGroupId not found. UserGroupId : " + userGrpId);
+            throw new ResourceNotFoundException("유저 그룹을 찾을 수 없습니다. 유저 그룹 아이디 : " + userGrpId);
         }
 
         return userGroup.get();
@@ -151,7 +151,7 @@ public class UserGroupService {
         Optional<UserGroup> userGroup = userGroupRepository.findByUserGroupId(userGrpId);
 
         if (!userGroup.isPresent()){
-            throw new ResourceNotFoundException("UserGroupId not found. userGroupId : " + userGrpId);
+            throw new ResourceNotFoundException("유저 그룹을 찾을 수 없습니다. 유저 그룹 아이디 : " + userGrpId);
         }
 
         return userGroup.get();

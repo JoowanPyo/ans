@@ -107,33 +107,37 @@ public class ArticleMediaService {
 
         CueSheet cueSheet = article.getCueSheet();
 
-        if (ObjectUtils.isEmpty(cueSheet) == false){
+        if (ObjectUtils.isEmpty(cueSheet) == false) {
 
             Long cueId = cueSheet.getCueId();
 
             Optional<CueSheet> getCueSheet = cueSheetRepository.findByCue(cueId);
 
-            if (getCueSheet.isPresent()){
+            if (getCueSheet.isPresent()) {
 
                 CueSheet cuesheetEntity = getCueSheet.get();
 
                 Optional<CueSheetItem> cueSheetItem = cueSheetItemRepository.findArticleCue(artclId);
 
-                if (cueSheetItem.isPresent()){
+                if (cueSheetItem.isPresent()) {
 
                     CueSheetItem cueSheetItemEntity = cueSheetItem.get();
 
                     /********** MQ [TOPIC] ************/
                     //Article article = articleMedia.getArticle();
                     Long articleId = null;
-                    if (ObjectUtils.isEmpty(article) == false){
+                    if (ObjectUtils.isEmpty(article) == false) {
                         articleId = article.getArtclId();
                     }
 
-                    sendCueTopicCreate(cuesheetEntity, cuesheetEntity.getCueId(), cueSheetItemEntity.getCueItemId() , articleId, null, "Article Media Create",
-                            cueSheetItemEntity.getSpareYn(), "Y", "Y", article);
+                    String mediaTypCd = articleMediaCreateDTO.getMediaTypCd();
 
 
+                   /* if ("media_typ_001".equals(mediaTypCd)) {
+
+                        sendCueTopicCreate(cuesheetEntity, cuesheetEntity.getCueId(), cueSheetItemEntity.getCueItemId(), articleId, null, "Article Media Create",
+                                cueSheetItemEntity.getSpareYn(), "Y", "Y", article);
+                    }*/
                 }
             }
 
@@ -150,7 +154,7 @@ public class ArticleMediaService {
 
         Integer cueVer = 0;
         Integer cueOderVer = 0;
-        if (ObjectUtils.isEmpty(cueSheet) == false){
+        if (ObjectUtils.isEmpty(cueSheet) == false) {
 
             cueVer = cueSheet.getCueVer();
             cueOderVer = cueSheet.getCueOderVer();
@@ -206,7 +210,7 @@ public class ArticleMediaService {
 
     }
 
-    public void delete(Long artclMediaId, String userId) {
+    public void delete(Long artclMediaId, String userId) throws JsonProcessingException {
 
         ArticleMedia articleMedia = articleMediaFindOrFail(artclMediaId);
 
@@ -234,6 +238,51 @@ public class ArticleMediaService {
         articleMapper.updateFromDto(articleDTO, article);
         articleRepository.save(article);
 
+
+
+
+        //Long artclId = articleEntity.getArtclId();
+        //Article article = articleService.articleFindOrFail(artclId);
+
+        CueSheet cueSheet = article.getCueSheet();
+
+        if (ObjectUtils.isEmpty(cueSheet) == false) {
+
+            Long cueId = cueSheet.getCueId();
+
+            Optional<CueSheet> getCueSheet = cueSheetRepository.findByCue(cueId);
+
+            if (getCueSheet.isPresent()) {
+
+                CueSheet cuesheetEntity = getCueSheet.get();
+
+                Optional<CueSheetItem> cueSheetItem = cueSheetItemRepository.findArticleCue(artclId);
+
+                if (cueSheetItem.isPresent()) {
+
+                    CueSheetItem cueSheetItemEntity = cueSheetItem.get();
+
+                    /********** MQ [TOPIC] ************/
+                    //Article article = articleMedia.getArticle();
+                    Long articleId = null;
+                    if (ObjectUtils.isEmpty(article) == false) {
+                        articleId = article.getArtclId();
+                    }
+
+                    String mediaTypCd = articleMedia.getMediaTypCd();
+
+
+                    if ("media_typ_001".equals(mediaTypCd)) {
+
+                        sendCueTopicCreate(cuesheetEntity, cuesheetEntity.getCueId(), cueSheetItemEntity.getCueItemId(), articleId, null, "Article Media Delete",
+                                cueSheetItemEntity.getSpareYn(), "N", "Y", article);
+                    }
+                }
+            }
+
+
+        }
+
     }
 
     public ArticleMedia articleMediaFindOrFail(Long artclMediaId) {
@@ -241,7 +290,7 @@ public class ArticleMediaService {
         Optional<ArticleMedia> articleMedia = articleMediaRepository.findByArticleMedia(artclMediaId);
 
         if (!articleMedia.isPresent()) {
-            throw new ResourceNotFoundException("ArticleMediaId not found. ArticleMediaId : " + artclMediaId);
+            throw new ResourceNotFoundException("기사 미디어를 찾을 수 없습니다. 기사 미디어 아이디 : " + artclMediaId);
         }
 
         return articleMedia.get();
@@ -261,11 +310,11 @@ public class ArticleMediaService {
         if (trnsfFileNm != null && trnsfFileNm.trim().isEmpty() == false) {
             booleanBuilder.and(qArticleMedia.trnsfFileNm.contains(trnsfFileNm));
         }
-        if (ObjectUtils.isEmpty(artclId) == false){
+        if (ObjectUtils.isEmpty(artclId) == false) {
             booleanBuilder.and(qArticleMedia.article.artclId.eq(artclId));
         }
 
-        if (mediaTypCd != null && mediaTypCd.trim().isEmpty() == false){
+        if (mediaTypCd != null && mediaTypCd.trim().isEmpty() == false) {
             booleanBuilder.and(qArticleMedia.mediaTypCd.eq(mediaTypCd));
         }
 

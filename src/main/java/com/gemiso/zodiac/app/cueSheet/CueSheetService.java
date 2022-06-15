@@ -837,7 +837,7 @@ public class CueSheetService {
         Optional<CueSheet> cueSheet = cueSheetRepository.findByCue(cueId);
 
         if (cueSheet.isPresent() == false){
-            throw new ResourceNotFoundException("CueSheetId not found. cueSheetId : " + cueId);
+            throw new ResourceNotFoundException("큐시트를 찾을 수 없습니다. 큐시트 아이디 : " + cueId);
         }
 
         return cueSheet.get();

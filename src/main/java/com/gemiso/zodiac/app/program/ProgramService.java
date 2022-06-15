@@ -106,7 +106,7 @@ public class ProgramService {
         Optional<Program> program = programRepository.findByProgramId(brdcPgmId);
 
         if (!program.isPresent()) {
-            throw new ResourceNotFoundException("Program not found. brdcPgmId : " + brdcPgmId);
+            throw new ResourceNotFoundException("프로그램을 찾을 수 없습니다. 프로그램 아이디 : " + brdcPgmId);
         }
         return program.get();
     }

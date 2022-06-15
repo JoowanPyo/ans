@@ -198,7 +198,7 @@ public class CodeService {
         Optional<Code> code = codeRepository.findByCodeId(cdId);
 
         if (!code.isPresent()) {
-            throw new ResourceNotFoundException("CodeId not found. CodeId : " + cdId);
+            throw new ResourceNotFoundException("코드를 찾을 수 없습니다. 코드 아이디 : " + cdId);
         }
         return code.get();
 

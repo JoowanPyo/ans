@@ -103,7 +103,7 @@ public class CueSheetMediaController {
     @DeleteMapping(path = "/{cueMediaId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "cueMediaId", required = true, description = "큐시트 미디어 아이디")
-                                 @PathVariable("cueMediaId") long cueMediaId) {
+                                 @PathVariable("cueMediaId") long cueMediaId) throws JsonProcessingException {
 
         cueSheetMediaService.delete(cueMediaId);
 

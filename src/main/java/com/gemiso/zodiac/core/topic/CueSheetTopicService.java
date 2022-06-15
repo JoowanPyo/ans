@@ -41,15 +41,15 @@ public class CueSheetTopicService {
         topicSendService.topicInterface(json);
 
 
-        CueSheetWebTopicDTO cueSheetWebTopicDTO = new CueSheetWebTopicDTO();
-        cueSheetWebTopicDTO.setEventId(eventId);
-        cueSheetWebTopicDTO.setCueId(cueId);
-        cueSheetWebTopicDTO.setCueItemId(cueItemId);
-        cueSheetWebTopicDTO.setArtclId(artclId);
-        cueSheetWebTopicDTO.setCueVer(cueSheet.getCueVer());
-        cueSheetWebTopicDTO.setCueOderVer(cueSheet.getCueOderVer());
-        cueSheetWebTopicDTO.setSpareYn(spareYn);
-        String webJson = marshallingJsonHelper.MarshallingJson(cueSheetWebTopicDTO);
+        //CueSheetWebTopicDTO cueSheetWebTopicDTO = new CueSheetWebTopicDTO();
+        //cueSheetWebTopicDTO.setEventId(eventId);
+        //cueSheetWebTopicDTO.setCueId(cueId);
+        //cueSheetWebTopicDTO.setCueItemId(cueItemId);
+        //cueSheetWebTopicDTO.setArtclId(artclId);
+        //cueSheetWebTopicDTO.setCueVer(cueSheet.getCueVer());
+        //cueSheetWebTopicDTO.setCueOderVer(cueSheet.getCueOderVer());
+        //cueSheetWebTopicDTO.setSpareYn(spareYn);
+        //String webJson = marshallingJsonHelper.MarshallingJson(cueSheetWebTopicDTO);
         //web에 큐메세지 전송
         //topicSendService.topicWeb(webJson);
 
@@ -61,10 +61,10 @@ public class CueSheetTopicService {
         Long cueId = cueSheet.getCueId();
 
         //토픽메세지 ArticleTopicDTO Json으로 변환후 send
-        CueSheetTakerTopicDTO cueSheetTakerTopicDTO = new CueSheetTakerTopicDTO();
+        TakerCueSheetTopicDTO cueSheetTakerTopicDTO = new TakerCueSheetTopicDTO();
         //모델부분은 안넣어줘도 될꺼같음.
-        cueSheetTakerTopicDTO.setEventId(eventId);
-        cueSheetTakerTopicDTO.setCueId(cueId);
+        cueSheetTakerTopicDTO.setEvent_id(eventId);
+        cueSheetTakerTopicDTO.setCue_id(cueId);
         //cueSheetTakerTopicDTO.setCueVer(cueSheet.getCueVer());
         //takerCueSheetTopicDTO.setCueSheet(object);
         String json = marshallingJsonHelper.MarshallingJson(cueSheetTakerTopicDTO);

@@ -104,7 +104,7 @@ public class AuthService {
         //log.info(" 패스워드 확인 : "+ hexPwd.toString());
 
         if (!passwordEncoder.matches(hexPwd, userEntity.getPwd())) {
-            throw new PasswordFailedException("Password failed.");
+            throw new PasswordFailedException("비빌 번호가 다릅니다 비밀번호를 확인해 주세요.");
         }
 
         UserToken userTokenEntity = userTokenRepository.findUserToken(userId);

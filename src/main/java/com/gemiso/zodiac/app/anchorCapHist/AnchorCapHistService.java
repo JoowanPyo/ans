@@ -65,7 +65,7 @@ public class AnchorCapHistService {
         Optional<AnchorCapHist> anchorCapHist = anchorCapHistRepository.findAnchorCapHist(ancCapHistId);
 
         if (anchorCapHist.isPresent() == false){
-            throw new ResourceNotFoundException("앵커자막 이력을 찾을수 없습니다. 앵커자막 아이디 : "+ancCapHistId);
+            throw new ResourceNotFoundException("앵커자막 이력을 찾을 수 없습니다. 앵커자막 아이디 : "+ancCapHistId);
         }
 
         return anchorCapHist.get();

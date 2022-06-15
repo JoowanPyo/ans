@@ -50,7 +50,7 @@ public class DeptsService {
         Optional<Depts> dept = deptsRepository.findDept(id);
 
         if (dept.isPresent() == false){
-            throw new ResourceNotFoundException("부서 정보를 찾을 수 없습니다. Id : "+id);
+            throw new ResourceNotFoundException("부서 정보를 찾을 수 없습니다. 부서 아이디 : "+id);
         }
 
         return dept.get();

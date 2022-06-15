@@ -329,7 +329,7 @@ public class UserService {
         Optional<User> userEntity = userRepository.findDeleteUser(userId);
 
         if (!userEntity.isPresent()){
-            throw new ResourceNotFoundException("Delete User not found. userId : " + userId);
+            throw new ResourceNotFoundException("삭제된 사용자 아이디를 찾을 수 없습니다. 사용자 아이디 : " + userId);
         }
 
         return userEntity.get();
@@ -353,7 +353,7 @@ public class UserService {
         Optional<User> userEntity = userRepository.findByUserId(userId);
 
         if (userEntity.isPresent() == false){
-            throw new ResourceNotFoundException("MisUser not found. userId : " + userId);
+            throw new ResourceNotFoundException("사용자 정보를 찾을 수 없습니다. 사용자 아이디 : " + userId);
         }
 
         return userEntity.get();
@@ -410,7 +410,7 @@ public class UserService {
         Optional<UserGroup> userGroup = userGroupRepository.findByUserGroupId(userGrpId);
 
         if (!userGroup.isPresent()){
-            throw new ResourceNotFoundException("UserGroupId not found. userGroupId : " + userGrpId);
+            throw new ResourceNotFoundException("유저 그룹을 찾을 수 없습니다. 유저 그룹 아이디 : " + userGrpId);
         }
 
         return userGroup.get();

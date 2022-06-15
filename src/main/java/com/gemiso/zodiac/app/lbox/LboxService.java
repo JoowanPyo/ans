@@ -2,17 +2,25 @@ package com.gemiso.zodiac.app.lbox;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
+import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
+import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMediaRepository;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMediaService;
 import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaDTO;
 import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaMapper;
 import com.gemiso.zodiac.app.lbox.mediaTransportDTO.*;
+import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.core.topic.TopicSendService;
+import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerCueSheetTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +50,8 @@ public class LboxService {
 
     private final ArticleMediaRepository articleMediaRepository;
     private final CueSheetMediaRepository cueSheetMediaRepository;
+    private final CueSheetRepository cueSheetRepository;
+    private final CueSheetItemRepository cueSheetItemRepository;
 
     private final ArticleMediaMapper articleMediaMapper;
     private final CueSheetMediaMapper cueSheetMediaMapper;
@@ -49,6 +59,9 @@ public class LboxService {
     private final UserAuthService userAuthService;
 
     private final CueSheetMediaService cueSheetMediaService;
+    private final TopicSendService topicSendService;
+
+    private final MarshallingJsonHelper marshallingJsonHelper;
 
     private static final String CONTENTS_URL = "api/ans/v2/contents";
     private static final String CATEGORIES_URL = "api/ans/v2/categories";
@@ -264,6 +277,7 @@ public class LboxService {
 
             transportResponseDTO.setArticleMediaDTO(articleMediaDTO);// 셋팅된 미디어정보
 
+
         } else if (clipInfoCount > 0 && tasksCount == 0) { //전송중 값이 0개이고 전송완료값이 0보다 크면 전송완료값으로 셋팅
 
             //기사 미디어 부조 전송 완료(이미 전송된 영상)
@@ -274,6 +288,9 @@ public class LboxService {
             articleMediaRepository.save(articleMedia); //수정
 
             transportResponseDTO.setArticleMediaDTO(articleMediaDTO); // 셋팅된 미디어정보
+
+            //매칭후 match_completed 이고 일반영상인 경우 테이커에 토픽 전송
+            articleTopicSend(articleMedia);
         }
 
         transportResponseDTO.setTransportFaild(transportFaildDTOList);
@@ -296,8 +313,8 @@ public class LboxService {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
-        int tasksCount = 0;
-        int clipInfoCount = 0;
+        Integer tasksCount = 0;
+        Integer clipInfoCount = 0;
         ClipInfoDTO clipInfoDTO = new ClipInfoDTO();
         List<String> destinations = new ArrayList<>();
 
@@ -366,10 +383,10 @@ public class LboxService {
                 clipInfoDTO = data.getClip_info(); //이미 전송된 영상이거나 전송완료인 영상 데이터DTO
                 List<TasksDTO> tasksDTO = data.getTasks(); //전송시작시 데이터
 
-                if (CollectionUtils.isEmpty(tasksDTO) == false && "NS".equals(dest)) {
+                if (CollectionUtils.isEmpty(tasksDTO) == false ) {
                     ++tasksCount; //전송중이 한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
                 }
-                if (ObjectUtils.isEmpty(clipInfoDTO) == false && "NS".equals(dest)) {
+                if (ObjectUtils.isEmpty(clipInfoDTO) == false ) {
                     ++clipInfoCount;//이미전송된 파일이  한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
                 }
 
@@ -410,7 +427,7 @@ public class LboxService {
         Optional<ArticleMedia> articleMediaEntity = articleMediaRepository.findByArticleMedia(mediaId);
 
         if (articleMediaEntity.isPresent() == false) {
-            throw new ResourceNotFoundException("기사 미디어를 찾을 수 없습니다. MediaId : " + mediaId);
+            throw new ResourceNotFoundException("기사 미디어를 찾을 수 없습니다. 기사 미디어 아이디 : " + mediaId);
         }
 
         return articleMediaEntity.get();
@@ -537,6 +554,7 @@ public class LboxService {
 
             transportResponseDTO.setCueSheetMediaDTO(cueSheetMediaDTO);// 셋팅된 미디어정보
 
+
         } else if (clipInfoCount > 0 && tasksCount == 0) { //전송중 값이 0개이고 전송완료값이 0보다 크면 전송완료값으로 셋팅
 
             //기사 미디어 부조 전송 완료(이미 전송된 영상)
@@ -546,6 +564,8 @@ public class LboxService {
             cueSheetMediaRepository.save(cueSheetMedia); //수정
 
             transportResponseDTO.setCueSheetMediaDTO(cueSheetMediaDTO); // 셋팅된 미디어정보
+
+            cueTopicSend(cueSheetMedia);
         }
 
         transportResponseDTO.setTransportFaild(transportFaildDTOList);
@@ -553,6 +573,120 @@ public class LboxService {
         log.info("SubrmNm : " + subrmNm + "변경된 미디어 정보 : " + cueSheetMedia + " 에러정보 : " + transportFaildDTOList);
 
         return transportResponseDTO;
+
+    }
+
+    //매칭후 match_completed 이고 일반영상인 경우 테이커에 토픽 전송
+    public void articleTopicSend(ArticleMedia articleMedia) throws JsonProcessingException {
+
+        String trnsfStCd = articleMedia.getTrnsfStCd();
+        String mediaTypCd = articleMedia.getMediaTypCd();
+        Article article = articleMedia.getArticle();
+        Long articleId = article.getArtclId();
+        Optional<CueSheetItem> cueSheetItemEntity = cueSheetItemRepository.findByCueItemArticle(articleId);
+        if (cueSheetItemEntity.isPresent()) {
+
+            CueSheetItem cueSheetItem = cueSheetItemEntity.get();
+            CueSheet cueSheet = cueSheetItem.getCueSheet();
+            Long cueSheetItemId = cueSheetItem.getCueItemId();
+            String spareYn = cueSheetItem.getSpareYn();
+            Long cueId = cueSheet.getCueId();
+            Optional<CueSheet> getCueSheet = cueSheetRepository.findByCue(cueId);
+
+            if (getCueSheet.isPresent()) {
+
+                CueSheet cuesheetEntity = getCueSheet.get();
+
+                if ("media_typ_001".equals(mediaTypCd) && "match_completed".equals(trnsfStCd)) {
+
+                    sendCueTopicCreate(cuesheetEntity, cuesheetEntity.getCueId(), cueSheetItemId, articleId, null, "Article Media Create",
+                            spareYn, "N", "Y", article);
+                }
+            }
+
+
+        }
+    }
+
+    public void cueTopicSend(CueSheetMedia cueSheetMedia) throws JsonProcessingException {
+
+        String trnsfStCd = cueSheetMedia.getTrnsfStCd();
+        String mediaTypCd = cueSheetMedia.getMediaTypCd();
+
+        CueSheetItem getCueSheetItem = cueSheetMedia.getCueSheetItem();
+        Long cueSheetItemId = getCueSheetItem.getCueItemId();
+        Optional<CueSheetItem> cueSheetItemEntity = cueSheetItemRepository.findByCueItem(cueSheetItemId);
+
+        if (cueSheetItemEntity.isPresent()) {
+
+            CueSheetItem cueSheetItem = cueSheetItemEntity.get();
+            CueSheet cueSheet = cueSheetItem.getCueSheet();
+            Article article = cueSheetItem.getArticle();
+            Long articleId = null;
+            if (ObjectUtils.isEmpty(article) == false){
+                articleId = article.getArtclId();
+            }
+            String spareYn = cueSheetItem.getSpareYn();
+            Long cueId = cueSheet.getCueId();
+            Optional<CueSheet> getCueSheet = cueSheetRepository.findByCue(cueId);
+            if (getCueSheet.isPresent()) {
+
+                CueSheet cuesheetEntity = getCueSheet.get();
+
+                if ("media_typ_001".equals(mediaTypCd) && "match_completed".equals(trnsfStCd)) {
+
+                    sendCueTopicCreate(cuesheetEntity, cuesheetEntity.getCueId(), cueSheetItemId, articleId, null, "Article Media Create",
+                            spareYn, "N", "Y", null);
+                }
+            }
+
+
+        }
+    }
+
+    //큐시트 토픽 메세지 전송
+    public void sendCueTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
+                                   String spareYn, String prompterFlag, String videoTakerFlag, Article article) throws JsonProcessingException {
+
+        Integer cueVer = 0;
+        Integer cueOderVer = 0;
+        if (ObjectUtils.isEmpty(cueSheet) == false) {
+
+            cueVer = cueSheet.getCueVer();
+            cueOderVer = cueSheet.getCueOderVer();
+
+        }
+
+
+        //토픽메세지 ArticleTopicDTO Json으로 변환후 send
+        TakerCueSheetTopicDTO takerCueSheetTopicDTO = new TakerCueSheetTopicDTO();
+        //모델부분은 안넣어줘도 될꺼같음.
+        takerCueSheetTopicDTO.setEvent_id(eventId);
+        takerCueSheetTopicDTO.setCue_id(cueId);
+        takerCueSheetTopicDTO.setCue_ver(cueVer);
+        takerCueSheetTopicDTO.setCue_oder_ver(cueOderVer);
+        takerCueSheetTopicDTO.setCue_item_id(cueItemId); //변경된 내용 추가
+        takerCueSheetTopicDTO.setArtcl_id(artclId);
+        takerCueSheetTopicDTO.setCue_tmplt_id(cueTmpltId);
+        takerCueSheetTopicDTO.setSpare_yn(spareYn);
+        takerCueSheetTopicDTO.setPrompter(prompterFlag);
+        takerCueSheetTopicDTO.setVideo_taker(videoTakerFlag);
+        String interfaceJson = marshallingJsonHelper.MarshallingJson(takerCueSheetTopicDTO);
+
+        //interface에 큐메세지 전송
+        topicSendService.topicInterface(interfaceJson);
+
+        //CueSheetWebTopicDTO cueSheetWebTopicDTO = new CueSheetWebTopicDTO();
+        //cueSheetWebTopicDTO.setEventId("Article Media Create");
+        //cueSheetWebTopicDTO.setCueId(cueId);
+        //cueSheetWebTopicDTO.setCueItemId(cueItemId);
+        //cueSheetWebTopicDTO.setArtclId(artclId);
+        //cueSheetWebTopicDTO.setCueVer(cueVer);
+        //cueSheetWebTopicDTO.setCueOderVer(cueOderVer);
+        //cueSheetWebTopicDTO.setSpareYn(spareYn);
+        //String webJson = marshallingJsonHelper.MarshallingJson(cueSheetWebTopicDTO);
+        //web에 큐메세지 전송
+        //topicSendService.topicWeb(webJson);
 
     }
 

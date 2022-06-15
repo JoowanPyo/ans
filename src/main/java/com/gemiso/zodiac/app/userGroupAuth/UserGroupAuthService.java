@@ -105,7 +105,7 @@ public class UserGroupAuthService {
         Optional<UserGroup> userGroup = userGroupRepository.findByUserGroupId(userGrpId);
 
         if (userGroup.isPresent()==false){
-            throw new ResourceNotFoundException("UserGroupId not found. UserGroupId : " + userGrpId);
+            throw new ResourceNotFoundException("유저 그룹을 찾을 수 없습니다. 유저 그룹 아이디 : " + userGrpId);
         }
         return userGroup.get();
     }
@@ -118,7 +118,7 @@ public class UserGroupAuthService {
         Optional<AppAuth> appAuth = appAuthRepository.findByAppAuthId(userGroupAuthId);
 
         if (!appAuth.isPresent()){
-            throw new ResourceNotFoundException("AppAuthId not found. AppAuthId : " + userGroupAuthId);
+            throw new ResourceNotFoundException("사용자 그룹 권한을 찾을 수 없습니다. 사용자 그룹 권한 아이디 : " + userGroupAuthId);
         }
         return appAuth.get();
     }

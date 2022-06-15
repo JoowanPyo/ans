@@ -72,7 +72,7 @@ public class ScrollNewsDetailService {
         Optional<ScrollNewsDetail> scrollNewsDetail = scrollNewsDetailRepository.findDetail(id);
 
         if (scrollNewsDetail.isPresent() == false){ //조회된 건수가 없으면 에러
-            throw new ResourceNotFoundException("스크롤 뉴스 상세를 찾을 수 없습니다. 스크롤 뉴스 상세 아이디 : " +id);
+            throw new ResourceNotFoundException("스크롤 뉴스 상세정보를 찾을 수 없습니다. 스크롤 뉴스 상세 아이디 : " +id);
         }
 
         //조회된 스크롤뉴스 상세 리턴

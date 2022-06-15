@@ -411,7 +411,7 @@ public class InterfaceController {
     @PutMapping(path = "/mediatransfer/updatestate")
     public AnsApiResponse<?> stateChange(@Parameter(description = "필수값<br> lckYn ", required = true)
                                          @RequestBody @Valid MediaTransferDTO mediaTransferDTO,
-                                         @RequestHeader(value = "securityKey") String securityKey) {
+                                         @RequestHeader(value = "securityKey") String securityKey) throws JsonProcessingException {
 
         //콘텐츠 아이디로 찾은 정보가 있으면 처리 [ 무조건 성공으로 넘어간다. ]
         log.info("Media State Update : ContentId : " + mediaTransferDTO.getContentId() + " Code : " + mediaTransferDTO.getTrnsfStCd() + " val : "
@@ -436,7 +436,7 @@ public class InterfaceController {
 
     @Operation(summary = "방송중 테이커 큐시트 동기화( 원본 )", description = "방송중 테이커 큐시트 동기화( 원본 )")
     @PostMapping(path = "/takersetcue")
-    public AnsApiResponse<?> takerSetCue(@Parameter(description = "필수값<br> ", required = true)
+    public AnsApiResponse<?> takerSetCue2(@Parameter(description = "필수값<br> ", required = true)
                                          @RequestBody @Valid TakerToCueBody2DTO takerToCueBodyDTO,
                                          @RequestHeader(value = "securityKey") String securityKey) throws JsonProcessingException {
 
@@ -447,9 +447,9 @@ public class InterfaceController {
         return AnsApiResponse.ok();
     }
 
-    @Operation(summary = "방송중 테이커 큐시트 동기화( 개선 )", description = "방송중 테이커 큐시트 동기화( 개선 )" )
-    @PostMapping(path = "/takersetcue2")
-    public AnsApiResponse<?> takerSetCue2(@Parameter(description = "필수값<br> ", required = true)
+    /*@Operation(summary = "방송중 테이커 큐시트 동기화( 개선 )", description = "방송중 테이커 큐시트 동기화( 개선 )" )
+    @PostMapping(path = "/takersetcue")
+    public AnsApiResponse<?> takerSetCue(@Parameter(description = "필수값<br> ", required = true)
                                          @RequestBody @Valid TakerToCueBodyDTO takerToCueBodyDTO,
                                          @RequestHeader(value = "securityKey") String securityKey) throws JsonProcessingException {
 
@@ -458,7 +458,7 @@ public class InterfaceController {
         interfaceService.takerSetCue2(takerToCueBodyDTO);
 
         return AnsApiResponse.ok();
-    }
+    }*/
 
    /* @Operation(summary = "방송중 테이커 큐시트 동기화 test", description = "방송중 테이커 큐시트 동기화 test")
     @PostMapping(path = "/takersetcuetest")

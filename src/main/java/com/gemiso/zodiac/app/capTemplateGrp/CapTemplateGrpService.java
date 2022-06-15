@@ -103,7 +103,7 @@ public class CapTemplateGrpService {
         Optional<CapTemplateGrp> template = capTemplateGrpRepository.findByTemplate(tmpltGrpId);
 
         if (!template.isPresent()){
-            throw new ResourceNotFoundException("CapTemplateGrp group not found. CapTemplateGrp group Id : " + tmpltGrpId);
+            throw new ResourceNotFoundException("자막 템플릿 그룹을 찾을 수 없습니다. 자막 템플릿 그룹 아이디 : " + tmpltGrpId);
         }
 
         return template.get();

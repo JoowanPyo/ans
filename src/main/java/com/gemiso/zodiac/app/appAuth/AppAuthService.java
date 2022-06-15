@@ -128,7 +128,7 @@ public class AppAuthService{
         Optional<AppAuth> appAuth = appAuthRepository.findByAppAuthId(appAuthId);
 
         if (!appAuth.isPresent()){
-            throw new ResourceNotFoundException("AppAuth not found. AppAuthId: "+appAuthId);
+            throw new ResourceNotFoundException("애플리케이션 권한을 찾을 수 없습니다. 권한 아이디 : "+appAuthId);
         }
 
         return appAuth.get();

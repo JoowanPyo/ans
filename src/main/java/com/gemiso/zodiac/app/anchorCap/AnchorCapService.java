@@ -131,7 +131,7 @@ public class AnchorCapService {
         Optional<AnchorCap> anchorCap = anchorCapRepository.findAnchorCap(anchorCapId);
 
         if (anchorCap.isPresent() == false){
-            throw  new ResourceNotFoundException("앵커자막을 찾을 수 없습니다. 앵커자막 아이디 : "+anchorCapId);
+            throw new ResourceNotFoundException("앵커자막을 찾을 수 없습니다. 앵커자막 아이디 : "+anchorCapId);
         }
 
         return anchorCap.get();
