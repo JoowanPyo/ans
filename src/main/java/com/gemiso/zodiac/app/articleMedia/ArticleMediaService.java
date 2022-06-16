@@ -105,7 +105,10 @@ public class ArticleMediaService {
         Long artclId = articleSimpleDTO.getArtclId();
         Article article = articleService.articleFindOrFail(artclId);
 
-        CueSheet cueSheet = article.getCueSheet();
+        /********** MQ [TOPIC] ************/
+
+        //이현준 부장, 이현진 차장 요청으로 매칭하고 부조전송 완료된 미디어만 웹소켓 메세지 전송
+       /* CueSheet cueSheet = article.getCueSheet();
 
         if (ObjectUtils.isEmpty(cueSheet) == false) {
 
@@ -123,7 +126,6 @@ public class ArticleMediaService {
 
                     CueSheetItem cueSheetItemEntity = cueSheetItem.get();
 
-                    /********** MQ [TOPIC] ************/
                     //Article article = articleMedia.getArticle();
                     Long articleId = null;
                     if (ObjectUtils.isEmpty(article) == false) {
@@ -133,16 +135,16 @@ public class ArticleMediaService {
                     String mediaTypCd = articleMediaCreateDTO.getMediaTypCd();
 
 
-                   /* if ("media_typ_001".equals(mediaTypCd)) {
+                    if ("media_typ_001".equals(mediaTypCd)) {
 
                         sendCueTopicCreate(cuesheetEntity, cuesheetEntity.getCueId(), cueSheetItemEntity.getCueItemId(), articleId, null, "Article Media Create",
                                 cueSheetItemEntity.getSpareYn(), "Y", "Y", article);
-                    }*/
+                    }
                 }
             }
 
 
-        }
+        }*/
 
         return articleMediaDTO;
 

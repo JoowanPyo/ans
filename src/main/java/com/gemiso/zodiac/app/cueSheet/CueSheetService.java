@@ -466,8 +466,10 @@ public class CueSheetService {
 
         CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
 
-        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
+        //큐시트 아이템
+        //List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
+        //List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
+        //cueSheetDTO.setCueSheetItem(cueSheetItemDTOList);
 
         //기사 미디어 있을경우 set
         //List<CueSheetItem> cueSheetItemList = cueSheetItemFindAll(cueId);
@@ -477,7 +479,6 @@ public class CueSheetService {
 
         //cueSheetItemDTOList = setSymbol(cueSheetItemDTOList);
 
-        cueSheetDTO.setCueSheetItem(cueSheetItemDTOList);
 
         return cueSheetDTO;
 

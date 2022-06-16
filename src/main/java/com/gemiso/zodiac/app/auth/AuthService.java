@@ -47,6 +47,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -107,9 +108,9 @@ public class AuthService {
             throw new PasswordFailedException("비빌 번호가 다릅니다 비밀번호를 확인해 주세요.");
         }
 
-        UserToken userTokenEntity = userTokenRepository.findUserToken(userId);
+        Optional<UserToken> getUserToken = userTokenRepository.findUserToken(userId);
 
-        if (ObjectUtils.isEmpty(userTokenEntity)) {
+        if (getUserToken.isPresent() == false) {
 
             String refreshToken = jwtBuilder.createRefreshToken(""); //리플레시 토큰 생성 [토큰 유효시간 24시간 유저정보 X]
 
@@ -130,6 +131,9 @@ public class AuthService {
             jwtDTO.setRefreshToken(refreshToken);   // client로 보내줄 리플레시 토큰
 
         } else {
+
+            UserToken userTokenEntity = getUserToken.get();
+
             //리플레시 토큰이 있으면, 리플레시토큰 시간이 만료되었는지 검증.
             String refreshToken = jwtParser.refreshTokenVerification(userTokenEntity.getRefreshToken());
             if (refreshToken == null || refreshToken.trim().isEmpty()) {
@@ -199,12 +203,14 @@ public class AuthService {
 
         String userId = jwtParser.acTokenParser(authorization);
 
-        UserToken userToken = userTokenRepository.findUserToken(userId);
+        Optional<UserToken> getUserToken = userTokenRepository.findUserToken(userId);
 
-        if (ObjectUtils.isEmpty(userToken)){ //토큰정보가 없을시 인증실패
+        if (getUserToken.isPresent() == false){ //토큰정보가 없을시 인증실패
             throw new ResourceNotFoundException("인증할 수 있는 토큰 정보가 없습니다 토큰 정보를 확인해 주세요.");
             //throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+
+        UserToken userToken = getUserToken.get();
 
         String refreshToken = jwtParser.refreshTokenVerification(userToken.getRefreshToken()); //리플레시 토큰이 만료되었는지 검증
         if (refreshToken == null && refreshToken.trim().isEmpty()) { //만료되었으면 재생성
@@ -245,10 +251,16 @@ public class AuthService {
 
         //에러없이 처리 [로그아웃 되어있는대 로그아웃 할 경우]
 
-        UserToken userToken = userTokenRepository.findUserToken(userId);
+        Optional<UserToken> getUserToken = userTokenRepository.findUserToken(userId);
+
+        if (getUserToken.isPresent() == false){
+            return;
+        }
+
+        UserToken userToken = getUserToken.get();
 
         String refreshToken = jwtParser.refreshTokenVerification(userToken.getRefreshToken()); //리플레시 토큰이 만료되었는지 검증
-        if (StringUtils.isEmpty(refreshToken)) { //만료되었으면 재생성
+        if (refreshToken != null && refreshToken.trim().isEmpty() == false) { //만료되었으면 재생성
             userTokenRepository.deleteById(userToken.getId());
         }
 

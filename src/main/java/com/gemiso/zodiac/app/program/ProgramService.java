@@ -36,9 +36,11 @@ public class ProgramService {
 
     public List<ProgramDTO> findAll(String brdcPgmNm) {
 
-        BooleanBuilder booleanBuilder = getSearch(brdcPgmNm);
+        //BooleanBuilder booleanBuilder = getSearch(brdcPgmNm);
 
-        List<Program> programList = (List<Program>) programRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "inputDtm"));
+        //List<Program> programList = (List<Program>) programRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "inputDtm"));
+
+        List<Program> programList = (List<Program>) programRepository.findByProgram(brdcPgmNm);
 
         List<ProgramDTO> programDTOList = programMapper.toDtoList(programList);
 

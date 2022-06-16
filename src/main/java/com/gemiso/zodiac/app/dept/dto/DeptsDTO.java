@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import javax.persistence.Column;
 import java.util.Date;
 
 @Data
@@ -17,9 +20,10 @@ public class DeptsDTO {
     private String name;
     private String code;
     private String isEnabled;
-    private Date createdAt;
-    private Date updatedAt;
-    private Date deletedAt;
+    private Date inputDtm;
+    private Date updtDtm;
+    private Date delDtm;
     private String parentCode;
     private Long id2;
+
 }

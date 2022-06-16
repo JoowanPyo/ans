@@ -1,6 +1,8 @@
 package com.gemiso.zodiac.app.cueSheetItem;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gemiso.zodiac.app.ArticleTag.ArticleTag;
+import com.gemiso.zodiac.app.ArticleTag.ArticleTagRepository;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
 import com.gemiso.zodiac.app.article.Article;
@@ -58,6 +60,8 @@ import com.gemiso.zodiac.app.lbox.LboxService;
 import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
+import com.gemiso.zodiac.app.tag.Tag;
+import com.gemiso.zodiac.app.tag.TagRepository;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.topic.CueSheetTopicService;
 import com.gemiso.zodiac.core.topic.TopicSendService;
@@ -95,7 +99,8 @@ public class CueSheetItemService {
     private final ArticleMediaRepository articleMediaRepository;
     private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
     private final CueSheetMediaRepository cueSheetMediaRepository;
-    private final ArticleActionLogRepository articleActionLogRepository;
+    private final ArticleTagRepository articleTagRepository;
+    //private final ArticleActionLogRepository articleActionLogRepository;
     //private final CueTmpltItemRepository cueTmpltItemRepository;
 
     private final CueSheetMapper cueSheetMapper;
@@ -918,6 +923,7 @@ public class CueSheetItemService {
 
         CueSheetItem cueSheetItem = null;
 
+        //예비 큐시트 일시 rmk에 입력자값을 넣어달라고 요청.
         if ("Y".equals(spareYn)) {
             cueSheetItem = CueSheetItem.builder()
                     .cueSheet(cueSheet)
@@ -1526,6 +1532,24 @@ public class CueSheetItemService {
 
                 }
             }
+        }
+
+        /*********************/
+        /* 기사 테그를 저장하는 부분 */
+
+        List<ArticleTag> articleTagList = articleTagRepository.findArticleTag(artclId);
+
+        for (ArticleTag articleTag : articleTagList){
+            
+            Tag tag = articleTag.getTag();
+
+            ArticleTag articleTagEntity = ArticleTag.builder()
+                    .article(articleEntity)
+                    .tag(tag)
+                    .build();
+
+            articleTagRepository.save(articleTagEntity);
+
         }
 
         /*List<ArticleActionLogDTO> articleActionLogs = articleActionLogService.findAll(artclId);

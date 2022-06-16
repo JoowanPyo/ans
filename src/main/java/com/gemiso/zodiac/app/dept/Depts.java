@@ -36,15 +36,15 @@ public class Depts {
     private String isEnabled;
 
     @CreatedDate
-    @Column(name = "created_at")
-    private Date createdAt;
+    @Column( name = "input_dtm", updatable = false)
+    private Date inputDtm;
 
     @LastModifiedDate
-    @Column(name = "updated_at")
-    private Date updatedAt;
+    @Column(name = "updt_dtm")
+    private Date updtDtm;
 
-    @Column(name = "deleted_at")
-    private Date deletedAt;
+    @Column(name = "del_dtm")
+    private Date delDtm;
 
     @Column(name = "parent_code", length = 50)
     private String parentCode;

@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.tagArticle;
+package com.gemiso.zodiac.app.ArticleTag;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

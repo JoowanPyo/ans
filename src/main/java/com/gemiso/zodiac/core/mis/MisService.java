@@ -319,7 +319,7 @@ public class MisService {
 
         DeptsDTO deptsDTO = deptsMapper.toDto(dept);
         deptsDTO.setIsEnabled("N"); // "0"일경우 사용안함
-        deptsDTO.setDeletedAt(new Date()); //삭제된 시점 셋팃
+        deptsDTO.setDelDtm(new Date()); //삭제된 시점 셋팃
 
         deptsMapper.updateFromDto(deptsDTO, dept); //원본에서 수정된값 업데이트
 
@@ -394,7 +394,7 @@ public class MisService {
                     .name(misDept.getId().getDeptName())
                     .code(misDept.getId().getDeptCode())
                     .isEnabled("N")
-                    .deletedAt(new Date())
+                    .delDtm(new Date())
                     .parentCode(misUpprDtcd)
                     .id2(parentId)
                     .build();

@@ -2,13 +2,14 @@ package com.gemiso.zodiac.exception;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gemiso.zodiac.app.appInterface.interfaceExceptionDTO.InterfaceExceptionDTO;
+import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
 import com.gemiso.zodiac.core.response.ApiErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,10 +19,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
-import java.security.InvalidParameterException;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +77,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
     public ResponseEntity<Object> handleApiRequestException(ResourceNotFoundException ex) {
         log.error(" ResourceNotFoundException : "+ ApiErrorResponse.makeResourceNotFoundResponse(ex));
         return new ResponseEntity<>(ApiErrorResponse.makeResourceNotFoundResponse(ex), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(value = InterfaceException.class)
+    public String handleInterfaceApiRequestException(InterfaceException ex) {
+        log.error(" Interface Exception : "+ ApiErrorResponse.makeInterfaceResponse(ex));
+
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.makeInterfaceResponse(ex);
+
+
+        InterfaceExceptionDTO dto = new InterfaceExceptionDTO();
+        dto.setErrors(apiErrorResponse.getError().getErrors());
+        dto.setCode(apiErrorResponse.getError().getCode().toString());
+        dto.setMessage(apiErrorResponse.getError().getMessage());
+        dto.setStatus(apiErrorResponse.getStatus());
+
+        //DTO TO XML 파싱
+        String xml = JAXBXmlHelper.marshal(dto, InterfaceExceptionDTO.class);
+
+        return xml;
     }
 
     @ExceptionHandler(value = UserFailException.class)

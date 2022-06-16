@@ -24,12 +24,17 @@ import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetFindAllDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
+import com.gemiso.zodiac.app.user.UserService;
+import com.gemiso.zodiac.app.user.dto.UserDTO;
+import com.gemiso.zodiac.app.user.dto.UserDeleteUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.helper.SearchDateInterface;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.exception.InterfaceException;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -52,7 +57,8 @@ public class InterfaceController {
 
     private final CueSheetService cueSheetService;
     private final CodeService codeService;
-    private final CueSheetItemService cueSheetItemService;
+    private final UserService userService;
+    //private final CueSheetItemService cueSheetItemService;
 
 
     @Operation(summary = "큐시트 일일편성 목록조회[Taker]", description = "큐시트 일일편성 목록조회[Taker]")
@@ -90,6 +96,8 @@ public class InterfaceController {
         List<ParentProgramDTO> parentProgramDTOList = new ArrayList<>();
         String takerCueSheetDTO = "";
 
+        /*try {*/
+
         //날짜로 조회조건이 들어온 경우
         if (sdate != null && sdate.trim().isEmpty() == false && edate != null && edate.trim().isEmpty() == false) {
 
@@ -105,7 +113,13 @@ public class InterfaceController {
         }
 
         return takerCueSheetDTO;
+        //throw new Exception();
 
+       /* }catch (Exception e){
+
+            throw new InterfaceException("큐스트를 찾을수 없습니다. 큐시트 아이디 : "+ "123");
+
+        }*/
     }
 
     /*@Operation(summary = "큐시트 상세조회[Taker]", description = "큐시트 상세조회[Taker]")
@@ -434,7 +448,7 @@ public class InterfaceController {
         return AnsApiResponse.ok();
     }*/
 
-    @Operation(summary = "방송중 테이커 큐시트 동기화( 원본 )", description = "방송중 테이커 큐시트 동기화( 원본 )")
+    /*@Operation(summary = "방송중 테이커 큐시트 동기화( 원본 )", description = "방송중 테이커 큐시트 동기화( 원본 )")
     @PostMapping(path = "/takersetcue")
     public AnsApiResponse<?> takerSetCue2(@Parameter(description = "필수값<br> ", required = true)
                                          @RequestBody @Valid TakerToCueBody2DTO takerToCueBodyDTO,
@@ -445,9 +459,9 @@ public class InterfaceController {
         interfaceService.takerSetCue(takerToCueBodyDTO);
 
         return AnsApiResponse.ok();
-    }
+    }*/
 
-    /*@Operation(summary = "방송중 테이커 큐시트 동기화( 개선 )", description = "방송중 테이커 큐시트 동기화( 개선 )" )
+    @Operation(summary = "방송중 테이커 큐시트 동기화( 개선 )", description = "방송중 테이커 큐시트 동기화( 개선 )")
     @PostMapping(path = "/takersetcue")
     public AnsApiResponse<?> takerSetCue(@Parameter(description = "필수값<br> ", required = true)
                                          @RequestBody @Valid TakerToCueBodyDTO takerToCueBodyDTO,
@@ -458,7 +472,7 @@ public class InterfaceController {
         interfaceService.takerSetCue2(takerToCueBodyDTO);
 
         return AnsApiResponse.ok();
-    }*/
+    }
 
    /* @Operation(summary = "방송중 테이커 큐시트 동기화 test", description = "방송중 테이커 큐시트 동기화 test")
     @PostMapping(path = "/takersetcuetest")
@@ -537,5 +551,39 @@ public class InterfaceController {
         List<CodeDTO> codeDTOList = codeService.findAll(null, "Y", hrnkCdIds);
 
         return new AnsApiResponse<>(codeDTOList);
+    }
+
+    @Operation(summary = "사용자 목록조회 ( 외부 )", description = "사용자 목록조회 ( 외부 )")
+    @GetMapping(path = "/users")
+    public AnsApiResponse<List<UserDTO>> findAllUsers(@Parameter(name = "userId", description = "사용자 아이디", in = ParameterIn.QUERY)
+                                                      @RequestParam(value = "userId", required = false) String userId,
+                                                      @Parameter(name = "userNm", description = "사용자명", in = ParameterIn.QUERY)
+                                                      @RequestParam(value = "userNm", required = false) String userNm,
+                                                      @Parameter(name = "searchWord", description = "검색키워드")
+                                                      @RequestParam(value = "searchWord", required = false) String searchWord,
+                                                      @Parameter(name = "email", description = "이메일")
+                                                      @RequestParam(value = "email", required = false) String email,
+                                                      @Parameter(name = "delYn", description = "삭제 여부", in = ParameterIn.QUERY)
+                                                      @RequestParam(value = "delYn", required = false) String delYn,
+                                                      @RequestHeader(value = "securityKey") String securityKey) {
+
+        List<UserDTO> result = userService.findAll(userId, userNm, searchWord, email, delYn);
+
+
+        return new AnsApiResponse<>(result);
+
+    }
+
+    @Operation(summary = "사용자 상세조회 ( 외부 )", description = "사용자 상세조회 ( 외부 )")
+    @GetMapping(path = "/user")
+    public AnsApiResponse<UserDTO> findUser(@Parameter(name = "userId", description = "사용자 아이디", in = ParameterIn.QUERY)
+                                            @RequestParam(value = "userId", required = false) String userId,
+                                            @RequestHeader(value = "securityKey") String securityKey) {
+
+
+        UserDTO returnUser = userService.find(userId);
+
+        return new AnsApiResponse<UserDTO>(returnUser);
+
     }
 }

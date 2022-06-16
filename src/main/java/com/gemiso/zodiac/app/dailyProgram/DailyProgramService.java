@@ -41,7 +41,7 @@ public class DailyProgramService {
     public List<DailyProgramDTO> findAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, String brdcDivCd, Long stdioId,
                                          Long subrmId, String searchWord){
 
-        BooleanBuilder booleanBuilder = getSearch(sdate, edate, brdcPgmId, brdcPgmNm, brdcDivCd, stdioId, subrmId, searchWord);
+       /* BooleanBuilder booleanBuilder = getSearch(sdate, edate, brdcPgmId, brdcPgmNm, brdcDivCd, stdioId, subrmId, searchWord);
 
         //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
         List<Sort.Order> orders = new ArrayList<>();
@@ -51,7 +51,10 @@ public class DailyProgramService {
         orders.add(order2);
 
         List<DailyProgram> dailyProgramList = (List<DailyProgram>) dailyProgramRepository.findAll(
-                booleanBuilder, Sort.by(orders));
+                booleanBuilder, Sort.by(orders));*/
+
+        List<DailyProgram> dailyProgramList = (List<DailyProgram>) dailyProgramRepository.findByDailyProgramList(
+                sdate, edate, brdcPgmId, brdcPgmNm, brdcDivCd, stdioId, subrmId, searchWord);
 
         List<DailyProgramDTO> dailyProgramDTOList = dailyProgramMapper.toDtoList(dailyProgramList);
 

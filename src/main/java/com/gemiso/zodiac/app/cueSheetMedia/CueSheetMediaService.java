@@ -107,7 +107,10 @@ public class CueSheetMediaService {
 
         cueSheetMediaRepository.save(cueSheetMedia);
 
-        CueSheetItem cueSheetItem = cueSheetMedia.getCueSheetItem();
+
+        /********** MQ [TOPIC] ************/
+        //이현준 부장, 이현진 차장 요청으로 매칭하고 부조전송 완료된 미디어만 웹소켓 메세지 전송
+        /*CueSheetItem cueSheetItem = cueSheetMedia.getCueSheetItem();
 
         if (ObjectUtils.isEmpty(cueSheetItem) == false){
 
@@ -129,13 +132,13 @@ public class CueSheetMediaService {
 
                 String mediaTypCd = cueSheetMediaCreateDTO.getMediaTypCd();
 
-               /* if ("media_typ_001".equals(mediaTypCd)) {
+                if ("media_typ_001".equals(mediaTypCd)) {
 
                     sendCueTopicCreate(cueSheet, cueId, cueItemId, 0L, null, "CueSheet Media Create",
                             spareYn, "Y", "Y", null);
-                }*/
+                }
             }
-        }
+        }*/
 
         return cueSheetMedia.getCueMediaId();
     }

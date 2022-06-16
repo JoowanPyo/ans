@@ -2,6 +2,9 @@ package com.gemiso.zodiac.core.response;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDTO;
+import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
+import com.gemiso.zodiac.exception.InterfaceException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.gemiso.zodiac.exception.UserFailException;
 import lombok.Getter;
@@ -142,6 +145,13 @@ public class ApiErrorResponse extends BaseApiResponse {
 
         return new ApiErrorResponse(error, HttpStatus.NOT_FOUND);
     }
+
+    public static ApiErrorResponse makeInterfaceResponse(InterfaceException exception) {
+        Error error = new Error(ErrorCodes.InternalServerError, exception.getLocalizedMessage(), null);
+
+        return new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
     public static ApiErrorResponse makeUserFailResponse(UserFailException exception) {
         Error error = new Error(ErrorCodes.InternalServerError, exception.getLocalizedMessage(), null);

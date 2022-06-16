@@ -3,11 +3,14 @@ package com.gemiso.zodiac.app.articleOrder;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderCreateDTO;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderDTO;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderStatusDTO;
+import com.gemiso.zodiac.app.articleOrderFile.ArticleOrderFile;
+import com.gemiso.zodiac.app.articleOrderFile.ArticleOrderFileRepository;
 import com.gemiso.zodiac.app.articleOrderFile.dto.ArticleOrderFileDTO;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderUpdateDTO;
 import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderCreateMapper;
 import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderMapper;
 import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderUpdateMapper;
+import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -33,6 +36,7 @@ public class ArticleOrderService {
     private String fileUrl;
 
     private final ArticleOrderRepository articleOrderRepository;
+    private final ArticleOrderFileRepository articleOrderFileRepository;
 
     private final ArticleOrderMapper articleOrderMapper;
     private final ArticleOrderCreateMapper articleOrderCreateMapper;
@@ -138,6 +142,20 @@ public class ArticleOrderService {
     public void delete(long orderId){
 
         ArticleOrder articleOrder = articleOrderFindOrFail(orderId); //해당 기사의뢰 존재유무 확인.
+
+        List<ArticleOrderFile> articleOrderFileList= articleOrder.getArticleOrderFile();
+
+        for (ArticleOrderFile articleOrderFile : articleOrderFileList){
+
+            Long id = articleOrderFile.getId();
+
+            //파일삭제는 하지 않기로
+           /* AttachFile attachFile = articleOrderFile.getFile();
+            String fileLoc = attachFile.getFileLoc();
+            String fileNm = attachFile.getFileNm();*/
+
+            articleOrderFileRepository.deleteById(id);
+        }
         
         articleOrderRepository.deleteById(orderId);//기사의뢰 삭제.
         

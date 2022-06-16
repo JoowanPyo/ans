@@ -1,15 +1,15 @@
-package com.gemiso.zodiac.app.tagArticle;
+package com.gemiso.zodiac.app.ArticleTag;
 
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.tag.Tag;
 import com.gemiso.zodiac.app.tag.TagRepository;
 import com.gemiso.zodiac.app.tag.TagService;
 import com.gemiso.zodiac.app.tag.dto.*;
-import com.gemiso.zodiac.app.tagArticle.mapper.ArticleTagCreateMapper;
-import com.gemiso.zodiac.app.tagArticle.mapper.ArticleTagMapper;
+import com.gemiso.zodiac.app.ArticleTag.mapper.ArticleTagCreateMapper;
+import com.gemiso.zodiac.app.ArticleTag.mapper.ArticleTagMapper;
 import com.gemiso.zodiac.app.tag.mapper.TagMapper;
-import com.gemiso.zodiac.app.tagArticle.dto.ArticleTagCreateDTO;
-import com.gemiso.zodiac.app.tagArticle.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagCreateDTO;
+import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagDTO;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

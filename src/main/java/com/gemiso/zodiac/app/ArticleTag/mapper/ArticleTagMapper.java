@@ -1,7 +1,7 @@
-package com.gemiso.zodiac.app.tagArticle.mapper;
+package com.gemiso.zodiac.app.ArticleTag.mapper;
 
-import com.gemiso.zodiac.app.tagArticle.ArticleTag;
-import com.gemiso.zodiac.app.tagArticle.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.ArticleTag.ArticleTag;
+import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagDTO;
 import com.gemiso.zodiac.core.mapper.GenericMapper;
 import org.mapstruct.Mapper;
 
