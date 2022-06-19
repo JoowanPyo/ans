@@ -9,7 +9,9 @@ import com.gemiso.zodiac.app.user.QUser;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -19,15 +21,16 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public class ArticleRepositoryImpl implements ArticleRepositoryCustorm {
+public class ArticleRepositoryImpl implements ArticleRepositoryCustorm{
 
     private final JPAQueryFactory jpaQueryFactory;
 
+
     @Autowired
     public ArticleRepositoryImpl(JPAQueryFactory jpaQueryFactory) {
+
         this.jpaQueryFactory = jpaQueryFactory;
     }
-
 
     @Override
     public Page<Article> findByArticleList(Date sdate,

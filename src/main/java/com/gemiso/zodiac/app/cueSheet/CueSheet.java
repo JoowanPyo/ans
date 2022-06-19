@@ -1,9 +1,7 @@
 package com.gemiso.zodiac.app.cueSheet;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.baseProgram.BaseProgram;
-import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.program.Program;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -12,9 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(
@@ -209,5 +205,4 @@ public class CueSheet {
         }
 
     }
-
 }

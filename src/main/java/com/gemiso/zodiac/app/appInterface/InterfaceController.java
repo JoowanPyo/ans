@@ -96,30 +96,29 @@ public class InterfaceController {
         List<ParentProgramDTO> parentProgramDTOList = new ArrayList<>();
         String takerCueSheetDTO = "";
 
-        /*try {*/
+        try {
 
-        //날짜로 조회조건이 들어온 경우
-        if (sdate != null && sdate.trim().isEmpty() == false && edate != null && edate.trim().isEmpty() == false) {
+            //날짜로 조회조건이 들어온 경우
+            if (sdate != null && sdate.trim().isEmpty() == false && edate != null && edate.trim().isEmpty() == false) {
 
-            //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
-            SearchDateInterface searchDate = new SearchDateInterface(sdate, edate);
-            parentProgramDTOList = interfaceService.dailyPgmFindAll(searchDate.getStartDate(), searchDate.getEndDate(), brdc_pgm_id, pgm_nm);
+                //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
+                SearchDateInterface searchDate = new SearchDateInterface(sdate, edate);
+                parentProgramDTOList = interfaceService.dailyPgmFindAll(searchDate.getStartDate(), searchDate.getEndDate(), brdc_pgm_id, pgm_nm);
 
-            takerCueSheetDTO = interfaceService.takerPgmToXml(parentProgramDTOList);
-        } else { //날짜로 조회조건이 들어오지 않은 경우
-            parentProgramDTOList = interfaceService.dailyPgmFindAll(null, null, brdc_pgm_id, pgm_nm);
+                takerCueSheetDTO = interfaceService.takerPgmToXml(parentProgramDTOList);
+            } else { //날짜로 조회조건이 들어오지 않은 경우
+                parentProgramDTOList = interfaceService.dailyPgmFindAll(null, null, brdc_pgm_id, pgm_nm);
 
-            takerCueSheetDTO = interfaceService.takerPgmToXml(parentProgramDTOList);
+                takerCueSheetDTO = interfaceService.takerPgmToXml(parentProgramDTOList);
+            }
+
+            return takerCueSheetDTO;
+
+        } catch (Exception e) {
+
+            throw new InterfaceException(e.getMessage());
+
         }
-
-        return takerCueSheetDTO;
-        //throw new Exception();
-
-       /* }catch (Exception e){
-
-            throw new InterfaceException("큐스트를 찾을수 없습니다. 큐시트 아이디 : "+ "123");
-
-        }*/
     }
 
     /*@Operation(summary = "큐시트 상세조회[Taker]", description = "큐시트 상세조회[Taker]")
@@ -178,12 +177,19 @@ public class InterfaceController {
                              @RequestHeader(value = "securityKey") String securityKey) {
 
         log.info("Taker Find : rd_id - " + rd_id);
+        String takerCue = "";
 
-        TakerCueSheetDataDTO takerCueSheetDataDTO = interfaceService.cuefindAll(rd_id, play_seq, cued_seq, vplay_seq, vcued_seq, del_yn,
-                ch_div_cd, usr_id, token, usr_ip, format, lang, os_type);
+        try {
 
-        String takerCue = interfaceService.takerCueToXml(takerCueSheetDataDTO);
+            TakerCueSheetDataDTO takerCueSheetDataDTO = interfaceService.cuefindAll(rd_id, play_seq, cued_seq, vplay_seq, vcued_seq, del_yn,
+                    ch_div_cd, usr_id, token, usr_ip, format, lang, os_type);
 
+            takerCue = interfaceService.takerCueToXml(takerCueSheetDataDTO);
+        } catch (Exception e) {
+
+            throw new InterfaceException(e.getMessage());
+
+        }
         return takerCue;
     }
 
@@ -201,17 +207,25 @@ public class InterfaceController {
 
         String returnData = "";
 
-        if ("N".equals(spare_yn)) {
+        try {
 
-            TakerCueRefreshDataDTO takerCueSheetDTO = interfaceService.takerCueItemRefresh(rd_id, rd_seq);
 
-            returnData = interfaceService.takerCueRefresh(takerCueSheetDTO);
+            if ("N".equals(spare_yn)) {
 
-        } else {
+                TakerCueRefreshDataDTO takerCueSheetDTO = interfaceService.takerCueItemRefresh(rd_id, rd_seq);
 
-            TakerSpareCueRefreshDataDTO takerSpareCueSheetDTO = interfaceService.takerSpareCueItemRefresh(rd_id, rd_seq);
+                returnData = interfaceService.takerCueRefresh(takerCueSheetDTO);
 
-            returnData = interfaceService.takerSpareCueRefresh(takerSpareCueSheetDTO);
+            } else {
+
+                TakerSpareCueRefreshDataDTO takerSpareCueSheetDTO = interfaceService.takerSpareCueItemRefresh(rd_id, rd_seq);
+
+                returnData = interfaceService.takerSpareCueRefresh(takerSpareCueSheetDTO);
+
+            }
+        } catch (Exception e) {
+
+            throw new InterfaceException(e.getMessage());
 
         }
         return returnData;
@@ -237,10 +251,19 @@ public class InterfaceController {
                               @RequestParam(value = "os_type", required = false) String os_type,
                               @RequestHeader(value = "securityKey") String securityKey) {
 
-        TakerCodeDTO takerCodeDTO = interfaceService.codeFindAll(key, ch_div_cd, usr_id, token, usr_ip, format, lang, os_type);
+        String takerCode = "";
+        try {
 
-        String takerCode = interfaceService.codeToTakerCodeXml(takerCodeDTO);
 
+            TakerCodeDTO takerCodeDTO = interfaceService.codeFindAll(key, ch_div_cd, usr_id, token, usr_ip, format, lang, os_type);
+
+            takerCode = interfaceService.codeToTakerCodeXml(takerCodeDTO);
+
+        } catch (Exception e) {
+
+            throw new InterfaceException(e.getMessage());
+
+        }
         return takerCode;
     }
 
@@ -293,21 +316,28 @@ public class InterfaceController {
         List<PrompterProgramDTO> prompterProgramDTOList = new ArrayList<>();
         String prompterProgram = "";
 
-        //날짜로 조회조건이 들어온 경우
-        if (sdate != null && sdate.trim().isEmpty() == false && fdate != null && fdate.trim().isEmpty() == false) {
+        try {
 
-            //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
-            SearchDateInterface searchDate = new SearchDateInterface(sdate, fdate);
+            //날짜로 조회조건이 들어온 경우
+            if (sdate != null && sdate.trim().isEmpty() == false && fdate != null && fdate.trim().isEmpty() == false) {
 
-            prompterProgramDTOList = interfaceService.getMstListService(pro_id, searchDate.getStartDate(), searchDate.getEndDate());
+                //검색날짜 시간설정 (검색시작 Date = yyyy-MM-dd 00:00:00 / 검색종료 Date yyyy-MM-dd 23:59:59)
+                SearchDateInterface searchDate = new SearchDateInterface(sdate, fdate);
 
-            prompterProgram = interfaceService.prompterProgramToXml(prompterProgramDTOList);
-        } else {
-            prompterProgramDTOList = interfaceService.getMstListService(pro_id, null, null);
+                prompterProgramDTOList = interfaceService.getMstListService(pro_id, searchDate.getStartDate(), searchDate.getEndDate());
 
-            prompterProgram = interfaceService.prompterProgramToXml(prompterProgramDTOList);
+                prompterProgram = interfaceService.prompterProgramToXml(prompterProgramDTOList);
+            } else {
+                prompterProgramDTOList = interfaceService.getMstListService(pro_id, null, null);
+
+                prompterProgram = interfaceService.prompterProgramToXml(prompterProgramDTOList);
+            }
+
+        } catch (Exception e) {
+
+            throw new InterfaceException(e.getMessage());
+
         }
-
 
         return prompterProgram;
     }
@@ -324,11 +354,19 @@ public class InterfaceController {
 
         log.info("Prompter Find : cs_id - " + cs_id);
 
-        //set Lsit<PrompterCueRefreshDTO>
-        PrompterCueSheetDataDTO prompterCueSheetDataDTO = interfaceService.getCuesheetService(cs_id);
+        String prompterCueSheetXml = "";
+        try {
 
-        String prompterCueSheetXml = interfaceService.prompterCueSheetXml(prompterCueSheetDataDTO);
+            //set Lsit<PrompterCueRefreshDTO>
+            PrompterCueSheetDataDTO prompterCueSheetDataDTO = interfaceService.getCuesheetService(cs_id);
 
+            prompterCueSheetXml = interfaceService.prompterCueSheetXml(prompterCueSheetDataDTO);
+
+        } catch (Exception e) {
+
+            throw new InterfaceException(e.getMessage());
+
+        }
         return prompterCueSheetXml;
     }
 
@@ -413,11 +451,19 @@ public class InterfaceController {
                                 @RequestHeader(value = "securityKey") String securityKey) throws JsonProcessingException {
 
         log.info("Taker CueSheet State Code Update : rd_id - " + rd_id + " cue_st_cd : " + takerCdUpdateDTO.toString());
+        String takerCueSheetDTO = "";
+        try {
 
-        ParentProgramDTO parentProgramDTO = interfaceService.cueStCdUpdate(rd_id, takerCdUpdateDTO);
 
-        String takerCueSheetDTO = interfaceService.takerPgmToXmlOne(parentProgramDTO);
+            ParentProgramDTO parentProgramDTO = interfaceService.cueStCdUpdate(rd_id, takerCdUpdateDTO);
 
+            takerCueSheetDTO = interfaceService.takerPgmToXmlOne(parentProgramDTO);
+
+        } catch (Exception e) {
+
+            throw new InterfaceException(e.getMessage());
+
+        }
         return takerCueSheetDTO;
     }
 
@@ -469,8 +515,16 @@ public class InterfaceController {
 
         log.info("Taker On Air status  : rd_id - " + takerToCueBodyDTO.toString());
 
-        interfaceService.takerSetCue2(takerToCueBodyDTO);
+        try {
 
+
+            interfaceService.takerSetCue2(takerToCueBodyDTO);
+
+        } catch (Exception e) {
+
+            throw new InterfaceException(e.getMessage());
+
+        }
         return AnsApiResponse.ok();
     }
 

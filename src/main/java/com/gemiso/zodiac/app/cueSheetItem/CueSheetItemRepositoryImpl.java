@@ -69,4 +69,36 @@ public class CueSheetItemRepositoryImpl implements CueSheetItemRepositoryCustorm
         return jpaQuery.fetch();
 
     }
+
+    @Override
+    public List<CueSheetItem> findByCueSheetItemMediaList(Long cueId) {
+
+
+        QCueSheetItem qCueSheetItem = QCueSheetItem.cueSheetItem;
+        QCueSheet qCueSheet = QCueSheet.cueSheet;
+        QArticle qArticle = QArticle.article;
+        QCueSheetTemplate qCueSheetTemplate = QCueSheetTemplate.cueSheetTemplate;
+        QCueSheetMedia qCueSheetMedia = QCueSheetMedia.cueSheetMedia;
+        QCueSheetItemCap qCueSheetItemCap = QCueSheetItemCap.cueSheetItemCap;
+        QCueSheetItemSymbol qCueSheetItemSymbol = QCueSheetItemSymbol.cueSheetItemSymbol;
+
+        JPAQuery jpaQuery = jpaQueryFactory.select(qCueSheetItem).from(qCueSheetItem)
+                .leftJoin(qCueSheetItem.cueSheet, qCueSheet).fetchJoin()
+                .leftJoin(qCueSheetItem.article, qArticle).fetchJoin()
+                .leftJoin(qCueSheetItem.cueSheetMedia, qCueSheetMedia).fetchJoin()
+                .leftJoin(qCueSheetItem.cueSheetTemplate, qCueSheetTemplate).fetchJoin()
+                .leftJoin(qCueSheetItem.cueSheetItemCap, qCueSheetItemCap).fetchJoin()
+                .leftJoin(qCueSheetItem.cueSheetItemSymbol, qCueSheetItemSymbol).fetchJoin().distinct();
+
+        //쿼리 where 조건 추가.
+        if (ObjectUtils.isEmpty(cueId) == false) {
+            jpaQuery.where(qCueSheetItem.cueSheet.cueId.eq(cueId));
+        }
+
+        jpaQuery.where(qCueSheetItem.delYn.eq("N"));
+
+        jpaQuery.orderBy(qCueSheetItem.cueItemOrd.asc());
+
+        return jpaQuery.fetch();
+    }
 }

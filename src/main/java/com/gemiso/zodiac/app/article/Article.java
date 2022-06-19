@@ -15,7 +15,9 @@ import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "tb_artcl",
@@ -32,6 +34,7 @@ import java.util.*;
 @ToString(exclude = {"issue", "cueSheet", "articleMedia", "articleCap", "anchorCap"})
 @DynamicUpdate
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+//@Document(indexName = "articles")
 public class Article extends BaseEntity {
 
     @Id
@@ -367,5 +370,4 @@ public class Article extends BaseEntity {
         }
 
     }
-
 }

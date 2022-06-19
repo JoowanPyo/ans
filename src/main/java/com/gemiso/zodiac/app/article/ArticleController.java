@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.article;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.article.dto.*;
 import com.gemiso.zodiac.core.enumeration.AuthEnum;
 import com.gemiso.zodiac.core.helper.SearchDate;
@@ -90,6 +89,59 @@ public class ArticleController {
 
         return new AnsApiResponse<>(pageList);
     }
+
+    /*@Operation(summary = "기사 목록조회 [엘라스틱]", description = "기사 목록조회 [엘라스틱]")
+    @GetMapping(path = "/elasticsearch")
+    public AnsApiResponse<?> findAllElasticsearch(
+            @Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+            @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+            @Parameter(name = "rcvDt", description = "수신일자(yyyyMMdd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date rcvDt,
+            @Parameter(name = "rptrId", description = "기자 아이디") @RequestParam(value = "rptrId", required = false) String rptrId,
+            @Parameter(name = "inputrId", description = "등록자 아이디") @RequestParam(value = "inputrId", required = false) String inputrId,
+            @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디") @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
+            @Parameter(name = "artclDivCd", description = "기사구분코드(01:일반, 02:전체, 03:이슈)") @RequestParam(value = "artclDivCd", required = false) String artclDivCd,
+            @Parameter(name = "artclTypCd", description = "기사유형코드(01:스트레이트, 02:리포트, 03:C/T, 04:하단롤, 05:긴급자막)") @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
+            @Parameter(name = "searchDivCd", description = "검색구분코드<br>01 - 기사제목<br>02 - 기자명") @RequestParam(value = "searchDivCd", required = false) String searchDivCd,
+            @Parameter(name = "searchWord", description = "검색키워드") @RequestParam(value = "searchWord", required = false) String searchWord,
+            @Parameter(name = "page", description = "시작페이지") @RequestParam(value = "page", required = false) Integer page,
+            @Parameter(name = "limit", description = "한 페이지에 데이터 수") @RequestParam(value = "limit", required = false) Integer limit,
+            @Parameter(name = "apprvDivCdList", description = "픽스구분코드(fix_none,article_fix,editor_fix,anchor_fix,desk_fix)") @RequestParam(value = "apprvDivCdList", required = false) List<String> apprvDivCdList,
+            @Parameter(name = "deptCd", description = "부서코드") @RequestParam(value = "deptCd", required = false) Integer deptCd,
+            @Parameter(name = "artclCateCd", description = "기사 카테고리 코드") @RequestParam(value = "artclCateCd", required = false) String artclCateCd,
+            @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
+            @Parameter(name = "delYn", description = "삭제 여부") @RequestParam(value = "delYn", required = false) String delYn,
+            @Parameter(name = "artclId", description = "기사아이디") @RequestParam(value = "artclId", required = false) Long artclId,
+            @Parameter(name = "orgArtclId", description = "원본기사 아이디") @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,
+            @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]") @RequestParam(value = "copyYn", required = false) String copyYn) throws Exception {
+
+        PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> pageList = null;
+        //List<ArticleDTO> articleDTOList = new ArrayList<>();
+
+        //기사읽기 권한이 없는 사용자 error.forbidden
+        //List<String> userAuth = userAuthService.authChk(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminRead.getAuth());
+        // if (userAuthService.authChks(AuthEnum.ArticleRead.getAuth(), AuthEnum.AdminMode.getAuth())) { //기사읽기 권한이거나, 관리자 읽기 권한일 경우 가능.
+        //     throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        // }
+
+        //검색조건 날짜형식이 들어왔을경우
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
+
+            SearchDate searchDate = new SearchDate(sdate, edate);
+
+            pageList = articleService.findAllElasticsearch(searchDate.getStartDate(), searchDate.getEndDate(), rcvDt, rptrId, inputrId,
+                    brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd,
+                    artclCateCd, artclTypDtlCd, delYn, artclId, copyYn, orgArtclId);
+            //검색조건 날짜형식이 안들어왔을경우
+        } else {
+
+            pageList = articleService.findAllElasticsearch(null, null, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd,
+                    artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd, artclCateCd,
+                    artclTypDtlCd, delYn, artclId, copyYn, orgArtclId);
+
+        }
+
+        return new AnsApiResponse<>(pageList);
+    }*/
 
     @Operation(summary = "기사 목록조회[큐시트]", description = "기사 목록조회[큐시트]")
     @GetMapping(path = "/cuesheet")
@@ -189,11 +241,14 @@ public class ArticleController {
 
         log.info("Article Create : User Id - " + userId + "<br>" + "Create Model - " + articleCreateDTO);
 
-        Long artclId = articleService.create(articleCreateDTO, userId);
+        Article article = articleService.create(articleCreateDTO, userId);
+
+        //엘라스틱서치 등록
+        //articleService.elasticCreate(article);
 
         //기사 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
-        articleDTO.setArtclId(artclId);
+        articleDTO.setArtclId(article.getArtclId());
 
         log.info("Article Create Success ID : " + articleDTO);
 
@@ -218,8 +273,10 @@ public class ArticleController {
             return new AnsApiResponse<>(articleAuthConfirmDTO);
         }
 
-        articleService.update(articleUpdateDTO, artclId, userId);
+        Article article = articleService.update(articleUpdateDTO, artclId, userId);
 
+        //엘라스틱서치 업데이트
+        //articleService.elasticUpdate(article);
         /* ArticleDTO articleDTO = articleService.find(artclId);*/
         //기사 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
@@ -241,7 +298,10 @@ public class ArticleController {
         log.info("Article Delete  : User Id - " + userId + "<br>" +
                 " Article Id" + artclId);
 
-        articleService.delete(artclId, userId);
+        Article article = articleService.delete(artclId, userId);
+
+        //엘라스틱서치 업데이트
+        //articleService.elasticUpdate(article);
 
         return AnsApiResponse.noContent();
 
@@ -332,7 +392,10 @@ public class ArticleController {
         log.info("Article Fix Info : ArticleId = " + artclId /*+" OrgApprvDivcd : " + orgApprvDivcd*/ + "NewApprvDivcd : " + apprvDivCd
                 + " User Id : " + userId);
 
-        articleService.vaildFixStaus(artclId, apprvDivCd, userId);
+        Article article = articleService.vaildFixStaus(artclId, apprvDivCd, userId);
+
+        //엘라스틱서치 업데이트
+        //articleService.elasticUpdate(article);
 
         ArticleDTO articleDTO = articleService.find(artclId);
 

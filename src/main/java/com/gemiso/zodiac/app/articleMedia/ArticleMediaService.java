@@ -108,7 +108,7 @@ public class ArticleMediaService {
         /********** MQ [TOPIC] ************/
 
         //이현준 부장, 이현진 차장 요청으로 매칭하고 부조전송 완료된 미디어만 웹소켓 메세지 전송
-       /* CueSheet cueSheet = article.getCueSheet();
+        CueSheet cueSheet = article.getCueSheet();
 
         if (ObjectUtils.isEmpty(cueSheet) == false) {
 
@@ -144,7 +144,7 @@ public class ArticleMediaService {
             }
 
 
-        }*/
+        }
 
         return articleMediaDTO;
 
@@ -163,7 +163,7 @@ public class ArticleMediaService {
 
         }
 
-        Long orgArtclId = article.getOrgArtclId();
+        /*Long orgArtclId = article.getOrgArtclId();
 
         if (artclId.equals(orgArtclId) == false) {
 
@@ -184,7 +184,7 @@ public class ArticleMediaService {
 
             //interface에 큐메세지 전송
             topicSendService.topicInterface(interfaceJson);
-        }
+        }*/
 
         CueSheetWebTopicDTO cueSheetWebTopicDTO = new CueSheetWebTopicDTO();
         cueSheetWebTopicDTO.setEventId("Article Media Create");

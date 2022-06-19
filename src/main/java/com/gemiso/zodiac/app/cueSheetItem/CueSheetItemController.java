@@ -357,5 +357,15 @@ public class CueSheetItemController {
         return new AnsApiResponse<>(cueSheetItemSimpleDTO);
     }
 
+    @Operation(summary = "큐시트 아이템 영상 매칭 목록 조회", description = "큐시트 아이템 영상 매칭 목록 조회")
+    @GetMapping(path = "/medialist")
+    public AnsApiResponse<CueSheetItemMediaListDTO> findAllMedia(@Parameter(name = "cueId", description = "큐시트 아이디")
+                                                         @RequestParam(value = "cueId", required = false) Long cueId) {
+
+        CueSheetItemMediaListDTO cueSheetItemMediaListDTO = cueSheetItemService.findAllMedia(cueId);
+
+        return new AnsApiResponse<>(cueSheetItemMediaListDTO);
+    }
+
 
 }

@@ -3,6 +3,7 @@ package com.gemiso.zodiac.app.cueSheetMedia;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaCreateDTO;
@@ -13,6 +14,7 @@ import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaMapper;
 import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaUpdateMapper;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.core.topic.CueSheetTopicService;
 import com.gemiso.zodiac.core.topic.TopicSendService;
 import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerCueSheetTopicDTO;
 import com.gemiso.zodiac.core.topic.cueSheetTopicDTO.CueSheetWebTopicDTO;
@@ -45,6 +47,7 @@ public class CueSheetMediaService {
     private final UserAuthService userAuthService;
 
     private final TopicSendService topicSendService;
+    private final CueSheetTopicService cueSheetTopicService;
     private final MarshallingJsonHelper marshallingJsonHelper;
 
 
@@ -110,7 +113,7 @@ public class CueSheetMediaService {
 
         /********** MQ [TOPIC] ************/
         //이현준 부장, 이현진 차장 요청으로 매칭하고 부조전송 완료된 미디어만 웹소켓 메세지 전송
-        /*CueSheetItem cueSheetItem = cueSheetMedia.getCueSheetItem();
+        CueSheetItem cueSheetItem = cueSheetMedia.getCueSheetItem();
 
         if (ObjectUtils.isEmpty(cueSheetItem) == false){
 
@@ -124,6 +127,7 @@ public class CueSheetMediaService {
                 String spareYn = getCueSheetItem.getSpareYn();
 
                 CueSheet cueSheet = getCueSheetItem.getCueSheet();
+
                 Long cueId = 0L;
                 if (ObjectUtils.isEmpty(cueSheet) == false){
                     cueId = cueSheet.getCueId();
@@ -134,11 +138,11 @@ public class CueSheetMediaService {
 
                 if ("media_typ_001".equals(mediaTypCd)) {
 
-                    sendCueTopicCreate(cueSheet, cueId, cueItemId, 0L, null, "CueSheet Media Create",
-                            spareYn, "Y", "Y", null);
+                    cueSheetTopicService.sendMediTopicCreate(cueSheet, cueId, cueItemId, null, null, "Create Media",
+                            spareYn, "N", "N");
                 }
             }
-        }*/
+        }
 
         return cueSheetMedia.getCueMediaId();
     }

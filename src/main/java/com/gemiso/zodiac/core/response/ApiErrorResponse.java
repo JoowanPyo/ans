@@ -159,9 +159,9 @@ public class ApiErrorResponse extends BaseApiResponse {
         return new ApiErrorResponse(error, HttpStatus.FORBIDDEN);
     }
 
-    public static ApiErrorResponse makeJonsFailResponse(JsonProcessingException exception) {
+    public static ApiErrorResponse makeJsonFailResponse(JsonProcessingException exception) {
 
-        Error error = new Error(ErrorCodes.InternalServerError, exception.getLocalizedMessage(), null);
+        Error error = new Error(ErrorCodes.InternalServerError, exception.getMessage(), null);
 
         return new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -172,7 +172,7 @@ public class ApiErrorResponse extends BaseApiResponse {
         //HashMap<String, List<String>> errors = exception.hashCode();
         //Error error = new Error(ErrorCodes.InvalidArguments, "입력 값이 유효하지 않습니다.", errors);
 
-        Error error = new Error(ErrorCodes.InternalServerError, exception.getLocalizedMessage(), null);
+        Error error = new Error(ErrorCodes.InternalServerError, exception.getMessage(), null);
 
         return new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }

@@ -3,6 +3,7 @@ package com.gemiso.zodiac.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.appInterface.interfaceExceptionDTO.InterfaceExceptionDTO;
+import com.gemiso.zodiac.app.appInterface.interfaceExceptionDTO.InterfaceExceptionResultDTO;
 import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
 import com.gemiso.zodiac.core.response.ApiErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -85,15 +86,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
 
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.makeInterfaceResponse(ex);
 
-
         InterfaceExceptionDTO dto = new InterfaceExceptionDTO();
-        dto.setErrors(apiErrorResponse.getError().getErrors());
+        InterfaceExceptionResultDTO resultDTO = new InterfaceExceptionResultDTO();
+        resultDTO.setSuccess("false");
+        resultDTO.setMsg(apiErrorResponse.getError().getMessage());
+        dto.setResult(resultDTO);
+       /* dto.setErrors(apiErrorResponse.getError().getErrors());
         dto.setCode(apiErrorResponse.getError().getCode().toString());
         dto.setMessage(apiErrorResponse.getError().getMessage());
-        dto.setStatus(apiErrorResponse.getStatus());
+        dto.setStatus(apiErrorResponse.getStatus());*/
 
         //DTO TO XML 파싱
-        String xml = JAXBXmlHelper.marshal(dto, InterfaceExceptionDTO.class);
+        String xml = JAXBXmlHelper.marshalNohead(dto, InterfaceExceptionDTO.class);
 
         return xml;
     }
@@ -118,9 +122,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
     @ExceptionHandler(value = {JsonProcessingException.class})
     public ResponseEntity<Object> handleJsonProcessingException(HttpServletRequest request, JsonProcessingException e) {
 
-        log.error(" JsonProcessingException : "+ApiErrorResponse.makeJonsFailResponse(e));
+        log.error(" JsonProcessingException : "+ApiErrorResponse.makeJsonFailResponse(e));
 
-        return new ResponseEntity<>(ApiErrorResponse.makeJonsFailResponse(e), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(ApiErrorResponse.makeJsonFailResponse(e), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = { ExpiredJwtException.class })

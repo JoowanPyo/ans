@@ -41,17 +41,36 @@ public class CueSheetTopicService {
         topicSendService.topicInterface(json);
 
 
-        //CueSheetWebTopicDTO cueSheetWebTopicDTO = new CueSheetWebTopicDTO();
-        //cueSheetWebTopicDTO.setEventId(eventId);
-        //cueSheetWebTopicDTO.setCueId(cueId);
-        //cueSheetWebTopicDTO.setCueItemId(cueItemId);
-        //cueSheetWebTopicDTO.setArtclId(artclId);
-        //cueSheetWebTopicDTO.setCueVer(cueSheet.getCueVer());
-        //cueSheetWebTopicDTO.setCueOderVer(cueSheet.getCueOderVer());
-        //cueSheetWebTopicDTO.setSpareYn(spareYn);
-        //String webJson = marshallingJsonHelper.MarshallingJson(cueSheetWebTopicDTO);
+        CueSheetWebTopicDTO cueSheetWebTopicDTO = new CueSheetWebTopicDTO();
+        cueSheetWebTopicDTO.setEventId(eventId);
+        cueSheetWebTopicDTO.setCueId(cueId);
+        cueSheetWebTopicDTO.setCueItemId(cueItemId);
+        cueSheetWebTopicDTO.setArtclId(artclId);
+        cueSheetWebTopicDTO.setCueVer(cueSheet.getCueVer());
+        cueSheetWebTopicDTO.setCueOderVer(cueSheet.getCueOderVer());
+        cueSheetWebTopicDTO.setSpareYn(spareYn);
+        String webJson = marshallingJsonHelper.MarshallingJson(cueSheetWebTopicDTO);
         //web에 큐메세지 전송
-        //topicSendService.topicWeb(webJson);
+        topicSendService.topicWeb(webJson);
+
+    }
+
+    //미디어
+    public void sendMediTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
+                                   String spareYn, String prompterFlag, String videoTakerFlag) throws JsonProcessingException {
+
+
+        CueSheetWebTopicDTO cueSheetWebTopicDTO = new CueSheetWebTopicDTO();
+        cueSheetWebTopicDTO.setEventId(eventId);
+        cueSheetWebTopicDTO.setCueId(cueId);
+        cueSheetWebTopicDTO.setCueItemId(cueItemId);
+        cueSheetWebTopicDTO.setArtclId(artclId);
+        cueSheetWebTopicDTO.setCueVer(cueSheet.getCueVer());
+        cueSheetWebTopicDTO.setCueOderVer(cueSheet.getCueOderVer());
+        cueSheetWebTopicDTO.setSpareYn(spareYn);
+        String webJson = marshallingJsonHelper.MarshallingJson(cueSheetWebTopicDTO);
+        //web에 큐메세지 전송
+        topicSendService.topicWeb(webJson);
 
     }
 
