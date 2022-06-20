@@ -42,6 +42,7 @@ import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
+import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
 import com.gemiso.zodiac.app.cueSheetItemCap.CueSheetItemCap;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
@@ -88,6 +89,7 @@ public class InterfaceService {
     private final ArticleMediaMapper articleMediaMapper;
     private final CueSheetMapper cueSheetMapper;
     private final CueSheetMediaMapper cueSheetMediaMapper;
+    private final CueSheetItemMapper cueSheetItemMapper;
 
     private final CueSheetService cueSheetService;
     private final CueSheetItemService cueSheetItemService;
@@ -2247,7 +2249,10 @@ public class InterfaceService {
     public CueSheetDTO getCueSheetItemArticle(CueSheetDTO cueSheetDTO) {
 
         List<CueSheetItemDTO> setItemList = new ArrayList<>();
-        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetDTO.getCueSheetItem();
+        Long cueId = cueSheetDTO.getCueId();
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
+
+        List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
 
         for (CueSheetItemDTO cueSheetItemDTO : cueSheetItemDTOList) {
 

@@ -46,6 +46,10 @@ import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
+import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticle;
+import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleDTO;
+import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleRepository;
+import com.gemiso.zodiac.app.elasticsearch.mapper.ElasticSearchArticleMapper;
 import com.gemiso.zodiac.app.facilityManage.FacilityManageService;
 import com.gemiso.zodiac.app.facilityManage.dto.FacilityManageDTO;
 import com.gemiso.zodiac.app.issue.Issue;
@@ -94,6 +98,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -123,7 +128,7 @@ public class ArticleService {
     private final ArticleMediaRepository articleMediaRepository;
     private final CueSheetRepository cueSheetRepository;
     private final ArticleTagRepository articleTagRepository;
-    //private final ElasticSearchArticleRepository elasticSearchArticleRepository;
+    private final ElasticSearchArticleRepository elasticSearchArticleRepository;
 
     private final ArticleMapper articleMapper;
     private final ArticleCreateMapper articleCreateMapper;
@@ -137,7 +142,7 @@ public class ArticleService {
     private final ArticleMediaSimpleMapper articleMediaSimpleMapper;
     private final ArticleMediaCreateMapper articleMediaCreateMapper;
     private final ArticleTagMapper articleTagMapper;
-    //private final ElasticSearchArticleMapper elasticSearchArticleMapper;
+    private final ElasticSearchArticleMapper elasticSearchArticleMapper;
 
     //private final UserAuthService userAuthService;
     private final UserAuthChkService userAuthChkService;
@@ -179,20 +184,21 @@ public class ArticleService {
     }
 
     //기사 목록조회 [엘라스틱서치]
-    /*public PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> findAllElasticsearch(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
-                                                      String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
-                                                      Integer page, Integer limit, List<String> apprvDivCdList, Integer deptCd,
-                                                      String artclCateCd, String artclTypDtlCd, String delYn, Long artclId, String copyYn,
-                                                      Long orgArtclId) {
+    public PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> findAllElasticsearch(
+            Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
+             String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
+             Integer page, Integer limit, List<String> apprvDivCdList, Integer deptCd,
+             String artclCateCd, String artclTypDtlCd, String delYn, Long artclId, String copyYn,
+             Long orgArtclId) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
         Pageable pageable = pageHelper.getArticlePageInfo();
 
-        *//*BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  rcvDt,  rptrId,  inputrId,  brdcPgmId,
+        /*BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  rcvDt,  rptrId,  inputrId,  brdcPgmId,
                  artclDivCd,  artclTypCd,  searchDivCd,  searchWord,
                  apprvDivCdList,  deptCd,  artclCateCd,  artclTypDtlCd,
-                 delYn,  artclId,  copyYn,  orgArtclId);*//*
+                 delYn,  artclId,  copyYn,  orgArtclId);*/
 
         //전체조회[page type]
         Page<ElasticSearchArticle> result = elasticSearchArticleRepository.findByElasticSearchArticleList(sdate,  edate,  rcvDt,  rptrId,  inputrId,  brdcPgmId,
@@ -205,7 +211,7 @@ public class ArticleService {
 
 
         return new PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle>(result, fn);
-    }*/
+    }
 
     //기사 목록조회[이슈 기사]
     public PageResultDTO<ArticleDTO, Article> findAllIsuue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd, String artclTypDtlCd,
@@ -330,7 +336,15 @@ public class ArticleService {
     }
 
     //엘라스틱 서치 등록
-    /*public void elasticCreate(Article article){
+    public void elasticCreate(Article article) throws ParseException {
+
+        Date getInputDtm = article.getInputDtm();
+
+        String inputDtm = null;
+        if (ObjectUtils.isEmpty(getInputDtm) == false){
+
+            inputDtm = dateChangeHelper.dateToStringNormal(getInputDtm);
+        }
 
 
         ElasticSearchArticle entity = ElasticSearchArticle.builder()
@@ -350,17 +364,25 @@ public class ArticleService {
                 .delYn(article.getDelYn())
                 .deptCd(article.getDeptCd())
                 .embgYn(article.getEmbgYn())
-                .inputDtm(article.getInputDtm())
+                .inputDtm(inputDtm)
                 .inputrId(article.getInputrId())
                 .lckYn(article.getLckYn())
                 .orgArtclId(article.getOrgArtclId())
                 .build();
 
         elasticSearchArticleRepository.save(entity);
-    }*/
+    }
 
     //엘라스틱 서치 업데이트
-    /*public void elasticUpdate(Article article){
+    public void elasticUpdate(Article article) throws ParseException {
+
+        Date getInputDtm = article.getInputDtm();
+
+        String inputDtm = null;
+        if (ObjectUtils.isEmpty(getInputDtm) == false){
+
+            inputDtm = dateChangeHelper.dateToStringNormal(getInputDtm);
+        }
 
         CueSheet cueSheet = article.getCueSheet();
 
@@ -391,14 +413,14 @@ public class ArticleService {
                 .delYn(article.getDelYn())
                 .deptCd(article.getDeptCd())
                 .embgYn(article.getEmbgYn())
-                .inputDtm(article.getInputDtm())
+                .inputDtm(inputDtm)
                 .inputrId(article.getInputrId())
                 .lckYn(article.getLckYn())
                 .orgArtclId(article.getOrgArtclId())
                 .build();
 
         elasticSearchArticleRepository.save(entity);
-    }*/
+    }
 
     //기사 수정
     public Article update(ArticleUpdateDTO articleUpdateDTO, Long artclId, String userId) throws Exception {

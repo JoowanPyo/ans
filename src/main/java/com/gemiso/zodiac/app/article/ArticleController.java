@@ -1,6 +1,8 @@
 package com.gemiso.zodiac.app.article;
 
 import com.gemiso.zodiac.app.article.dto.*;
+import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticle;
+import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleDTO;
 import com.gemiso.zodiac.core.enumeration.AuthEnum;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.page.PageResultDTO;
@@ -90,7 +92,7 @@ public class ArticleController {
         return new AnsApiResponse<>(pageList);
     }
 
-    /*@Operation(summary = "기사 목록조회 [엘라스틱]", description = "기사 목록조회 [엘라스틱]")
+    @Operation(summary = "기사 목록조회 [엘라스틱]", description = "기사 목록조회 [엘라스틱]")
     @GetMapping(path = "/elasticsearch")
     public AnsApiResponse<?> findAllElasticsearch(
             @Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
@@ -141,7 +143,7 @@ public class ArticleController {
         }
 
         return new AnsApiResponse<>(pageList);
-    }*/
+    }
 
     @Operation(summary = "기사 목록조회[큐시트]", description = "기사 목록조회[큐시트]")
     @GetMapping(path = "/cuesheet")
@@ -241,10 +243,11 @@ public class ArticleController {
 
         log.info("Article Create : User Id - " + userId + "<br>" + "Create Model - " + articleCreateDTO);
 
+
         Article article = articleService.create(articleCreateDTO, userId);
 
         //엘라스틱서치 등록
-        //articleService.elasticCreate(article);
+        articleService.elasticCreate(article);
 
         //기사 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
@@ -276,7 +279,7 @@ public class ArticleController {
         Article article = articleService.update(articleUpdateDTO, artclId, userId);
 
         //엘라스틱서치 업데이트
-        //articleService.elasticUpdate(article);
+        articleService.elasticUpdate(article);
         /* ArticleDTO articleDTO = articleService.find(artclId);*/
         //기사 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();

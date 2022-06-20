@@ -26,6 +26,23 @@ public class DateChangeHelper {
         return returnDate;
     }
 
+    //Date To Date
+    public Date DateToDate(Date date) throws ParseException {
+
+        Date returnDate = null;
+
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        if (ObjectUtils.isEmpty(date) == false){
+
+            String data2 = transFormat.format(date);
+            returnDate = transFormat.parse(data2);
+        }
+
+
+        return returnDate;
+    }
+
     //String형식을 Date으로 파싱
     public Date StringToDateNormal(String str) throws ParseException {
 

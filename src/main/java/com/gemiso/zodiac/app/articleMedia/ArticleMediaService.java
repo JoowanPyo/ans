@@ -20,6 +20,7 @@ import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
+import com.gemiso.zodiac.core.topic.CueSheetTopicService;
 import com.gemiso.zodiac.core.topic.TopicSendService;
 import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerCueSheetTopicDTO;
 import com.gemiso.zodiac.core.topic.cueSheetTopicDTO.CueSheetWebTopicDTO;
@@ -53,8 +54,9 @@ public class ArticleMediaService {
     private final ArticleMapper articleMapper;
 
     private final ArticleService articleService;
-    private final CueSheetItemService cueSheetItemService;
-    private final CueSheetService cueSheetService;
+    private final CueSheetTopicService cueSheetTopicService;
+    //private final CueSheetItemService cueSheetItemService;
+    //private final CueSheetService cueSheetService;
 
     //private final UserAuthService userAuthService;
 
@@ -137,8 +139,10 @@ public class ArticleMediaService {
 
                     if ("media_typ_001".equals(mediaTypCd)) {
 
-                        sendCueTopicCreate(cuesheetEntity, cuesheetEntity.getCueId(), cueSheetItemEntity.getCueItemId(), articleId, null, "Article Media Create",
-                                cueSheetItemEntity.getSpareYn(), "Y", "Y", article);
+                        /************ MQ messages *************/
+
+                        cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, null, artclId, null, "Create Media",
+                                null, "N", "N");
                     }
                 }
             }
@@ -276,8 +280,8 @@ public class ArticleMediaService {
 
                     if ("media_typ_001".equals(mediaTypCd)) {
 
-                        sendCueTopicCreate(cuesheetEntity, cuesheetEntity.getCueId(), cueSheetItemEntity.getCueItemId(), articleId, null, "Article Media Delete",
-                                cueSheetItemEntity.getSpareYn(), "N", "Y", article);
+                        cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, null, artclId, null, "Delete Media",
+                                null, "N", "N");
                     }
                 }
             }
