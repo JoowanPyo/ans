@@ -32,4 +32,7 @@ public interface CodeRepository extends JpaRepository<Code, Long> , QuerydslPred
     //and a.useYn = 'Y'뺌 이유는 어차피 관리자밖에 사용안함.
     @Query("select a from Code a where a.hrnkCdId = :hrnkCd and a.delYn = 'N' order by a.cdOrd asc ")
     List<Code> findCodeList(@Param("hrnkCd")String hrnkCd);
+
+    @Query("select a from Code a where a.hrnkCdId = '' and a.delYn = 'N' ")
+    List<Code> findHrnkCodeList();
 }

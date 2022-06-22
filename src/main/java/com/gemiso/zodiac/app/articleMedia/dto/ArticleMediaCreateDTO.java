@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-@Schema(description = "기사미디어 등록 DTO")
+@Schema(description = "기사미디어 등록 articleDTO")
 @Data
 @Builder
 @NoArgsConstructor

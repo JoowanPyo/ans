@@ -61,7 +61,7 @@ public class ScrollNewsService {
         //목록조회된 엔티티 리스트 DTO변환
         List<ScrollNewsDTO> scrollNewsDTOList = scrollNewsMapper.toDtoList(scrollNews);
         
-        //DTO 리스트 리턴
+        //articleDTO 리스트 리턴
         return scrollNewsDTOList;
     }
 

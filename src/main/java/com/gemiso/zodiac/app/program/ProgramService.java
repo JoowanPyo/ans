@@ -34,13 +34,13 @@ public class ProgramService {
 
     private final UserAuthService userAuthService;
 
-    public List<ProgramDTO> findAll(String brdcPgmNm) {
+    public List<ProgramDTO> findAll(String brdcPgmNm, String useYn) {
 
         //BooleanBuilder booleanBuilder = getSearch(brdcPgmNm);
 
         //List<Program> programList = (List<Program>) programRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "inputDtm"));
 
-        List<Program> programList = (List<Program>) programRepository.findByProgram(brdcPgmNm);
+        List<Program> programList = (List<Program>) programRepository.findByProgram(brdcPgmNm, useYn);
 
         List<ProgramDTO> programDTOList = programMapper.toDtoList(programList);
 
@@ -95,6 +95,7 @@ public class ProgramService {
         programDTO.setDelrId(userId);
         programDTO.setDelDtm(new Date());
         programDTO.setDelYn("Y");
+        programDTO.setUseYn("N");
 
 
         programMapper.updateFromDto(programDTO, program);

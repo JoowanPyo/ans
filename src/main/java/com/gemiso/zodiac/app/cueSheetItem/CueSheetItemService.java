@@ -1196,7 +1196,7 @@ public class CueSheetItemService {
 
                     symbolDTO.setUrl(url);//방송아이콘이 저장된 url set
 
-                    getCueSheetItemSymbol.setSymbol(symbolDTO);//url 추가 DTO set
+                    getCueSheetItemSymbol.setSymbol(symbolDTO);//url 추가 articleDTO set
                 }
 
 
@@ -1212,7 +1212,7 @@ public class CueSheetItemService {
     //방송아이콘 url 추가
     public List<CueSheetItemSymbolDTO> createUrl(List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTOList) {
 
-        //큐시트 아이템 방송아이콘 리스트를 Url을 추가해서 리턴해줄 DTO 리스트 생성
+        //큐시트 아이템 방송아이콘 리스트를 Url을 추가해서 리턴해줄 articleDTO 리스트 생성
         List<CueSheetItemSymbolDTO> returnCueSheetItemSymbolDTOList = new ArrayList<>();
 
         if (CollectionUtils.isEmpty(cueSheetItemSymbolDTOList) == false) {

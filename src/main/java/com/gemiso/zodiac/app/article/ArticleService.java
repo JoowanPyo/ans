@@ -42,12 +42,16 @@ import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaCreateMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
+import com.gemiso.zodiac.app.code.Code;
+import com.gemiso.zodiac.app.code.CodeRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
-import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticle;
-import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleDTO;
+import com.gemiso.zodiac.app.dept.Depts;
+import com.gemiso.zodiac.app.dept.DeptsRepository;
+import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticle;
+import com.gemiso.zodiac.app.elasticsearch.articleDTO.ElasticSearchArticleDTO;
 import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleRepository;
 import com.gemiso.zodiac.app.elasticsearch.mapper.ElasticSearchArticleMapper;
 import com.gemiso.zodiac.app.facilityManage.FacilityManageService;
@@ -60,6 +64,7 @@ import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.user.QUser;
 import com.gemiso.zodiac.app.user.User;
+import com.gemiso.zodiac.app.user.UserRepository;
 import com.gemiso.zodiac.app.user.UserService;
 import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuth;
 import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuthRepository;
@@ -129,6 +134,9 @@ public class ArticleService {
     private final CueSheetRepository cueSheetRepository;
     private final ArticleTagRepository articleTagRepository;
     private final ElasticSearchArticleRepository elasticSearchArticleRepository;
+    private final CodeRepository codeRepository;
+    private final UserRepository userRepository;
+    private final DeptsRepository deptsRepository;
 
     private final ArticleMapper articleMapper;
     private final ArticleCreateMapper articleCreateMapper;
@@ -164,7 +172,7 @@ public class ArticleService {
     //기사 목록조회
     public PageResultDTO<ArticleDTO, Article> findAll(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
                                                       String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
-                                                      Integer page, Integer limit, List<String> apprvDivCdList, Integer deptCd,
+                                                      Integer page, Integer limit, List<String> apprvDivCdList, Long deptCd,
                                                       String artclCateCd, String artclTypDtlCd, String delYn, Long artclId, String copyYn,
                                                       Long orgArtclId) {
 
@@ -187,9 +195,9 @@ public class ArticleService {
     public PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> findAllElasticsearch(
             Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
              String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
-             Integer page, Integer limit, List<String> apprvDivCdList, Integer deptCd,
+             Integer page, Integer limit, List<String> apprvDivCdList, Long deptCd,
              String artclCateCd, String artclTypDtlCd, String delYn, Long artclId, String copyYn,
-             Long orgArtclId) {
+             Long orgArtclId, Long cueId) throws Exception {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
@@ -204,7 +212,7 @@ public class ArticleService {
         Page<ElasticSearchArticle> result = elasticSearchArticleRepository.findByElasticSearchArticleList(sdate,  edate,  rcvDt,  rptrId,  inputrId,  brdcPgmId,
                 artclDivCd,  artclTypCd,  searchDivCd,  searchWord,
                 apprvDivCdList,  deptCd,  artclCateCd,  artclTypDtlCd,
-                delYn,  artclId,  copyYn,  orgArtclId, pageable);
+                delYn,  artclId,  copyYn,  orgArtclId, cueId, pageable);
 
 
         Function<ElasticSearchArticle, ElasticSearchArticleDTO> fn = (entity -> elasticSearchArticleMapper.toDto(entity));
@@ -213,9 +221,30 @@ public class ArticleService {
         return new PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle>(result, fn);
     }
 
+    public PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> findAllElasticsearchCue(Date sdate, Date edate, String searchWord, Long cueId,
+                                                                                                String brdcPgmId, String artclTypCd,String artclTypDtlCd,
+                                                                                                String copyYn, Long deptCd, Long orgArtclId, Integer page, Integer limit) throws Exception {
+
+        //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
+        PageHelper pageHelper = new PageHelper(page, limit);
+        Pageable pageable = pageHelper.getArticlePageInfo();
+
+        //전체조회[page type]
+        Page<ElasticSearchArticle> result = elasticSearchArticleRepository.findByElasticSearchArticleListCue(sdate, edate, searchWord, cueId,
+                brdcPgmId, artclTypCd,artclTypDtlCd, copyYn, deptCd, orgArtclId, pageable);
+
+
+        Function<ElasticSearchArticle, ElasticSearchArticleDTO> fn = (entity -> elasticSearchArticleMapper.toDto(entity));
+
+
+        return new PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle>(result, fn);
+
+
+    }
+
     //기사 목록조회[이슈 기사]
     public PageResultDTO<ArticleDTO, Article> findAllIsuue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd, String artclTypDtlCd,
-                                                           String artclCateCd, Integer deptCd, String inputrId,
+                                                           String artclCateCd, Long deptCd, String inputrId,
                                                            String brdcPgmId, Long orgArtclId, String delYn,
                                                            String searchDivCd, String searchWord, Integer page, Integer limit, List<String> apprvDivCdList) {
 
@@ -241,7 +270,7 @@ public class ArticleService {
     // 큐시트에서 기사 목록 조회
     public PageResultDTO<ArticleDTO, Article> findCue(Date sdate, Date edate, String searchWord, Long cueId,
                                                       String brdcPgmId, String artclTypCd,String artclTypDtlCd,
-                                                      String copyYn, Integer deptCd, Long orgArtclId, Integer page, Integer limit) {
+                                                      String copyYn, Long deptCd, Long orgArtclId, Integer page, Integer limit) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
@@ -335,6 +364,97 @@ public class ArticleService {
         return article;
     }
 
+    public Article setCode(Article article){
+
+
+        List<Code> codeList = codeRepository.findAll();
+
+        for (Code code : codeList){
+
+            String cd = code.getCd();
+            String cdNm = code.getCdNm();
+
+            String apprvDivCd = article.getApprvDivCd();
+            if (apprvDivCd != null && apprvDivCd.trim().isEmpty() == false){
+
+                if (apprvDivCd.equals(cd)){
+                    article.setApprvDivCdNm(cdNm);
+                }
+            }
+
+            String artclCateCd = article.getArtclCateCd();
+            if (artclCateCd != null && artclCateCd.trim().isEmpty() == false){
+
+                if (artclCateCd.equals(cd)){
+                    article.setArtclCateCdNm(cdNm);
+                }
+            }
+
+            String artclTypCd = article.getArtclTypCd();
+            if (artclTypCd != null && artclTypCd.trim().isEmpty() == false){
+
+                if (artclTypCd.equals(cd)){
+                    article.setArtclTypCdNm(cdNm);
+                }
+            }
+
+            String artclTypDtlCd = article.getArtclTypDtlCd();
+            if (artclTypDtlCd != null && artclTypDtlCd.trim().isEmpty() == false){
+
+                if (artclTypDtlCd.equals(cd)){
+                    article.setArtclTypDtlCdNm(cdNm);
+                }
+            }
+
+
+        }
+
+        return article;
+    }
+
+    public Article setUser(Article article){
+
+        String inputrId = article.getInputrId();
+        String rptrId = article.getRptrId();
+
+        List<User> userList = userRepository.findAll();
+
+        for (User user : userList){
+
+            String userId = user.getUserId();
+            String userNm = user.getUserNm();
+
+            if (userId.equals(inputrId)){
+                article.setInputrNm(userNm);
+            }
+
+            if (userId.equals(rptrId)){
+                article.setRptrNm(userNm);
+            }
+        }
+
+        return article;
+    }
+
+    public Article setDept(Article article){
+
+        Long deptCd = article.getDeptCd();
+
+        if (ObjectUtils.isEmpty(deptCd) == false){
+
+            Optional<Depts> depts = deptsRepository.findDept(deptCd);
+
+            if (depts.isPresent()){
+                Depts dept = depts.get();
+                String deptNm = dept.getName();
+
+                article.setDeptNm(deptNm);
+            }
+        }
+
+        return article;
+    }
+
     //엘라스틱 서치 등록
     public void elasticCreate(Article article) throws ParseException {
 
@@ -346,28 +466,41 @@ public class ArticleService {
             inputDtm = dateChangeHelper.dateToStringNormal(getInputDtm);
         }
 
+        //코드네임 셋팅
+        article = setCode(article);
+
+        article = setUser(article);
+
+        article = setDept(article);
 
         ElasticSearchArticle entity = ElasticSearchArticle.builder()
+                .ancMentCtt(article.getAncMentCtt())
                 .apprvDivCd(article.getApprvDivCd())
+                .apprvDivCdNm(article.getApprvDivCdNm())
                 .artclCateCd(article.getArtclCateCd())
+                .artclCateCdNm(article.getArtclCateCdNm())
                 .artclDivCd(article.getArtclDivCd())
                 .artclId(article.getArtclId())
                 .artclOrd(article.getArtclOrd())
                 .artclTitl(article.getArtclTitl())
                 .artclTitlEn(article.getArtclTitlEn())
                 .artclTypCd(article.getArtclTypCd())
+                .artclTypCdNm(article.getArtclTypCdNm())
                 .artclTypDtlCd(article.getArtclTypDtlCd())
+                .artclTypDtlCdNm(article.getArtclTypDtlCdNm())
+                .artclCtt(article.getArtclCtt())
                 .brdcPgmId(article.getBrdcPgmId())
-                //.brdcPgmNm(article.)
-                //.cueId(article.getCueSheet().getCueId())
-                //.subrmId(article.getCueSheet().getSubrmId())
                 .delYn(article.getDelYn())
                 .deptCd(article.getDeptCd())
+                .deptNm(article.getDeptNm())
                 .embgYn(article.getEmbgYn())
                 .inputDtm(inputDtm)
                 .inputrId(article.getInputrId())
+                .inputrNm(article.getInputrNm())
                 .lckYn(article.getLckYn())
                 .orgArtclId(article.getOrgArtclId())
+                .rptrId(article.getRptrId())
+                .rptrNm(article.getRptrNm())
                 .build();
 
         elasticSearchArticleRepository.save(entity);
@@ -396,27 +529,47 @@ public class ArticleService {
             subrmId = Optional.ofNullable(cueSheet.getSubrmId()).orElse(null);
         }
 
+        //코드네임 셋팅
+        article = setCode(article);
+
+        article = setUser(article);
+
+        article = setDept(article);
+
+
+
+
         ElasticSearchArticle entity = ElasticSearchArticle.builder()
+                .ancMentCtt(article.getAncMentCtt())
                 .apprvDivCd(article.getApprvDivCd())
+                .apprvDivCdNm(article.getApprvDivCdNm())
                 .artclCateCd(article.getArtclCateCd())
+                .artclCateCdNm(article.getArtclCateCdNm())
                 .artclDivCd(article.getArtclDivCd())
                 .artclId(article.getArtclId())
                 .artclOrd(article.getArtclOrd())
                 .artclTitl(article.getArtclTitl())
                 .artclTitlEn(article.getArtclTitlEn())
                 .artclTypCd(article.getArtclTypCd())
+                .artclTypCdNm(article.getArtclTypCdNm())
                 .artclTypDtlCd(article.getArtclTypDtlCd())
+                .artclTypDtlCdNm(article.getArtclTypDtlCdNm())
+                .artclCtt(article.getArtclCtt())
                 .brdcPgmId(article.getBrdcPgmId())
-                .brdcPgmNm(brdcPgmNm)
-                .cueId(cueId)
-                .subrmId(subrmId)
                 .delYn(article.getDelYn())
                 .deptCd(article.getDeptCd())
+                .deptNm(article.getDeptNm())
                 .embgYn(article.getEmbgYn())
                 .inputDtm(inputDtm)
                 .inputrId(article.getInputrId())
+                .inputrNm(article.getInputrNm())
                 .lckYn(article.getLckYn())
                 .orgArtclId(article.getOrgArtclId())
+                .rptrId(article.getRptrId())
+                .rptrNm(article.getRptrNm())
+                .brdcPgmNm(brdcPgmNm)
+                .cueId(cueId)
+                .subrmId(subrmId)
                 .build();
 
         elasticSearchArticleRepository.save(entity);
@@ -875,6 +1028,35 @@ public class ArticleService {
             articleMediaRepository.save(articleMedia);
 
         }
+    }
+
+    //큐시트 기사 목록조회시 큐시트에 포함되어 있는 기사 제거.
+    public PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> confirmArticleListElastic(
+            PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> pageList, Long cueId) {
+
+        //현재 큐시트에 포함된 큐시트아이템을 조회
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
+
+        List<ElasticSearchArticleDTO> confirmList = pageList.getDtoList();
+
+        //큐시트 아이템으로 포함된 기사 조회정보에서 삭제.
+        if (ObjectUtils.isEmpty(cueSheetItemList) == false) {
+            for (CueSheetItem cueSheetItem : cueSheetItemList) {
+                if (ObjectUtils.isEmpty(cueSheetItem.getArticle()) == false) { //기사 아이디가 있으면 조회된 기사리트와 검사하여 포함된 기사 삭제
+                    Long cueArticleId = cueSheetItem.getArticle().getArtclId(); //큐시트 아이템으로 포함되어 있는 기사아이디 get
+                    for (int i = confirmList.size() - 1; i >= 0; i--) {
+                        Long artclId = confirmList.get(i).getArtclId();
+                        if (cueArticleId.equals(artclId)) {
+                            confirmList.remove(i);
+                        }
+                    }
+                }
+            }
+        }
+        pageList.setDtoList(confirmList);
+
+        return pageList;
+
     }
 
     //큐시트 기사 목록조회시 큐시트에 포함되어 있는 기사 제거.
@@ -1699,8 +1881,13 @@ public class ArticleService {
         User user = userService.userFindOrFail(userId);
         String userNm = user.getUserNm();
 
+        Date lckDtm = article.getLckDtm();
+        String lckYn = article.getLckYn();
+        String lckrNm = article.getLckrNm();
+
         //MQ메세지 전송
-        articleTopicService.articleLockTopic("Article Lock", artclId, " Lock User Name : " +userNm+" ( "+userId+" )");
+        articleTopicService.articleLockTopic("Article Lock", artclId, " Lock User Name : " +userNm+" ( "+userId+" )",
+                lckDtm, userId, userNm);
 
         //토픽메세지 ArticleTopicDTO Json으로 변환후 send
         /*ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
@@ -1747,8 +1934,14 @@ public class ArticleService {
 
         articleActionLogLock(article, userId, locMessage, locAction);//기사 액션 로그 등록
 
+        Date lckDtm = article.getLckDtm();
+        String lckYn = article.getLckYn();
+        String lckrId = article.getLckrId();
+        String lckrNm = article.getLckrNm();
+
         //MQ메세지 전송
-        articleTopicService.articleLockTopic("Article UnLock", artclId, " Unlock User Name : " +userNm+" ( "+userId+" )");
+        articleTopicService.articleLockTopic("Article UnLock", artclId, " Unlock User Name : " +userNm+" ( "+userId+" )",
+                lckDtm, userId, userNm);
 
     }
 
@@ -1782,7 +1975,7 @@ public class ArticleService {
     //기사 목록조회시 조건 빌드[일반 목록조회 ]
     public BooleanBuilder getSearch(Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
                                     String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
-                                    List<String> apprvDivCdList, Integer deptCd, String artclCateCd, String artclTypDtlCd,
+                                    List<String> apprvDivCdList, Long deptCd, String artclCateCd, String artclTypDtlCd,
                                     String delYn, Long artclId, String copyYn, Long orgArtclId) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
@@ -2529,7 +2722,7 @@ public class ArticleService {
             ArticleAuthConfirmDTO articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
                     .artclId(article.getArtclId())
                     .msg("PD 권한은 기사를 수정 할 수 없습니다.")
-                    .authCode("cannot_be_modified")
+                    .authCode("qArticlenot_be_modified")
                     .httpStatus(HttpStatus.FORBIDDEN)
                     .build();
 

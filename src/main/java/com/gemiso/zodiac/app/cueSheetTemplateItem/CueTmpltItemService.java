@@ -121,7 +121,7 @@ public class CueTmpltItemService {
 
                     symbolDTO.setUrl(url);//방송아이콘이 저장된 url set
 
-                    cueSheetItemSymbolDTO.setSymbol(symbolDTO);//url 추가 DTO set
+                    cueSheetItemSymbolDTO.setSymbol(symbolDTO);//url 추가 articleDTO set
                 }
 
 
@@ -268,7 +268,7 @@ public class CueTmpltItemService {
 
         CueTmpltItem cueTmpltItem = findCueTmplItem(cueTmpltItemId); //큐시트 템플릿 아이템 조회 및 존재유무 확인
 
-        CueTmpltItemDTO cueTmpltItemDTO = cueTmpltItemMapper.toDto(cueTmpltItem);//수정을위해 엔티티 DTO 변환
+        CueTmpltItemDTO cueTmpltItemDTO = cueTmpltItemMapper.toDto(cueTmpltItem);//수정을위해 엔티티 articleDTO 변환
         cueTmpltItemDTO.setCueItemOrd(cueItemOrd); //큐시트 템플릿 아이템 순번 set
 
         cueTmpltItemMapper.updateFromDto(cueTmpltItemDTO, cueTmpltItem); //순번 업데이트

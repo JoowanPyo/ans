@@ -90,7 +90,7 @@ public class ArticleCreateDTO {
     private Integer ancMentCttTime;
     private Integer artclExtTime;
     private Integer videoTime;
-    private Integer deptCd;
+    private Long deptCd;
     //private String deptNm;
     private String deviceCd;
     private String memo;

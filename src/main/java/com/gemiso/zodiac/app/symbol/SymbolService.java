@@ -94,11 +94,11 @@ public class SymbolService {
         String userId = userAuthService.authUser.getUserId();
         symbolCreateDTO.setInputrId(userId); //등록자 추가.
 
-        Symbol symbol = symbolCreateMapper.toEntity(symbolCreateDTO); //DTO -> Entity로 변환
+        Symbol symbol = symbolCreateMapper.toEntity(symbolCreateDTO); //articleDTO -> Entity로 변환
 
         symbolRepository.save(symbol); //등록
 
-        return symbol.getSymbolId(); //DTO -> Entity변환시 자동생성된 ID return
+        return symbol.getSymbolId(); //articleDTO -> Entity변환시 자동생성된 ID return
 
     }
 

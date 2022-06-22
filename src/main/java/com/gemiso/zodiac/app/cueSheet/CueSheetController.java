@@ -41,7 +41,7 @@ public class CueSheetController {
                                                       @Parameter(name = "brdcPgmNm", description = "프로그램 명")
                                                       @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
                                                       @Parameter(name = "deptCd", description = "부서 코드")
-                                                      @RequestParam(value = "deptCd", required = false) Integer deptCd,
+                                                      @RequestParam(value = "deptCd", required = false) Long deptCd,
                                                       @Parameter(name = "searchWord", description = "검색키워드")
                                                       @RequestParam(value = "searchWord", required = false) String searchWord) throws Exception {
 

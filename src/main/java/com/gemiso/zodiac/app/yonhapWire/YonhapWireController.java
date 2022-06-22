@@ -137,7 +137,7 @@ public class YonhapWireController {
     public ResponseEntity<?> createReuter(@Parameter(description = "필수값<br> ", required = true)
                                           @RequestBody YonhapReuterCreateDTO yonhapReuterCreateDTO) throws JsonProcessingException, ParseException {
 
-        log.info(" Yonhap Router :  Yonhap Reuter Create DTO - " + yonhapReuterCreateDTO.toString());
+        log.info(" Yonhap Router :  Yonhap Reuter Create articleDTO - " + yonhapReuterCreateDTO.toString());
 
         YonhapExceptionDomain yonhapExceptionDomain = yonhapWireService.createReuter(yonhapReuterCreateDTO);
 
@@ -156,7 +156,7 @@ public class YonhapWireController {
 
         String userId = userAuthService.authUser.getUserId();
 
-        log.info(" Yonhap Assign : UserId - " + userId + " Yonhap Assign DTO - " + yonhapWireAssignCreateDTO.toString());
+        log.info(" Yonhap Assign : UserId - " + userId + " Yonhap Assign articleDTO - " + yonhapWireAssignCreateDTO.toString());
 
         YonhapAssignSimpleDTO yonhapAssignSimpleDTO = yonhapWireService.createWireAssign(yonhapWireAssignCreateDTO, userId);
 

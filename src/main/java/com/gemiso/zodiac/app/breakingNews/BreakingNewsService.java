@@ -67,7 +67,7 @@ public class BreakingNewsService {
 
         BreakingNewsDTO breakingNewsDTO = breakingNewsMapper.toDto(breakingNews);//조회된 속보뉴스 DTO변환
 
-        return breakingNewsDTO;//속보뉴스 DTO 리턴
+        return breakingNewsDTO;//속보뉴스 articleDTO 리턴
     }
     
     //속보뉴스 등록

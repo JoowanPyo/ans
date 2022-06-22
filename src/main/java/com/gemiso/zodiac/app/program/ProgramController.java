@@ -27,10 +27,12 @@ public class ProgramController {
     @Operation(summary = "프로그램 목록조회", description = "프로그램 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<ProgramDTO>> findAll(@Parameter(name = "brdcPgmNm", description = "방송프로그램 명")
-                                                    @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm) throws Exception {
+                                                    @RequestParam(value = "brdcPgmNm", required = false) String brdcPgmNm,
+                                                    @Parameter(name = "useYn", description = "사용 여부값")
+                                                    @RequestParam(value = "useYn", required = false) String useYn) throws Exception {
 
 
-        List<ProgramDTO> programDTOList = programService.findAll(brdcPgmNm);
+        List<ProgramDTO> programDTOList = programService.findAll(brdcPgmNm, useYn);
 
 
         return new AnsApiResponse<>(programDTOList);

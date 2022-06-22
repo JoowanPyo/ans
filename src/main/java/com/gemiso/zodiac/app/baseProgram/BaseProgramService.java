@@ -54,7 +54,7 @@ public class BaseProgramService {
 
         BaseProgram baseProgram = findBasepgm(basePgmschId);//기본편성 조회 및 존재유무 확인.
 
-        BaseProgramDTO baseProgramDTO = baseProgramMapper.toDto(baseProgram);//엔티티 DTO 변환
+        BaseProgramDTO baseProgramDTO = baseProgramMapper.toDto(baseProgram);//엔티티 articleDTO 변환
 
         return baseProgramDTO; // 리턴
     }
@@ -66,7 +66,7 @@ public class BaseProgramService {
 
         baseProgramCreateDTO.setInputrId(userId);//입력자 set
 
-        BaseProgram baseProgram = baseProgramCreateMapper.toEntity(baseProgramCreateDTO);//DTO 엔티티 변환
+        BaseProgram baseProgram = baseProgramCreateMapper.toEntity(baseProgramCreateDTO);//articleDTO 엔티티 변환
 
         baseProgramRepository.save(baseProgram);//등록
 

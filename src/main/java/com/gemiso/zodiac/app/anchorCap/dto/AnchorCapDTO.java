@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "앵커자막 DTO")
+@Schema(description = "앵커자막 articleDTO")
 @Data
 @Builder
 @NoArgsConstructor

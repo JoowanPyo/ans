@@ -37,4 +37,7 @@ public class ProgramSimpleDTO {
     private String updtrNm;
     private String delrId;
     private String delrNm;
+    private String scriptYn;
+    private String nodYn;
+    private String useYn;
 }

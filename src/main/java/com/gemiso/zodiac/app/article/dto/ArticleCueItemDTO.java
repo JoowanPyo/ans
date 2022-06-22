@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Schema(description = "기사 큐시트아이템 DTO")
+@Schema(description = "기사 큐시트아이템 articleDTO")
 @Data
 @Builder
 @NoArgsConstructor
@@ -157,7 +157,7 @@ public class ArticleCueItemDTO {
     @Schema(description = "영상 시간")
     private Integer videoTime;
     @Schema(description = "부서 코드")
-    private Integer deptCd;
+    private Long deptCd;
     @Schema(description = "부서 명")
     private String deptNm;
     @Schema(description = "")

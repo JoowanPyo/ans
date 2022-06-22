@@ -32,7 +32,7 @@ public class ArticleActionLogService {
         //생성된 조회조건으로 기사액션로그 목록조회
         List<ArticleActionLog> articleActionLogList = (List<ArticleActionLog>) articleActionLogRepository.findAll(booleanBuilder);
 
-        //조회된 목록조회를 DTO List로 변환 후 리턴
+        //조회된 목록조회를 articleDTO List로 변환 후 리턴
         List<ArticleActionLogDTO> articleActionLogDTOList = articleActionLogMapper.toDtoList(articleActionLogList);
 
         return articleActionLogDTOList;

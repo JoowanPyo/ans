@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "기사 맵핑 DTO")
+@Schema(description = "기사 맵핑 articleDTO")
 @Data
 @Builder
 @NoArgsConstructor

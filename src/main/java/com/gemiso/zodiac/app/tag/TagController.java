@@ -51,20 +51,20 @@ public class TagController {
     @Operation(summary = "테그 등록", description = "테그 등록")
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public AnsApiResponse<TagIdDTO> create(@Parameter(name = "tagCreateDTO", required = true, description = "테그 생성 DTO")
+    public AnsApiResponse<TagIdDTO> create(@Parameter(name = "tagCreateDTO", required = true, description = "테그 생성 articleDTO")
                                         @Valid @RequestBody TagCreateDTO tagCreateDTO) {
 
         TagIdDTO tagDTO = new TagIdDTO();
 
-        Long tagId = tagService.create(tagCreateDTO);
-        tagDTO.setTagId(tagId);
+        Tag tag = tagService.create(tagCreateDTO);
+        tagDTO.setTagId(tag.getTagId());
 
         return new AnsApiResponse<>(tagDTO);
     }
 
     @Operation(summary = "테그 수정", description = "테그 수정")
     @PutMapping(path = "/{tagId}")
-    public AnsApiResponse<TagIdDTO> update(@Parameter(name = "tagUpdateDTO", required = true, description = "테그 수정 DTO")
+    public AnsApiResponse<TagIdDTO> update(@Parameter(name = "tagUpdateDTO", required = true, description = "테그 수정 articleDTO")
                                         @Valid @RequestBody TagUpdateDTO tagUpdateDTO,
                                            @Parameter(name = "tagId", required = true, description = "테그아이디")
                                         @PathVariable("tagId") Long tagId) {

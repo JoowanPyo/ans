@@ -70,7 +70,7 @@ public class CueSheetDTO {
     private String brdcRunTime;
     private Integer cueVer;
     private Integer cueOderVer;
-    private Integer deptCd;
+    private Long deptCd;
     private String deptNm;
     private ProgramDTO program;
     private BaseProgramSimpleDTO baseProgram;

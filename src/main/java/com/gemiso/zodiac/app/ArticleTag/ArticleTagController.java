@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.ArticleTag;
 
 import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticleTags;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,7 +43,9 @@ public class ArticleTagController {
                                                       @Parameter(name = "tag", description = "테그")
                                                       @RequestParam(value = "tag", required = false) List<String> tagList) {
 
-        articleTagService.create(artclId, tagList);
+        List<ElasticSearchArticleTags> tags = articleTagService.create(artclId, tagList);
+
+        articleTagService.updateElasticArticle(tags, artclId);
 
         List<ArticleTagDTO> articleTagDTOList = articleTagService.find(artclId);
 

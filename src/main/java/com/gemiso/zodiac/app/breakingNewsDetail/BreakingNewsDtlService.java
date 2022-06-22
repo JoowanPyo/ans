@@ -37,7 +37,7 @@ public class BreakingNewsDtlService {
         //조회된 엔티티 리스트를 DTO변환
         List<BreakingNewsDtlDTO> breakingNewsDtlDTOList = breakingNewsDtlMapper.toDtoList(breakingNewsDtls);
         
-        //DTO 리턴
+        //articleDTO 리턴
         return breakingNewsDtlDTOList;
     }
 

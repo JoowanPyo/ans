@@ -103,7 +103,7 @@ public class CueCapTmpltService {
         cueCapTmpltUpdateMapper.updateFromDto(cueCapTmpltUpdateDTO, cueCapTmplt);
         cueCapTmpltRepository.save(cueCapTmplt); //수정
 
-        CueCapTmpltDTO cueCapTmpltDTO = cueCapTmpltMapper.toDto(cueCapTmplt); //조회하여 업데이트된 엔티티 데이터 DTO 변환 후 리턴.
+        CueCapTmpltDTO cueCapTmpltDTO = cueCapTmpltMapper.toDto(cueCapTmplt); //조회하여 업데이트된 엔티티 데이터 articleDTO 변환 후 리턴.
 
         return cueCapTmpltDTO;
     }

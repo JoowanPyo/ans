@@ -3,7 +3,6 @@ package com.gemiso.zodiac.app.cueSheetMedia;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
-import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
 import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaCreateDTO;
@@ -16,8 +15,8 @@ import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.core.topic.CueSheetTopicService;
 import com.gemiso.zodiac.core.topic.TopicSendService;
-import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerCueSheetTopicDTO;
 import com.gemiso.zodiac.core.topic.cueSheetTopicDTO.CueSheetWebTopicDTO;
+import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerCueSheetTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +50,7 @@ public class CueSheetMediaService {
     private final MarshallingJsonHelper marshallingJsonHelper;
 
 
-    public List<CueSheetMediaDTO> findAll(Date sdate, Date edate, String trnsfFileNm, Long cueItemId, String mediaTypCd, String delYn){
+    public List<CueSheetMediaDTO> findAll(Date sdate, Date edate, String trnsfFileNm, Long cueItemId, String mediaTypCd, String delYn) {
 
         BooleanBuilder booleanBuilder = getSearch(sdate, edate, trnsfFileNm, cueItemId, mediaTypCd, delYn);
 
@@ -63,7 +62,7 @@ public class CueSheetMediaService {
     }
 
     //목록조회 조건 빌드
-    public BooleanBuilder getSearch(Date sdate, Date edate, String trnsfFileNm, Long cueItemId, String mediaTypCd, String delYn){
+    public BooleanBuilder getSearch(Date sdate, Date edate, String trnsfFileNm, Long cueItemId, String mediaTypCd, String delYn) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -75,15 +74,15 @@ public class CueSheetMediaService {
         if (trnsfFileNm != null && trnsfFileNm.trim().isEmpty() == false) {
             booleanBuilder.and(qCueSheetMedia.trnsfFileNm.contains(trnsfFileNm));
         }
-        if (ObjectUtils.isEmpty(cueItemId) == false){
+        if (ObjectUtils.isEmpty(cueItemId) == false) {
             booleanBuilder.and(qCueSheetMedia.cueSheetItem.cueItemId.eq(cueItemId));
         }
 
-        if (mediaTypCd != null && mediaTypCd.trim().isEmpty() == false){
+        if (mediaTypCd != null && mediaTypCd.trim().isEmpty() == false) {
             booleanBuilder.and(qCueSheetMedia.mediaTypCd.eq(mediaTypCd));
         }
 
-        if (delYn != null && delYn.trim().isEmpty() == false){
+        if (delYn != null && delYn.trim().isEmpty() == false) {
             booleanBuilder.and(qCueSheetMedia.delYn.eq(delYn));
         }
 
@@ -91,7 +90,7 @@ public class CueSheetMediaService {
         return booleanBuilder;
     }
 
-    public CueSheetMediaDTO find(Long cueMediaId){
+    public CueSheetMediaDTO find(Long cueMediaId) {
 
         CueSheetMedia cueSheetMedia = cueSheetMediaFindOrFail(cueMediaId);
 
@@ -115,13 +114,13 @@ public class CueSheetMediaService {
         //이현준 부장, 이현진 차장 요청으로 매칭하고 부조전송 완료된 미디어만 웹소켓 메세지 전송
         CueSheetItem cueSheetItem = cueSheetMedia.getCueSheetItem();
 
-        if (ObjectUtils.isEmpty(cueSheetItem) == false){
+        if (ObjectUtils.isEmpty(cueSheetItem) == false) {
 
             Long cueItemId = cueSheetItem.getCueItemId();
 
             Optional<CueSheetItem> cueSheetItemEntity = cueSheetItemRepository.findByCueItem(cueItemId);
 
-            if (cueSheetItemEntity.isPresent()){
+            if (cueSheetItemEntity.isPresent()) {
 
                 CueSheetItem getCueSheetItem = cueSheetItemEntity.get();
                 String spareYn = getCueSheetItem.getSpareYn();
@@ -129,25 +128,22 @@ public class CueSheetMediaService {
                 CueSheet cueSheet = getCueSheetItem.getCueSheet();
 
                 Long cueId = 0L;
-                if (ObjectUtils.isEmpty(cueSheet) == false){
+                if (ObjectUtils.isEmpty(cueSheet) == false) {
                     cueId = cueSheet.getCueId();
 
                 }
 
-                String mediaTypCd = cueSheetMediaCreateDTO.getMediaTypCd();
 
-                if ("media_typ_001".equals(mediaTypCd)) {
+                cueSheetTopicService.sendMediTopicCreate(cueSheet, cueId, cueItemId, null, null, "Create Media",
+                        spareYn, "N", "N");
 
-                    cueSheetTopicService.sendMediTopicCreate(cueSheet, cueId, cueItemId, null, null, "Create Media",
-                            spareYn, "N", "N");
-                }
             }
         }
 
         return cueSheetMedia.getCueMediaId();
     }
 
-    public void update(CueSheetMediaUpdateDTO cueSheetMediaUpdateDTO, Long cueMediaId){
+    public void update(CueSheetMediaUpdateDTO cueSheetMediaUpdateDTO, Long cueMediaId) {
 
         CueSheetMedia cueSheetMedia = cueSheetMediaFindOrFail(cueMediaId);
 
@@ -179,42 +175,39 @@ public class CueSheetMediaService {
 
         CueSheetItem cueSheetItem = cueSheetMedia.getCueSheetItem();
 
-        if (ObjectUtils.isEmpty(cueSheetItem) == false){
+        if (ObjectUtils.isEmpty(cueSheetItem) == false) {
 
             Long cueItemId = cueSheetItem.getCueItemId();
 
             Optional<CueSheetItem> cueSheetItemEntity = cueSheetItemRepository.findByCueItem(cueItemId);
 
-            if (cueSheetItemEntity.isPresent()){
+            if (cueSheetItemEntity.isPresent()) {
 
                 CueSheetItem getCueSheetItem = cueSheetItemEntity.get();
                 String spareYn = getCueSheetItem.getSpareYn();
 
                 CueSheet cueSheet = getCueSheetItem.getCueSheet();
                 Long cueId = 0L;
-                if (ObjectUtils.isEmpty(cueSheet) == false){
+                if (ObjectUtils.isEmpty(cueSheet) == false) {
                     cueId = cueSheet.getCueId();
 
                 }
 
-                String mediaTypCd = cueSheetMedia.getMediaTypCd();
 
-                if ("media_typ_001".equals(mediaTypCd)) {
+                sendCueTopicCreate(cueSheet, cueId, cueItemId, 0L, null, "Delete Media",
+                        spareYn, "N", "Y", null);
 
-                    sendCueTopicCreate(cueSheet, cueId, cueItemId, 0L, null, "CueSheet Media Delete",
-                            spareYn, "N", "Y", null);
-                }
             }
         }
 
     }
 
-    public CueSheetMedia cueSheetMediaFindOrFail(Long cueMediaId){
+    public CueSheetMedia cueSheetMediaFindOrFail(Long cueMediaId) {
 
         Optional<CueSheetMedia> cueSheetMedia = cueSheetMediaRepository.findByCueSheetMedia(cueMediaId);
 
-        if (!cueSheetMedia.isPresent()){
-            throw new ResourceNotFoundException("큐시트 영상을 찾을 수 없습니다. 큐시트 영상 아이디 : "+ cueMediaId);
+        if (!cueSheetMedia.isPresent()) {
+            throw new ResourceNotFoundException("큐시트 영상을 찾을 수 없습니다. 큐시트 영상 아이디 : " + cueMediaId);
         }
 
         return cueSheetMedia.get();
@@ -276,11 +269,10 @@ public class CueSheetMediaService {
 
         } catch (Exception e) {
 
-            log.error("CueSheetMedia Topic Errer : CueSheet - "+cueSheet.toString()+" CueItemId - "+cueItemId +" Message - " +eventId);
+            log.error("CueSheetMedia Topic Errer : CueSheet - " + cueSheet.toString() + " CueItemId - " + cueItemId + " Message - " + eventId);
 
         }
     }
-
 
 
 }

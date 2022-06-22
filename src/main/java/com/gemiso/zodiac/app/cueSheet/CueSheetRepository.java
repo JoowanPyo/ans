@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-public interface CueSheetRepository extends JpaRepository<CueSheet, Long>, QuerydslPredicateExecutor<CueSheet> {
+public interface CueSheetRepository extends JpaRepository<CueSheet, Long>, QuerydslPredicateExecutor<CueSheet>, CueSheetRepositoryCustorm {
 
     @Query("select a from CueSheet a where a.cueId =:cueId and a.delYn ='N' ")
     Optional<CueSheet> findByCue(@Param("cueId")Long cueId);

@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "권한 수정 DTO")
+@Schema(description = "권한 수정 articleDTO")
 @Data
 @Builder
 @AllArgsConstructor

@@ -66,7 +66,7 @@ public class TagService {
         return tagDTO;
     }
 
-    public Long create(TagCreateDTO tagCreateDTO){ //테그생성
+    public Tag create(TagCreateDTO tagCreateDTO){ //테그생성
 
         tagCreateDTO.setTagClicked(0); //0으로 초기화
         
@@ -74,7 +74,7 @@ public class TagService {
 
         tagRepository.save(tag);
 
-        return tag.getTagId();
+        return tag;
     }
 
     public Tag findTag(Long tagId){ //테그 아이디로 해당 태그 찾기.

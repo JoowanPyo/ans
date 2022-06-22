@@ -176,7 +176,7 @@ public class CueSheet {
     private Integer cueOderVer;
 
     @Column(name = "dept_cd", length = 50)
-    private Integer deptCd;
+    private Long deptCd;
 
     //@Basic(fetch = FetchType.LAZY)
     @Formula("(select a.name from tb_depts a where a.id = dept_cd)")

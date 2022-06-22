@@ -53,7 +53,7 @@ public class SpareCueSheetItemService {
         List<SpareCueSheetItem> spareCueSheetItemList =
                 (List<SpareCueSheetItem>) spareCueSheetItemRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "cueItemOrd"));
 
-        //조회된 리스트 엔티티를 DTO 리스트로 변환.
+        //조회된 리스트 엔티티를 articleDTO 리스트로 변환.
         List<SpareCueSheetItemDTO> spareCueSheetItemDTOList = spareCueSheetItemMapper.toDtoList(spareCueSheetItemList);
 
         //DTO리스트 리턴
@@ -145,7 +145,7 @@ public class SpareCueSheetItemService {
             //예비 큐시트아이템 DTO변환
             SpareCueSheetItemDTO resetSpareCueSheetItemDTO = spareCueSheetItemMapper.toDto(spareCueSheetItemEntity);
             resetSpareCueSheetItemDTO.setCueItemOrd(index); //순번순차로 재등록
-            //DTO to Entity변환
+            //articleDTO to Entity변환
             SpareCueSheetItem resetSpareCueSheetItem = spareCueSheetItemMapper.toEntity(resetSpareCueSheetItemDTO);
             spareCueSheetItemRepository.save(resetSpareCueSheetItem);//등록
             index++;//index + 1
@@ -215,7 +215,7 @@ public class SpareCueSheetItemService {
             //예비 큐시트아이템 DTO변환
             SpareCueSheetItemDTO resetSpareCueSheetItemDTO = spareCueSheetItemMapper.toDto(spareCueSheetItemEntity);
             resetSpareCueSheetItemDTO.setCueItemOrd(index); //순번순차로 재등록
-            //DTO to Entity변환
+            //articleDTO to Entity변환
             SpareCueSheetItem resetSpareCueSheetItem = spareCueSheetItemMapper.toEntity(resetSpareCueSheetItemDTO);
             spareCueSheetItemRepository.save(resetSpareCueSheetItem);//등록
             index++;//index + 1

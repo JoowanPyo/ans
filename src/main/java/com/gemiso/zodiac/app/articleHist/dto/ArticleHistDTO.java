@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
-@Schema(description = "기사이력 DTO")
+@Schema(description = "기사이력 articleDTO")
 @Data
 @Builder
 @NoArgsConstructor

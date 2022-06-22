@@ -1,8 +1,8 @@
 package com.gemiso.zodiac.app.article;
 
 import com.gemiso.zodiac.app.article.dto.*;
-import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticle;
-import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleDTO;
+import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticle;
+import com.gemiso.zodiac.app.elasticsearch.articleDTO.ElasticSearchArticleDTO;
 import com.gemiso.zodiac.core.enumeration.AuthEnum;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.page.PageResultDTO;
@@ -55,7 +55,7 @@ public class ArticleController {
             @Parameter(name = "page", description = "시작페이지") @RequestParam(value = "page", required = false) Integer page,
             @Parameter(name = "limit", description = "한 페이지에 데이터 수") @RequestParam(value = "limit", required = false) Integer limit,
             @Parameter(name = "apprvDivCdList", description = "픽스구분코드(fix_none,article_fix,editor_fix,anchor_fix,desk_fix)") @RequestParam(value = "apprvDivCdList", required = false) List<String> apprvDivCdList,
-            @Parameter(name = "deptCd", description = "부서코드") @RequestParam(value = "deptCd", required = false) Integer deptCd,
+            @Parameter(name = "deptCd", description = "부서코드") @RequestParam(value = "deptCd", required = false) Long deptCd,
             @Parameter(name = "artclCateCd", description = "기사 카테고리 코드") @RequestParam(value = "artclCateCd", required = false) String artclCateCd,
             @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
             @Parameter(name = "delYn", description = "삭제 여부") @RequestParam(value = "delYn", required = false) String delYn,
@@ -108,13 +108,14 @@ public class ArticleController {
             @Parameter(name = "page", description = "시작페이지") @RequestParam(value = "page", required = false) Integer page,
             @Parameter(name = "limit", description = "한 페이지에 데이터 수") @RequestParam(value = "limit", required = false) Integer limit,
             @Parameter(name = "apprvDivCdList", description = "픽스구분코드(fix_none,article_fix,editor_fix,anchor_fix,desk_fix)") @RequestParam(value = "apprvDivCdList", required = false) List<String> apprvDivCdList,
-            @Parameter(name = "deptCd", description = "부서코드") @RequestParam(value = "deptCd", required = false) Integer deptCd,
+            @Parameter(name = "deptCd", description = "부서코드") @RequestParam(value = "deptCd", required = false) Long deptCd,
             @Parameter(name = "artclCateCd", description = "기사 카테고리 코드") @RequestParam(value = "artclCateCd", required = false) String artclCateCd,
             @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
             @Parameter(name = "delYn", description = "삭제 여부") @RequestParam(value = "delYn", required = false) String delYn,
             @Parameter(name = "artclId", description = "기사아이디") @RequestParam(value = "artclId", required = false) Long artclId,
             @Parameter(name = "orgArtclId", description = "원본기사 아이디") @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,
-            @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]") @RequestParam(value = "copyYn", required = false) String copyYn) throws Exception {
+            @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]") @RequestParam(value = "copyYn", required = false) String copyYn,
+            @Parameter(name = "cueId", description = "큐시트 아이디") @RequestParam(value = "cueId", required = false) Long cueId) throws Exception {
 
         PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> pageList = null;
         //List<ArticleDTO> articleDTOList = new ArrayList<>();
@@ -132,13 +133,13 @@ public class ArticleController {
 
             pageList = articleService.findAllElasticsearch(searchDate.getStartDate(), searchDate.getEndDate(), rcvDt, rptrId, inputrId,
                     brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd,
-                    artclCateCd, artclTypDtlCd, delYn, artclId, copyYn, orgArtclId);
+                    artclCateCd, artclTypDtlCd, delYn, artclId, copyYn, orgArtclId, cueId);
             //검색조건 날짜형식이 안들어왔을경우
         } else {
 
             pageList = articleService.findAllElasticsearch(null, null, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd,
                     artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd, artclCateCd,
-                    artclTypDtlCd, delYn, artclId, copyYn, orgArtclId);
+                    artclTypDtlCd, delYn, artclId, copyYn, orgArtclId, cueId);
 
         }
 
@@ -146,7 +147,46 @@ public class ArticleController {
     }
 
     @Operation(summary = "기사 목록조회[큐시트]", description = "기사 목록조회[큐시트]")
-    @GetMapping(path = "/cuesheet")
+    @GetMapping(path = "/cuesheetsearchcue")
+    public AnsApiResponse<PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle>> findAllElasticsearchCue(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = true)
+                                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                                      @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = true)
+                                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                                      @Parameter(name = "searchWord", description = "검색키워드")
+                                                                      @RequestParam(value = "searchWord", required = false) String searchWord,
+                                                                      @Parameter(name = "cueId", description = "검색키워드", required = false)
+                                                                      @RequestParam(value = "cueId") Long cueId,
+                                                                      @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디")
+                                                                      @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
+                                                                      @Parameter(name = "artclTypCd", description = "기사유형코드(01:스트레이트, 02:리포트, 03:C/T, 04:하단롤, 05:긴급자막)")
+                                                                      @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
+                                                                      @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드")
+                                                                      @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
+                                                                      @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]")
+                                                                      @RequestParam(value = "copyYn", required = false) String copyYn,
+                                                                      @Parameter(name = "deptCd", description = "부서 코드")
+                                                                      @RequestParam(value = "deptCd", required = false) Long deptCd,
+                                                                      @Parameter(name = "orgArtclId", description = "원본기사 아이디")
+                                                                      @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,
+                                                                      @Parameter(name = "page", description = "시작페이지")
+                                                                      @RequestParam(value = "page", required = false) Integer page,
+                                                                      @Parameter(name = "limit", description = "한 페이지에 데이터 수")
+                                                                      @RequestParam(value = "limit", required = false) Integer limit) throws Exception {
+
+
+        SearchDate searchDate = new SearchDate(sdate, edate);
+
+        PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> pageList = articleService.findAllElasticsearchCue(searchDate.getStartDate(), searchDate.getEndDate(),
+                searchWord, cueId, brdcPgmId, artclTypCd, artclTypDtlCd, copyYn, deptCd, orgArtclId, page, limit);
+
+        pageList = articleService.confirmArticleListElastic(pageList, cueId);
+
+        return new AnsApiResponse<>(pageList);
+
+    }
+
+    @Operation(summary = "기사 목록조회[큐시트]", description = "기사 목록조회[큐시트]")
+    @GetMapping(path = "/elastic")
     public AnsApiResponse<PageResultDTO<ArticleDTO, Article>> findCue(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = true)
                                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                                       @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = true)
@@ -164,7 +204,7 @@ public class ArticleController {
                                                                       @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]")
                                                                       @RequestParam(value = "copyYn", required = false) String copyYn,
                                                                       @Parameter(name = "deptCd", description = "부서 코드")
-                                                                      @RequestParam(value = "deptCd", required = false) Integer deptCd,
+                                                                      @RequestParam(value = "deptCd", required = false) Long deptCd,
                                                                       @Parameter(name = "orgArtclId", description = "원본기사 아이디")
                                                                       @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,
                                                                       @Parameter(name = "page", description = "시작페이지")
@@ -194,7 +234,7 @@ public class ArticleController {
             @Parameter(name = "artclTypCd", description = "기사 유형 코드") @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
             @Parameter(name = "artclTypDtlCd", description = "기상 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
             @Parameter(name = "artclCateCd", description = "기사 카테고리 코드") @RequestParam(value = "artclCateCd", required = false) String artclCateCd,
-            @Parameter(name = "deptCd", description = "부서 코드") @RequestParam(value = "deptCd", required = false) Integer deptCd,
+            @Parameter(name = "deptCd", description = "부서 코드") @RequestParam(value = "deptCd", required = false) Long deptCd,
             @Parameter(name = "inputrId", description = "입력자 아이디") @RequestParam(value = "inputrId", required = false) String inputrId,
             @Parameter(name = "brdcPgmId", description = "방송 프로그램 아이디") @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
             @Parameter(name = "orgArtclId", description = "원본 기사 아이디") @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,
@@ -304,7 +344,7 @@ public class ArticleController {
         Article article = articleService.delete(artclId, userId);
 
         //엘라스틱서치 업데이트
-        //articleService.elasticUpdate(article);
+        articleService.elasticUpdate(article);
 
         return AnsApiResponse.noContent();
 

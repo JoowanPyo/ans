@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
-@Schema(description = "권한 DTO")
+@Schema(description = "권한 articleDTO")
 @Data
 @Builder
 @AllArgsConstructor

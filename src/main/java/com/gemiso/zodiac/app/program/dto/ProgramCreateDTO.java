@@ -29,6 +29,9 @@ public class ProgramCreateDTO {
     private String schTime;
     private String inputDtm;
     private String inputrId;
+    private String scriptYn;
+    private String nodYn;
+    private String useYn;
 
 
 }

@@ -27,4 +27,7 @@ public interface UserRepository extends JpaRepository<User, String> , QuerydslPr
     @Query("select b from UserGroupUser a left outer join User b on b.userId = a.user.userId " +
             "where a.userGroup.userGrpId = :userGrpId")
     List<User> findByUser(@Param("userGrpId")Long userGrpId);
+
+    @Query("select a from User a where a.userId in (:userIds)")
+    List<User> findByUsers(@Param("userIds")String[] userIds);
 }

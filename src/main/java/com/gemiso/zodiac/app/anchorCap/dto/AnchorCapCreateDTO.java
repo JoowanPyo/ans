@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
-@Schema(name = "앵커자막 등록 DTO")
+@Schema(name = "앵커자막 등록 articleDTO")
 @Data
 @Builder
 @NoArgsConstructor

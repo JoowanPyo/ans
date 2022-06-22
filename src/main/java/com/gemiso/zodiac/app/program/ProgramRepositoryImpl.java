@@ -16,7 +16,7 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustorm{
     }
 
     @Override
-    public List<Program> findByProgram(String brdcPgmNm) {
+    public List<Program> findByProgram(String brdcPgmNm, String useYn) {
 
         QProgram qProgram = QProgram.program;
 
@@ -27,6 +27,10 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustorm{
 
         if (brdcPgmNm != null && brdcPgmNm.trim().isEmpty() == false) {
             jpaQuery.where(qProgram.brdcPgmNm.contains(brdcPgmNm));
+        }
+
+        if (useYn != null && useYn.trim().isEmpty() == false){
+            jpaQuery.where(qProgram.useYn.eq(useYn));
         }
 
         jpaQuery.orderBy(qProgram.inputDtm.asc());

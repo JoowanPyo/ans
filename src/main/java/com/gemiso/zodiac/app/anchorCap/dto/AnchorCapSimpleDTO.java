@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "앵커 자막 맵핑 DTO")
+@Schema(description = "앵커 자막 맵핑 articleDTO")
 @Data
 @Builder
 @NoArgsConstructor

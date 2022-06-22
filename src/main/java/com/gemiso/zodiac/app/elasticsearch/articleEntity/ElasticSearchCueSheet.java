@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.elasticsearch;
+package com.gemiso.zodiac.app.elasticsearch.articleEntity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

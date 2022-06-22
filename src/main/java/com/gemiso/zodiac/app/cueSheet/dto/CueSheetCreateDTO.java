@@ -41,7 +41,7 @@ public class CueSheetCreateDTO {
     private String brdcRunTime;
     private int cueVer;
     private int cueOderVer;
-    private Integer deptCd;
+    private Long deptCd;
     //private String deptNm;
     private BaseProgramSimpleDTO baseProgram;
     private ProgramSimpleDTO program;

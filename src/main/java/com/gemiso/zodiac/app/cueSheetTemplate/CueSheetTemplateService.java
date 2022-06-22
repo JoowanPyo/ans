@@ -64,7 +64,7 @@ public class CueSheetTemplateService {
 
         cueSheetTemplateCreateDTO.setInputrId(userId);
 
-        //DTO -> 엔티티 변환.
+        //articleDTO -> 엔티티 변환.
         CueSheetTemplate cueSheetTemplate = cueSheetTemplateCreateMapper.toEntity(cueSheetTemplateCreateDTO);
 
         //큐시트 템플릿 엔티티 등록.
@@ -90,7 +90,7 @@ public class CueSheetTemplateService {
     public void delete(Long cueTmpltId, String userId){
 
         CueSheetTemplate cueSheetTemplate = cueSheetTemplateFindOrFail(cueTmpltId);//큐시트 템플릿 존재 유무 확인 및 단건조회.
-        //조회된 큐시트 템플릿 엔티티 DTO변환 [데이터 셋팅 위해 DTO 변환].
+        //조회된 큐시트 템플릿 엔티티 DTO변환 [데이터 셋팅 위해 articleDTO 변환].
         CueSheetTemplateDTO cueSheetTemplateDTO = cueSheetTemplateMapper.toDto(cueSheetTemplate);
 
         cueSheetTemplateDTO.setDelDtm(new Date());//삭제일시 set.

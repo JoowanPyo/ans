@@ -45,8 +45,8 @@ public class DictionaryService {
         List<Dictionary> dictionaryList =
                 (List<Dictionary>) dictionaryRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "inputDtm"));
 
-        //searchWord 조건이 있으면 조건에 맞는 엔티티만 DTO List로 변환후 리턴
-        //searchWord 조건이 없으면 검색된 엔티티 DTO List로 변환후 리턴
+        //searchWord 조건이 있으면 조건에 맞는 엔티티만 articleDTO List로 변환후 리턴
+        //searchWord 조건이 없으면 검색된 엔티티 articleDTO List로 변환후 리턴
         List<DictionaryDTO> dictionaryDTOList = dictionaryMapper.toDtoList(dictionaryList);
 
         return dictionaryDTOList;
@@ -166,7 +166,7 @@ public class DictionaryService {
     }*/
     
 //////////////////////////////////////////////////Json 빌드 작업
-    /*public Dictionary toEntity(DictionaryCreateDTO dictionaryCreateDTO){ // 등록 DTO To Entity
+    /*public Dictionary toEntity(DictionaryCreateDTO dictionaryCreateDTO){ // 등록 articleDTO To Entity
 
         Dictionary dictionary = Dictionary.builder()
                 .expl(dictionaryCreateDTO.getExpl())
@@ -197,7 +197,7 @@ public class DictionaryService {
     }*/
 
 
-    //목록조회된 엔티티 리스트 To DTO List 변환
+    //목록조회된 엔티티 리스트 To articleDTO List 변환
     //searchWord[검색어]있으면 검색조건에 해당하는 엔티티만 변환후 List에 추가 후 리턴.
     /*public List<DictionaryDTO> toEntityList(List<Dictionary> dictionaryList, String searchWord) throws Exception {
 

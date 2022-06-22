@@ -73,7 +73,7 @@ public class ArticleOrderService {
         for (ArticleOrderDTO articleOrderDTO: articleOrderDTOList){
 
             List<ArticleOrderFileDTO> setFileDTOList = new ArrayList<>(); //새로 url추가생성하여 set해줄 contentDTO list
-            List<ArticleOrderFileDTO> orgFileDTOList = articleOrderDTO.getArticleOrderFile(); //목록조회된 기사의뢰 List에서 기사의뢰파일 DTO 리스트 get
+            List<ArticleOrderFileDTO> orgFileDTOList = articleOrderDTO.getArticleOrderFile(); //목록조회된 기사의뢰 List에서 기사의뢰파일 articleDTO 리스트 get
 
             for (int i = 0; i < orgFileDTOList.size(); i++){
 
@@ -86,8 +86,8 @@ public class ArticleOrderService {
                 setFileDTOList.add(fileDTO); // newDTO list에 추가.
             }
 
-            articleOrderDTO.setArticleOrderFile(setFileDTOList); //의뢰DTO 파일에DTO리스트에 url추가된 DTO 리스트 set
-            returnDtoList.add(articleOrderDTO); // 리턴 DTO 리스트에 add
+            articleOrderDTO.setArticleOrderFile(setFileDTOList); //의뢰DTO 파일에DTO리스트에 url추가된 articleDTO 리스트 set
+            returnDtoList.add(articleOrderDTO); // 리턴 articleDTO 리스트에 add
         }
 
         return returnDtoList;

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Schema(description = "속보뉴스 DTO")
+@Schema(description = "속보뉴스 articleDTO")
 @Data
 @Builder
 @NoArgsConstructor

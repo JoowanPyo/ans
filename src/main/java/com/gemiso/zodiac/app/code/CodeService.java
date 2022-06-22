@@ -153,41 +153,68 @@ public class CodeService {
         codeRepository.save(code);
     }
 
-    public void updateOrd(CodeOrdUpdateDTO codeOrdUpdateDTO, Long cdId){
+    public void updateOrd(CodeOrdUpdateDTO codeOrdUpdateDTO, Long cdId) {
 
         Code code = codeFindOrFail(cdId);
 
         Integer cdOrd = codeOrdUpdateDTO.getCdOrd();
         String hrnkCdId = codeOrdUpdateDTO.getHrnkCdId();
-
         CodeDTO codeDTO = codeMapper.toDto(code);
         codeDTO.setCdOrd(cdOrd);
         codeMapper.updateFromDto(codeDTO, code);
         codeRepository.save(code);
 
-        List<Code> codeList = codeRepository.findCodeList(hrnkCdId);
+        if (hrnkCdId != null && hrnkCdId.trim().isEmpty() == false) { //상위코드 순번설정
 
-        for (int i = codeList.size()-1; i >= 0; i-- ){
+            List<Code> codeList = codeRepository.findCodeList(hrnkCdId);
 
-            Long newCdId = codeList.get(i).getCdId();
+            for (int i = codeList.size() - 1; i >= 0; i--) {
 
-            if (newCdId.equals(cdId)){
-                codeList.remove(i);
+                Long newCdId = codeList.get(i).getCdId();
+
+                if (newCdId.equals(cdId)) {
+                    codeList.remove(i);
+                }
             }
+
+            codeList.add(cdOrd, code);
+
+            int index = 0;
+            for (Code codeEntity : codeList) {
+
+                CodeDTO updateCodeDTO = codeMapper.toDto(codeEntity);
+                updateCodeDTO.setCdOrd(index);
+                Code updateCode = codeMapper.toEntity(updateCodeDTO);
+                codeRepository.save(updateCode);
+                index++;
+            }
+
+        }else{ //상위코드 순번설정
+
+            List<Code> codeList = codeRepository.findHrnkCodeList();
+
+            for (int i = codeList.size() - 1; i >= 0; i--) {
+
+                Long newCdId = codeList.get(i).getCdId();
+
+                if (newCdId.equals(cdId)) {
+                    codeList.remove(i);
+                }
+            }
+
+            codeList.add(cdOrd, code);
+
+            int index = 0;
+            for (Code codeEntity : codeList) {
+
+                CodeDTO updateCodeDTO = codeMapper.toDto(codeEntity);
+                updateCodeDTO.setCdOrd(index);
+                Code updateCode = codeMapper.toEntity(updateCodeDTO);
+                codeRepository.save(updateCode);
+                index++;
+            }
+
         }
-
-        codeList.add(cdOrd, code);
-
-        int index = 0;
-        for (Code codeEntity : codeList){
-
-            CodeDTO updateCodeDTO = codeMapper.toDto(codeEntity);
-            updateCodeDTO.setCdOrd(index);
-            Code updateCode = codeMapper.toEntity(updateCodeDTO);
-            codeRepository.save(updateCode);
-            index++;
-        }
-
     }
 
     public Code codeFindOrFail(Long cdId) {

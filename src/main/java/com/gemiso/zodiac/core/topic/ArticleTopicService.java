@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.ArticleLockTopicDTO;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.ArticleTopicDTO;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 @Slf4j
@@ -43,13 +46,16 @@ public class ArticleTopicService {
         topicSendService.topicWeb(json);
     }
 
-    public void articleLockTopic(String eventId, Long artclId, String msg) throws JsonProcessingException {
+    public void articleLockTopic(String eventId, Long artclId, String msg, Date lckDtm, String lckrId, String lckrNm) throws JsonProcessingException {
 
         ArticleLockTopicDTO articleLockTopicDTO = new ArticleLockTopicDTO();
 
         articleLockTopicDTO.setEventId(eventId);
         articleLockTopicDTO.setArtclId(artclId);
         articleLockTopicDTO.setMsg(msg);
+        articleLockTopicDTO.setLckDtm(lckDtm);
+        articleLockTopicDTO.setLckrId(lckrId);
+        articleLockTopicDTO.setLckrNm(lckrNm);
 
         //토픽메세지 ArticleTopicDTO Json으로 변환후 send
 

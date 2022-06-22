@@ -37,7 +37,7 @@ public class ScrollNewsDetailService {
         //조회된 엔티티 리스트 DTO변환
         List<ScrollNewsDetailDTO> scrollNewsDetailDTOList = scrollNewsDetailMapper.toDtoList(scrollNewsDetailList);
 
-        //DTO 리스트 리턴
+        //articleDTO 리스트 리턴
         return scrollNewsDetailDTOList;
 
     }
@@ -48,10 +48,10 @@ public class ScrollNewsDetailService {
         //스크롤 뉴스 상세 단건조회[ 조회조건 스크롤 뉴스 상세 아이디] 및 존재유무 확인
         ScrollNewsDetail scrollNewsDetail = findDetail(id);
 
-        //엔티티 DTO 변환
+        //엔티티 articleDTO 변환
         ScrollNewsDetailDTO scrollNewsDetailDTO = scrollNewsDetailMapper.toDto(scrollNewsDetail);
 
-        //DTO 리턴
+        //articleDTO 리턴
         return scrollNewsDetailDTO;
     }
 

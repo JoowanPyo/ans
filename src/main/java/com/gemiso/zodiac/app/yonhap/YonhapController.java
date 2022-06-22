@@ -121,7 +121,7 @@ public class YonhapController {
 
         String userId = userAuthService.authUser.getUserId();
 
-        log.info(" Yonhap Assign : UserId - "+userId + " Yonhap Assign DTO - "+yonhapAssignCreateDTO.toString());
+        log.info(" Yonhap Assign : UserId - "+userId + " Yonhap Assign articleDTO - "+yonhapAssignCreateDTO.toString());
 
         YonhapAssignSimpleDTO yonhapAssignSimpleDTO = yonhapService.createAssign(yonhapAssignCreateDTO, userId);
 

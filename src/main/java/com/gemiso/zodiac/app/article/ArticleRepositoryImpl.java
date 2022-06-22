@@ -44,7 +44,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm{
                                            String searchDivCd,
                                            String searchWord,
                                            List<String> apprvDivCdList,
-                                           Integer deptCd,
+                                           Long deptCd,
                                            String artclCateCd,
                                            String artclTypDtlCd,
                                            String delYn,
@@ -179,7 +179,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm{
 
     @Override
     public Page<Article> findByArticleIssue(Date sdate, Date edate, String issuKwd, String artclDivCd, String artclTypCd,
-                                            String artclTypDtlCd, String artclCateCd, Integer deptCd, String inputrId,
+                                            String artclTypDtlCd, String artclCateCd, Long deptCd, String inputrId,
                                             String brdcPgmId, Long orgArtclId, String delYn, String searchDivCd,
                                             String searchWord, List<String> apprvDivCdList, Pageable pageable) {
 
@@ -280,7 +280,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm{
 
     @Override
     public Page<Article> findByArticleCue(Date sdate, Date edate, String searchWord, Long cueId, String brdcPgmId, String artclTypCd,
-                                          String artclTypDtlCd, String copyYn, Integer deptCd, Long orgArtclId, Pageable pageable) {
+                                          String artclTypDtlCd, String copyYn, Long deptCd, Long orgArtclId, Pageable pageable) {
 
 
         QArticle qArticle = QArticle.article;

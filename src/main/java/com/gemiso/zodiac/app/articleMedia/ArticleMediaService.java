@@ -15,14 +15,11 @@ import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaUpdateMapper;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
-import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
-import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.topic.CueSheetTopicService;
 import com.gemiso.zodiac.core.topic.TopicSendService;
-import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerCueSheetTopicDTO;
 import com.gemiso.zodiac.core.topic.cueSheetTopicDTO.CueSheetWebTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -134,16 +131,12 @@ public class ArticleMediaService {
                         articleId = article.getArtclId();
                     }
 
-                    String mediaTypCd = articleMediaCreateDTO.getMediaTypCd();
 
+                    /************ MQ messages *************/
 
-                    if ("media_typ_001".equals(mediaTypCd)) {
+                    cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, null, artclId, null, "Create Media",
+                            null, "N", "N");
 
-                        /************ MQ messages *************/
-
-                        cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, null, artclId, null, "Create Media",
-                                null, "N", "N");
-                    }
                 }
             }
 
@@ -245,8 +238,6 @@ public class ArticleMediaService {
         articleRepository.save(article);
 
 
-
-
         //Long artclId = articleEntity.getArtclId();
         //Article article = articleService.articleFindOrFail(artclId);
 
@@ -275,14 +266,10 @@ public class ArticleMediaService {
                         articleId = article.getArtclId();
                     }
 
-                    String mediaTypCd = articleMedia.getMediaTypCd();
 
+                    cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, null, artclId, null, "Delete Media",
+                            null, "N", "N");
 
-                    if ("media_typ_001".equals(mediaTypCd)) {
-
-                        cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, null, artclId, null, "Delete Media",
-                                null, "N", "N");
-                    }
                 }
             }
 

@@ -371,7 +371,7 @@ public class InterfaceService {
 
     public String takerPgmToXml(List<ParentProgramDTO> parentProgramDTOList) {
 
-        //큐시트목록 xml을 담는 DTO
+        //큐시트목록 xml을 담는 articleDTO
         TakerProgramDTO takerProgramDTO = new TakerProgramDTO();
         //success="true" msg="ok" 담는DTO
         TakerProgramResultDTO takerProgramResultDTO = new TakerProgramResultDTO();
@@ -392,7 +392,7 @@ public class InterfaceService {
         takerProgramDTO.setResult(takerProgramResultDTO);
         takerProgramDTO.setData(takerProgramDataDTO);
 
-        //DTO TO XML 파싱
+        //articleDTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(takerProgramDTO, TakerProgramDTO.class);
 
         // name.out.println("xml : " + xml);
@@ -404,7 +404,7 @@ public class InterfaceService {
         List<ParentProgramDTO> parentProgramDTOList = new ArrayList<>();
         parentProgramDTOList.add(parentProgramDTO);
 
-        //큐시트목록 xml을 담는 DTO
+        //큐시트목록 xml을 담는 articleDTO
         TakerProgramDTO takerProgramDTO = new TakerProgramDTO();
         //success="true" msg="ok" 담는DTO
         TakerProgramResultDTO takerProgramResultDTO = new TakerProgramResultDTO();
@@ -425,7 +425,7 @@ public class InterfaceService {
         takerProgramDTO.setResult(takerProgramResultDTO);
         takerProgramDTO.setData(takerProgramDataDTO);
 
-        //DTO TO XML 파싱
+        //articleDTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(takerProgramDTO, TakerProgramDTO.class);
 
         // name.out.println("xml : " + xml);
@@ -973,7 +973,7 @@ public class InterfaceService {
     //큐시트 아이템 비디오 정보 get
     public TakerCueSheetVideoDTO getVideoDTOList(List<CueSheetMedia> cueSheetMediaList) {
 
-        TakerCueSheetVideoDTO returnDTO = new TakerCueSheetVideoDTO(); //리턴할 비디오 DTO 리스트
+        TakerCueSheetVideoDTO returnDTO = new TakerCueSheetVideoDTO(); //리턴할 비디오 articleDTO 리스트
         List<TakerCueSheetVideoClipDTO> takerCueSheetVideoDTOList = new ArrayList<>();
 
         Integer seq = 1;
@@ -1022,7 +1022,7 @@ public class InterfaceService {
     //큐시트 기사 비디오 정보 get
     public TakerCueSheetVideoDTO getArticleVideoDTOList(List<ArticleMedia> cueSheetMediaArticleList) {
 
-        TakerCueSheetVideoDTO returnDTO = new TakerCueSheetVideoDTO(); //리턴할 비디오 DTO 리스트
+        TakerCueSheetVideoDTO returnDTO = new TakerCueSheetVideoDTO(); //리턴할 비디오 articleDTO 리스트
         List<TakerCueSheetVideoClipDTO> takerCueSheetVideoDTOList = new ArrayList<>();
 
         Integer seq = 1;
@@ -1071,7 +1071,7 @@ public class InterfaceService {
 
     //조회된 큐시트 데이터 리스트를 XML DTO에 set 후 XML형식 String데이터로 파싱
     public String takerCueToXml(TakerCueSheetDataDTO takerCueSheetDataDTO) {
-        //큐시트목록 xml을 담는 DTO
+        //큐시트목록 xml을 담는 articleDTO
         TakerCueSheetXML takerCueSheetXML = new TakerCueSheetXML();
         //success="true" msg="ok" 담는DTO
         TakerCueSheetResultDTO takerCueSheetResultDTO = new TakerCueSheetResultDTO();
@@ -1098,7 +1098,7 @@ public class InterfaceService {
         takerCueSheetXML.setData(takerCueSheetDataDTO);
         takerCueSheetXML.setResult(takerCueSheetResultDTO);
 
-        //DTO TO XML 파싱
+        //articleDTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(takerCueSheetXML, TakerCueSheetXML.class);
 
         return xml;
@@ -1143,7 +1143,7 @@ public class InterfaceService {
 
     public String codeToTakerCodeXml(TakerCodeDTO takerCodeDTO) {
 
-        //코드목록 XML을 담는 DTO [DTO TO XML]
+        //코드목록 XML을 담는 articleDTO [articleDTO TO XML]
         TakerCodeXML takerCodeXML = new TakerCodeXML();
         //&List<Code>
         TakerCodeDataDTO takerCodeDataDTO = new TakerCodeDataDTO();
@@ -1161,7 +1161,7 @@ public class InterfaceService {
         takerCodeXML.setData(takerCodeDataDTO);
         takerCodeXML.setResult(takerCodeResultDTO);
 
-        //DTO TO XML 파싱
+        //articleDTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(takerCodeXML, TakerCodeXML.class);
 
         return xml;
@@ -1306,7 +1306,7 @@ public class InterfaceService {
 
         /* prompterProgramXML.setPrompterProgramDTO(prompterProgramDTOList);*/
 
-        //DTO TO XML 파싱
+        //articleDTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(prompterProgramXML, PrompterProgramXML.class);
 
         return xml;
@@ -1333,9 +1333,9 @@ public class InterfaceService {
         //큐시트 예비조회 및 DTO빌드
         List<PrompterSpareCueSheetDTO> prompterSpareCueSheetDTOList = cueToPrompterSpareCue(cueSheet);
 
-        //큐시트 아이템 DTO 빌드 set
+        //큐시트 아이템 articleDTO 빌드 set
         prompterCueSheetDataDTO.setCueSheetDTO(prompterCueSheetDTOList);
-        //예비 큐시트 아이템 DTO 빌드 set
+        //예비 큐시트 아이템 articleDTO 빌드 set
         prompterCueSheetDataDTO.setPrompterSpareCueSheetDTOS(prompterSpareCueSheetDTOList);
 
         return prompterCueSheetDataDTO;
@@ -1344,7 +1344,7 @@ public class InterfaceService {
 
     public String prompterCueSheetXml(PrompterCueSheetDataDTO prompterCueSheetDataDTO) {
 
-        //프롬프터 큐시트 xml형식으로 변환할 DTO
+        //프롬프터 큐시트 xml형식으로 변환할 articleDTO
         PrompterCueSheetXML prompterCueSheetXML = new PrompterCueSheetXML();
 
         //success="true" msg="ok" 담는DTO
@@ -1366,7 +1366,7 @@ public class InterfaceService {
 
         /*prompterCueSheetXML.setCueSheetDTO(prompterCueSheetDTOList);*/
 
-        //DTO TO XML 파싱
+        //articleDTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(prompterCueSheetXML, PrompterCueSheetXML.class);
 
         return xml;
@@ -1798,7 +1798,7 @@ public class InterfaceService {
             }
         }
 
-        TakerCueSheetDTO takerCueSheetDTO = new TakerCueSheetDTO(); //데이터 DTO에 담을 DTO
+        TakerCueSheetDTO takerCueSheetDTO = new TakerCueSheetDTO(); //데이터 DTO에 담을 articleDTO
 
         if (ObjectUtils.isEmpty(article)) { //기사가 포함이 안된 큐시트 아이템 일시
 
@@ -1922,7 +1922,7 @@ public class InterfaceService {
             }
         }
 
-        TakerCueSheetDTO takerCueSheetDTO = new TakerCueSheetDTO(); //데이터 DTO에 담을 DTO
+        TakerCueSheetDTO takerCueSheetDTO = new TakerCueSheetDTO(); //데이터 DTO에 담을 articleDTO
 
         if (ObjectUtils.isEmpty(article)) { //기사가 포함이 안된 큐시트 아이템 일시
 
@@ -1959,9 +1959,9 @@ public class InterfaceService {
 
     }
 
-    //테이커 큐시트 리플레시 DTO TO XML
+    //테이커 큐시트 리플레시 articleDTO TO XML
     public String takerCueRefresh(TakerCueRefreshDataDTO takerCueSheetDTO) {
-        //큐시트목록 xml을 담는 DTO
+        //큐시트목록 xml을 담는 articleDTO
         TakerCueRefreshXML takerCueSheetXML = new TakerCueRefreshXML();
         //success="true" msg="ok" 담는DTO
         TakerCueSheetResultDTO takerCueSheetResultDTO = new TakerCueSheetResultDTO();
@@ -1983,15 +1983,15 @@ public class InterfaceService {
         takerCueSheetXML.setData(takerCueSheetDTO);
         takerCueSheetXML.setResult(takerCueSheetResultDTO);
 
-        //DTO TO XML 파싱
+        //articleDTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(takerCueSheetXML, TakerCueRefreshXML.class);
 
         return xml;
     }
 
-    //테이커 큐시트 리플레시 DTO TO XML
+    //테이커 큐시트 리플레시 articleDTO TO XML
     public String takerSpareCueRefresh(TakerSpareCueRefreshDataDTO takerSpareCueSheetDTO) {
-        //큐시트목록 xml을 담는 DTO
+        //큐시트목록 xml을 담는 articleDTO
         TakerSpareCueRefreshXML takerSpareCueRefreshXML = new TakerSpareCueRefreshXML();
         //success="true" msg="ok" 담는DTO
         TakerCueSheetResultDTO takerCueSheetResultDTO = new TakerCueSheetResultDTO();
@@ -2013,7 +2013,7 @@ public class InterfaceService {
         takerSpareCueRefreshXML.setData(takerSpareCueSheetDTO);
         takerSpareCueRefreshXML.setResult(takerCueSheetResultDTO);
 
-        //DTO TO XML 파싱
+        //articleDTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(takerSpareCueRefreshXML, TakerSpareCueRefreshXML.class);
 
         return xml;

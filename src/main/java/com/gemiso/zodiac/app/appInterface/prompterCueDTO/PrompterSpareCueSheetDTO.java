@@ -73,7 +73,7 @@ public class PrompterSpareCueSheetDTO {
     private String rptrNm;
 
     @XmlElement(name = "dept_cd")
-    private Integer deptCd;
+    private Long deptCd;
 
     @XmlElement(name = "artcl_reqd_sec")
     private Integer artclReqdSec;

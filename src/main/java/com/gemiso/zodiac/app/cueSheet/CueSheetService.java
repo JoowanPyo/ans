@@ -134,18 +134,18 @@ public class CueSheetService {
 
 
     //큐시트 목록조회 + 유니온 일일편성 [큐시트 인터페이스+큐시트 아이템추가 목록]
-    public CueSheetFindAllDTO findAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, Integer deptCd, String searchWord){
+    public CueSheetFindAllDTO findAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, Long deptCd, String searchWord){
 
-        BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm, deptCd, searchWord);
+        //BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm, deptCd, searchWord);
 
         //order by 정령조건 생성[ ASC 방송일시, DESC 방송시작시간]
-        List<Sort.Order> orders = new ArrayList<>();
+       /* List<Sort.Order> orders = new ArrayList<>();
         Sort.Order order1 = new Sort.Order(Sort.Direction.ASC, "brdcDt");
         orders.add(order1);
         Sort.Order order2 = new Sort.Order(Sort.Direction.ASC, "brdcStartTime");
-        orders.add(order2);
+        orders.add(order2);*/
 
-        List<CueSheet> cueSheets = (List<CueSheet>) cueSheetRepository.findAll(booleanBuilder, Sort.by(orders));
+        List<CueSheet> cueSheets = cueSheetRepository.findByCueSheetList(sdate,  edate,  brdcPgmId,  brdcPgmNm, deptCd, searchWord);
 
         List<CueSheetDTO> cueSheetDTOList = cueSheetMapper.toDtoList(cueSheets);
 
@@ -166,7 +166,7 @@ public class CueSheetService {
     }
 
     //큐시트 목록조회 + 유니온 일일편성 [큐시트 인터페이스+큐시트 아이템추가 목록]
-    public List<CueSheetDTO> takerFindAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, Integer deptCd, String searchWord){
+    public List<CueSheetDTO> takerFindAll(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, Long deptCd, String searchWord){
 
         BooleanBuilder booleanBuilder = getSearch( sdate,  edate,  brdcPgmId,  brdcPgmNm, deptCd,   searchWord);
 
@@ -558,7 +558,7 @@ public class CueSheetService {
 
                     symbolDTO.setUrl(url);//방송아이콘이 저장된 url set
 
-                    getCueSheetItemSymbol.setSymbol(symbolDTO);//url 추가 DTO set
+                    getCueSheetItemSymbol.setSymbol(symbolDTO);//url 추가 articleDTO set
                 }
 
 
@@ -778,7 +778,7 @@ public class CueSheetService {
         //큐시트아이템 이력 버전 카운트 조회
         int getCueVer = cueSheetHistRepository.findCueVer(cueId);
 
-        //큐시트 아이템 이력 DTO 빌드
+        //큐시트 아이템 이력 articleDTO 빌드
         CueSheetHistCreateDTO cueSheetHistBuild = CueSheetHistCreateDTO.builder()
                 .cueVer(cueSheet.getCueVer())
                 .cueAction(ActionEnum.UPDATE.getAction(ActionEnum.UPDATE))
@@ -815,7 +815,7 @@ public class CueSheetService {
         //큐시트아이템 이력 버전 카운트 조회
         int getCueVer = cueSheetHistRepository.findCueVer(cueId);
 
-        //큐시트 아이템 이력 DTO 빌드
+        //큐시트 아이템 이력 articleDTO 빌드
         CueSheetHistCreateDTO cueSheetHistBuild = CueSheetHistCreateDTO.builder()
                 .cueVer(cueSheet.getCueVer())
                 .cueAction(ActionEnum.DELETE.getAction(ActionEnum.DELETE))
@@ -846,7 +846,7 @@ public class CueSheetService {
     }
 
     //큐시트 목록조회 조회조건 빌드
-    private BooleanBuilder getSearch(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, Integer deptCd, String searchWord) {
+    private BooleanBuilder getSearch(Date sdate, Date edate, String brdcPgmId, String brdcPgmNm, Long deptCd, String searchWord) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -1594,7 +1594,7 @@ public class CueSheetService {
         CueSheetCapDownloadXMLDTO cueSheetCapDownloadXMLDTO = new CueSheetCapDownloadXMLDTO();
         cueSheetCapDownloadXMLDTO.setCd(cueSheetCapDownloadCgDTOS);
 
-        //DTO TO XML 파싱
+        //articleDTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(cueSheetCapDownloadXMLDTO, CueSheetCapDownloadXMLDTO.class);
 
 

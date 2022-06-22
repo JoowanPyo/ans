@@ -96,7 +96,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         dto.setMessage(apiErrorResponse.getError().getMessage());
         dto.setStatus(apiErrorResponse.getStatus());*/
 
-        //DTO TO XML 파싱
+        //articleDTO TO XML 파싱
         String xml = JAXBXmlHelper.marshalNohead(dto, InterfaceExceptionDTO.class);
 
         return xml;

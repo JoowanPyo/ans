@@ -59,7 +59,7 @@ public class CueTmpltItemCapController {
                                                            @Parameter(name = "cueTmpltItemId", description = "큐시트 템플릿 아이템 아이디")
                                                            @PathVariable("cueTmpltItemId") Long cueTmpltItemId) {
 
-        //아이디를 담아 리털할 DTO
+        //아이디를 담아 리털할 articleDTO
         CueTmpltItemCapSimpleDTO cueTmpltItemCapSimpleDTO = cueTmpltItemCapService.create(cueTmpltItemCapCreateDTO, cueTmpltItemId);
 
         return new AnsApiResponse<>(cueTmpltItemCapSimpleDTO);

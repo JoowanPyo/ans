@@ -1,16 +1,9 @@
 package com.gemiso.zodiac.app.program.dto;
 
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
-import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateDTO;
-import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
-import java.util.List;
 
 @Data
 @Builder
@@ -40,5 +33,8 @@ public class ProgramUpdateDTO {
     //private String updtrNm;
     //private String delrId;
     //private String delrNm;
+    private String scriptYn;
+    private String nodYn;
+    private String useYn;
 
 }

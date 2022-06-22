@@ -98,6 +98,15 @@ public class Program {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
     private String delrNm;
 
+    @Column(name = "script_yn", length = 50)
+    private String scriptYn;
+
+    @Column(name = "nod_yn", length = 50)
+    private String nodYn;
+
+    @Column(name = "use_yn", length = 50)
+    private String useYn;
+
    /* @OneToMany(mappedBy = "program")
     private List<CueSheetTemplate> cueSheetTemplate;*/
 
@@ -114,6 +123,15 @@ public class Program {
 
         if (this.delYn == null || this.delYn == "") {
             this.delYn = "N";
+        }
+        if (this.scriptYn == null || this.scriptYn == "") {
+            this.scriptYn = "N";
+        }
+        if (this.nodYn == null || this.nodYn == "") {
+            this.nodYn = "N";
+        }
+        if (this.useYn == null || this.useYn == "") {
+            this.useYn = "Y";
         }
     }
 }
