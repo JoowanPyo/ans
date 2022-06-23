@@ -45,7 +45,7 @@ public class CueTmpltItem extends BaseEntity {
     @Column(name = "cue_item_titl_en", length = 300)
     private String cueItemTitlEn;
 
-    @Column(name = "cue_item_ctt", length = 500)
+    @Column(name = "cue_item_ctt", columnDefinition = "text")
     private String cueItemCtt;
 
     @Column(name = "cue_item_ord")

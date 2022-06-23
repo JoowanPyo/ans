@@ -46,22 +46,21 @@ public class CueSheetItemRepositoryImpl implements CueSheetItemRepositoryCustorm
         QAnchorCap qAnchorCap = QAnchorCap.anchorCap;
 
 
-
         JPAQuery jpaQuery = jpaQueryFactory.select(qCueSheetItem).from(qCueSheetItem)
                 .leftJoin(qCueSheetItem.cueSheet, qCueSheet).fetchJoin()
                 .leftJoin(qCueSheetItem.article, qArticle).fetchJoin()
                 .leftJoin(qArticle.articleMedia, qArticleMedia).fetchJoin()
-                .leftJoin(qArticle.articleCap, qArticleCap).fetchJoin()
-                .leftJoin(qArticleCap.symbol, qSymbol).fetchJoin()
-                .leftJoin(qArticle.anchorCap, qAnchorCap).fetchJoin()
-                .leftJoin(qAnchorCap.symbol, qSymbol).fetchJoin()
                 .leftJoin(qCueSheetItem.cueSheetTemplate, qCueSheetTemplate).fetchJoin()
                 .leftJoin(qCueSheetItem.cueSheetMedia, qCueSheetMedia).fetchJoin()
                 .leftJoin(qCueSheetItem.cueSheetItemCap, qCueSheetItemCap).fetchJoin()
-                .leftJoin(qCueSheetItemCap.symbol, qSymbol).fetchJoin()
-                .leftJoin(qCueSheetItem.cueSheetItemSymbol, qCueSheetItemSymbol).fetchJoin()
-                .leftJoin(qCueSheetItemSymbol.symbol, qSymbol).fetchJoin()
-                .leftJoin(qSymbol.attachFile, qAttachFile).fetchJoin().distinct();
+                .leftJoin(qCueSheetItem.cueSheetItemSymbol, qCueSheetItemSymbol).fetchJoin().distinct();
+                //.leftJoin(qArticle.articleCap, qArticleCap).fetchJoin()
+                //.leftJoin(qArticleCap.symbol, qSymbol).fetchJoin()
+                //.leftJoin(qArticle.anchorCap, qAnchorCap).fetchJoin()
+                //.leftJoin(qAnchorCap.symbol, qSymbol).fetchJoin()
+                //.leftJoin(qCueSheetItemCap.symbol, qSymbol).fetchJoin()
+                //.leftJoin(qCueSheetItemSymbol.symbol, qSymbol).fetchJoin()
+                //.leftJoin(qSymbol.attachFile, qAttachFile).fetchJoin().distinct();
 
 
         if (delYn != null && delYn.trim().isEmpty() == false) {

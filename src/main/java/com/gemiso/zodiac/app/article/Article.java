@@ -118,7 +118,7 @@ public class Article extends BaseEntity {
     @Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_cate_cd)")
     private String artclCateCdNm;
 
-    @Column(name = "artcl_titl", length = 500)
+    @Column(name = "artcl_titl", length = 300)
     private String artclTitl;
 
     @Column(name = "artcl_titl_en", length = 300)

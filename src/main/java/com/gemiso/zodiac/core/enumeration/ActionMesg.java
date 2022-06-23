@@ -2,19 +2,19 @@ package com.gemiso.zodiac.core.enumeration;
 
 public enum ActionMesg {
 
-    articleC("article create"),
-    articleU("article update"),
-    articleD("article delete"),
-    articleTM("article title modify"),
-    articleTEM("article english title modify"),
+    articleC("Created"),
+    articleU("Updated"),
+    articleD("Deleted"),
+    articleTM("Korean Title Modified"),
+    articleTEM("English Title Modified"),
     articleCM("article contents modify"),
-    anchorMM("anchor ment contents modify"),
+    anchorMM("Anchor Lead Updated"),
     articleOPEN("the article open"),
     articleCLOSE("the article close"),
     articleLOCK("article Lock"),
     articleUNLOCK("article UnLock"),
-    articleForcedLock("article forced Lock"),
-    fixM("the news fix status changed");
+    articleForcedLock("Overriden"),
+    fixM("Status Changed");
 
     String mesg;
 

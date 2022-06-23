@@ -565,6 +565,35 @@ public class InterfaceService {
                 }
             }
 
+            //NS채널이 없고 오디오 채널이 있을경우엔 오디오 채널값을 넣어준다.
+            if (returnSymbolId == null || returnSymbolId.isEmpty()){
+
+                for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
+                    Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+
+                    if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+                        String symbolId = symbol.getSymbolId(); //심볼아이디
+                        String symbolNm = symbol.getSymbolNm(); //심볼 명
+
+                        switch (symbolId) { // ANS1, ANS2, ANS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                            case "ANS1":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                            case "ANS2":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                            case "ANS3":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                        }
+                    }
+                }
+
+            }
+
             if (ObjectUtils.isEmpty(article)) { //기사가 포함이 안된 큐시트 아이템 일시
 
                 //큐시트 아이템 비디오 정보 get
@@ -797,6 +826,35 @@ public class InterfaceService {
                             break;
                     }
                 }
+            }
+
+            //NS채널이 없고 오디오 채널이 있을경우엔 오디오 채널값을 넣어준다.
+            if (returnSymbolId == null || returnSymbolId.isEmpty()){
+
+                for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
+                    Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+
+                    if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+                        String symbolId = symbol.getSymbolId(); //심볼아이디
+                        String symbolNm = symbol.getSymbolNm(); //심볼 명
+
+                        switch (symbolId) { // ANS1, ANS2, ANS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                            case "ANS1":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                            case "ANS2":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                            case "ANS3":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                        }
+                    }
+                }
+
             }
 
 
@@ -1387,6 +1445,68 @@ public class InterfaceService {
 
             Article article = cueSheetItem.getArticle(); //큐시스트 아이템에서 기사 get
 
+            Long cueItemId = cueSheetItem.getCueItemId();
+
+            //큐시트 아이템 방송아이콘 List 조회
+            List<CueSheetItemSymbol> cueSheetItemSymbolList = cueSheetItemSymbolRepository.findSymbol(cueItemId);
+
+            //cmDivCd, cmDivCd 값 구하기 [채널값으로 심볼에 들어가는 NS-1, NS-2, NS-3 값 구하기]
+            String returnSymbolId = "";
+            String returnSymbolNm = "";
+            for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
+                Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+
+                if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+                    String symbolId = symbol.getSymbolId(); //심볼아이디
+                    String symbolNm = symbol.getSymbolNm(); //심볼 명
+
+                    switch (symbolId) { // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                        case "VNS1":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "VNS2":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "VNS3":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                    }
+                }
+            }
+
+            //NS채널이 없고 오디오 채널이 있을경우엔 오디오 채널값을 넣어준다.
+            if (returnSymbolId == null || returnSymbolId.isEmpty()){
+
+                for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
+                    Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+
+                    if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+                        String symbolId = symbol.getSymbolId(); //심볼아이디
+                        String symbolNm = symbol.getSymbolNm(); //심볼 명
+
+                        switch (symbolId) { // ANS1, ANS2, ANS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                            case "ANS1":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                            case "ANS2":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                            case "ANS3":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                        }
+                    }
+                }
+
+            }
+
+
             if (ObjectUtils.isEmpty(article)) { //기사 정보가 없으면 contiue [프롬프트에서 기사정보만 쓰임]
 
                 //템플릿이 있을경우 템플릿아이디 추가
@@ -1416,6 +1536,8 @@ public class InterfaceService {
                         .cueId(cueSheet.getCueId()) //Topic 사용 큐시트 아이디
                         .cueItemId(cueSheetItem.getCueItemId()) //Topic 사용 큐시트 아이템 아이디
                         .cueTmpltId(cueTmpltId)
+                        .cmDivCd(returnSymbolId)
+                        .cmDivNm(returnSymbolNm)
                         .build();
 
                 //빌드된 PrompterCueSheetDTO를 PrompterCueRefreshDTO List에 add
@@ -1478,6 +1600,8 @@ public class InterfaceService {
                         .cueId(cueSheet.getCueId())
                         .cueTmpltId(null)
                         .cueItemId(cueSheetItem.getCueItemId())
+                        .cmDivCd(returnSymbolId)
+                        .cmDivNm(returnSymbolNm)
                         .build();
 
 
@@ -1507,6 +1631,67 @@ public class InterfaceService {
 
             Article article = cueSheetItem.getArticle(); //큐시스트 아이템에서 기사 get
 
+            Long cueItemId = cueSheetItem.getCueItemId();
+
+            //큐시트 아이템 방송아이콘 List 조회
+            List<CueSheetItemSymbol> cueSheetItemSymbolList = cueSheetItemSymbolRepository.findSymbol(cueItemId);
+
+            //cmDivCd, cmDivCd 값 구하기 [채널값으로 심볼에 들어가는 NS-1, NS-2, NS-3 값 구하기]
+            String returnSymbolId = "";
+            String returnSymbolNm = "";
+            for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
+                Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+
+                if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+                    String symbolId = symbol.getSymbolId(); //심볼아이디
+                    String symbolNm = symbol.getSymbolNm(); //심볼 명
+
+                    switch (symbolId) { // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                        case "VNS1":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "VNS2":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "VNS3":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                    }
+                }
+            }
+
+            //NS채널이 없고 오디오 채널이 있을경우엔 오디오 채널값을 넣어준다.
+            if (returnSymbolId == null || returnSymbolId.isEmpty()){
+
+                for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
+                    Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+
+                    if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+                        String symbolId = symbol.getSymbolId(); //심볼아이디
+                        String symbolNm = symbol.getSymbolNm(); //심볼 명
+
+                        switch (symbolId) { // ANS1, ANS2, ANS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                            case "ANS1":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                            case "ANS2":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                            case "ANS3":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                        }
+                    }
+                }
+
+            }
+
             if (ObjectUtils.isEmpty(article)) { //기사 정보가 없으면 contiue [프롬프트에서 기사정보만 쓰임]
 
                 //템플릿이 있을경우 템플릿아이디 추가
@@ -1530,6 +1715,8 @@ public class InterfaceService {
                         .cueId(cueSheet.getCueId())
                         .cueTmpltId(cueTmpltId)
                         .cueItemId(cueSheetItem.getCueItemId())
+                        .cmDivCd(returnSymbolId)
+                        .cmDivNm(returnSymbolNm)
                         .build();
 
                 //빌드된 PrompterCueSheetDTO를 PrompterCueRefreshDTO List에 add
@@ -1577,6 +1764,8 @@ public class InterfaceService {
                         .cueId(cueSheet.getCueId())
                         .cueTmpltId(null)
                         .cueItemId(cueSheetItem.getCueItemId())
+                        .cmDivCd(returnSymbolId)
+                        .cmDivNm(returnSymbolNm)
                         .build();
 
 
@@ -1798,6 +1987,35 @@ public class InterfaceService {
             }
         }
 
+        //NS채널이 없고 오디오 채널이 있을경우엔 오디오 채널값을 넣어준다.
+        if (returnSymbolId == null || returnSymbolId.isEmpty()){
+
+            for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
+                Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+
+                if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+                    String symbolId = symbol.getSymbolId(); //심볼아이디
+                    String symbolNm = symbol.getSymbolNm(); //심볼 명
+
+                    switch (symbolId) { // ANS1, ANS2, ANS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                        case "ANS1":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "ANS2":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "ANS3":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                    }
+                }
+            }
+
+        }
+
         TakerCueSheetDTO takerCueSheetDTO = new TakerCueSheetDTO(); //데이터 DTO에 담을 articleDTO
 
         if (ObjectUtils.isEmpty(article)) { //기사가 포함이 안된 큐시트 아이템 일시
@@ -1920,6 +2138,35 @@ public class InterfaceService {
                         break;
                 }
             }
+        }
+
+        //NS채널이 없고 오디오 채널이 있을경우엔 오디오 채널값을 넣어준다.
+        if (returnSymbolId == null || returnSymbolId.isEmpty()){
+
+            for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
+                Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+
+                if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+                    String symbolId = symbol.getSymbolId(); //심볼아이디
+                    String symbolNm = symbol.getSymbolNm(); //심볼 명
+
+                    switch (symbolId) { // ANS1, ANS2, ANS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                        case "ANS1":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "ANS2":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "ANS3":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                    }
+                }
+            }
+
         }
 
         TakerCueSheetDTO takerCueSheetDTO = new TakerCueSheetDTO(); //데이터 DTO에 담을 articleDTO

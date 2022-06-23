@@ -97,5 +97,10 @@ public class PrompterSpareCueSheetDTO {
     @XmlElement(name = "cue_item_id")
     private Long cueItemId;
 
+    @XmlElement(name="cm_div_cd")
+    private String cmDivCd;
+    @XmlElement(name="cm_div_nm")
+    private String cmDivNm;
+
 
 }

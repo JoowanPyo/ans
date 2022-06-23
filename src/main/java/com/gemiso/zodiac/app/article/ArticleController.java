@@ -147,7 +147,7 @@ public class ArticleController {
     }
 
     @Operation(summary = "기사 목록조회[큐시트]", description = "기사 목록조회[큐시트]")
-    @GetMapping(path = "/cuesheetsearchcue")
+    @GetMapping(path = "/elasticsearchcue")
     public AnsApiResponse<PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle>> findAllElasticsearchCue(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = true)
                                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                                       @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = true)
@@ -186,7 +186,7 @@ public class ArticleController {
     }
 
     @Operation(summary = "기사 목록조회[큐시트]", description = "기사 목록조회[큐시트]")
-    @GetMapping(path = "/elastic")
+    @GetMapping(path = "/cuesheet")
     public AnsApiResponse<PageResultDTO<ArticleDTO, Article>> findCue(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = true)
                                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                                       @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = true)

@@ -98,13 +98,13 @@ public class Program {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
     private String delrNm;
 
-    @Column(name = "script_yn", length = 50)
+    @Column(name = "script_yn", columnDefinition = "bpchar(1) default 'N'")
     private String scriptYn;
 
-    @Column(name = "nod_yn", length = 50)
+    @Column(name = "nod_yn", columnDefinition = "bpchar(1) default 'N'")
     private String nodYn;
 
-    @Column(name = "use_yn", length = 50)
+    @Column(name = "use_yn", columnDefinition = "bpchar(1) default 'Y'")
     private String useYn;
 
    /* @OneToMany(mappedBy = "program")

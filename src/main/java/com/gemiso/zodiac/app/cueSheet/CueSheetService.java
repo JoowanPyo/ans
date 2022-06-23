@@ -13,8 +13,12 @@ import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
+import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
+import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
+import com.gemiso.zodiac.app.baseProgram.BaseProgram;
+import com.gemiso.zodiac.app.baseProgram.dto.BaseProgramSimpleDTO;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.cueCapTmplt.CueCapTmplt;
 import com.gemiso.zodiac.app.cueCapTmplt.CueCapTmpltRepository;
@@ -38,7 +42,9 @@ import com.gemiso.zodiac.app.cueSheetItem.mapper.CueSheetItemMapper;
 import com.gemiso.zodiac.app.cueSheetItemCap.CueSheetItemCap;
 import com.gemiso.zodiac.app.cueSheetItemCap.CueSheetItemCapRepotitory;
 import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapCreateDTO;
+import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.mapper.CueSheetItemCapCreateMapper;
+import com.gemiso.zodiac.app.cueSheetItemCap.mapper.CueSheetItemCapMapper;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbolRepository;
 import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolCreateDTO;
@@ -48,7 +54,9 @@ import com.gemiso.zodiac.app.cueSheetItemSymbol.mapper.CueSheetItemSymbolMapper;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMedia;
 import com.gemiso.zodiac.app.cueSheetMedia.CueSheetMediaRepository;
 import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaCreateDTO;
+import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaDTO;
 import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaCreateMapper;
+import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaMapper;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgramService;
 import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
 import com.gemiso.zodiac.app.facilityManage.FacilityManage;
@@ -116,6 +124,9 @@ public class CueSheetService {
     private final CueSheetItemCapCreateMapper cueSheetItemCapCreateMapper;
     private final ArticleMediaSimpleMapper articleMediaSimpleMapper;
     private final CueSheetMediaCreateMapper cueSheetMediaCreateMapper;
+    private final ArticleMediaMapper articleMediaMapper;
+    private final CueSheetMediaMapper cueSheetMediaMapper;
+    private final CueSheetItemCapMapper cueSheetItemCapMapper;
 
     private final ProgramService programService;
     //private final UserAuthService userAuthService;
@@ -647,9 +658,26 @@ public class CueSheetService {
         if (ObjectUtils.isEmpty(program) == false) {
             String brdcPgmId = program.getBrdcPgmId();
             if (brdcPgmId != null && brdcPgmId.trim().isEmpty() == false){
-                cueSheet.setProgram(null);
+
+                //프로그램 정보 업데이트
+                Program updateProgram = Program.builder().brdcPgmId(brdcPgmId).build();
+                cueSheet.setProgram(updateProgram);
             }
         }
+
+        BaseProgramSimpleDTO baseProgram = cueSheetUpdateDTO.getBaseProgram();
+
+        if (ObjectUtils.isEmpty(baseProgram) == false){
+
+            Long basePgmschId = baseProgram.getBasePgmschId();
+
+            BaseProgram updateBaseProgram = BaseProgram.builder().basePgmschId(basePgmschId).build();
+
+            cueSheet.setBaseProgram(updateBaseProgram);
+
+        }
+
+
 
         cueSheetUpdateDTO.setCueVer(cueSheet.getCueVer() + 1); //버전정보 + 1
 
@@ -682,8 +710,117 @@ public class CueSheetService {
 
         cueSheetHistDelete( cueId, cueSheet, userId);
 
+        //큐시트에 포함된 아이템 기사 삭제
+        cueItemAnsArticleDelete(cueId, userId);
+
         //sendCueTopic(cueSheet, "CuSheet Delete", cueSheetDTO);
         cueSheetTopicService.sendCueTopic(cueSheet, "CuSheet Delete", cueSheetDTO);
+    }
+
+    //큐시트가 삭제될때 큐시트 아이템 및 기사도 삭제처리
+    public void cueItemAnsArticleDelete(Long cueId, String userId){
+
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findCueItemIdListAll(cueId);
+
+        for (CueSheetItem cueSheetItem : cueSheetItemList){
+
+            CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
+
+            cueSheetItemDTO.setDelrId(userId);
+            cueSheetItemDTO.setDelYn("Y");
+            cueSheetItemDTO.setDelDtm(new Date());
+
+            cueSheetItemMapper.updateFromDto(cueSheetItemDTO, cueSheetItem);
+            cueSheetItemRepository.save(cueSheetItem);
+
+            //큐시트 아이템 삭제시 포함된 기사(복사된 기사)도 삭제
+            Article article = cueSheetItem.getArticle();
+
+            if (ObjectUtils.isEmpty(article) == false) {
+                Long artclId = article.getArtclId();
+
+                //articleService.delete(artclId, userId);
+
+                //Article chkArticle = articleService.articleFindOrFailCueItem(artclId);
+
+                if (ObjectUtils.isEmpty(article) == false) {
+
+                    article.setDelrId(userId);
+                    article.setDelYn("Y");
+                    article.setDelDtm(new Date());
+
+                    articleRepository.save(article);
+
+                    //기사가 삭제될때 포함된 미디어정보도 같이 삭제처리 ( delYn = "Y")
+                    Set<ArticleMedia> articleMedia = article.getArticleMedia();
+                    deleteArticleMedia(articleMedia, userId);
+                }
+            }
+
+
+            //삭제되 아이템이 포함된 미디어정보 삭제 플레그 처리 ( delYn = "Y")
+            Set<CueSheetMedia> cueSheetMedia = cueSheetItem.getCueSheetMedia();
+            deleteMedia(cueSheetMedia, userId);
+            //삭제되 아이템이 포함된 자막 삭제 플레그 처리 ( delYn = "Y")
+            Set<CueSheetItemCap> cueSheetItemCap = cueSheetItem.getCueSheetItemCap();
+            deleteItemCap(cueSheetItemCap, userId);
+
+        }
+
+
+
+    }
+
+    //삭제되 아이템이 포함된 자막 삭제 플레그 처리 ( delYn = "Y")
+    public void deleteItemCap(Set<CueSheetItemCap> cueSheetItemCapSet, String userId){
+
+        for (CueSheetItemCap cueSheetItemCap : cueSheetItemCapSet){
+
+            CueSheetItemCapDTO cueSheetItemCapDTO = cueSheetItemCapMapper.toDto(cueSheetItemCap);
+            cueSheetItemCapDTO.setDelYn("Y");
+            cueSheetItemCapDTO.setDelrId(userId);
+            cueSheetItemCapDTO.setDelDtm(new Date());
+
+            cueSheetItemCapMapper.updateFromDto(cueSheetItemCapDTO, cueSheetItemCap);
+
+            cueSheetItemCapRepotitory.save(cueSheetItemCap);
+        }
+
+    }
+
+    //기사가 삭제될때 포함된 미디어정보도 같이 삭제처리 ( delYn = "Y")
+    public void deleteArticleMedia(Set<ArticleMedia> articleMediaSet, String userId){
+
+        for (ArticleMedia articleMedia : articleMediaSet){
+
+            ArticleMediaDTO articleMediaDTO = articleMediaMapper.toDto(articleMedia);
+            articleMediaDTO.setDelYn("Y");
+            articleMediaDTO.setDelrId(userId);
+            articleMediaDTO.setDelDtm(new Date());
+
+            articleMediaMapper.updateFromDto(articleMediaDTO, articleMedia);
+
+            articleMediaRepository.save(articleMedia);
+
+        }
+    }
+
+    //삭제되 아이템이 포함된 미디어정보 삭제 플레그 처리 ( delYn = "Y")
+    public void deleteMedia(Set<CueSheetMedia> cueSheetMediaSet, String userId){
+
+        for (CueSheetMedia cueSheetMedia :  cueSheetMediaSet){
+
+            CueSheetMediaDTO cueSheetMediaDTO = cueSheetMediaMapper.toDto(cueSheetMedia);
+            cueSheetMediaDTO.setDelYn("Y");
+            cueSheetMediaDTO.setDelrId(userId);
+            cueSheetMediaDTO.setDelDtm(new Date());
+
+            cueSheetMediaMapper.updateFromDto(cueSheetMediaDTO, cueSheetMedia);
+
+            cueSheetMediaRepository.save(cueSheetMedia);
+
+        }
+
     }
 
     //이미등록된 큐시트가 있는지 체크

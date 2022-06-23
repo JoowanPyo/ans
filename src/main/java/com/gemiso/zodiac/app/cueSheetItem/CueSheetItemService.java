@@ -134,6 +134,7 @@ public class CueSheetItemService {
 
     public List<CueSheetItemDTO> findAll(Long artclId, Long cueId, String delYn, String spareYn) {
 
+        long beforeTime = System.currentTimeMillis();
         //BooleanBuilder booleanBuilder = getSearch(artclId, cueId, delYn, spareYn);
 
         List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueSheetItemList(artclId, cueId, delYn, spareYn);
@@ -141,6 +142,10 @@ public class CueSheetItemService {
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
 
         cueSheetItemDTOList = setSymbol(cueSheetItemDTOList); //방송아이콘 url 추가.
+
+        long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
+        long secDiffTime = (afterTime - beforeTime); //두 시간에 차 계산
+        System.out.println("시간차이(m) : "+secDiffTime);
 
         return cueSheetItemDTOList;
     }
