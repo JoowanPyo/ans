@@ -629,6 +629,8 @@ public class InterfaceService {
                         .rdDtlDivNm(cueSheetItem.getCueItemDivCdNm())//큐시트아이템 구분 코드 명
                         .mcStNm(cueSheet.getCueStCdNm())//방송상태코드 명
                         .cmDivNm(returnSymbolNm)//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
+                        .artclTitl(cueSheetItem.getCueItemTitl()) //큐시트 아이템 제목
+                        .artclTitlEn(cueSheetItem.getCueItemTitlEn()) //큐시트 아이템 영어 제목
                         .takerCueSheetVideoDTO(takerCueSheetVideoDTOList)//???
                         .takerCueSheetVideoSymbolDTO(takerCueSheetVideoSymbolDTO)
                         .takerCueSheetAudioSymbolDTO(takerCueSheetAudioSymbolDTO)

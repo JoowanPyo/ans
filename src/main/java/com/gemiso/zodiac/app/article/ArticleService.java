@@ -1227,8 +1227,9 @@ public class ArticleService {
         article.setArticleCap(null);//기사에서 기사자막삭제
         article.setAnchorCap(null);//기사에서 앵커자막삭제
 
-        String orgAnchorMent = article.getAncMentCtt(); //원본기사 앵커 맨트
-        String newAnchorMent = articleUpdateDTO.getAncMentCtt(); //수정기사 앵커 맨트
+        String orgAnchorMent = Optional.ofNullable(article.getAncMentCtt()).orElse(""); //원본기사 앵커 맨트
+        String newAnchorMent = Optional.ofNullable(articleUpdateDTO.getAncMentCtt()).orElse(""); //수정기사 앵커 맨트
+
 
         // 앵커맨트 내용이 바뀐경우 기사액션로그 업데이트
         if (Objects.equals(orgAnchorMent, newAnchorMent) == false) {
@@ -1240,8 +1241,8 @@ public class ArticleService {
             return;
         }
 
-        String orgContents = article.getArtclCtt(); //원본 기사 내용
-        String newContents = articleUpdateDTO.getArtclCtt(); // 수정기사 내용
+        String orgContents = Optional.ofNullable(article.getArtclCtt()).orElse(""); //원본 기사 내용
+        String newContents = Optional.ofNullable(articleUpdateDTO.getArtclCtt()).orElse(""); // 수정기사 내용
 
         //기사 내용이 바뀐경우 기사액션로그 업데이트
         if (Objects.equals(orgContents, newContents) == false) {
@@ -1253,8 +1254,8 @@ public class ArticleService {
             return;
         }
 
-        String orgTitle = article.getArtclTitl(); //등록되어 있던 기사 제목
-        String newTitle = articleUpdateDTO.getArtclTitl(); //신규 기사 제목
+        String orgTitle = Optional.ofNullable(article.getArtclTitl()).orElse(""); //등록되어 있던 기사 제목
+        String newTitle = Optional.ofNullable(articleUpdateDTO.getArtclTitl()).orElse(""); //신규 기사 제목
 
         // 기사제목이 바뀌었을 경우 기사액션로그 등록
         if (Objects.equals(orgTitle, newTitle) == false) {
@@ -1266,8 +1267,8 @@ public class ArticleService {
             return;
         }
 
-        String orgEnglishTile = article.getArtclTitlEn(); //원본 기사 영어 제목
-        String newEnglishTile = articleUpdateDTO.getArtclTitlEn(); // 수정기사 영어제목
+        String orgEnglishTile = Optional.ofNullable(article.getArtclTitlEn()).orElse(""); //원본 기사 영어 제목
+        String newEnglishTile = Optional.ofNullable(articleUpdateDTO.getArtclTitlEn()).orElse(""); // 수정기사 영어제목
 
         //영어제목이 바뀐경우 기사액션로그 업데이트
         if (Objects.equals(orgEnglishTile, newEnglishTile) == false) {
@@ -1686,16 +1687,20 @@ public class ArticleService {
     //복사된 기사자막 수정.
     private void articleCapUpdate(Article article, ArticleUpdateDTO articleUpdateDTO, Long articleHistId) {
 
-        Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
-        List<ArticleCap> articleCapList = articleCapRepository.findArticleCap(articleId);
-
-        for (ArticleCap articleCap : articleCapList) {
-            Long artclCapId = articleCap.getArtclCapId();
-            articleCapRepository.deleteById(artclCapId);
-        }
-
         List<ArticleCapCreateDTO> capSimpleDTOList = articleUpdateDTO.getArticleCap(); //update로 들어온 기사 등록
-        createArticleCap(capSimpleDTOList, articleId, articleHistId); //기사자막 등록
+
+        if (CollectionUtils.isEmpty(capSimpleDTOList) == false) {
+
+            Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
+            List<ArticleCap> articleCapList = articleCapRepository.findArticleCap(articleId);
+
+            for (ArticleCap articleCap : articleCapList) {
+                Long artclCapId = articleCap.getArtclCapId();
+                articleCapRepository.deleteById(artclCapId);
+            }
+
+            createArticleCap(capSimpleDTOList, articleId, articleHistId); //기사자막 등록
+        }
 
 
     }
@@ -1796,16 +1801,20 @@ public class ArticleService {
     //앵커자막 수정.
     private void anchorCapUpdate(Article article, ArticleUpdateDTO articleUpdateDTO, Long articleHistId) {
 
-        Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
-        List<AnchorCap> anchorCaps = anchorCapRepository.findAnchorCapList(articleId);
-
-        for (AnchorCap anchorCap : anchorCaps) {
-            Long anchorCapId = anchorCap.getAnchorCapId();
-            anchorCapRepository.deleteById(anchorCapId);
-        }
-
         List<AnchorCapCreateDTO> anchorCapCreateDTOList = articleUpdateDTO.getAnchorCap();
-        createAnchorCap(anchorCapCreateDTOList, articleId, articleHistId);//앵커자막 등록
+
+        if (CollectionUtils.isEmpty(anchorCapCreateDTOList) == false) {
+
+            Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
+            List<AnchorCap> anchorCaps = anchorCapRepository.findAnchorCapList(articleId);
+
+            for (AnchorCap anchorCap : anchorCaps) {
+                Long anchorCapId = anchorCap.getAnchorCapId();
+                anchorCapRepository.deleteById(anchorCapId);
+            }
+
+            createAnchorCap(anchorCapCreateDTOList, articleId, articleHistId);//앵커자막 등록
+        }
 
     }
 

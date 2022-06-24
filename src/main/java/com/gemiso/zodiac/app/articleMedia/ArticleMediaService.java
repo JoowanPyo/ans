@@ -85,6 +85,22 @@ public class ArticleMediaService {
 
     public ArticleMediaDTO create(ArticleMediaCreateDTO articleMediaCreateDTO, String userId) throws JsonProcessingException {
 
+        /**********기사 미디어 타입 계산**********/
+
+        ArticleSimpleDTO articleSimpleDTO = articleMediaCreateDTO.getArticle();
+        Long artclId = articleSimpleDTO.getArtclId();
+        Article article = articleService.articleFindOrFail(artclId);
+
+        int videoTime = Optional.ofNullable(article.getVideoTime()).orElse(0);
+        int mediaDuration = Optional.ofNullable(articleMediaCreateDTO.getMediaDurtn()).orElse(0);
+
+        ArticleDTO articleDTO = articleMapper.toDto(article);
+        articleDTO.setVideoTime(videoTime + mediaDuration);
+
+        articleMapper.updateFromDto(articleDTO, article);
+
+        articleRepository.save(article);
+
 
         articleMediaCreateDTO.setInputrId(userId);
 
@@ -100,9 +116,6 @@ public class ArticleMediaService {
         articleMediaDTO.setArtclMediaId(artclMediaId);
         articleMediaDTO.setContId(contId);
 
-        ArticleSimpleDTO articleSimpleDTO = articleMediaCreateDTO.getArticle();
-        Long artclId = articleSimpleDTO.getArtclId();
-        Article article = articleService.articleFindOrFail(artclId);
 
         /********** MQ [TOPIC] ************/
 
@@ -207,6 +220,30 @@ public class ArticleMediaService {
 
         articleMediaRepository.save(articleMedia);
 
+        /**********기사 미디어 타입 계산**********/
+
+        Article getArticle = articleMedia.getArticle();
+        Long artclId = getArticle.getArtclId();
+        Article article = articleService.articleFindOrFail(artclId);
+
+        List<ArticleMedia> articleMediaList = articleMediaRepository.findArticleMediaList(artclId);
+
+        int total = 0;
+
+        for (ArticleMedia media : articleMediaList){
+
+            int mediaDurtn = media.getMediaDurtn();
+
+            total = total + mediaDurtn;
+        }
+
+        ArticleDTO articleDTO = articleMapper.toDto(article);
+        articleDTO.setVideoTime(total);
+
+        articleMapper.updateFromDto(articleDTO, article);
+
+        articleRepository.save(article);
+
     }
 
     public void delete(Long artclMediaId, String userId) throws JsonProcessingException {
@@ -223,7 +260,7 @@ public class ArticleMediaService {
 
         articleMediaRepository.save(articleMedia);
 
-        ArticleSimpleDTO articleSimpleDTO = articleMediaDTO.getArticle();
+        /*ArticleSimpleDTO articleSimpleDTO = articleMediaDTO.getArticle();
         Long artclId = articleSimpleDTO.getArtclId();
 
         Article article = articleService.articleFindOrFail(artclId);
@@ -235,6 +272,30 @@ public class ArticleMediaService {
         articleDTO.setVideoTime(totalVideoTime);
 
         articleMapper.updateFromDto(articleDTO, article);
+        articleRepository.save(article);*/
+
+        /**********기사 미디어 타입 계산**********/
+
+        Article getArticle = articleMedia.getArticle();
+        Long artclId = getArticle.getArtclId();
+        Article article = articleService.articleFindOrFail(artclId);
+
+        List<ArticleMedia> articleMediaList = articleMediaRepository.findArticleMediaList(artclId);
+
+        int total = 0;
+
+        for (ArticleMedia media : articleMediaList){
+
+            int mediaDurtn = media.getMediaDurtn();
+
+            total = total + mediaDurtn;
+        }
+
+        ArticleDTO articleDTO = articleMapper.toDto(article);
+        articleDTO.setVideoTime(total);
+
+        articleMapper.updateFromDto(articleDTO, article);
+
         articleRepository.save(article);
 
 

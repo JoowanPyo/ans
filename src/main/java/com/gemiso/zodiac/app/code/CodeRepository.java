@@ -20,7 +20,7 @@ public interface CodeRepository extends JpaRepository<Code, Long> , QuerydslPred
     @Query("select a from Code a where a.cdId =:cdId and a.delYn = 'N' ")
     Optional<Code> findByCodeId(@Param("cdId")Long cdId);
 
-    @Query("select a from Code a where a.hrnkCdId = :artclTypCd and a.delYn = 'N' and a.useYn = 'Y' ")
+    @Query("select a from Code a where a.hrnkCdId = :artclTypCd and a.delYn = 'N' and a.useYn = 'Y' order by a.cdOrd asc ")
     List<Code> findArticleTypeCD(@Param("artclTypCd")String artclTypCd);
 
     @Query("select a from Code a where a.hrnkCdId IN (:underArtclTypCd) and a.useYn = 'Y' ")
