@@ -45,7 +45,7 @@ public class ArticleTagController {
 
         List<ElasticSearchArticleTags> tags = articleTagService.create(artclId, tagList);
 
-        articleTagService.updateElasticArticle(tags, artclId);
+       // articleTagService.updateElasticArticle(tags, artclId);
 
         List<ArticleTagDTO> articleTagDTOList = articleTagService.find(artclId);
 

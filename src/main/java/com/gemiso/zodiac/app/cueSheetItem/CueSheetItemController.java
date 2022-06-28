@@ -147,6 +147,34 @@ public class CueSheetItemController {
 
     }
 
+    @Operation(summary = "큐시트 아이템 수정 [아이템 컬럼 수정]", description = "큐시트 아이템 수정 [아이템 컬럼 수정]")
+    @PutMapping(path = "/{cueId}/item/{cueItemId}/update")
+    public AnsApiResponse<CueSheetItemResponseDTO> updateItem(@Parameter(description = "필수값<br> ", required = true)
+                                                          @RequestBody @Valid CueSheetItemUpdateDTO cueSheetItemUpdateDTO,
+                                                          @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드", required = true)
+                                                          @RequestParam(value = "cueItemDivCd") String cueItemDivCd,
+                                                          @Parameter(name = "cueId", description = "큐시트아이디")
+                                                          @PathVariable("cueId") Long cueId,
+                                                          @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
+                                                          @PathVariable("cueItemId") Long cueItemId) throws Exception {
+
+        //토큰 사용자 Id(현재 로그인된 사용자 ID)
+        String userId = userAuthService.authUser.getUserId();
+        log.info("CueSheet Item Update [Item] : userId - " + userId + " CueId - " + cueId + " CueItemDivCd - " + cueItemDivCd
+                + "CueItemId - " + cueItemId + "<br>" +
+                " CueSheet Item Model - " + cueSheetItemUpdateDTO.toString());
+
+
+        cueSheetItemService.updateItem(cueSheetItemUpdateDTO, cueItemDivCd, cueId, cueItemId);
+
+        CueSheetItemResponseDTO cueSheetItemDTOList = new CueSheetItemResponseDTO();
+        cueSheetItemDTOList.setCueId(cueId);
+
+
+        return new AnsApiResponse<>(cueSheetItemDTOList);
+
+    }
+
     @Operation(summary = "큐시트 아이템 삭제", description = "큐시트 아이템 삭제")
     @DeleteMapping(path = "/{cueId}/item/{cueItemId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

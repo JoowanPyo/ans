@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -57,6 +58,47 @@ public class CueSheetRepositoryImpl implements CueSheetRepositoryCustorm {
         if (ObjectUtils.isEmpty(deptCd) == false){
             jpaQuery.where(qCueSheet.deptCd.eq(deptCd));
         }
+
+        jpaQuery.orderBy(qCueSheet.brdcDt.asc(), qCueSheet.brdcStartTime.asc());
+
+        return jpaQuery.fetch();
+    }
+
+    @Override
+    public List<CueSheet> findNodCue(Date sdate, Date edate, String cueDivCd) {
+
+        QCueSheet qCueSheet = QCueSheet.cueSheet;
+        QProgram qProgram = QProgram.program;
+        QBaseProgram qBaseProgram = QBaseProgram.baseProgram;
+
+        JPAQuery jpaQuery = jpaQueryFactory.select(qCueSheet).from(qCueSheet)
+                .leftJoin(qCueSheet.program, qProgram).fetchJoin()
+                .leftJoin(qCueSheet.baseProgram, qBaseProgram).fetchJoin().distinct();
+
+        jpaQuery.where(qCueSheet.delYn.eq("N"));
+
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
+            DateChangeHelper dateChangeHelper = new DateChangeHelper();
+            String stringSdate = dateChangeHelper.dateToStringNoTime(sdate);//Date To String( yyyy-MM-dd )
+            String stringEdate = dateChangeHelper.dateToStringNoTime(edate);//Date To String( yyyy-MM-dd )
+
+            String stime = dateChangeHelper.dateToStringNormal(sdate);
+            String etime = dateChangeHelper.dateToStringNormal(edate);
+
+            String newStime = new SimpleDateFormat("HH:mm:ss").format(sdate); // 09:0:00
+            String newEtime = new SimpleDateFormat("HH:mm:ss").format(edate); // 09:0:00
+
+
+            //방송날짜 조회
+            jpaQuery.where(qCueSheet.brdcDt.between(stringSdate, stringEdate));
+            //방송시간 조회
+            jpaQuery.where(qCueSheet.brdcStartTime.goe(newStime));
+            jpaQuery.where(qCueSheet.brdcStartTime.loe(newEtime));
+        }
+
+        //if (cueDivCd != null && cueDivCd.trim().isEmpty() == false){
+        //    jpaQuery.where(qCueSheet.cueDivCd.eq(cueDivCd));
+        //}
 
         jpaQuery.orderBy(qCueSheet.brdcDt.asc(), qCueSheet.brdcStartTime.asc());
 

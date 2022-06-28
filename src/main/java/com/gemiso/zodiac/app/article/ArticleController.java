@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.article;
 
 import com.gemiso.zodiac.app.article.dto.*;
+import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleService;
 import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticle;
 import com.gemiso.zodiac.app.elasticsearch.articleDTO.ElasticSearchArticleDTO;
 import com.gemiso.zodiac.core.enumeration.AuthEnum;
@@ -35,6 +36,7 @@ import java.util.List;
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final ElasticSearchArticleService elasticSearchArticleService;
 
     private final UserAuthService userAuthService;
     private final UserAuthChkService userAuthChkService;
@@ -287,7 +289,7 @@ public class ArticleController {
         Article article = articleService.create(articleCreateDTO, userId);
 
         //엘라스틱서치 등록
-        articleService.elasticCreate(article);
+        //articleService.elasticCreate(article);
 
         //기사 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
@@ -319,7 +321,7 @@ public class ArticleController {
         Article article = articleService.update(articleUpdateDTO, artclId, userId);
 
         //엘라스틱서치 업데이트
-        articleService.elasticUpdate(article);
+        //articleService.elasticUpdate(article);
         /* ArticleDTO articleDTO = articleService.find(artclId);*/
         //기사 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
@@ -344,7 +346,7 @@ public class ArticleController {
         Article article = articleService.delete(artclId, userId);
 
         //엘라스틱서치 업데이트
-        articleService.elasticUpdate(article);
+        //articleService.elasticUpdate(article);
 
         return AnsApiResponse.noContent();
 

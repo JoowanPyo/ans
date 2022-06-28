@@ -89,7 +89,7 @@ dependencies {
     //Elasticsearch
     // https://mvnrepository.com/artifact/org.springframework.data/spring-data-elasticsearch
     implementation 'org.springframework.data:spring-data-elasticsearch:4.3.4'
-    implementation 'co.elastic.clients:elasticsearch-java:7.16.3'
+    //implementation 'co.elastic.clients:elasticsearch-java:7.16.3'
 
     //compile('org.springframework.boot:spring-boot-starter-data-elasticsearch')
     //implementation 'org.springframework.data:spring-data-elasticsearch:7.16.2'
@@ -107,7 +107,7 @@ dependencies {
 }*/
 bootJar {
     archiveBaseName = 'ans'
-    archiveVersion = "0.2_06-24"
+    archiveVersion = "0.4_06-28"
 }
 
 
@@ -132,3 +132,5 @@ configurations {
 compileQuerydsl{
     options.annotationProcessorPath = configurations.querydsl
 }
+// projectname/android/app/build.gradle file
+

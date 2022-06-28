@@ -5,10 +5,7 @@ import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "tb_nod"
@@ -24,7 +21,8 @@ import javax.persistence.Table;
 public class Nod extends BaseEntity {
 
     @Id
-    @Column(name = "nod_id", length = 50, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "nod_id", nullable = false)
     private Long nodId;
 
     @Column(name = "cue_id", nullable = false)

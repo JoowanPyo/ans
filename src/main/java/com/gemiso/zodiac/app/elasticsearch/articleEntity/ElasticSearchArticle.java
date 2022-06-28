@@ -108,8 +108,20 @@ public class ElasticSearchArticle {
     @Field(type = FieldType.Keyword)
     private String rptrNm;
 
+    @Field(type = FieldType.Integer)
+    private Integer ancMentCttTime;
+
+    @Field(type = FieldType.Integer)
+    private Integer artclCttTime;
+
+    @Field(type = FieldType.Integer)
+    private Integer artclExtTime;
+
     @Field(type = FieldType.Nested)
     private List<ElasticSearchArticleTags> tags;
+
+    @Field(type = FieldType.Nested)
+    private List<ElasricSearchArticleMedia> articleMedias;
 
 
 
@@ -146,7 +158,11 @@ public class ElasticSearchArticle {
                                 String brdcPgmNm,
                                 Long cueId,
                                 Long subrmId,
-                                List<ElasticSearchArticleTags> tags){
+                                Integer ancMentCttTime,
+                                Integer artclCttTime,
+                                Integer artclExtTime,
+                                List<ElasticSearchArticleTags> tags,
+                                List<ElasricSearchArticleMedia> articleMedias){
 
         this.ancMentCtt = ancMentCtt;
         this.apprvDivCd = apprvDivCd;
@@ -178,7 +194,11 @@ public class ElasticSearchArticle {
         this.orgArtclId = orgArtclId;
         this.rptrId = rptrId;
         this.rptrNm = rptrNm;
+        this.ancMentCttTime = ancMentCttTime;
+        this.artclCttTime = artclCttTime;
+        this.artclExtTime = artclExtTime;
         this.tags = tags;
+        this.articleMedias = articleMedias;
     }
 
    /* @PersistenceConstructor

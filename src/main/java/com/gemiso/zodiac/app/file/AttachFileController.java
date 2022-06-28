@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
@@ -54,10 +55,23 @@ public class AttachFileController {
         if (attachFileDTO.getFileDivCd().equals(fileDivCd)) {
             rep = attachFileService.find(request, response, attachFileDTO, fileDivCd);
         } else {
-            String errorMessage = "File does not exist";
-            OutputStream outputStream = response.getOutputStream();
-            outputStream.write(errorMessage.getBytes(Charset.forName("UTF-8")));
-            outputStream.close();
+            try {
+                String errorMessage = "File does not exist";
+                OutputStream outputStream = response.getOutputStream();
+                try {
+                    outputStream.write(errorMessage.getBytes(Charset.forName("UTF-8")));
+                } finally {
+
+                    if (outputStream != null) {
+                        outputStream.close();
+                    }
+                }
+            }
+            catch (Exception e){
+
+            }
+
+
             return null;
         }
 

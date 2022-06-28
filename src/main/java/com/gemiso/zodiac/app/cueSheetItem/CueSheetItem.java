@@ -179,9 +179,9 @@ public class CueSheetItem extends BaseEntity {
     @Column(name = "delr_id", length = 50)
     private String delrId;
 
-    /*@Basic(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
-    private String delrNm;*/
+    private String delrNm;
 
     @Column(name = "lckr_id", length = 50)
     private String lckrId;

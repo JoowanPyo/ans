@@ -284,7 +284,7 @@ public class BisInterfaceService {
         httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
         httpHeaders.add("Session_user_id", "ans");
 
-        for (/*int i = 3; i < 10; i++*/int i = 0; i < 7; i++) {
+        for (int i = 3; i < 10; i++/*int i = 0; i < 7; i++*/) {
             Calendar cal = Calendar.getInstance();
             //현재 날짜 구하기
             Date now = new Date();
@@ -553,6 +553,9 @@ public class BisInterfaceService {
                             .gneDivCd(gneDivCd)//장르구분
                             .prdDivCd(prdDivCd)//제작구분
                             .useYn("Y")
+                            .delYn("N")
+                            .scriptYn("N")
+                            .nodYn("N")
                             /*.inputrId(userId)*/
                             .build();
 

@@ -274,6 +274,42 @@ public class CueSheetItemService {
                 spareYn, "Y", "N");
     }
 
+    //큐시트 아이템 컬럼들만 업데이트
+    public void updateItem(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, String cueItemDivCd, Long cueId, Long cueItemId){
+
+        //큐시트 아이디로 큐시트 조회 및 존재유무 확인.
+        CueSheet cueSheet = cueSheetService.cueSheetFindOrFail(cueId);
+
+        CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
+
+        //CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
+
+        String artclRef = cueSheetItemUpdateDTO.getArtclRef();
+        String artclTop = cueSheetItemUpdateDTO.getArtclTop();
+        String headLn = cueSheetItemUpdateDTO.getHeadLn();
+        String rmk = cueSheetItemUpdateDTO.getRmk();
+        String cueItemTypCd = cueSheetItemUpdateDTO.getCueItemTypCd();
+        String mediaChCd = cueSheetItemUpdateDTO.getMediaChCd();
+        String title = cueSheetItemUpdateDTO.getCueItemTitl();
+        String titleEn = cueSheetItemUpdateDTO.getCueItemTitlEn();
+
+
+        cueSheetItem.setArtclRef(artclRef);
+        cueSheetItem.setArtclTop(artclTop);
+        cueSheetItem.setHeadLn(headLn);
+        cueSheetItem.setRmk(rmk);
+        cueSheetItem.setCueItemTypCd(cueItemTypCd);
+        cueSheetItem.setMediaChCd(mediaChCd);
+        cueSheetItem.setCueItemTitl(title);
+        cueSheetItem.setCueItemTitlEn(titleEn);
+
+
+        cueSheetItemRepository.save(cueSheetItem);
+
+
+
+    }
+
     //큐시트 아이템 기사 수정시
     public void updateCueItemArticle(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId, String userId) throws Exception {
 

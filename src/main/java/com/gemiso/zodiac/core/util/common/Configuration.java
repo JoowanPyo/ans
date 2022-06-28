@@ -71,7 +71,9 @@ public class Configuration extends AbstractConfiguration
             finally
             {
                 try{
-                    fin.close();
+                    if (fin != null) {
+                        fin.close();
+                    }
                 }catch (IOException ex){
                     //System.out.println("BufferedReader 종료 중 에러 발생");
                     log.error("BufferedReader 종료 중 에러 발생 "+ex.getMessage());

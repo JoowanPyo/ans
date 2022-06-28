@@ -87,7 +87,7 @@ public class ArticleMediaService {
 
         /**********기사 미디어 타입 계산**********/
 
-        ArticleSimpleDTO articleSimpleDTO = articleMediaCreateDTO.getArticle();
+        /*ArticleSimpleDTO articleSimpleDTO = articleMediaCreateDTO.getArticle();
         Long artclId = articleSimpleDTO.getArtclId();
         Article article = articleService.articleFindOrFail(artclId);
 
@@ -99,7 +99,7 @@ public class ArticleMediaService {
 
         articleMapper.updateFromDto(articleDTO, article);
 
-        articleRepository.save(article);
+        articleRepository.save(article);*/
 
 
         articleMediaCreateDTO.setInputrId(userId);
@@ -119,6 +119,9 @@ public class ArticleMediaService {
 
         /********** MQ [TOPIC] ************/
 
+        ArticleSimpleDTO articleSimpleDTO = articleMediaCreateDTO.getArticle();
+        Long artclId = articleSimpleDTO.getArtclId();
+        Article article = articleService.articleFindOrFail(artclId);
         //이현준 부장, 이현진 차장 요청으로 매칭하고 부조전송 완료된 미디어만 웹소켓 메세지 전송
         CueSheet cueSheet = article.getCueSheet();
 
@@ -222,7 +225,7 @@ public class ArticleMediaService {
 
         /**********기사 미디어 타입 계산**********/
 
-        Article getArticle = articleMedia.getArticle();
+        /*Article getArticle = articleMedia.getArticle();
         Long artclId = getArticle.getArtclId();
         Article article = articleService.articleFindOrFail(artclId);
 
@@ -242,7 +245,7 @@ public class ArticleMediaService {
 
         articleMapper.updateFromDto(articleDTO, article);
 
-        articleRepository.save(article);
+        articleRepository.save(article);*/
 
     }
 
@@ -280,7 +283,7 @@ public class ArticleMediaService {
         Long artclId = getArticle.getArtclId();
         Article article = articleService.articleFindOrFail(artclId);
 
-        List<ArticleMedia> articleMediaList = articleMediaRepository.findArticleMediaList(artclId);
+      /*  List<ArticleMedia> articleMediaList = articleMediaRepository.findArticleMediaList(artclId);
 
         int total = 0;
 
@@ -296,7 +299,7 @@ public class ArticleMediaService {
 
         articleMapper.updateFromDto(articleDTO, article);
 
-        articleRepository.save(article);
+        articleRepository.save(article);*/
 
 
         //Long artclId = articleEntity.getArtclId();

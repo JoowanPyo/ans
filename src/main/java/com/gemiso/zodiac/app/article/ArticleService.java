@@ -194,10 +194,10 @@ public class ArticleService {
     //기사 목록조회 [엘라스틱서치]
     public PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> findAllElasticsearch(
             Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
-             String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
-             Integer page, Integer limit, List<String> apprvDivCdList, Long deptCd,
-             String artclCateCd, String artclTypDtlCd, String delYn, Long artclId, String copyYn,
-             Long orgArtclId, Long cueId) throws Exception {
+            String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
+            Integer page, Integer limit, List<String> apprvDivCdList, Long deptCd,
+            String artclCateCd, String artclTypDtlCd, String delYn, Long artclId, String copyYn,
+            Long orgArtclId, Long cueId) throws Exception {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
@@ -209,10 +209,10 @@ public class ArticleService {
                  delYn,  artclId,  copyYn,  orgArtclId);*/
 
         //전체조회[page type]
-        Page<ElasticSearchArticle> result = elasticSearchArticleRepository.findByElasticSearchArticleList(sdate,  edate,  rcvDt,  rptrId,  inputrId,  brdcPgmId,
-                artclDivCd,  artclTypCd,  searchDivCd,  searchWord,
-                apprvDivCdList,  deptCd,  artclCateCd,  artclTypDtlCd,
-                delYn,  artclId,  copyYn,  orgArtclId, cueId, pageable);
+        Page<ElasticSearchArticle> result = elasticSearchArticleRepository.findByElasticSearchArticleList(sdate, edate, rcvDt, rptrId, inputrId, brdcPgmId,
+                artclDivCd, artclTypCd, searchDivCd, searchWord,
+                apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd,
+                delYn, artclId, copyYn, orgArtclId, cueId, pageable);
 
 
         Function<ElasticSearchArticle, ElasticSearchArticleDTO> fn = (entity -> elasticSearchArticleMapper.toDto(entity));
@@ -222,7 +222,7 @@ public class ArticleService {
     }
 
     public PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> findAllElasticsearchCue(Date sdate, Date edate, String searchWord, Long cueId,
-                                                                                                String brdcPgmId, String artclTypCd,String artclTypDtlCd,
+                                                                                                String brdcPgmId, String artclTypCd, String artclTypDtlCd,
                                                                                                 String copyYn, Long deptCd, Long orgArtclId, Integer page, Integer limit) throws Exception {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
@@ -231,7 +231,7 @@ public class ArticleService {
 
         //전체조회[page type]
         Page<ElasticSearchArticle> result = elasticSearchArticleRepository.findByElasticSearchArticleListCue(sdate, edate, searchWord, cueId,
-                brdcPgmId, artclTypCd,artclTypDtlCd, copyYn, deptCd, orgArtclId, pageable);
+                brdcPgmId, artclTypCd, artclTypDtlCd, copyYn, deptCd, orgArtclId, pageable);
 
 
         Function<ElasticSearchArticle, ElasticSearchArticleDTO> fn = (entity -> elasticSearchArticleMapper.toDto(entity));
@@ -269,7 +269,7 @@ public class ArticleService {
 
     // 큐시트에서 기사 목록 조회
     public PageResultDTO<ArticleDTO, Article> findCue(Date sdate, Date edate, String searchWord, Long cueId,
-                                                      String brdcPgmId, String artclTypCd,String artclTypDtlCd,
+                                                      String brdcPgmId, String artclTypCd, String artclTypDtlCd,
                                                       String copyYn, Long deptCd, Long orgArtclId, Integer page, Integer limit) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
@@ -280,7 +280,7 @@ public class ArticleService {
 
         //전체조회[page type]
         Page<Article> result = articleRepository.findByArticleCue(sdate, edate, searchWord, cueId,
-                brdcPgmId, artclTypCd,artclTypDtlCd, copyYn, deptCd, orgArtclId, pageable);
+                brdcPgmId, artclTypCd, artclTypDtlCd, copyYn, deptCd, orgArtclId, pageable);
 
         Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
 
@@ -364,217 +364,6 @@ public class ArticleService {
         return article;
     }
 
-    public Article setCode(Article article){
-
-
-        List<Code> codeList = codeRepository.findAll();
-
-        for (Code code : codeList){
-
-            String cd = code.getCd();
-            String cdNm = code.getCdNm();
-
-            String apprvDivCd = article.getApprvDivCd();
-            if (apprvDivCd != null && apprvDivCd.trim().isEmpty() == false){
-
-                if (apprvDivCd.equals(cd)){
-                    article.setApprvDivCdNm(cdNm);
-                }
-            }
-
-            String artclCateCd = article.getArtclCateCd();
-            if (artclCateCd != null && artclCateCd.trim().isEmpty() == false){
-
-                if (artclCateCd.equals(cd)){
-                    article.setArtclCateCdNm(cdNm);
-                }
-            }
-
-            String artclTypCd = article.getArtclTypCd();
-            if (artclTypCd != null && artclTypCd.trim().isEmpty() == false){
-
-                if (artclTypCd.equals(cd)){
-                    article.setArtclTypCdNm(cdNm);
-                }
-            }
-
-            String artclTypDtlCd = article.getArtclTypDtlCd();
-            if (artclTypDtlCd != null && artclTypDtlCd.trim().isEmpty() == false){
-
-                if (artclTypDtlCd.equals(cd)){
-                    article.setArtclTypDtlCdNm(cdNm);
-                }
-            }
-
-
-        }
-
-        return article;
-    }
-
-    public Article setUser(Article article){
-
-        String inputrId = article.getInputrId();
-        String rptrId = article.getRptrId();
-
-        List<User> userList = userRepository.findAll();
-
-        for (User user : userList){
-
-            String userId = user.getUserId();
-            String userNm = user.getUserNm();
-
-            if (userId.equals(inputrId)){
-                article.setInputrNm(userNm);
-            }
-
-            if (userId.equals(rptrId)){
-                article.setRptrNm(userNm);
-            }
-        }
-
-        return article;
-    }
-
-    public Article setDept(Article article){
-
-        Long deptCd = article.getDeptCd();
-
-        if (ObjectUtils.isEmpty(deptCd) == false){
-
-            Optional<Depts> depts = deptsRepository.findDept(deptCd);
-
-            if (depts.isPresent()){
-                Depts dept = depts.get();
-                String deptNm = dept.getName();
-
-                article.setDeptNm(deptNm);
-            }
-        }
-
-        return article;
-    }
-
-    //엘라스틱 서치 등록
-    public void elasticCreate(Article article) throws ParseException {
-
-        Date getInputDtm = article.getInputDtm();
-
-        String inputDtm = null;
-        if (ObjectUtils.isEmpty(getInputDtm) == false){
-
-            inputDtm = dateChangeHelper.dateToStringNormal(getInputDtm);
-        }
-
-        //코드네임 셋팅
-        article = setCode(article);
-
-        article = setUser(article);
-
-        article = setDept(article);
-
-        ElasticSearchArticle entity = ElasticSearchArticle.builder()
-                .ancMentCtt(article.getAncMentCtt())
-                .apprvDivCd(article.getApprvDivCd())
-                .apprvDivCdNm(article.getApprvDivCdNm())
-                .artclCateCd(article.getArtclCateCd())
-                .artclCateCdNm(article.getArtclCateCdNm())
-                .artclDivCd(article.getArtclDivCd())
-                .artclId(article.getArtclId())
-                .artclOrd(article.getArtclOrd())
-                .artclTitl(article.getArtclTitl())
-                .artclTitlEn(article.getArtclTitlEn())
-                .artclTypCd(article.getArtclTypCd())
-                .artclTypCdNm(article.getArtclTypCdNm())
-                .artclTypDtlCd(article.getArtclTypDtlCd())
-                .artclTypDtlCdNm(article.getArtclTypDtlCdNm())
-                .artclCtt(article.getArtclCtt())
-                .brdcPgmId(article.getBrdcPgmId())
-                .delYn(article.getDelYn())
-                .deptCd(article.getDeptCd())
-                .deptNm(article.getDeptNm())
-                .embgYn(article.getEmbgYn())
-                .inputDtm(inputDtm)
-                .inputrId(article.getInputrId())
-                .inputrNm(article.getInputrNm())
-                .lckYn(article.getLckYn())
-                .orgArtclId(article.getOrgArtclId())
-                .rptrId(article.getRptrId())
-                .rptrNm(article.getRptrNm())
-                .build();
-
-        elasticSearchArticleRepository.save(entity);
-    }
-
-    //엘라스틱 서치 업데이트
-    public void elasticUpdate(Article article) throws ParseException {
-
-        Date getInputDtm = article.getInputDtm();
-
-        String inputDtm = null;
-        if (ObjectUtils.isEmpty(getInputDtm) == false){
-
-            inputDtm = dateChangeHelper.dateToStringNormal(getInputDtm);
-        }
-
-        CueSheet cueSheet = article.getCueSheet();
-
-        String brdcPgmNm = null;
-        Long cueId = null;
-        Long subrmId = null;
-        if (ObjectUtils.isEmpty(cueSheet) == false){
-
-            brdcPgmNm = Optional.ofNullable(cueSheet.getBrdcPgmNm()).orElse(null);
-            cueId = Optional.ofNullable(cueSheet.getCueId()).orElse(null);
-            subrmId = Optional.ofNullable(cueSheet.getSubrmId()).orElse(null);
-        }
-
-        //코드네임 셋팅
-        article = setCode(article);
-
-        article = setUser(article);
-
-        article = setDept(article);
-
-
-
-
-        ElasticSearchArticle entity = ElasticSearchArticle.builder()
-                .ancMentCtt(article.getAncMentCtt())
-                .apprvDivCd(article.getApprvDivCd())
-                .apprvDivCdNm(article.getApprvDivCdNm())
-                .artclCateCd(article.getArtclCateCd())
-                .artclCateCdNm(article.getArtclCateCdNm())
-                .artclDivCd(article.getArtclDivCd())
-                .artclId(article.getArtclId())
-                .artclOrd(article.getArtclOrd())
-                .artclTitl(article.getArtclTitl())
-                .artclTitlEn(article.getArtclTitlEn())
-                .artclTypCd(article.getArtclTypCd())
-                .artclTypCdNm(article.getArtclTypCdNm())
-                .artclTypDtlCd(article.getArtclTypDtlCd())
-                .artclTypDtlCdNm(article.getArtclTypDtlCdNm())
-                .artclCtt(article.getArtclCtt())
-                .brdcPgmId(article.getBrdcPgmId())
-                .delYn(article.getDelYn())
-                .deptCd(article.getDeptCd())
-                .deptNm(article.getDeptNm())
-                .embgYn(article.getEmbgYn())
-                .inputDtm(inputDtm)
-                .inputrId(article.getInputrId())
-                .inputrNm(article.getInputrNm())
-                .lckYn(article.getLckYn())
-                .orgArtclId(article.getOrgArtclId())
-                .rptrId(article.getRptrId())
-                .rptrNm(article.getRptrNm())
-                .brdcPgmNm(brdcPgmNm)
-                .cueId(cueId)
-                .subrmId(subrmId)
-                .build();
-
-        elasticSearchArticleRepository.save(entity);
-    }
-
     //기사 수정
     public Article update(ArticleUpdateDTO articleUpdateDTO, Long artclId, String userId) throws Exception {
 
@@ -626,7 +415,7 @@ public class ArticleService {
 
             Long cueId = getCueSheet.getCueId();
 
-            CueSheet cueSheet  = findArticleCue(cueId);
+            CueSheet cueSheet = findArticleCue(cueId);
 
             CueSheetItem cueSheetItem = findArticleCueItem(artclId);
 
@@ -643,22 +432,22 @@ public class ArticleService {
         return article;
     }
 
-    public CueSheetItem findArticleCueItem(Long artclId){
+    public CueSheetItem findArticleCueItem(Long artclId) {
 
         Optional<CueSheetItem> cueSheetItem = cueSheetItemRepository.findByCueItemArticle(artclId);
 
-        if (cueSheetItem.isPresent() == false){
-            throw new ResourceNotFoundException("큐시트 아이템을 찾을 수 없습니다. 기사 아아디 : "+ artclId);
+        if (cueSheetItem.isPresent() == false) {
+            throw new ResourceNotFoundException("큐시트 아이템을 찾을 수 없습니다. 기사 아아디 : " + artclId);
         }
 
         return cueSheetItem.get();
     }
 
-    public CueSheet findArticleCue(Long cueId){
+    public CueSheet findArticleCue(Long cueId) {
 
         Optional<CueSheet> cueSheet = cueSheetRepository.findByCue(cueId);
 
-        if (cueSheet.isPresent() == false){
+        if (cueSheet.isPresent() == false) {
             throw new ResourceNotFoundException("큐시트를 찾을 수 없습니다. 큐시트 아이디 : " + cueId);
         }
 
@@ -698,7 +487,7 @@ public class ArticleService {
 
                     Long copyArticleId = copyArticle.getArtclId();
                     Long copyOrgArticleId = copyArticle.getOrgArtclId();
-                    if (copyArticleId.equals(copyOrgArticleId)){
+                    if (copyArticleId.equals(copyOrgArticleId)) {
                         continue;
                     }
 
@@ -715,7 +504,7 @@ public class ArticleService {
                         Long articleHistId = updateArticleHist(updateCopyArticle);
 
                         //기사 미디어 update
-                        copyarticleMediaUpdate(updateCopyArticle, articleId, articleHistId,userId);
+                        copyarticleMediaUpdate(updateCopyArticle, articleId, articleHistId, userId);
 
                         //기사 자막 Update
                         copyArticleCapUpdate(updateCopyArticle, articleUpdateDTO, articleHistId);
@@ -740,7 +529,7 @@ public class ArticleService {
 
         List<ArticleMedia> articleMediaList = articleMediaRepository.findArticleMediaList(artclId);
 
-        for (ArticleMedia articleMedia : articleMediaList ){
+        for (ArticleMedia articleMedia : articleMediaList) {
 
             Long artclMediaId = articleMedia.getArtclMediaId();
 
@@ -757,13 +546,13 @@ public class ArticleService {
         //기사 매칭후 전송할 부조값 구하기
         CueSheet cueSheet = updateArticle.getCueSheet();
         String subrmNm = "";
-        if(ObjectUtils.isEmpty(cueSheet) == false){
+        if (ObjectUtils.isEmpty(cueSheet) == false) {
 
             Long cueId = cueSheet.getCueId();
 
             Optional<CueSheet> getCueSheet = cueSheetRepository.findByCue(cueId);
 
-            if (getCueSheet.isPresent()){
+            if (getCueSheet.isPresent()) {
 
                 CueSheet cueSheetEntity = getCueSheet.get();
 
@@ -779,7 +568,7 @@ public class ArticleService {
 
         ArticleSimpleDTO articleSimpleDTO = ArticleSimpleDTO.builder().artclId(artclId).build();
 
-        for (ArticleMedia setArticleMedia : articleMedias){
+        for (ArticleMedia setArticleMedia : articleMedias) {
 
             String mediaTypCd = setArticleMedia.getMediaTypCd();
 
@@ -1651,7 +1440,7 @@ public class ArticleService {
 
         List<ArticleCap> capSimpleList = articleCapRepository.findArticleCap(orgArticleId); //update로 들어온 기사 등록
 
-        log.info("org cap list : "+ capSimpleList.toString());
+        log.info("org cap list : " + capSimpleList.toString());
         List<ArticleCapCreateDTO> capSimpleDTOList = new ArrayList<>();
         for (ArticleCap articleCap : capSimpleList) {
 
@@ -1689,18 +1478,16 @@ public class ArticleService {
 
         List<ArticleCapCreateDTO> capSimpleDTOList = articleUpdateDTO.getArticleCap(); //update로 들어온 기사 등록
 
-        if (CollectionUtils.isEmpty(capSimpleDTOList) == false) {
 
-            Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
-            List<ArticleCap> articleCapList = articleCapRepository.findArticleCap(articleId);
+        Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
+        List<ArticleCap> articleCapList = articleCapRepository.findArticleCap(articleId);
 
-            for (ArticleCap articleCap : articleCapList) {
-                Long artclCapId = articleCap.getArtclCapId();
-                articleCapRepository.deleteById(artclCapId);
-            }
-
-            createArticleCap(capSimpleDTOList, articleId, articleHistId); //기사자막 등록
+        for (ArticleCap articleCap : articleCapList) {
+            Long artclCapId = articleCap.getArtclCapId();
+            articleCapRepository.deleteById(artclCapId);
         }
+
+        createArticleCap(capSimpleDTOList, articleId, articleHistId); //기사자막 등록
 
 
     }
@@ -1716,7 +1503,7 @@ public class ArticleService {
             anchorCapRepository.deleteById(anchorCapId);
         }
 
-       // Long orgArticleId = article.getArtclId();
+        // Long orgArticleId = article.getArtclId();
 
         List<AnchorCapCreateDTO> capSimpleList = articleUpdateDTO.getAnchorCap(); //update로 들어온 기사 등록
         createAnchorCap(capSimpleList, articleId, articleHistId);
@@ -1803,18 +1590,16 @@ public class ArticleService {
 
         List<AnchorCapCreateDTO> anchorCapCreateDTOList = articleUpdateDTO.getAnchorCap();
 
-        if (CollectionUtils.isEmpty(anchorCapCreateDTOList) == false) {
 
-            Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
-            List<AnchorCap> anchorCaps = anchorCapRepository.findAnchorCapList(articleId);
+        Long articleId = article.getArtclId();//수정할 기사자막 등록시 등록할 기사 아이디
+        List<AnchorCap> anchorCaps = anchorCapRepository.findAnchorCapList(articleId);
 
-            for (AnchorCap anchorCap : anchorCaps) {
-                Long anchorCapId = anchorCap.getAnchorCapId();
-                anchorCapRepository.deleteById(anchorCapId);
-            }
-
-            createAnchorCap(anchorCapCreateDTOList, articleId, articleHistId);//앵커자막 등록
+        for (AnchorCap anchorCap : anchorCaps) {
+            Long anchorCapId = anchorCap.getAnchorCapId();
+            anchorCapRepository.deleteById(anchorCapId);
         }
+
+        createAnchorCap(anchorCapCreateDTOList, articleId, articleHistId);//앵커자막 등록
 
     }
 
@@ -1826,7 +1611,7 @@ public class ArticleService {
         //Lock모드로 조회
         Optional<Article> articleLockEntity = articleRepository.findLockArticle(artclId);
 
-        if (articleLockEntity.isPresent() == false){
+        if (articleLockEntity.isPresent() == false) {
 
             articleAuthConfirmDTO = ArticleAuthConfirmDTO.builder()
                     .artclId(artclId)
@@ -1895,7 +1680,7 @@ public class ArticleService {
         String lckrNm = article.getLckrNm();
 
         //MQ메세지 전송
-        articleTopicService.articleLockTopic("Article Lock", artclId, " Lock User Name : " +userNm+" ( "+userId+" )",
+        articleTopicService.articleLockTopic("Article Lock", artclId, " Lock User Name : " + userNm + " ( " + userId + " )",
                 lckDtm, userId, userNm);
 
         //토픽메세지 ArticleTopicDTO Json으로 변환후 send
@@ -1949,7 +1734,7 @@ public class ArticleService {
         String lckrNm = article.getLckrNm();
 
         //MQ메세지 전송
-        articleTopicService.articleLockTopic("Article UnLock", artclId, " Unlock User Name : " +userNm+" ( "+userId+" )",
+        articleTopicService.articleLockTopic("Article UnLock", artclId, " Unlock User Name : " + userNm + " ( " + userId + " )",
                 lckDtm, userId, userNm);
 
     }
@@ -2061,9 +1846,9 @@ public class ArticleService {
         }
 
         //부서코드
-        if (deptCd != 0 && deptCd != null){
+        if (deptCd != 0 && deptCd != null) {
             booleanBuilder.and(qArticle.deptCd.eq(deptCd));
-         }
+        }
         //기사카테고리코드
         if (artclCateCd != null && artclCateCd.trim().isEmpty() == false) {
             booleanBuilder.and(qArticle.artclCateCd.eq(artclCateCd));
@@ -2086,7 +1871,7 @@ public class ArticleService {
             }
         }
 
-        if (ObjectUtils.isEmpty(orgArtclId) == false){
+        if (ObjectUtils.isEmpty(orgArtclId) == false) {
             booleanBuilder.and(qArticle.orgArtclId.eq(orgArtclId));
         }
 
@@ -2282,10 +2067,10 @@ public class ArticleService {
         String lckrNm = article.getLckrNm();
         String lckYn = article.getLckYn();
 
-        if ("Y".equals(lckYn)){
+        if ("Y".equals(lckYn)) {
 
-            if (userId.equals(lckrId) == false){
-                throw new ResourceNotFoundException(" 다른 사용자가 수정중 입니다.  수정중인 사용자 : " + lckrNm+" ( "+lckrId+" )");
+            if (userId.equals(lckrId) == false) {
+                throw new ResourceNotFoundException(" 다른 사용자가 수정중 입니다.  수정중인 사용자 : " + lckrNm + " ( " + lckrId + " )");
             }
 
         }
@@ -2331,7 +2116,7 @@ public class ArticleService {
     }
 
     //픽스 단계 맞추기
-    public String confirmApprvDivCd(String apprvDivCd, Article article){
+    public String confirmApprvDivCd(String apprvDivCd, Article article) {
 
         String artclFixUser = article.getArtclFixUser();
         String editorFixUser = article.getEditorFixUser();
@@ -2339,47 +2124,44 @@ public class ArticleService {
         String deskFixUser = article.getDeskFixUser();
 
 
-
-        if ("article_fix".equals(apprvDivCd)){
-            if (artclFixUser == null || artclFixUser.trim().isEmpty()){
+        if ("article_fix".equals(apprvDivCd)) {
+            if (artclFixUser == null || artclFixUser.trim().isEmpty()) {
                 return "fix_none";
-            }else {
+            } else {
                 return "article_fix";
             }
 
-        }
-        else if ("editor_fix".equals(apprvDivCd)){
+        } else if ("editor_fix".equals(apprvDivCd)) {
 
-            if (editorFixUser == null || editorFixUser.trim().isEmpty()){
+            if (editorFixUser == null || editorFixUser.trim().isEmpty()) {
 
-                if (artclFixUser == null || artclFixUser.trim().isEmpty()){
+                if (artclFixUser == null || artclFixUser.trim().isEmpty()) {
                     return "fix_none";
-                }else {
+                } else {
                     return "article_fix";
                 }
 
-            }else {
+            } else {
                 return "editor_fix";
             }
 
-        }
-        else if ("anchor_fix".equals(apprvDivCd)){
+        } else if ("anchor_fix".equals(apprvDivCd)) {
 
-            if (anchorFixUser == null || anchorFixUser.trim().isEmpty()){
+            if (anchorFixUser == null || anchorFixUser.trim().isEmpty()) {
 
-                if (editorFixUser == null || editorFixUser.trim().isEmpty()){
+                if (editorFixUser == null || editorFixUser.trim().isEmpty()) {
 
-                    if (artclFixUser == null || artclFixUser.trim().isEmpty()){
+                    if (artclFixUser == null || artclFixUser.trim().isEmpty()) {
                         return "fix_none";
-                    }else {
+                    } else {
                         return "article_fix";
                     }
 
-                }else {
+                } else {
                     return "editor_fix";
                 }
 
-            }else {
+            } else {
                 return "anchor_fix";
             }
 
@@ -2403,15 +2185,15 @@ public class ArticleService {
 
             // article_fix에서 fix_none으로 픽스를 풀 경우 등록된 기자,일시 삭제
             //if ("article_fix".equals(orgApprvDivcd)) {
-                article.setArtclFixUser(null);
-                article.setArtclFixDtm(null);
-                article.setEditorFixUser(null);
-                article.setEditorFixDtm(null);
-                article.setEditorId(null);
-                article.setAnchorFixUser(null);
-                article.setAnchorFixDtm(null);
-                article.setDeskFixUser(null);
-                article.setDeskFixDtm(null);
+            article.setArtclFixUser(null);
+            article.setArtclFixDtm(null);
+            article.setEditorFixUser(null);
+            article.setEditorFixDtm(null);
+            article.setEditorId(null);
+            article.setAnchorFixUser(null);
+            article.setAnchorFixDtm(null);
+            article.setDeskFixUser(null);
+            article.setDeskFixDtm(null);
             //}
         }
 
@@ -2438,7 +2220,7 @@ public class ArticleService {
                     Long getArticleId = articleEntity.getArtclId();
                     Long getOrgArticleId = articleEntity.getOrgArtclId();
 
-                    if (getArticleId.equals(getOrgArticleId)){
+                    if (getArticleId.equals(getOrgArticleId)) {
                         continue;
                     }
 
@@ -2447,7 +2229,7 @@ public class ArticleService {
                     if ("fix_none".equals(apprvDicCd)) { //복사된 기사가 fix_none일경우 article_fix로 업데이트
 
                         Long orgArtclId = article.getOrgArtclId();
-                        if (artclId.equals(orgArtclId) ){//원본 기사일 경우 기사내용전부 업데이트
+                        if (artclId.equals(orgArtclId)) {//원본 기사일 경우 기사내용전부 업데이트
 
                             // 수정할 기사 빌드 후 업데이트 save
                             Article updateCopyArticle = fixCopyArticleBuild(articleEntity, article, userId);
@@ -2506,7 +2288,7 @@ public class ArticleService {
 
             } else { // editor_fix 으로 픽스를 풀 경우 등록된 앵커, 데스커 기록 삭제
 
-                if("fix_none".equals(orgApprvDivcd)){
+                if ("fix_none".equals(orgApprvDivcd)) {
 
                     article.setArtclFixUser(userId);
                     article.setArtclFixDtm(new Date());
@@ -2517,7 +2299,7 @@ public class ArticleService {
                     article.setAnchorFixDtm(null);
                     article.setDeskFixUser(null);
                     article.setDeskFixDtm(null);
-                }else {
+                } else {
 
                     article.setAnchorFixUser(null);
                     article.setAnchorFixDtm(null);
@@ -2537,7 +2319,7 @@ public class ArticleService {
 
             } else {
 
-                if("fix_none".equals(orgApprvDivcd)){
+                if ("fix_none".equals(orgApprvDivcd)) {
 
                     article.setArtclFixUser(userId);
                     article.setArtclFixDtm(new Date());
@@ -2548,7 +2330,7 @@ public class ArticleService {
                     article.setAnchorFixDtm(new Date());
                     article.setDeskFixUser(null);
                     article.setDeskFixDtm(null);
-                }else if ("article_fix".equals(orgApprvDivcd)){
+                } else if ("article_fix".equals(orgApprvDivcd)) {
 
                     article.setEditorFixUser(userId);
                     article.setEditorFixDtm(new Date());
@@ -2558,7 +2340,7 @@ public class ArticleService {
                     article.setDeskFixUser(null);
                     article.setDeskFixDtm(null);
 
-                }else if ("editor_fix".equals(orgApprvDivcd)){
+                } else if ("editor_fix".equals(orgApprvDivcd)) {
 
                     article.setAnchorFixUser(userId);
                     article.setAnchorFixDtm(new Date());
@@ -2571,7 +2353,7 @@ public class ArticleService {
         //데스커 픽스일 경우 픽스한 데스커 set
         if ("desk_fix".equals(apprvDivCd)) {
 
-            if("fix_none".equals(orgApprvDivcd)){
+            if ("fix_none".equals(orgApprvDivcd)) {
 
                 article.setArtclFixUser(userId);
                 article.setArtclFixDtm(new Date());
@@ -2582,7 +2364,7 @@ public class ArticleService {
                 article.setAnchorFixDtm(new Date());
                 article.setDeskFixUser(userId);
                 article.setDeskFixDtm(new Date());
-            }else if ("article_fix".equals(orgApprvDivcd)){
+            } else if ("article_fix".equals(orgApprvDivcd)) {
 
                 article.setEditorFixUser(userId);
                 article.setEditorFixDtm(new Date());
@@ -2592,19 +2374,18 @@ public class ArticleService {
                 article.setDeskFixUser(userId);
                 article.setDeskFixDtm(new Date());
 
-            }else if ("editor_fix".equals(orgApprvDivcd)){
+            } else if ("editor_fix".equals(orgApprvDivcd)) {
 
                 article.setAnchorFixUser(userId);
                 article.setAnchorFixDtm(new Date());
                 article.setDeskFixUser(userId);
                 article.setDeskFixDtm(new Date());
 
-            }else if ("anchor_fix".equals(orgApprvDivcd)){
+            } else if ("anchor_fix".equals(orgApprvDivcd)) {
 
                 article.setDeskFixUser(userId);
                 article.setDeskFixDtm(new Date());
             }
-
 
 
         }
@@ -2868,7 +2649,7 @@ public class ArticleService {
     }
 
     //기사 락이 6시간이상 걸려있는 기사 체크후 락 해제
-    public void articleLockChk(){
+    public void articleLockChk() {
 
         /*Date nowDate = new Date();
 
@@ -2884,7 +2665,7 @@ public class ArticleService {
 
         List<Article> articleList = articleRepository.findLockChkList(formatDate, "Y");
 
-        for (Article article : articleList){
+        for (Article article : articleList) {
 
             Long artclId = article.getArtclId();
             String lckrNm = article.getLckrNm();
@@ -2898,7 +2679,7 @@ public class ArticleService {
             articleMapper.updateFromDto(articleDTO, article);
             articleRepository.save(article);
 
-            log.info("Article UnLock From Server. Article Id : "+ artclId+" Lock User Name : "+lckrNm+" ( "+lckrId+" )");
+            log.info("Article UnLock From Server. Article Id : " + artclId + " Lock User Name : " + lckrNm + " ( " + lckrId + " )");
         }
 
     }
