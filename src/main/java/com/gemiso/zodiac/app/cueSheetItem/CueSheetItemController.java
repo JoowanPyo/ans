@@ -55,6 +55,16 @@ public class CueSheetItemController {
         return new AnsApiResponse<>(cueSheetItemDTO);
     }
 
+    @Operation(summary = "큐시트 아이템 상세정보 조회[ 삭제 아이템 ]", description = "큐시트 아이템 상세정보 조회[ 삭제 아이템 ]")
+    @GetMapping(path = "/{cueItemId}/deleteitem")
+    public AnsApiResponse<CueSheetItemDTO> findDeleteItem(@Parameter(name = "cueItemId", description = "큐시트아이템아이디")
+                                                @PathVariable("cueItemId") Long cueItemId) {
+
+        CueSheetItemDTO cueSheetItemDTO = cueSheetItemService.findDeleteItem(cueItemId);
+
+        return new AnsApiResponse<>(cueSheetItemDTO);
+    }
+
     @Operation(summary = "큐시트 아이템 템플릿(운영참조) 등록", description = "큐시트 아이템 템플릿(운영참조) 등록")
     @PostMapping(path = "/{cueId}/item/template")
     public AnsApiResponse<CueSheetItemResponseDTO> createTemplate(@Parameter(description = "필수값<br> ", required = true)
@@ -374,7 +384,7 @@ public class CueSheetItemController {
                                                                      @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
                                                                      @PathVariable("cueItemId") Long cueItemId,
                                                                      @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
-                                                                     @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd) throws JsonProcessingException {
+                                                                     @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd) throws Exception {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
         String userId = userAuthService.authUser.getUserId();

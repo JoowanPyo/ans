@@ -2,11 +2,7 @@ package com.gemiso.zodiac.app.yonhapWire.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
-import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileDTO;
-import com.gemiso.zodiac.app.yonhapWireAttchFile.YonhapWireAttchFile;
-import com.gemiso.zodiac.app.yonhapWireAttchFile.dto.YonhapWireAttchFileDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +11,6 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class YonhapWireDTO {

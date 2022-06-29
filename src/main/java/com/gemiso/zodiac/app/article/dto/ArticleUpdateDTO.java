@@ -1,14 +1,11 @@
 package com.gemiso.zodiac.app.article.dto;
 
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapCreateDTO;
-import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapCreateDTO;
-import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArticleUpdateDTO {

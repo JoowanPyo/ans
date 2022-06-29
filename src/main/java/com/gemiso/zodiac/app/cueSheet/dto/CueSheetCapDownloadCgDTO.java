@@ -11,10 +11,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @XmlRootElement(name = "cg")
+@Builder
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CueSheetCapDownloadCgDTO {
 

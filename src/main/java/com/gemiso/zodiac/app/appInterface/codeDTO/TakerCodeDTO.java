@@ -12,9 +12,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @XmlRootElement(name = "record")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TakerCodeDTO {

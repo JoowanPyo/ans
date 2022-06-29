@@ -3,14 +3,10 @@ package com.gemiso.zodiac.app.cueSheetTemplate.dto;
 import com.gemiso.zodiac.app.baseProgram.dto.BaseProgramSimpleDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class CueSheetTemplateUpdateDTO {

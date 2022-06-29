@@ -17,6 +17,7 @@ import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
+import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleService;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.topic.CueSheetTopicService;
 import com.gemiso.zodiac.core.topic.TopicSendService;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -52,6 +54,7 @@ public class ArticleMediaService {
 
     private final ArticleService articleService;
     private final CueSheetTopicService cueSheetTopicService;
+    private final ElasticSearchArticleService elasticSearchArticleService;
     //private final CueSheetItemService cueSheetItemService;
     //private final CueSheetService cueSheetService;
 
@@ -83,7 +86,7 @@ public class ArticleMediaService {
 
     }
 
-    public ArticleMediaDTO create(ArticleMediaCreateDTO articleMediaCreateDTO, String userId) throws JsonProcessingException {
+    public ArticleMediaDTO create(ArticleMediaCreateDTO articleMediaCreateDTO, String userId) throws Exception {
 
         /**********기사 미디어 타입 계산**********/
 
@@ -117,11 +120,17 @@ public class ArticleMediaService {
         articleMediaDTO.setContId(contId);
 
 
-        /********** MQ [TOPIC] ************/
 
         ArticleSimpleDTO articleSimpleDTO = articleMediaCreateDTO.getArticle();
         Long artclId = articleSimpleDTO.getArtclId();
         Article article = articleService.articleFindOrFail(artclId);
+
+
+        //엘라스틱 서치 등록
+        elasticSearchArticleService.elasticPush(article);
+
+        /********** MQ [TOPIC] ************/
+
         //이현준 부장, 이현진 차장 요청으로 매칭하고 부조전송 완료된 미디어만 웹소켓 메세지 전송
         CueSheet cueSheet = article.getCueSheet();
 
@@ -249,7 +258,7 @@ public class ArticleMediaService {
 
     }
 
-    public void delete(Long artclMediaId, String userId) throws JsonProcessingException {
+    public void delete(Long artclMediaId, String userId) throws Exception {
 
         ArticleMedia articleMedia = articleMediaFindOrFail(artclMediaId);
 
@@ -277,11 +286,13 @@ public class ArticleMediaService {
         articleMapper.updateFromDto(articleDTO, article);
         articleRepository.save(article);*/
 
-        /**********기사 미디어 타입 계산**********/
 
         Article getArticle = articleMedia.getArticle();
         Long artclId = getArticle.getArtclId();
         Article article = articleService.articleFindOrFail(artclId);
+
+        //엘라스틱 서치 등록
+        elasticSearchArticleService.elasticPush(article);
 
       /*  List<ArticleMedia> articleMediaList = articleMediaRepository.findArticleMediaList(artclId);
 

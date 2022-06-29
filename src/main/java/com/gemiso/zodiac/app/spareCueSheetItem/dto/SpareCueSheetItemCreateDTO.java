@@ -13,9 +13,9 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class SpareCueSheetItemCreateDTO {
 
     //private Long spareCueItemId;

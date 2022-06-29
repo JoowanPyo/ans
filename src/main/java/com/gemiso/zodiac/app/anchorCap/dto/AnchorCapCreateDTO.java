@@ -10,9 +10,9 @@ import javax.validation.constraints.NotNull;
 
 @Schema(name = "앵커자막 등록 articleDTO")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AnchorCapCreateDTO {
 
     //@Schema(description = "앵커 자막 아이디")

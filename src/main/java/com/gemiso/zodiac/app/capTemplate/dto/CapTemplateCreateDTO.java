@@ -1,18 +1,14 @@
 package com.gemiso.zodiac.app.capTemplate.dto;
 
 import com.gemiso.zodiac.app.capTemplateGrp.dto.CapTemplateGrpDTO;
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class CapTemplateCreateDTO {

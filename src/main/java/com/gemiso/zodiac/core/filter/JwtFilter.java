@@ -1,10 +1,8 @@
 package com.gemiso.zodiac.core.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserRepository;
 import com.gemiso.zodiac.app.user.dto.UserDTO;
-import com.gemiso.zodiac.core.response.ApiErrorResponse;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import io.jsonwebtoken.Claims;
@@ -22,11 +20,7 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;

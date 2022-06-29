@@ -1,26 +1,16 @@
 package com.gemiso.zodiac.app.cueSheetItemCap.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateDTO;
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
-import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSimpleDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
-import com.gemiso.zodiac.app.symbol.dto.SymbolSimpleDTO;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.util.Date;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class CueSheetItemCapDTO {

@@ -136,7 +136,7 @@ public class CueSheetController {
     @DeleteMapping(path = "/{cueId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                    @PathVariable("cueId") Long cueId) throws JsonProcessingException {
+                                    @PathVariable("cueId") Long cueId) throws Exception {
 
         //사용자 비밀번호 체크
         //토픽메세지

@@ -1,20 +1,10 @@
 package com.gemiso.zodiac.app.program.dto;
 
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
-import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateDTO;
-import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.List;
-
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProgramCreateDTO {

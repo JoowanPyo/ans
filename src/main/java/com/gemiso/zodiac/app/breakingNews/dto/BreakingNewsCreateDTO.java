@@ -2,9 +2,7 @@ package com.gemiso.zodiac.app.breakingNews.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.breakingNewsDetail.dto.BreakingNewsDtlCreateDTO;
-import com.gemiso.zodiac.app.breakingNewsDetail.dto.BreakingNewsDtlDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +12,6 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BreakingNewsCreateDTO {

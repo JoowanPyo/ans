@@ -76,7 +76,7 @@ public class ArticleMediaController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<ArticleMediaDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                  @RequestBody @Valid ArticleMediaCreateDTO articleMediaCreateDTO) throws JsonProcessingException {
+                                                  @RequestBody @Valid ArticleMediaCreateDTO articleMediaCreateDTO) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
@@ -114,7 +114,7 @@ public class ArticleMediaController {
     @DeleteMapping(path = "/{artclMediaId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "artclMediaId", description = "기사미디어 아이디")
-                                    @PathVariable("artclMediaId") Long artclMediaId) throws JsonProcessingException {
+                                    @PathVariable("artclMediaId") Long artclMediaId) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();

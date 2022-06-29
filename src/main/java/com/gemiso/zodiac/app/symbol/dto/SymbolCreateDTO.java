@@ -1,17 +1,13 @@
 package com.gemiso.zodiac.app.symbol.dto;
 
-import com.gemiso.zodiac.app.file.AttachFile;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class SymbolCreateDTO {

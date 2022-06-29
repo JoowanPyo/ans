@@ -11,9 +11,9 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @XmlRootElement(name = "clip")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TakerCueSheetVideoClipDTO {

@@ -1,13 +1,10 @@
 package com.gemiso.zodiac.app.userGroup.dto;
 
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserGroupUpdateDTO {

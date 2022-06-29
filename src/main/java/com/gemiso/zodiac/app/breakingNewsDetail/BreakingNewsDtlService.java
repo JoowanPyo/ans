@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.breakingNewsDetail;
 
-import com.gemiso.zodiac.app.breakingNews.QBreakingNews;
 import com.gemiso.zodiac.app.breakingNewsDetail.dto.BreakingNewsDtlDTO;
 import com.gemiso.zodiac.app.breakingNewsDetail.mapper.BreakingNewsDtlMapper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;

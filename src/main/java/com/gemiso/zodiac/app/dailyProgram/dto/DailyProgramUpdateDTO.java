@@ -1,18 +1,12 @@
 package com.gemiso.zodiac.app.dailyProgram.dto;
 
 import com.gemiso.zodiac.app.baseProgram.dto.BaseProgramSimpleDTO;
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class DailyProgramUpdateDTO {

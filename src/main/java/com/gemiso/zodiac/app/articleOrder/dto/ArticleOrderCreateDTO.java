@@ -2,7 +2,6 @@ package com.gemiso.zodiac.app.articleOrder.dto;
 
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +9,6 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArticleOrderCreateDTO {

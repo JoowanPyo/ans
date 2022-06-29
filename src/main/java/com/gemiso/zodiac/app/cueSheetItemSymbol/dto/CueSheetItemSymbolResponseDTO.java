@@ -1,13 +1,10 @@
 package com.gemiso.zodiac.app.cueSheetItemSymbol.dto;
 
-import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class CueSheetItemSymbolResponseDTO {

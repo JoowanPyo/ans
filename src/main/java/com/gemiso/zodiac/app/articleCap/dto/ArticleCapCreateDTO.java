@@ -1,9 +1,5 @@
 package com.gemiso.zodiac.app.articleCap.dto;
 
-import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
-import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateDTO;
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
-import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

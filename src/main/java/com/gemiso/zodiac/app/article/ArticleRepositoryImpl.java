@@ -159,17 +159,19 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm{
         if (copyYn != null && copyYn.trim().isEmpty() == false) {
 
             if ("N".equals(copyYn)) {
-                jpaQuery.where(qArticle.orgArtclId.eq(qArticle.artclId));
+                jpaQuery.where(qArticle.artclOrd.eq(0));
             } else {
-                jpaQuery.where(qArticle.orgArtclId.ne(qArticle.artclId));
+                jpaQuery.where(qArticle.artclOrd.ne(0));
             }
         }
+
+        jpaQuery.offset(pageable.getOffset());
+        jpaQuery.limit(pageable.getPageSize());
 
         jpaQuery.orderBy(qArticle.orgArtclId.desc(), qArticle.artclOrd.asc());
 
         Long totalCount = jpaQuery.fetchCount();
-        jpaQuery.offset(pageable.getOffset());
-        jpaQuery.limit(pageable.getPageSize());
+
 
         List<Article> articleList = jpaQuery.fetch();
 
@@ -339,9 +341,9 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm{
         if (copyYn != null && copyYn.trim().isEmpty() == false) {
 
             if ("N".equals(copyYn)) {
-                jpaQuery.where(qArticle.orgArtclId.eq(qArticle.artclId));
+                jpaQuery.where(qArticle.artclOrd.eq(0));
             } else {
-                jpaQuery.where(qArticle.orgArtclId.ne(qArticle.artclId));
+                jpaQuery.where(qArticle.artclOrd.ne(0));
             }
         }
 
@@ -354,5 +356,40 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustorm{
         List<Article> articleList = jpaQuery.fetch();
 
         return new PageImpl<>(articleList, pageable, totalCount);
+    }
+
+    @Override
+    public Page<Article> findByArticleListElastic(Date sdate, Date edate,Pageable pageable) {
+
+        QArticle qArticle = QArticle.article;
+        QUser qUser = QUser.user;
+        //QArticleCap qArticleCap = QArticleCap.articleCap;
+        //QAnchorCap qAnchorCap = QAnchorCap.anchorCap;
+        QCueSheet qCueSheet = QCueSheet.cueSheet;
+        //QIssue qIssue = QIssue.issue;
+        //QArticleMedia qArticleMedia = QArticleMedia.articleMedia;
+
+        JPAQuery jpaQuery = jpaQueryFactory.select(qArticle).from(qArticle)
+                .leftJoin(qArticle.cueSheet, qCueSheet).fetchJoin().distinct();
+                /*.leftJoin(qArticle.issue, qIssue).fetchJoin()
+                .leftJoin(qArticle.articleMedia, qArticleMedia).fetchJoin()
+                .leftJoin(qArticle.articleCap, qArticleCap).fetchJoin()
+                .leftJoin(qArticle.anchorCap, qAnchorCap).fetchJoin().distinct();*/
+
+        //등록날짜 기준으로 조회
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
+            jpaQuery.where(qArticle.inputDtm.between(sdate, edate)
+                    /*.or(qArticle.embgDtm.between(sdate, edate)
+                            .or(qArticle.brdcSchdDtm.between(sdate, edate)))*/);
+        }
+
+        jpaQuery.orderBy(qArticle.artclId.asc());
+
+        jpaQuery.offset(pageable.getOffset());
+        jpaQuery.limit(pageable.getPageSize());
+
+        List<Article> articleList = jpaQuery.fetch();
+
+        return new PageImpl<>(articleList, pageable, 0);
     }
 }

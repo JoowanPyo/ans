@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.appInterface.prompterCueDTO;
 
-import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetSpareDTO;
 import lombok.Data;
 
 import javax.xml.bind.annotation.*;

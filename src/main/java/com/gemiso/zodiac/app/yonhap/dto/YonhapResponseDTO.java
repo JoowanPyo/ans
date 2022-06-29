@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class YonhapResponseDTO {
 
     private Long yh_artcl_id;

@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Data
-@Builder
 @AllArgsConstructor
+@Builder
 @NoArgsConstructor
 public class CueSheetHistCreateDTO {
 

@@ -23,12 +23,12 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final ObjectMapper objectMapper;
 
-    @Bean
+    /*@Bean
     public MappingJackson2HttpMessageConverter jsonEscapeConverter() {
         ObjectMapper copy = objectMapper.copy();
         copy.getFactory().setCharacterEscapes(new HtmlCharacterEscapes());
         return new MappingJackson2HttpMessageConverter(copy);
-    }
+    }*/
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

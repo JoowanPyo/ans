@@ -10,9 +10,9 @@ import java.util.Date;
 
 @Schema(description = "기사이력 맵핑 articleDTO")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ArticleHistSimpleDTO {
 
     @Schema(description = "기사 이력 아이디")

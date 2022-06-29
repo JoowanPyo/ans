@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -11,6 +12,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.WriteTypeHint;
 
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import java.util.List;
 import java.util.Objects;
@@ -117,6 +119,12 @@ public class ElasticSearchArticle {
     @Field(type = FieldType.Integer)
     private Integer artclExtTime;
 
+    @Field(type = FieldType.Keyword)
+    private String editorFixUser;
+
+    @Field(type = FieldType.Keyword)
+    private String editorFixUserNm;
+
     @Field(type = FieldType.Nested)
     private List<ElasticSearchArticleTags> tags;
 
@@ -161,6 +169,8 @@ public class ElasticSearchArticle {
                                 Integer ancMentCttTime,
                                 Integer artclCttTime,
                                 Integer artclExtTime,
+                                String editorFixUser,
+                                String editorFixUserNm,
                                 List<ElasticSearchArticleTags> tags,
                                 List<ElasricSearchArticleMedia> articleMedias){
 
@@ -197,6 +207,8 @@ public class ElasticSearchArticle {
         this.ancMentCttTime = ancMentCttTime;
         this.artclCttTime = artclCttTime;
         this.artclExtTime = artclExtTime;
+        this.editorFixUser = editorFixUser;
+        this.editorFixUserNm = editorFixUserNm;
         this.tags = tags;
         this.articleMedias = articleMedias;
     }

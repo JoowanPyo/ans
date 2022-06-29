@@ -1,7 +1,6 @@
 package com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +11,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @XmlRootElement(name = "video_symbols")

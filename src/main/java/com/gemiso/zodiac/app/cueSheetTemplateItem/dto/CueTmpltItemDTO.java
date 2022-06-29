@@ -1,21 +1,18 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItem.dto;
 
-import com.gemiso.zodiac.app.cueSheetTemplateMedia.CueTmpltMedia;
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapSimpleDTO;
+import com.gemiso.zodiac.app.cueSheetTemplateMedia.CueTmpltMedia;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class CueTmpltItemDTO {

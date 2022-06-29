@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.cueCapTmplt;
 
-import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateSimpleDTO;
 import com.gemiso.zodiac.app.cueCapTmplt.dto.CueCapTmpltCreateDTO;
 import com.gemiso.zodiac.app.cueCapTmplt.dto.CueCapTmpltDTO;
@@ -8,11 +7,9 @@ import com.gemiso.zodiac.app.cueCapTmplt.dto.CueCapTmpltUpdateDTO;
 import com.gemiso.zodiac.app.cueCapTmplt.mapper.CueCapTmpltCreateMapper;
 import com.gemiso.zodiac.app.cueCapTmplt.mapper.CueCapTmpltMapper;
 import com.gemiso.zodiac.app.cueCapTmplt.mapper.CueCapTmpltUpdateMapper;
-import com.gemiso.zodiac.app.cueSheetItemCap.mapper.CueSheetItemCapUpdateMapper;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

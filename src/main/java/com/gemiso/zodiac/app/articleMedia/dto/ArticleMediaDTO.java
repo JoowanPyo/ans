@@ -1,13 +1,9 @@
 package com.gemiso.zodiac.app.articleMedia.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +11,6 @@ import java.util.Date;
 
 @Schema(description = "기사미디어 articleDTO")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArticleMediaDTO {

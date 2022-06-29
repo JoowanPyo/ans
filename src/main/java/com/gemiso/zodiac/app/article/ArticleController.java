@@ -95,17 +95,16 @@ public class ArticleController {
     }
 
     @Operation(summary = "기사 목록조회 [엘라스틱]", description = "기사 목록조회 [엘라스틱]")
-    @GetMapping(path = "/elasticsearch")
+    @GetMapping(path = "/search")
     public AnsApiResponse<?> findAllElasticsearch(
             @Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
             @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-            @Parameter(name = "rcvDt", description = "수신일자(yyyyMMdd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date rcvDt,
             @Parameter(name = "rptrId", description = "기자 아이디") @RequestParam(value = "rptrId", required = false) String rptrId,
             @Parameter(name = "inputrId", description = "등록자 아이디") @RequestParam(value = "inputrId", required = false) String inputrId,
             @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디") @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
             @Parameter(name = "artclDivCd", description = "기사구분코드(01:일반, 02:전체, 03:이슈)") @RequestParam(value = "artclDivCd", required = false) String artclDivCd,
             @Parameter(name = "artclTypCd", description = "기사유형코드(01:스트레이트, 02:리포트, 03:C/T, 04:하단롤, 05:긴급자막)") @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
-            @Parameter(name = "searchDivCd", description = "검색구분코드<br>01 - 기사제목<br>02 - 기자명") @RequestParam(value = "searchDivCd", required = false) String searchDivCd,
+            @Parameter(name = "searchDivCd", description = "검색구분코드<br>01 - 기사제목<br>02 - 원본 기사 아이디") @RequestParam(value = "searchDivCd", required = false) String searchDivCd,
             @Parameter(name = "searchWord", description = "검색키워드") @RequestParam(value = "searchWord", required = false) String searchWord,
             @Parameter(name = "page", description = "시작페이지") @RequestParam(value = "page", required = false) Integer page,
             @Parameter(name = "limit", description = "한 페이지에 데이터 수") @RequestParam(value = "limit", required = false) Integer limit,
@@ -133,15 +132,21 @@ public class ArticleController {
 
             SearchDate searchDate = new SearchDate(sdate, edate);
 
-            pageList = articleService.findAllElasticsearch(searchDate.getStartDate(), searchDate.getEndDate(), rcvDt, rptrId, inputrId,
+            pageList = articleService.findAllElasticsearch(searchDate.getStartDate(), searchDate.getEndDate(), rptrId, inputrId,
                     brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd,
                     artclCateCd, artclTypDtlCd, delYn, artclId, copyYn, orgArtclId, cueId);
+
+            //엘라스틱서치 lock데이터 추가
+            pageList = articleService.lockInfoAdd(pageList);
             //검색조건 날짜형식이 안들어왔을경우
         } else {
 
-            pageList = articleService.findAllElasticsearch(null, null, rcvDt, rptrId, inputrId, brdcPgmId, artclDivCd,
+            pageList = articleService.findAllElasticsearch(null, null, rptrId, inputrId, brdcPgmId, artclDivCd,
                     artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd, artclCateCd,
                     artclTypDtlCd, delYn, artclId, copyYn, orgArtclId, cueId);
+
+            //엘라스틱서치 lock데이터 추가
+            pageList = articleService.lockInfoAdd(pageList);
 
         }
 
@@ -149,7 +154,7 @@ public class ArticleController {
     }
 
     @Operation(summary = "기사 목록조회[큐시트]", description = "기사 목록조회[큐시트]")
-    @GetMapping(path = "/elasticsearchcue")
+    @GetMapping(path = "/searchcue")
     public AnsApiResponse<PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle>> findAllElasticsearchCue(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = true)
                                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
                                                                       @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = true)
@@ -274,6 +279,16 @@ public class ArticleController {
         return new AnsApiResponse<>(articleDTO);
     }
 
+    @Operation(summary = "기사 상세조회[ 삭제 기사 ]", description = "기사 상세조회[ 삭제 기사 ]")
+    @GetMapping(path = "/{artclId}/deletearticle")
+    public AnsApiResponse<ArticleDTO> findDeleteArticle(@Parameter(name = "artclId", required = true, description = "기사 아이디")
+                                           @PathVariable("artclId") Long artclId) {
+
+        ArticleDTO articleDTO = articleService.findDeleteArticle(artclId);
+
+        return new AnsApiResponse<>(articleDTO);
+    }
+
     @Operation(summary = "기사 등록", description = "기사 등록")
     @PostMapping(name = "")
     @ResponseStatus(HttpStatus.CREATED)
@@ -289,7 +304,7 @@ public class ArticleController {
         Article article = articleService.create(articleCreateDTO, userId);
 
         //엘라스틱서치 등록
-        //articleService.elasticCreate(article);
+        elasticSearchArticleService.elasticPush(article);
 
         //기사 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
@@ -320,9 +335,9 @@ public class ArticleController {
 
         Article article = articleService.update(articleUpdateDTO, artclId, userId);
 
-        //엘라스틱서치 업데이트
-        //articleService.elasticUpdate(article);
-        /* ArticleDTO articleDTO = articleService.find(artclId);*/
+        //엘라스틱서치 등록
+        elasticSearchArticleService.elasticPush(article);
+
         //기사 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
         articleDTO.setArtclId(artclId);
@@ -345,8 +360,8 @@ public class ArticleController {
 
         Article article = articleService.delete(artclId, userId);
 
-        //엘라스틱서치 업데이트
-        //articleService.elasticUpdate(article);
+        //엘라스틱서치 등록
+        elasticSearchArticleService.elasticPush(article);
 
         return AnsApiResponse.noContent();
 
@@ -439,8 +454,8 @@ public class ArticleController {
 
         Article article = articleService.vaildFixStaus(artclId, apprvDivCd, userId);
 
-        //엘라스틱서치 업데이트
-        //articleService.elasticUpdate(article);
+        //엘라스틱서치 등록
+        elasticSearchArticleService.elasticPush(article);
 
         ArticleDTO articleDTO = articleService.find(artclId);
 

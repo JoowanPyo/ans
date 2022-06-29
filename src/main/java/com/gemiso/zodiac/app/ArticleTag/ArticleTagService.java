@@ -1,22 +1,22 @@
 package com.gemiso.zodiac.app.ArticleTag;
 
+import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagCreateDTO;
+import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.ArticleTag.mapper.ArticleTagCreateMapper;
+import com.gemiso.zodiac.app.ArticleTag.mapper.ArticleTagMapper;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.ArticleRepository;
 import com.gemiso.zodiac.app.article.ArticleService;
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
-import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleRepository;
-import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticle;
 import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticleTags;
 import com.gemiso.zodiac.app.tag.Tag;
 import com.gemiso.zodiac.app.tag.TagRepository;
 import com.gemiso.zodiac.app.tag.TagService;
-import com.gemiso.zodiac.app.tag.dto.*;
-import com.gemiso.zodiac.app.ArticleTag.mapper.ArticleTagCreateMapper;
-import com.gemiso.zodiac.app.ArticleTag.mapper.ArticleTagMapper;
+import com.gemiso.zodiac.app.tag.dto.TagCreateDTO;
+import com.gemiso.zodiac.app.tag.dto.TagDTO;
+import com.gemiso.zodiac.app.tag.dto.TagIdDTO;
 import com.gemiso.zodiac.app.tag.mapper.TagMapper;
-import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagCreateDTO;
-import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagDTO;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,7 +83,7 @@ public class ArticleTagService {
         return articleTagDTOList;
     }
 
-    public List<ElasticSearchArticleTags> create(Long artclId, List<String> tagList){
+    public void create(Long artclId, List<String> tagList){
 
 
         //등록되어 있던 기사테그 List 조회
@@ -92,36 +91,27 @@ public class ArticleTagService {
 
         deleteArticleTag(articleTagList); //기존에 등록되어 있던 기사테그 List 삭제
 
-        List<ElasticSearchArticleTags> tags = new ArrayList<>();
+        if (CollectionUtils.isEmpty(tagList) == false) {
+            for (String tag : tagList) { //등록할 테그List
 
-        for (String tag : tagList){ //등록할 테그List
+                Tag tagEntity = chkTags(tag);//테그 신규등록일지, 기존에 등록된 테그인지 검사후, 등록 or 클릭수 업데이트 return  tagId
 
-            Tag tagEntity = chkTags(tag);//테그 신규등록일지, 기존에 등록된 테그인지 검사후, 등록 or 클릭수 업데이트 return  tagId
+                ArticleTagCreateDTO articleTagCreateDTO = new ArticleTagCreateDTO(); //기사테크 등록 articleDTO
 
-            ArticleTagCreateDTO articleTagCreateDTO = new ArticleTagCreateDTO(); //기사테크 등록 articleDTO
+                TagIdDTO tagIdDTO = TagIdDTO.builder().tagId(tagEntity.getTagId()).build(); //테그DTO 빌드 (테그 아이디)
+                ArticleSimpleDTO articleId = ArticleSimpleDTO.builder().artclId(artclId).build();//기사DTO 빌드 (기사 아이디)
+                articleTagCreateDTO.setArticle(articleId);
+                articleTagCreateDTO.setTag(tagIdDTO);
 
-            TagIdDTO tagIdDTO = TagIdDTO.builder().tagId(tagEntity.getTagId()).build(); //테그DTO 빌드 (테그 아이디)
-            ArticleSimpleDTO articleId = ArticleSimpleDTO.builder().artclId(artclId).build();//기사DTO 빌드 (기사 아이디)
-            articleTagCreateDTO.setArticle(articleId);
-            articleTagCreateDTO.setTag(tagIdDTO);
+                ArticleTag articleTag = articleTagCreateMapper.toEntity(articleTagCreateDTO);//기사테그 등록 엔티티 변환
 
-            ArticleTag articleTag = articleTagCreateMapper.toEntity(articleTagCreateDTO);//기사테그 등록 엔티티 변환
+                articleTagRepository.save(articleTag);//기사테그 등록
 
-            articleTagRepository.save(articleTag);//기사테그 등록
-
-            ElasticSearchArticleTags elasticTag = new ElasticSearchArticleTags();
-            elasticTag.setTag(tagEntity.getTag());
-            elasticTag.setTagId(tagEntity.getTagId());
-
-            tags.add(elasticTag);
-            
+            }
         }
 
-        return tags;
 
     }
-
-
 
     public void deleteArticleTag(List<ArticleTag> articleTagList){ //기사테그 삭제
 

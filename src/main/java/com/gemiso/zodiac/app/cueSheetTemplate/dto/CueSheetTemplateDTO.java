@@ -2,27 +2,16 @@ package com.gemiso.zodiac.app.cueSheetTemplate.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.baseProgram.dto.BaseProgramSimpleDTO;
-import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemSimpleDTO;
-import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Formula;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class CueSheetTemplateDTO {

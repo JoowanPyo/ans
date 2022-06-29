@@ -1,9 +1,6 @@
 package com.gemiso.zodiac.app.user;
 
-import com.gemiso.zodiac.app.user.dto.UserCreateDTO;
-import com.gemiso.zodiac.app.user.dto.UserDTO;
-import com.gemiso.zodiac.app.user.dto.UserDeleteUpdateDTO;
-import com.gemiso.zodiac.app.user.dto.UserUpdateDTO;
+import com.gemiso.zodiac.app.user.dto.*;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import com.gemiso.zodiac.exception.UserAlreadyExistException;
 import io.swagger.annotations.Api;
@@ -81,12 +78,12 @@ public class UserController {
         if (userService.checkUser(userId)) {
             //return AnsApiResponse.aleadyExist();
             User user = userService.deleteChkUserFind(userId);
-            
-            if (ObjectUtils.isEmpty(user)){
-                throw new UserAlreadyExistException("사용자가 이미 존재합니다. 사용자 아이디 : "+userId);
 
-            }else {
-                throw new UserAlreadyExistException("삭제된 사용자입니다. 사용자 아이디 : "+userId);
+            if (ObjectUtils.isEmpty(user)) {
+                throw new UserAlreadyExistException("사용자가 이미 존재합니다. 사용자 아이디 : " + userId);
+
+            } else {
+                throw new UserAlreadyExistException("삭제된 사용자입니다. 사용자 아이디 : " + userId);
             }
         }
 
@@ -124,10 +121,10 @@ public class UserController {
 
     @Operation(summary = "사용자 비밀번호 확인", description = "사용자 비밀번호 확인")
     @GetMapping(path = "/confirm")
-    public AnsApiResponse<?> passwordConfirm(@Parameter(name = "comfirmPwd", description = "확인 패스워드", in = ParameterIn.QUERY)
-                                             @RequestParam(value = "comfirmPwd", required = false) String comfirmPwd) throws NoSuchAlgorithmException {
+    public AnsApiResponse<?> passwordConfirm(@Parameter(name = "userCreateDTO", required = true, description = "필수값<br> userNm , password")
+                                             @Valid @RequestBody UserConfirmDTO userConfirmDTO) throws NoSuchAlgorithmException {
 
-        userService.passwordConfirm(comfirmPwd);
+        userService.passwordConfirm(userConfirmDTO);
 
         return AnsApiResponse.ok();
     }

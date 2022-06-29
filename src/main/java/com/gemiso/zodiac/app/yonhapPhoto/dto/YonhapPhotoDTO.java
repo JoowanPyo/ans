@@ -1,11 +1,8 @@
 package com.gemiso.zodiac.app.yonhapPhoto.dto;
 
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
-import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileCreateDTO;
-import com.gemiso.zodiac.app.yonhapPotoAttchFile.YonhapPhotoAttchFile;
 import com.gemiso.zodiac.app.yonhapPotoAttchFile.dto.YonhapPhotoAttchFileDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +11,6 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class YonhapPhotoDTO {

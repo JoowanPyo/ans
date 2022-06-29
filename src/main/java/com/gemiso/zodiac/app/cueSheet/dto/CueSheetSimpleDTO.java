@@ -6,14 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class CueSheetSimpleDTO {
 
     private Long cueId;
     private String brdcPgmNm;
-    private String subrmId; //부조 아이디
+    private Long subrmId; //부조 아이디
 /*    private String cueDivCd;
     private String cueDivCdNm;
     private String chDivCd;

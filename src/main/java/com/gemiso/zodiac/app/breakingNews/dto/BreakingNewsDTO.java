@@ -1,11 +1,9 @@
 package com.gemiso.zodiac.app.breakingNews.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gemiso.zodiac.app.breakingNewsDetail.BreakingNewsDtl;
 import com.gemiso.zodiac.app.breakingNewsDetail.dto.BreakingNewsDtlDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +13,6 @@ import java.util.List;
 
 @Schema(description = "속보뉴스 articleDTO")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BreakingNewsDTO {

@@ -1,21 +1,17 @@
 package com.gemiso.zodiac.app.user;
 
-import com.gemiso.zodiac.app.user.dto.UserCreateDTO;
-import com.gemiso.zodiac.app.user.dto.UserDTO;
-import com.gemiso.zodiac.app.user.dto.UserDeleteUpdateDTO;
-import com.gemiso.zodiac.app.userGroupUser.QUserGroupUser;
-import com.gemiso.zodiac.app.userGroupUser.UserGroupUserService;
-import com.gemiso.zodiac.app.userGroupUser.dto.UserGroupUserDTO;
-import com.gemiso.zodiac.app.user.dto.UserUpdateDTO;
+import com.gemiso.zodiac.app.user.dto.*;
 import com.gemiso.zodiac.app.user.mapper.UserCreateMapper;
-import com.gemiso.zodiac.app.userGroupUser.dto.UserToGroupUdateDTO;
-import com.gemiso.zodiac.app.userGroupUser.mapper.UserGroupUserMapper;
 import com.gemiso.zodiac.app.user.mapper.UserMapper;
 import com.gemiso.zodiac.app.user.mapper.UserUpdateMapper;
 import com.gemiso.zodiac.app.userGroup.UserGroup;
 import com.gemiso.zodiac.app.userGroup.UserGroupRepository;
+import com.gemiso.zodiac.app.userGroupUser.QUserGroupUser;
 import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
 import com.gemiso.zodiac.app.userGroupUser.UserGroupUserRepository;
+import com.gemiso.zodiac.app.userGroupUser.dto.UserGroupUserDTO;
+import com.gemiso.zodiac.app.userGroupUser.dto.UserToGroupUdateDTO;
+import com.gemiso.zodiac.app.userGroupUser.mapper.UserGroupUserMapper;
 import com.gemiso.zodiac.core.helper.EncodingHelper;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.PasswordFailedException;
@@ -29,7 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -287,7 +282,9 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void passwordConfirm(String comfirmPwd) throws NoSuchAlgorithmException {
+    public void passwordConfirm(UserConfirmDTO userConfirmDTO) throws NoSuchAlgorithmException {
+
+        String comfirm = userConfirmDTO.getComfirm();
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String tokenUserId = userAuthService.authUser.getUserId();
@@ -297,7 +294,7 @@ public class UserService {
         String password = user.getPwd();
 
         //아리랑 pwd sha256해싱 [ pwd + salt ]
-        EncodingHelper encodingHelper = new EncodingHelper(comfirmPwd, saltKey);
+        EncodingHelper encodingHelper = new EncodingHelper(comfirm, saltKey);
         String hexPwd = encodingHelper.getHex();
         //String encodePassword = encodePassword(hexPwd); //패스워드 비크립트
 

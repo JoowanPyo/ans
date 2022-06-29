@@ -2,13 +2,11 @@ package com.gemiso.zodiac.app.anchorCap.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Schema(description = "앵커 자막 수정 articleDTO")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnchorCapUpdateDTO {

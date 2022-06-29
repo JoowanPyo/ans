@@ -33,7 +33,6 @@ import com.gemiso.zodiac.app.cueSheetHist.dto.CueSheetHistCreateDTO;
 import com.gemiso.zodiac.app.cueSheetHist.mapper.CueSheetHistCreateMapper;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
-import com.gemiso.zodiac.app.cueSheetItem.QCueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemSimpleDTO;
@@ -59,6 +58,7 @@ import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaCreateMapper;
 import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaMapper;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgramService;
 import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
+import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleService;
 import com.gemiso.zodiac.app.facilityManage.FacilityManage;
 import com.gemiso.zodiac.app.facilityManage.FacilityManageService;
 import com.gemiso.zodiac.app.lbox.LboxService;
@@ -84,6 +84,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.ParseException;
 import java.util.*;
 
 @Service
@@ -107,7 +108,6 @@ public class CueSheetService {
     private final CueSheetItemCapRepotitory cueSheetItemCapRepotitory;
     private final CueCapTmpltRepository cueCapTmpltRepository;
 
-
     private final CueSheetMapper cueSheetMapper;
     private final CueSheetCreateMapper cueSheetCreateMapper;
     private final CueSheetUpdateMapper cueSheetUpdateMapper;
@@ -128,6 +128,7 @@ public class CueSheetService {
     private final ProgramService programService;
     //private final UserAuthService userAuthService;
     private final ArticleService articleService;
+    private final ElasticSearchArticleService elasticSearchArticleService;
 
     private final DailyProgramService dailyProgramService;
 
@@ -534,14 +535,14 @@ public class CueSheetService {
     }
 
     //큐시트아이템 목록조회(검색조건 :  큐시트 아이디)
-    public List<CueSheetItem> cueSheetItemFindAll(Long cueId) {
+   /* public List<CueSheetItem> cueSheetItemFindAll(Long cueId) {
 
         BooleanBuilder booleanBuilder = getSearchCueItem(cueId);
 
         List<CueSheetItem> cueSheetItemList = (List<CueSheetItem>) cueSheetItemRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "cueItemOrd"));
 
         return cueSheetItemList;
-    }
+    }*/
 
     //방송아이콘 url 추가
     public List<CueSheetItemDTO> setSymbol(List<CueSheetItemDTO> cueSheetItemDTOList) {
@@ -580,7 +581,7 @@ public class CueSheetService {
     }
 
     //큐시트아이템 목록조회 조건검색빌드
-    public BooleanBuilder getSearchCueItem(Long cueId) {
+   /* public BooleanBuilder getSearchCueItem(Long cueId) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -598,7 +599,7 @@ public class CueSheetService {
         }
 
         return booleanBuilder;
-    }
+    }*/
 
 
     //큐시트 등록
@@ -690,7 +691,7 @@ public class CueSheetService {
     }
 
     //큐시트 삭제
-    public void delete(Long cueId, String userId) throws JsonProcessingException {
+    public void delete(Long cueId, String userId) throws Exception {
 
         CueSheet cueSheet = cueSheetFindOrFail(cueId);
 
@@ -714,7 +715,7 @@ public class CueSheetService {
     }
 
     //큐시트가 삭제될때 큐시트 아이템 및 기사도 삭제처리
-    public void cueItemAnsArticleDelete(Long cueId, String userId) {
+    public void cueItemAnsArticleDelete(Long cueId, String userId) throws ParseException {
 
         List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findCueItemIdListAll(cueId);
 
@@ -730,12 +731,14 @@ public class CueSheetService {
             cueSheetItemRepository.save(cueSheetItem);
 
             //큐시트 아이템 삭제시 포함된 기사(복사된 기사)도 삭제
-            Article article = cueSheetItem.getArticle();
+            Article getArticle = cueSheetItem.getArticle();
 
-            if (ObjectUtils.isEmpty(article) == false) {
-                Long artclId = article.getArtclId();
+            if (ObjectUtils.isEmpty(getArticle) == false) {
+                Long artclId = getArticle.getArtclId();
 
                 //articleService.delete(artclId, userId);
+
+                Article article = articleService.articleFindOrFail(artclId);
 
                 //Article chkArticle = articleService.articleFindOrFailCueItem(artclId);
 
@@ -750,6 +753,9 @@ public class CueSheetService {
                     //기사가 삭제될때 포함된 미디어정보도 같이 삭제처리 ( delYn = "Y")
                     Set<ArticleMedia> articleMedia = article.getArticleMedia();
                     deleteArticleMedia(articleMedia, userId);
+
+                    //엘라스틱서치 등록
+                    elasticSearchArticleService.elasticPush(article);
                 }
             }
 
@@ -1374,6 +1380,7 @@ public class CueSheetService {
 
         Long orgArtclId = article.getOrgArtclId();//원본기사 아이디
         Long artclId = article.getOrgArtclId();
+        Integer artclOrder = article.getArtclOrd();
 
         String getOrgApprvDivCd = article.getApprvDivCd(); //원본 픽스구분 코드를 가져온다.
         String artclFixUser = article.getArtclFixUser(); // 원본 기사 픽스자를 가져온다
@@ -1393,7 +1400,7 @@ public class CueSheetService {
             }
         }
 
-        if (artclId.equals(orgArtclId)) { // 최초 복사일시
+        if (artclOrder == 0) { // 최초 복사일시
 
             return Article.builder()
                     .chDivCd(article.getChDivCd())
@@ -1419,7 +1426,7 @@ public class CueSheetService {
                     .apprvDtm(article.getApprvDtm())
                     .artclOrd(artclOrd)//기사 시퀀스 +1
                     .brdcCnt(article.getBrdcCnt())
-                    .orgArtclId(article.getArtclId())//원본기사 아이디set
+                    .orgArtclId(article.getOrgArtclId())//원본기사 아이디set
                     .urgYn(article.getUrgYn())
                     .frnotiYn(article.getFrnotiYn())
                     .embgYn(article.getEmbgYn())

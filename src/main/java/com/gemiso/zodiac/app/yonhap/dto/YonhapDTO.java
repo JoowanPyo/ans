@@ -1,20 +1,15 @@
 package com.gemiso.zodiac.app.yonhap.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
-import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileDTO;
 import com.gemiso.zodiac.app.yonhapAttchFile.dto.YonhapAttachFileSimpleDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class YonhapDTO {

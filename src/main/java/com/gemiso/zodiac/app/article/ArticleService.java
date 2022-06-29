@@ -42,17 +42,16 @@ import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaCreateMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
-import com.gemiso.zodiac.app.code.Code;
 import com.gemiso.zodiac.app.code.CodeRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
-import com.gemiso.zodiac.app.dept.Depts;
 import com.gemiso.zodiac.app.dept.DeptsRepository;
-import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticle;
-import com.gemiso.zodiac.app.elasticsearch.articleDTO.ElasticSearchArticleDTO;
 import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleRepository;
+import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleService;
+import com.gemiso.zodiac.app.elasticsearch.articleDTO.ElasticSearchArticleDTO;
+import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticle;
 import com.gemiso.zodiac.app.elasticsearch.mapper.ElasticSearchArticleMapper;
 import com.gemiso.zodiac.app.facilityManage.FacilityManageService;
 import com.gemiso.zodiac.app.facilityManage.dto.FacilityManageDTO;
@@ -103,7 +102,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -134,9 +132,9 @@ public class ArticleService {
     private final CueSheetRepository cueSheetRepository;
     private final ArticleTagRepository articleTagRepository;
     private final ElasticSearchArticleRepository elasticSearchArticleRepository;
-    private final CodeRepository codeRepository;
-    private final UserRepository userRepository;
-    private final DeptsRepository deptsRepository;
+    //private final CodeRepository codeRepository;
+    //private final UserRepository userRepository;
+    //private final DeptsRepository deptsRepository;
 
     private final ArticleMapper articleMapper;
     private final ArticleCreateMapper articleCreateMapper;
@@ -157,6 +155,8 @@ public class ArticleService {
     private final UserService userService;
     private final IssueService issueService;
     private final FacilityManageService facilityManageService;
+    private final ElasticSearchArticleService elasticSearchArticleService;
+    private final OrgArticleIdCreateService orgArticleIdCreateService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -191,9 +191,26 @@ public class ArticleService {
         return new PageResultDTO<ArticleDTO, Article>(result, fn);
     }
 
+    //기사 목록조회
+    public PageResultDTO<ArticleDTO, Article> findAllElasticPush(Date sdate, Date edate,Integer page, Integer limit) {
+
+        //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
+        PageHelper pageHelper = new PageHelper(page, limit);
+        Pageable pageable = pageHelper.getArticlePageInfo();
+
+        //전체조회[page type]
+        Page<Article> result = articleRepository.findByArticleListElastic(sdate, edate, pageable);
+
+
+        Function<Article, ArticleDTO> fn = (entity -> articleMapper.toDto(entity));
+
+
+        return new PageResultDTO<ArticleDTO, Article>(result, fn);
+    }
+
     //기사 목록조회 [엘라스틱서치]
     public PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> findAllElasticsearch(
-            Date sdate, Date edate, Date rcvDt, String rptrId, String inputrId, String brdcPgmId,
+            Date sdate, Date edate, String rptrId, String inputrId, String brdcPgmId,
             String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
             Integer page, Integer limit, List<String> apprvDivCdList, Long deptCd,
             String artclCateCd, String artclTypDtlCd, String delYn, Long artclId, String copyYn,
@@ -209,7 +226,7 @@ public class ArticleService {
                  delYn,  artclId,  copyYn,  orgArtclId);*/
 
         //전체조회[page type]
-        Page<ElasticSearchArticle> result = elasticSearchArticleRepository.findByElasticSearchArticleList(sdate, edate, rcvDt, rptrId, inputrId, brdcPgmId,
+        Page<ElasticSearchArticle> result = elasticSearchArticleRepository.findByElasticSearchArticleList(sdate, edate, rptrId, inputrId, brdcPgmId,
                 artclDivCd, artclTypCd, searchDivCd, searchWord,
                 apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd,
                 delYn, artclId, copyYn, orgArtclId, cueId, pageable);
@@ -219,6 +236,48 @@ public class ArticleService {
 
 
         return new PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle>(result, fn);
+    }
+
+    //엘라스틱서치 lock데이터 추가
+    public PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> lockInfoAdd(PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> result){
+
+
+        List<ElasticSearchArticleDTO> articleDTOList = result.getDtoList();
+
+        List<Long> artclIds = new ArrayList<>();
+
+        for (ElasticSearchArticleDTO articleDTO : articleDTOList){
+
+            Long artclId = articleDTO.getArtclId();
+
+            artclIds.add(artclId);
+        }
+
+        List<ArticleElasticLockInfoDTO> articleList = articleRepository.findLockArticleListElastic(artclIds);
+
+        for (ElasticSearchArticleDTO searchArticleDTO : articleDTOList){
+
+            Long artclId = searchArticleDTO.getArtclId();
+
+            for (ArticleElasticLockInfoDTO dbarticle : articleList){
+
+                Long dbArtclId = dbarticle.getArtclId();
+
+                if (artclId.equals(dbArtclId)){
+
+                    searchArticleDTO.setLckYn(dbarticle.getLckYn());
+                    searchArticleDTO.setLckDtm(dbarticle.getLckDtm());
+                    searchArticleDTO.setLckrId(dbarticle.getLckrId());
+                    searchArticleDTO.setLckrNm(dbarticle.getLckrNm());
+
+                }
+            }
+        }
+
+        result.setDtoList(articleDTOList);
+
+        return result;
+
     }
 
     public PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> findAllElasticsearchCue(Date sdate, Date edate, String searchWord, Long cueId,
@@ -289,6 +348,39 @@ public class ArticleService {
     }
 
     //기사 상세정보 조회
+    public ArticleDTO findDeleteArticle(Long artclId) {
+
+        Optional<Article> articleEntity = articleRepository.findDeleteArticle(artclId);
+
+        if (articleEntity.isPresent() == false){
+            throw new ResourceNotFoundException("삭제된 기사 아이디가 없습니다. 기사 아이디  : " + artclId);
+        }
+
+        Article article = articleEntity.get();
+
+        ArticleDTO articleDTO = articleMapper.toDto(article);
+
+        List<ArticleMedia> articleMedia = articleMediaRepository.findArticleMediaList(artclId);
+        List<ArticleMediaSimpleDTO> articleMediaDTOList = articleMediaSimpleMapper.toDtoList(articleMedia);
+        List<ArticleTag> articleTagList = articleTagRepository.findArticleTag(artclId);
+        List<ArticleTagDTO> articleTagDTOList = articleTagMapper.toDtoList(articleTagList);
+
+
+        //방송아이콘 이미지 Url 추가. 기사자막 방송아이콘 url set
+        List<ArticleCapSimpleDTO> setArticleCapDTOList = setUrlArticleCap(articleDTO.getArticleCap());
+        //방송아이콘 이미지 Url 추가. 앵커자막 방송아이콘 url set
+        List<AnchorCapSimpleDTO> setAnchorCapDTOList = setUrlAnchorCap(articleDTO.getAnchorCap());
+        articleDTO.setArticleCap(setArticleCapDTOList);
+        articleDTO.setAnchorCap(setAnchorCapDTOList);
+        articleDTO.setArticleMedia(articleMediaDTOList);
+        articleDTO.setArticleTag(articleTagDTOList);
+
+
+        return articleDTO;
+
+    }
+
+    //기사 상세정보 조회
     public ArticleDTO find(Long artclId) {
 
         Article article = articleFindOrFail(artclId);
@@ -333,7 +425,8 @@ public class ArticleService {
         articleRepository.save(article);
         //원본일 경우 orgArticleId에 articleId와 같은 값을 입력 시켜줘야 한다.
         Long articleId = article.getArtclId();//기사 자막등록 및 리턴시켜줄 기사아이디
-        article.setOrgArtclId(articleId);
+        Long orgArticleId = orgArticleIdCreateService.orgArticleIdCreate();
+        article.setOrgArtclId(orgArticleId);
         articleRepository.save(article);
 
         articleActionLogCreate(article, userId);//기사 액션 로그 등록
@@ -476,18 +569,20 @@ public class ArticleService {
         Long articleId = article.getArtclId();
         Long orgArtclId = article.getOrgArtclId();
         String apprvDivCd = article.getApprvDivCd();
+
+        Integer articleOrd = article.getArtclOrd();
         //원본기사인경우.
-        if (articleId.equals(orgArtclId)) {
+        if (articleOrd == 0) {
             //원본기사가 fix_none인경우
             if ("fix_none".equals(apprvDivCd)) {
 
-                List<Article> copyArticleList = articleRepository.findCopyArticle(articleId);
+                List<Article> copyArticleList = articleRepository.findCopyArticle(orgArtclId);
 
                 for (Article copyArticle : copyArticleList) {
 
-                    Long copyArticleId = copyArticle.getArtclId();
-                    Long copyOrgArticleId = copyArticle.getOrgArtclId();
-                    if (copyArticleId.equals(copyOrgArticleId)) {
+                    //원본기사일 경우 빠져나감
+                    Integer getArticleOrder = copyArticle.getArtclOrd();
+                    if (getArticleOrder == 0) {
                         continue;
                     }
 
@@ -509,6 +604,9 @@ public class ArticleService {
                         //기사 자막 Update
                         copyArticleCapUpdate(updateCopyArticle, articleUpdateDTO, articleHistId);
                         copyAnchorCapUpdate(updateCopyArticle, articleUpdateDTO, articleHistId);
+
+                        //엘라스틱서치 등록
+                       // elasticSearchArticleService.elasticPush(updateCopyArticle);
 
                         Long artclId = updateCopyArticle.getArtclId();
                         //MQ메세지 전송
@@ -1865,9 +1963,9 @@ public class ArticleService {
         if (copyYn != null && copyYn.trim().isEmpty() == false) {
 
             if ("N".equals(copyYn)) {
-                booleanBuilder.and(qArticle.orgArtclId.isNull());
+                booleanBuilder.and(qArticle.artclOrd.eq(0));
             } else {
-                booleanBuilder.and(qArticle.orgArtclId.isNotNull());
+                booleanBuilder.and(qArticle.artclOrd.ne(0));
             }
         }
 
@@ -2211,16 +2309,20 @@ public class ArticleService {
                 article.setDeskFixUser(null);
                 article.setDeskFixDtm(null);
 
+                Integer orgArticleOrder = article.getArtclOrd();
+                Long orgArticleId = article.getOrgArtclId();
                 Long artclId = article.getArtclId();
 
-                List<Article> articleList = articleRepository.findCopyArticle(artclId);
+                List<Article> articleList = articleRepository.findCopyArticle(orgArticleId);
 
                 for (Article articleEntity : articleList) {
 
                     Long getArticleId = articleEntity.getArtclId();
+                    Integer articleOrd = articleEntity.getArtclOrd();
                     Long getOrgArticleId = articleEntity.getOrgArtclId();
 
-                    if (getArticleId.equals(getOrgArticleId)) {
+                    //원본 기사일 경우
+                    if (articleOrd == 0) {
                         continue;
                     }
 
@@ -2228,8 +2330,8 @@ public class ArticleService {
 
                     if ("fix_none".equals(apprvDicCd)) { //복사된 기사가 fix_none일경우 article_fix로 업데이트
 
-                        Long orgArtclId = article.getOrgArtclId();
-                        if (artclId.equals(orgArtclId)) {//원본 기사일 경우 기사내용전부 업데이트
+                        //Long orgArtclId = article.getOrgArtclId();
+                        if (orgArticleOrder == 0) {//원본 기사일 경우 기사내용전부 업데이트
 
                             // 수정할 기사 빌드 후 업데이트 save
                             Article updateCopyArticle = fixCopyArticleBuild(articleEntity, article, userId);
@@ -2241,6 +2343,9 @@ public class ArticleService {
                             //기사 자막 Update
                             fixCopyArticleCapUpdate(updateCopyArticle, artclId, articleHistId);
                             fixCopyAnchorCapUpdate(updateCopyArticle, artclId, articleHistId);
+
+                            //엘라스틱서치 등록
+                            elasticSearchArticleService.elasticPush(updateCopyArticle);
 
                             Long updateArtclId = updateCopyArticle.getArtclId();
                             //MQ메세지 전송

@@ -3,17 +3,12 @@ package com.gemiso.zodiac.app.cueSheet.dto;
 import com.gemiso.zodiac.app.baseProgram.dto.BaseProgramSimpleDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Formula;
 
-import javax.persistence.Column;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class CueSheetCreateDTO {

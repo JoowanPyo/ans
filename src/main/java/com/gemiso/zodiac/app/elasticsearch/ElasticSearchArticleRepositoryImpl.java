@@ -57,7 +57,6 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
     @Override
     public Page<ElasticSearchArticle> findByElasticSearchArticleList(Date sdate,
                                                                      Date edate,
-                                                                     Date rcvDt,
                                                                      String rptrId,
                                                                      String inputrId,
                                                                      String brdcPgmId,
@@ -126,13 +125,22 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
 
                     query.must(QueryBuilders.boolQuery().should(QueryBuilders.multiMatchQuery(search,
                             "artclTitl", "artclTitl.nori", "artclTitl.fulltext", "artclTitlEn", "artclTitlEn.nori",
-                            "artclTitlEn.fulltext", "ancMentCtt.nori", "ancMentCtt.fulltext", "artclCtt.nori", "artclCtt.fulltext")));
+                            "artclTitlEn.fulltext", "ancMentCtt.nori", "ancMentCtt.fulltext", "artclCtt.nori", "artclCtt.fulltext"))
+                            .should(QueryBuilders.wildcardQuery("artclTitl.fulltext", "*"+searchWord+"*")) //타이틀 풀텍스트
+                            .should(QueryBuilders.wildcardQuery("artclTitlEn.fulltext", "*"+searchWord+"*")));
                 }
 
             }
             //검색구분코드 02 일때 기자이름으로 검색
             else if ("02".equals(searchDivCd)) {
-                query.must(QueryBuilders.boolQuery().should(QueryBuilders.multiMatchQuery(searchWord, "rptrNm")));
+
+                Long getArtclId = 0L;
+                boolean isNumeric =  searchDivCd.matches("[+-]?\\d*(\\.\\d+)?");
+                if (isNumeric){
+                    getArtclId = Long.parseLong(searchDivCd);
+                }
+
+                query.must(QueryBuilders.boolQuery().should(QueryBuilders.termQuery("orgArtclId", getArtclId)));
             }
             //검색구분코드 안들어왔을 경우
             else if (searchDivCd == null || searchDivCd.trim().isEmpty()) {
@@ -150,11 +158,11 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
                             "artclTitl", "artclTitl.nori", "artclTitl.fulltext", "artclTitlEn",
                             "artclTitlEn.nori", "artclTitlEn.fulltext", "ancMentCtt.nori", "ancMentCtt.fulltext",
                             "artclCtt.nori", "artclCtt.fulltext"))
-                            .should(QueryBuilders.termQuery("artclId", getArtclId))
-                            .should(QueryBuilders.wildcardQuery("artclTitl.fulltext", searchWord)) //타이틀 풀텍스트
-                            .should(QueryBuilders.wildcardQuery("artclTitlEn.fulltext", searchWord)) //영문타이틀 풀텍스트
-                            .should(QueryBuilders.wildcardQuery("ancMentCtt.fulltext", searchWord)) //앵커맨트내용 풀텍스트
-                            .should(QueryBuilders.wildcardQuery("artclCtt.fulltext", searchWord)) //내용 풀텍스트
+                            .should(QueryBuilders.termQuery("orgArtclId", getArtclId))
+                            .should(QueryBuilders.wildcardQuery("artclTitl.fulltext", "*"+searchWord+"*")) //타이틀 풀텍스트
+                            .should(QueryBuilders.wildcardQuery("artclTitlEn.fulltext", "*"+searchWord+"*")) //영문타이틀 풀텍스트
+                            .should(QueryBuilders.wildcardQuery("ancMentCtt.fulltext", "*"+searchWord+"*")) //앵커맨트내용 풀텍스트
+                            .should(QueryBuilders.wildcardQuery("artclCtt.fulltext", "*"+searchWord+"*")) //내용 풀텍스트
                             //테그
                             .should(QueryBuilders.nestedQuery(
                                     "tags", QueryBuilders.matchQuery("tags.tag", searchWord), ScoreMode.None)));
@@ -165,7 +173,7 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
         }
         //픽스구분코드[여러개의 or조건으로 가능]
         if (CollectionUtils.isEmpty(apprvDivCdList) == false) {
-            query.must(QueryBuilders.termQuery("apprvDivCd", apprvDivCdList));
+            query.must(QueryBuilders.termsQuery("apprvDivCd", apprvDivCdList));
         }
         //원본 기사 및 복사된 기사 검색조건
         if (copyYn != null && copyYn.trim().isEmpty() == false) {
@@ -203,7 +211,7 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
         }
         //방송 프로그램 아이디로 조회
         if (brdcPgmId != null && brdcPgmId.trim().isEmpty() == false) {
-            query.must(QueryBuilders.termQuery("brdcPgmId", cueId));
+            query.must(QueryBuilders.termQuery("brdcPgmId", brdcPgmId));
         }
 
         //기사 구분 코드로 조회

@@ -3,7 +3,6 @@ package com.gemiso.zodiac.app.scrollNews.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gemiso.zodiac.app.scrollNewsDetail.dto.ScrollNewsDetailCreateDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +11,6 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ScrollNewsCreateDTO {

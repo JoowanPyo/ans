@@ -14,6 +14,7 @@ import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasricSearchArticleMed
 import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticle;
 import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticleTags;
 import com.gemiso.zodiac.app.tag.Tag;
+import com.gemiso.zodiac.app.tag.TagRepository;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserRepository;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
@@ -40,6 +41,7 @@ public class ElasticSearchArticleService {
     private final UserRepository userRepository;
     private final ArticleTagRepository articleTagRepository;
     private final ArticleMediaRepository articleMediaRepository;
+    private final TagRepository tagRepository;
     private final ElasticSearchArticleRepository elasticSearchArticleRepository;
 
     private final DateChangeHelper dateChangeHelper;
@@ -47,75 +49,85 @@ public class ElasticSearchArticleService {
     //엘라스틱 서치 업데이트
     public void elasticPush(Article article) throws ParseException {
 
-        Date getInputDtm = article.getInputDtm();
+        try {
 
-        String inputDtm = null;
-        if (ObjectUtils.isEmpty(getInputDtm) == false) {
+            Date getInputDtm = article.getInputDtm();
 
-            inputDtm = dateChangeHelper.dateToStringNormal(getInputDtm);
+            String inputDtm = null;
+            if (ObjectUtils.isEmpty(getInputDtm) == false) {
+
+                inputDtm = dateChangeHelper.dateToStringNormal(getInputDtm);
+            }
+
+            CueSheet cueSheet = article.getCueSheet();
+
+            String brdcPgmNm = null;
+            Long cueId = null;
+            Long subrmId = null;
+            if (ObjectUtils.isEmpty(cueSheet) == false) {
+
+                brdcPgmNm = Optional.ofNullable(cueSheet.getBrdcPgmNm()).orElse(null);
+                cueId = Optional.ofNullable(cueSheet.getCueId()).orElse(null);
+                subrmId = Optional.ofNullable(cueSheet.getSubrmId()).orElse(null);
+            }
+
+            //코드네임 셋팅
+            article = setCode(article);
+
+            article = setUser(article);
+
+            article = setDept(article);
+
+            Long articleId = article.getArtclId();
+
+            List<ElasticSearchArticleTags> tags = findTags(articleId);
+
+            List<ElasricSearchArticleMedia> medias = findMedia(articleId);
+
+            ElasticSearchArticle entity = ElasticSearchArticle.builder()
+                    .ancMentCtt(article.getAncMentCtt())
+                    .apprvDivCd(article.getApprvDivCd())
+                    .apprvDivCdNm(article.getApprvDivCdNm())
+                    .artclCateCd(article.getArtclCateCd())
+                    .artclCateCdNm(article.getArtclCateCdNm())
+                    .artclDivCd(article.getArtclDivCd())
+                    .artclId(article.getArtclId())
+                    .artclOrd(article.getArtclOrd())
+                    .artclTitl(article.getArtclTitl())
+                    .artclTitlEn(article.getArtclTitlEn())
+                    .artclTypCd(article.getArtclTypCd())
+                    .artclTypCdNm(article.getArtclTypCdNm())
+                    .artclTypDtlCd(article.getArtclTypDtlCd())
+                    .artclTypDtlCdNm(article.getArtclTypDtlCdNm())
+                    .artclCtt(article.getArtclCtt())
+                    .brdcPgmId(article.getBrdcPgmId())
+                    .delYn(article.getDelYn())
+                    .deptCd(article.getDeptCd())
+                    .deptNm(article.getDeptNm())
+                    .embgYn(article.getEmbgYn())
+                    .inputDtm(inputDtm)
+                    .inputrId(article.getInputrId())
+                    .inputrNm(article.getInputrNm())
+                    .lckYn(article.getLckYn())
+                    .orgArtclId(article.getOrgArtclId())
+                    .rptrId(article.getRptrId())
+                    .rptrNm(article.getRptrNm())
+                    .brdcPgmNm(brdcPgmNm)
+                    .cueId(cueId)
+                    .subrmId(subrmId)
+                    .ancMentCttTime(article.getAncMentCttTime())
+                    .artclCttTime(article.getArtclCttTime())
+                    .artclExtTime(article.getArtclExtTime())
+                    .editorFixUser(article.getEditorFixUser())
+                    .editorFixUserNm(article.getEditorFixUserNm())
+                    .tags(tags)
+                    .articleMedias(medias)
+                    .build();
+
+            elasticSearchArticleRepository.save(entity);
+        }catch (Exception e){
+            log.error("ElasticSearch Error : "+e.getMessage());
         }
-
-        CueSheet cueSheet = article.getCueSheet();
-
-        String brdcPgmNm = null;
-        Long cueId = null;
-        Long subrmId = null;
-        if (ObjectUtils.isEmpty(cueSheet) == false) {
-
-            brdcPgmNm = Optional.ofNullable(cueSheet.getBrdcPgmNm()).orElse(null);
-            cueId = Optional.ofNullable(cueSheet.getCueId()).orElse(null);
-            subrmId = Optional.ofNullable(cueSheet.getSubrmId()).orElse(null);
-        }
-
-        //코드네임 셋팅
-        article = setCode(article);
-
-        article = setUser(article);
-
-        article = setDept(article);
-
-        Long articleId = article.getArtclId();
-
-        List<ElasticSearchArticleTags> tags = findTags(articleId);
-
-        List<ElasricSearchArticleMedia> medias = findMedia(articleId);
-
-        ElasticSearchArticle entity = ElasticSearchArticle.builder()
-                .ancMentCtt(article.getAncMentCtt())
-                .apprvDivCd(article.getApprvDivCd())
-                .apprvDivCdNm(article.getApprvDivCdNm())
-                .artclCateCd(article.getArtclCateCd())
-                .artclCateCdNm(article.getArtclCateCdNm())
-                .artclDivCd(article.getArtclDivCd())
-                .artclId(article.getArtclId())
-                .artclOrd(article.getArtclOrd())
-                .artclTitl(article.getArtclTitl())
-                .artclTitlEn(article.getArtclTitlEn())
-                .artclTypCd(article.getArtclTypCd())
-                .artclTypCdNm(article.getArtclTypCdNm())
-                .artclTypDtlCd(article.getArtclTypDtlCd())
-                .artclTypDtlCdNm(article.getArtclTypDtlCdNm())
-                .artclCtt(article.getArtclCtt())
-                .brdcPgmId(article.getBrdcPgmId())
-                .delYn(article.getDelYn())
-                .deptCd(article.getDeptCd())
-                .deptNm(article.getDeptNm())
-                .embgYn(article.getEmbgYn())
-                .inputDtm(inputDtm)
-                .inputrId(article.getInputrId())
-                .inputrNm(article.getInputrNm())
-                .lckYn(article.getLckYn())
-                .orgArtclId(article.getOrgArtclId())
-                .rptrId(article.getRptrId())
-                .rptrNm(article.getRptrNm())
-                .brdcPgmNm(brdcPgmNm)
-                .cueId(cueId)
-                .subrmId(subrmId)
-                .tags(tags)
-                .articleMedias(medias)
-                .build();
-
-        elasticSearchArticleRepository.save(entity);
     }
 
     public List<ElasricSearchArticleMedia> findMedia(Long articleId){
@@ -146,11 +158,21 @@ public class ElasticSearchArticleService {
             Tag tag = articleTag.getTag();
 
             if (ObjectUtils.isEmpty(tag) == false) {
-                ElasticSearchArticleTags elasticSearchArticleTags = new ElasticSearchArticleTags();
-                elasticSearchArticleTags.setTag(tag.getTag());
-                elasticSearchArticleTags.setTagId(tag.getTagId());
 
-                tagsList.add(elasticSearchArticleTags);
+                Long tagId = tag.getTagId();
+
+                Optional<Tag> tagEntity = tagRepository.findByTag(tagId);
+
+                if (tagEntity.isPresent()) {
+
+                    Tag getTag = tagEntity.get();
+
+                    ElasticSearchArticleTags elasticSearchArticleTags = new ElasticSearchArticleTags();
+                    elasticSearchArticleTags.setTag(getTag.getTag());
+                    elasticSearchArticleTags.setTagId(getTag.getTagId());
+
+                    tagsList.add(elasticSearchArticleTags);
+                }
             }
         }
 
@@ -209,6 +231,7 @@ public class ElasticSearchArticleService {
 
         String inputrId = article.getInputrId();
         String rptrId = article.getRptrId();
+        String editorFixUser = article.getEditorFixUser();
 
         List<User> userList = userRepository.findAll();
 
@@ -224,6 +247,19 @@ public class ElasticSearchArticleService {
             if (userId.equals(rptrId)) {
                 article.setRptrNm(userNm);
             }
+            if (userId.equals(editorFixUser)){
+                article.setEditorFixUserNm(userNm);
+            }
+        }
+
+        if (inputrId == null || inputrId.isEmpty()){
+            article.setInputrNm(null);
+        }
+        if (rptrId == null || rptrId.isEmpty()){
+            article.setRptrNm(null);
+        }
+        if (editorFixUser == null || editorFixUser.isEmpty()){
+            article.setEditorFixUserNm(null);
         }
 
         return article;

@@ -1,7 +1,9 @@
 package com.gemiso.zodiac.app.ArticleTag;
 
 import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagDTO;
-import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticleTags;
+import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.article.ArticleService;
+import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleService;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
 @Api(description = "기사테그 API")
@@ -21,6 +24,8 @@ import java.util.List;
 public class ArticleTagController {
 
     private final ArticleTagService articleTagService;
+    private final ArticleService articleService;
+    private final ElasticSearchArticleService elasticSearchArticleService;
 
 
     @Operation(summary = "기사 테그 목록조회", description = "기사 테그 목록조회")
@@ -41,10 +46,12 @@ public class ArticleTagController {
     public AnsApiResponse<List<ArticleTagDTO>> create(@Parameter(name = "artclId", required = true, description = "기사 아이디")
                                                       @PathVariable("artclId") long artclId,
                                                       @Parameter(name = "tag", description = "테그")
-                                                      @RequestParam(value = "tag", required = false) List<String> tagList) {
+                                                      @RequestParam(value = "tag", required = false) List<String> tagList) throws ParseException {
 
-        List<ElasticSearchArticleTags> tags = articleTagService.create(artclId, tagList);
+        articleTagService.create(artclId, tagList);
 
+        Article article = articleService.articleFindOrFail(artclId);
+        elasticSearchArticleService.elasticPush(article);
        // articleTagService.updateElasticArticle(tags, artclId);
 
         List<ArticleTagDTO> articleTagDTOList = articleTagService.find(artclId);

@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.symbol;
 
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemResponseDTO;
 import com.gemiso.zodiac.app.symbol.dto.*;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;

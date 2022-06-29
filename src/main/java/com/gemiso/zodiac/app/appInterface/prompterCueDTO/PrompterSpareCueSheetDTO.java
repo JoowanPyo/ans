@@ -11,9 +11,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @XmlRootElement(name = "spare_record")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PrompterSpareCueSheetDTO {

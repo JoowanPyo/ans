@@ -302,10 +302,12 @@ public class Article extends BaseEntity {
     private Long cueId;*/
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @Where(clause = "del_yn = 'N'")
     @JoinColumn(name = "cue_id")
     private CueSheet cueSheet;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @Where(clause = "del_yn = 'N'")
     @JoinColumn(name = "issu_id")
     private Issue issue;
 

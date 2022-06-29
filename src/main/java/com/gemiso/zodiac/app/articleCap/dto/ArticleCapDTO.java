@@ -5,13 +5,11 @@ import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Schema(description = "기사자막 articleDTO")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArticleCapDTO {

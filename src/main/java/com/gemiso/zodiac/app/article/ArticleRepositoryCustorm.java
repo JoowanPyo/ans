@@ -21,4 +21,7 @@ public interface ArticleRepositoryCustorm {
 
     Page<Article> findByArticleCue(Date sdate, Date edate, String searchWord, Long cueId, String brdcPgmId, String artclTypCd,
                                    String artclTypDtlCd, String copyYn, Long deptCd, Long orgArtclId, Pageable pageable);
+
+
+    Page<Article> findByArticleListElastic(Date sdate, Date edate,Pageable pageable);
 }

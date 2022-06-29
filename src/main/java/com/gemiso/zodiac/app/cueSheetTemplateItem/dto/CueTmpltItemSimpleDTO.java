@@ -1,17 +1,14 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItem.dto;
 
-import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class CueTmpltItemSimpleDTO {
 
     private Long cueTmpltItemId;

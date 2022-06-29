@@ -16,7 +16,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString(exclude = "article")
+@ToString(exclude = {"article","tag"})
 @Setter
 @DynamicUpdate
 public class ArticleTag {

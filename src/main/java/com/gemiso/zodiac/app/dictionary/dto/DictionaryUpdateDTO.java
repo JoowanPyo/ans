@@ -1,17 +1,10 @@
 package com.gemiso.zodiac.app.dictionary.dto;
 
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import springfox.documentation.spring.web.json.Json;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class DictionaryUpdateDTO {

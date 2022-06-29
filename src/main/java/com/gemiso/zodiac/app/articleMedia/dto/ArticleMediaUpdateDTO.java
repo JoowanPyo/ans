@@ -3,7 +3,6 @@ package com.gemiso.zodiac.app.articleMedia.dto;
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +10,6 @@ import java.util.Date;
 
 @Schema(description = "기사미디어 수정 articleDTO")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArticleMediaUpdateDTO {

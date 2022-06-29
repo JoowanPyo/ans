@@ -3,13 +3,17 @@ package com.gemiso.zodiac.app.cueSheetItem;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.ArticleTag.ArticleTag;
 import com.gemiso.zodiac.app.ArticleTag.ArticleTagRepository;
+import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.ArticleTag.mapper.ArticleTagMapper;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.ArticleRepository;
 import com.gemiso.zodiac.app.article.ArticleService;
+import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
+import com.gemiso.zodiac.app.article.mapper.ArticleCueItemMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
 import com.gemiso.zodiac.app.articleActionLog.ArticleActionLogRepository;
 import com.gemiso.zodiac.app.articleActionLog.ArticleActionLogService;
@@ -54,6 +58,7 @@ import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItemService;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.CueTmpltItemCap;
 import com.gemiso.zodiac.app.cueSheetTemplateMedia.CueTmpltMedia;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbol;
+import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleService;
 import com.gemiso.zodiac.app.facilityManage.FacilityManage;
 import com.gemiso.zodiac.app.facilityManage.FacilityManageService;
 import com.gemiso.zodiac.app.lbox.LboxService;
@@ -78,6 +83,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.text.ParseException;
 import java.util.*;
 
 @Service
@@ -110,12 +116,14 @@ public class CueSheetItemService {
     private final CueSheetItemSymbolMapper cueSheetItemSymbolMapper;
     private final CueSheetItemSymbolCreateMapper cueSheetItemSymbolCreateMapper;
     private final CueSheetMediaCreateMapper cueSheetMediaCreateMapper;
-    //private final ArticleMapper articleMapper;
-    private final CueSheetItemCapCreateMapper cueSheetItemCapCreateMapper;
-    private final ArticleMapper articleMapper;
     private final CueSheetMediaMapper cueSheetMediaMapper;
     private final CueSheetItemCapMapper cueSheetItemCapMapper;
+    private final CueSheetItemCapCreateMapper cueSheetItemCapCreateMapper;
+    //private final ArticleMapper articleMapper;
+    private final ArticleMapper articleMapper;
+    private final ArticleCueItemMapper articleCueItemMapper;
     private final ArticleMediaMapper articleMediaMapper;
+    private final ArticleTagMapper articleTagMapper;
 
     private final CueSheetService cueSheetService;
     private final CueTmpltItemService cueTmpltItemService;
@@ -125,6 +133,7 @@ public class CueSheetItemService {
     private final CueSheetTemplateService cueSheetTemplateService;
     private final ArticleActionLogService articleActionLogService;
     private final ArticleService articleService;
+    private final ElasticSearchArticleService elasticSearchArticleService;
 
     //private final UserAuthService userAuthService;
 
@@ -148,6 +157,58 @@ public class CueSheetItemService {
         System.out.println("시간차이(m) : "+secDiffTime);
 
         return cueSheetItemDTOList;
+    }
+
+    //큐시트 아이템 상세 조회
+    public CueSheetItemDTO findDeleteItem(Long cueItemId) {
+
+        //큐시트 아이템 조회
+        Optional<CueSheetItem> cueSheetItemEntity = cueSheetItemRepository.findDeleteCueItemList(cueItemId);
+
+        if (cueSheetItemEntity.isPresent() == false){
+            throw new ResourceNotFoundException("삭제된 큐시트 아이템을 찾을 수 없습니다. 큐시트 아이템 아이디 : " + cueItemId);
+        }
+
+        CueSheetItem cueSheetItem = cueSheetItemEntity.get();
+
+
+        ArticleCueItemDTO articleDTO = new ArticleCueItemDTO();
+        Article getArticle = cueSheetItem.getArticle();
+        if (ObjectUtils.isEmpty(getArticle) == false) {
+            Long artclId = getArticle.getArtclId();
+            Optional<Article> articleEntity = articleRepository.findDeleteArticle(artclId);
+
+            if (articleEntity.isPresent() == false){
+                throw new ResourceNotFoundException("삭제된 기사 아이디가 없습니다. 기사 아이디  : " + artclId);
+            }
+
+            Article article = articleEntity.get();
+
+            List<ArticleTag> articleTagList = articleTagRepository.findArticleTag(artclId);
+            List<ArticleTagDTO> articleTagDTOList = articleTagMapper.toDtoList(articleTagList);
+
+            articleDTO = articleCueItemMapper.toDto(article);
+
+            articleDTO.setArticleTag(articleTagDTOList);
+
+        }
+
+        //큐시트 아이템 방송아이콘 List 조회
+        Set<CueSheetItemSymbol> cueSheetItemSymbol = cueSheetItem.getCueSheetItemSymbol();
+
+        List<CueSheetItemSymbol> cueSheetItemSymbols = new ArrayList<>(cueSheetItemSymbol);
+
+        List<CueSheetItemSymbolDTO> cueSheetItemSymbolDTO = cueSheetItemSymbolMapper.toDtoList(cueSheetItemSymbols);
+
+        cueSheetItemSymbolDTO = createUrl(cueSheetItemSymbolDTO);//방송아이콘 url 추가
+
+        CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItem);
+
+        cueSheetItemDTO.setCueSheetItemSymbol(cueSheetItemSymbolDTO);
+        cueSheetItemDTO.setArticle(articleDTO);
+
+        return cueSheetItemDTO;
+
     }
 
     //큐시트 아이템 상세 조회
@@ -339,7 +400,9 @@ public class CueSheetItemService {
                 articleUpdateDTO.setArtclTypDtlCd(newCueItemTypCd);
             }
 
-            articleService.update(articleUpdateDTO, artclId, userId); //기사 수정.
+            Article article = articleService.update(articleUpdateDTO, artclId, userId); //기사 수정.
+            //검색엔진 업데이트
+            elasticSearchArticleService.elasticPush(article);
         }
 
         /************ MQ messages *************/
@@ -381,12 +444,14 @@ public class CueSheetItemService {
         cueSheetItemRepository.save(cueSheetItem);
 
         //큐시트 아이템 삭제시 포함된 기사(복사된 기사)도 삭제
-        Article article = cueSheetItem.getArticle();
+        Article getArticle = cueSheetItem.getArticle();
 
-        if (ObjectUtils.isEmpty(article) == false) {
-            Long artclId = article.getArtclId();
+        if (ObjectUtils.isEmpty(getArticle) == false) {
+            Long artclId = getArticle.getArtclId();
 
             //articleService.delete(artclId, userId);
+
+            Article article = articleService.articleFindOrFail(artclId);
 
             //Article chkArticle = articleService.articleFindOrFailCueItem(artclId);
 
@@ -401,6 +466,9 @@ public class CueSheetItemService {
                 //기사가 삭제될때 포함된 미디어정보도 같이 삭제처리 ( delYn = "Y")
                 Set<ArticleMedia> articleMedia = article.getArticleMedia();
                 deleteArticleMedia(articleMedia, userId);
+
+                //엘라스틱서치 등록
+                elasticSearchArticleService.elasticPush(article);
             }
         }
 
@@ -524,6 +592,9 @@ public class CueSheetItemService {
             Long orgArtclId = copyArticle.getArtclId();
             //기사 복사[복사된 기사 Id get]
             article = copyArticle(orgArtclId, cueId, userId);
+
+            //엘라스틱서치 등록
+            elasticSearchArticleService.elasticPush(article);
 
             artclId = article.getArtclId();
         }
@@ -976,6 +1047,9 @@ public class CueSheetItemService {
         //기사 복사[복사된 기사 Id get]
         Article copyArtcl = copyArticle(artclId, cueId, userId);
 
+        //엘라스틱서치 등록
+        elasticSearchArticleService.elasticPush(copyArtcl);
+
         //예비큐시트 값 set
         if (spareYn == null && spareYn.trim().isEmpty()) {
             spareYn = "N"; //예비여부값이 안들어오면 N 값 디폴트
@@ -1123,7 +1197,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 복구(del : N ) 으로 복구&&기사도 같이 복구
-    public CueSheetItemSimpleDTO cueSheetItemRestore(Long cueId, Long cueItemId, Integer cueItemOrd) throws JsonProcessingException {
+    public CueSheetItemSimpleDTO cueSheetItemRestore(Long cueId, Long cueItemId, Integer cueItemOrd) throws Exception {
 
         //큐시트 아이디로 큐시트 조회 및 존재유무 확인.
         CueSheet cueSheet = cueSheetService.cueSheetFindOrFail(cueId);
@@ -1482,11 +1556,12 @@ public class CueSheetItemService {
     public Integer getArticleOrd(Article article, Long artclId) {
 
         Long orgArtclId = article.getOrgArtclId();
+        Integer artclOrd = article.getArtclOrd();
 
 
-        if (artclId.equals(orgArtclId)) { //원본일경우
+        if (artclOrd == 0) { //원본일경우
 
-            Optional<Integer> getMaxOrd = articleRepository.findArticleOrd(artclId);
+            Optional<Integer> getMaxOrd = articleRepository.findArticleOrd(orgArtclId);
 
             if (getMaxOrd.isPresent() == false) {
 
@@ -1522,7 +1597,7 @@ public class CueSheetItemService {
         //조회된 기사 빈값 검사.
 
         if (getArticle.isPresent() == false) {
-            throw new ResourceNotFoundException(String.format("기사아이디에 해당하는 기사가 없습니다. {%ld}", artclId));
+            throw new ResourceNotFoundException("기사아이디에 해당하는 기사가 없습니다. 기사 아이디:" +artclId);
         }
 
         //큐시트 아이디로 큐시트 조회 및 존재유무 확인.
@@ -1671,6 +1746,7 @@ public class CueSheetItemService {
 
         Long artclId = article.getArtclId();
         Long orgArtclId = article.getOrgArtclId();//원본기사 아이디
+        Integer artclOrd = article.getArtclOrd();
 
         String getOrgApprvDivCd = article.getApprvDivCd(); //원본 픽스구분 코드를 가져온다.
         String artclFixUser = article.getArtclFixUser(); // 원본 기사 픽스자를 가져온다
@@ -1687,7 +1763,7 @@ public class CueSheetItemService {
             newApprvDivCd = getOrgApprvDivCd; //none_fix값 처리
         }
 
-        if (artclId.equals(orgArtclId)) { //원본기사가 아이디가없고 최초 복사일시
+        if (artclOrd == 0) { //원본기사가 아이디가없고 최초 복사일시
 
             return Article.builder()
                     .chDivCd(article.getChDivCd())
@@ -1711,7 +1787,7 @@ public class CueSheetItemService {
                     .apprvDtm(article.getApprvDtm())
                     .artclOrd(maxArtclOrd)//기사 시퀀스 +1
                     .brdcCnt(article.getBrdcCnt())
-                    .orgArtclId(article.getArtclId())//원본기사 아이디set
+                    .orgArtclId(article.getOrgArtclId())//원본기사 아이디set
                     .urgYn(article.getUrgYn())
                     .frnotiYn(article.getFrnotiYn())
                     .embgYn(article.getEmbgYn())
@@ -2031,7 +2107,7 @@ public class CueSheetItemService {
     }
 
     //삭제처리된 기사 복구(del : N )
-    public void deletedArticleUpdate(CueSheetItem cueSheetItem) {
+    public void deletedArticleUpdate(CueSheetItem cueSheetItem) throws ParseException {
 
         Article article = cueSheetItem.getArticle(); //조회된 큐시트아이템에 포함된 기사를 가져온다.
 
@@ -2041,6 +2117,9 @@ public class CueSheetItemService {
         articleMapper.updateFromDto(articleDTO, article);
 
         articleRepository.save(article); //기사 삭제 플레그 N으로 수정등록
+
+        //엘라스틱서치 등록
+        elasticSearchArticleService.elasticPush(article);
     }
 
    /* //큐시트 토픽 메세지 전송

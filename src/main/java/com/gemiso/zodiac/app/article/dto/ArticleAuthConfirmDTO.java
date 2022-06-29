@@ -9,9 +9,9 @@ import org.springframework.http.HttpStatus;
 import java.util.Date;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ArticleAuthConfirmDTO {
 
     private Long artclId;

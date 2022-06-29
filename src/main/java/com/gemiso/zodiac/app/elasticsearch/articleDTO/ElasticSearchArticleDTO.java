@@ -1,22 +1,17 @@
 package com.gemiso.zodiac.app.elasticsearch.articleDTO;
 
-import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticleTags;
-import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchCueSheet;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import javax.persistence.Embedded;
+import java.util.Date;
 import java.util.List;
 
 @Schema(description = "엘라스틱 기사 articleDTO")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ElasticSearchArticleDTO {
@@ -46,9 +41,20 @@ public class ElasticSearchArticleDTO {
     private String inputrId;
     private String inputrNm;
     private String lckYn;
+
+    private String lckrId;
+    private String lckrNm;
+    private Date lckDtm;
+
     private Long orgArtclId;
     private String rptrId;
     private String rptrNm;
-    private List<ElasticSearchArticleTags> tags;
+    private Integer ancMentCttTime;
+    private Integer artclCttTime;
+    private Integer artclExtTime;
+    private String editorFixUser;
+    private String editorFixUserNm;
+    private List<ElasticSearchArticleTagsDTO> tags;
+    private List<ElasricSearchArticleMediaDTO> articleMedias;
 
 }

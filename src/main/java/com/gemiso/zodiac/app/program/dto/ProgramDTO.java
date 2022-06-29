@@ -1,24 +1,13 @@
 package com.gemiso.zodiac.app.program.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gemiso.zodiac.app.code.dto.CodeSimpleDTO;
-import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
-import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateDTO;
-import com.gemiso.zodiac.app.dailyProgram.DailyProgram;
-import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
-import com.gemiso.zodiac.app.user.dto.UserSimpleDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Formula;
 
-import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProgramDTO {
