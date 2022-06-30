@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -130,7 +131,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
     @ExceptionHandler(value = { ExpiredJwtException.class })
     public ResponseEntity<Object> handleExpiredJwtException(ExpiredJwtException ex){
         ApiErrorResponse.Error error =
-                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.expiredAccesstoken, ex.getLocalizedMessage());
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.expiredAccesstoken, ex.getMessage());
+        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
+
+
+        log.error(" ExpiredJwtException : "+ apiErrorResponse.toString());
+
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = { ResponseStatusException.class })
+    public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex){
+        ApiErrorResponse.Error error =
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.expiredAccesstoken, ex.getMessage());
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
 
 

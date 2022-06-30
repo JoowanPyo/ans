@@ -61,6 +61,7 @@ import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import com.gemiso.zodiac.app.lbox.LboxService;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
+import com.gemiso.zodiac.app.tag.Tag;
 import com.gemiso.zodiac.app.user.QUser;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserRepository;
@@ -605,8 +606,11 @@ public class ArticleService {
                         copyArticleCapUpdate(updateCopyArticle, articleUpdateDTO, articleHistId);
                         copyAnchorCapUpdate(updateCopyArticle, articleUpdateDTO, articleHistId);
 
+                        /* 기사 테그를 저장하는 부분 */
+                        copyArticleTag(updateCopyArticle, article);
+
                         //엘라스틱서치 등록
-                       // elasticSearchArticleService.elasticPush(updateCopyArticle);
+                       elasticSearchArticleService.elasticPush(updateCopyArticle);
 
                         Long artclId = updateCopyArticle.getArtclId();
                         //MQ메세지 전송
@@ -618,6 +622,42 @@ public class ArticleService {
             }
         }
 
+    }
+
+    /* 기사 테그를 저장하는 부분 */
+    public void copyArticleTag(Article updateCopyArticle, Article orgArticle){
+
+        Long newArtclId = updateCopyArticle.getArtclId();
+        List<ArticleTag> orgArticleTagList = articleTagRepository.findArticleTag(newArtclId);
+
+        //기존에 있던 테그 삭제후 재등록
+        if (CollectionUtils.isEmpty(orgArticleTagList) == false){
+            
+            for (ArticleTag articleTag : orgArticleTagList){
+
+                Long id = articleTag.getId();
+
+                articleTagRepository.deleteById(id);
+            }
+        }
+
+
+        Long artclId = orgArticle.getArtclId();
+
+        List<ArticleTag> articleTagList = articleTagRepository.findArticleTag(artclId);
+
+        for (ArticleTag articleTag : articleTagList){
+
+            Tag tag = articleTag.getTag();
+
+            ArticleTag articleTagEntity = ArticleTag.builder()
+                    .article(updateCopyArticle)
+                    .tag(tag)
+                    .build();
+
+            articleTagRepository.save(articleTagEntity);
+
+        }
     }
 
     //기사 미디어 update
@@ -2343,6 +2383,9 @@ public class ArticleService {
                             //기사 자막 Update
                             fixCopyArticleCapUpdate(updateCopyArticle, artclId, articleHistId);
                             fixCopyAnchorCapUpdate(updateCopyArticle, artclId, articleHistId);
+
+                            /* 기사 테그를 저장하는 부분 */
+                            copyArticleTag(updateCopyArticle, article);
 
                             //엘라스틱서치 등록
                             elasticSearchArticleService.elasticPush(updateCopyArticle);

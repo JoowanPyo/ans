@@ -22,7 +22,9 @@ import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
+import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
+import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
@@ -124,6 +126,7 @@ public class CueSheetItemService {
     private final ArticleCueItemMapper articleCueItemMapper;
     private final ArticleMediaMapper articleMediaMapper;
     private final ArticleTagMapper articleTagMapper;
+    private final ArticleMediaSimpleMapper articleMediaSimpleMapper;
 
     private final CueSheetService cueSheetService;
     private final CueTmpltItemService cueTmpltItemService;
@@ -184,12 +187,16 @@ public class CueSheetItemService {
 
             Article article = articleEntity.get();
 
+            List<ArticleMedia> articleMediaList = articleMediaRepository.findDeleteArticleMediaList(artclId);
+            List<ArticleMediaSimpleDTO> articleMediaDTOS = articleMediaSimpleMapper.toDtoList(articleMediaList);
+
             List<ArticleTag> articleTagList = articleTagRepository.findArticleTag(artclId);
             List<ArticleTagDTO> articleTagDTOList = articleTagMapper.toDtoList(articleTagList);
 
             articleDTO = articleCueItemMapper.toDto(article);
 
             articleDTO.setArticleTag(articleTagDTOList);
+            articleDTO.setArticleMedia(articleMediaDTOS);
 
         }
 
@@ -1850,7 +1857,7 @@ public class CueSheetItemService {
                     .inputrNm(article.getInputrNm())
                     .notiYn(article.getNotiYn())
                     .regAppTyp(article.getRegAppTyp())
-                    .brdcPgmId(article.getBrdcPgmId())
+                    .brdcPgmId(brdcPgmId)
                     .brdcSchdDtm(article.getBrdcSchdDtm())
                     .inputrId(article.getInputrId())
                     .apprvrId(article.getApprvrId())
@@ -2109,14 +2116,30 @@ public class CueSheetItemService {
     //삭제처리된 기사 복구(del : N )
     public void deletedArticleUpdate(CueSheetItem cueSheetItem) throws ParseException {
 
-        Article article = cueSheetItem.getArticle(); //조회된 큐시트아이템에 포함된 기사를 가져온다.
+        Article getArticle = cueSheetItem.getArticle(); //조회된 큐시트아이템에 포함된 기사를 가져온다.
 
-        ArticleDTO articleDTO = articleMapper.toDto(article);
-        articleDTO.setDelYn("N"); //기사 삭제 플레그 N으로 업데이트
+        Long artclId = getArticle.getArtclId();
 
-        articleMapper.updateFromDto(articleDTO, article);
+        Optional<Article> articleEntity = articleRepository.findDeleteArticle(artclId);
+
+        if (articleEntity.isPresent() == false){
+            throw new ResourceNotFoundException("삭제된 기사 아이디가 없습니다. 기사 아이디  : " + artclId);
+        }
+
+        Article article = articleEntity.get();
+
+        article.setDelYn("N");
 
         articleRepository.save(article); //기사 삭제 플레그 N으로 수정등록
+
+        List<ArticleMedia> articleMediaList = articleMediaRepository.findDeleteArticleMediaList(artclId);
+
+        for (ArticleMedia articleMedia : articleMediaList){
+
+            articleMedia.setDelYn("N");
+
+            articleMediaRepository.save(articleMedia);
+        }
 
         //엘라스틱서치 등록
         elasticSearchArticleService.elasticPush(article);

@@ -79,21 +79,28 @@ public class CueSheetRepositoryImpl implements CueSheetRepositoryCustorm {
 
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
             DateChangeHelper dateChangeHelper = new DateChangeHelper();
-            String stringSdate = dateChangeHelper.dateToStringNoTime(sdate);//Date To String( yyyy-MM-dd )
+            /*String stringSdate = dateChangeHelper.dateToStringNoTime(sdate);//Date To String( yyyy-MM-dd )
             String stringEdate = dateChangeHelper.dateToStringNoTime(edate);//Date To String( yyyy-MM-dd )
-
+*/
             String stime = dateChangeHelper.dateToStringNormal(sdate);
             String etime = dateChangeHelper.dateToStringNormal(edate);
 
-            String newStime = new SimpleDateFormat("HH:mm:ss").format(sdate); // 09:0:00
-            String newEtime = new SimpleDateFormat("HH:mm:ss").format(edate); // 09:0:00
+            /*String newStime = new SimpleDateFormat("HH:mm:ss").format(sdate); // 09:0:00
+            String newEtime = new SimpleDateFormat("HH:mm:ss").format(edate); // 09:0:00*/
 
 
             //방송날짜 조회
-            jpaQuery.where(qCueSheet.brdcDt.between(stringSdate, stringEdate));
+           /* jpaQuery.where(qCueSheet.brdcDt.eq(stringSdate).and(qCueSheet.brdcStartTime.goe(newStime))
+                    .and(qCueSheet.brdcDt.eq(stringEdate).and(qCueSheet.brdcStartTime.loe(newEtime))));*/
+
+            //방송일자 + ' ' + 방송시작시간 between 검색조건 1 "yyyy-MM-dd HH:mm:ss" and 검색조건2 "yyyy-MM-dd HH:mm:ss"
+            jpaQuery.where(qCueSheet.brdcDt.append(" ").append(qCueSheet.brdcStartTime).between(stime, etime));
+
             //방송시간 조회
-            jpaQuery.where(qCueSheet.brdcStartTime.goe(newStime));
-            jpaQuery.where(qCueSheet.brdcStartTime.loe(newEtime));
+            /*jpaQuery.where(qCueSheet.brdcStartTime.loe(newStime));
+            jpaQuery.where(qCueSheet.brdcStartTime.goe(newEtime));*/
+            /*jpaQuery.where(qCueSheet.brdcStartTime.goe(newStime));
+            jpaQuery.where(qCueSheet.brdcStartTime.loe(newEtime));*/
         }
 
         //if (cueDivCd != null && cueDivCd.trim().isEmpty() == false){

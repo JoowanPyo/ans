@@ -20,4 +20,5 @@ public class NodCreateDTO {
     private String transSt;
     private String brdcPgmNm;
     private String brdcPgmId;
+    private String subrmId;
 }

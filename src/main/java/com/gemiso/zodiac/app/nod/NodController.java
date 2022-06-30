@@ -3,6 +3,7 @@ package com.gemiso.zodiac.app.nod;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
 import com.gemiso.zodiac.app.nod.dto.NodCreateDTO;
 import com.gemiso.zodiac.app.nod.dto.NodDTO;
+import com.gemiso.zodiac.app.nod.dto.NodScriptSendDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,5 +60,17 @@ public class NodController {
 
 
         return new AnsApiResponse<>(returnNod, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "NOD 등록", description = "NOD 등록")
+    @PostMapping(path = "/sendhomepage")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AnsApiResponse<?> sendScriptToHomePage(@Parameter(name = "nodDTO", required = true, description = "필수값<br>  , ")
+                                         @Valid @RequestBody NodScriptSendDTO nodScriptSendDTO) throws Exception {
+
+        nodService.sendScriptToHomePage(nodScriptSendDTO);
+
+
+        return AnsApiResponse.ok();
     }
 }

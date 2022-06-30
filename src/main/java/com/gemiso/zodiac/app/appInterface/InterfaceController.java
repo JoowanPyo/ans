@@ -370,6 +370,34 @@ public class InterfaceController {
         return prompterCueSheetXml;
     }
 
+    @Operation(summary = "프롬프트 큐시트 상세조회[ 내용, 제목 Base64 인코딩 ] ", description = "프롬프트 큐시트 상세조회[ 내용, 제목 Base64 인코딩 ]")
+    @GetMapping(path = "/getcuesheetservice/prompter")
+    public String getCuesheetServicePrompter(@Parameter(name = "cs_id", description = "큐시트 아이디???")
+                                     @RequestParam(value = "cs_id", required = false) Long cs_id,
+                                     @Parameter(name = "usr_id", description = "사용자 아이디???")
+                                     @RequestParam(value = "usr_id", required = false) String usr_id,
+                                     @Parameter(name = "user_ip", description = "사용자 아이피???")
+                                     @RequestParam(value = "user_ip", required = false) String user_ip,
+                                     @RequestHeader(value = "securityKey") String securityKey) {
+
+        log.info("Prompter Find : cs_id - " + cs_id);
+
+        String prompterCueSheetXml = "";
+        try {
+
+            //set Lsit<PrompterCueRefreshDTO>
+            PrompterCueSheetDataDTO prompterCueSheetDataDTO = interfaceService.getCuesheetServiceIncoding(cs_id);
+
+            prompterCueSheetXml = interfaceService.prompterCueSheetXml(prompterCueSheetDataDTO);
+
+        } catch (Exception e) {
+
+            throw new InterfaceException(e.getMessage());
+
+        }
+        return prompterCueSheetXml;
+    }
+
     //일단 프롬프터 리플레시 기능은x 테이커 먼저 (2022.03.15)
     /*@Operation(summary = "프롬프트 큐시트 기사 리플레시", description = "프롬프트 큐시트 기사 리플레시")
     @GetMapping(path = "/prompter_refresh")

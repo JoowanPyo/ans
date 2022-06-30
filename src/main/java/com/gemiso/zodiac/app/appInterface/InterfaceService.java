@@ -1401,6 +1401,36 @@ public class InterfaceService {
 
     }
 
+    //프롬프터 큐시트 상세 조회 -> PrompterCueSheetDTO리스트로 변환
+    public PrompterCueSheetDataDTO getCuesheetServiceIncoding(Long cs_id) {
+
+        //set Lsit<PrompterCueRefreshDTO>
+        PrompterCueSheetDataDTO prompterCueSheetDataDTO = new PrompterCueSheetDataDTO();
+
+        //CueSheetDTO cueSheetDTO = cueSheetService.find(cs_id); //프롬프트로 보내줄 큐시트를 조회[단건 : 조건 큐시트 아이디]
+        CueSheet cueSheet = findCueSheet(cs_id, "N");
+
+        //List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetDTO.getCueSheetItem(); //조회된 큐시트상세 정보에서 큐시트 아이템get*/
+
+        //List<CueSheetItem> cueSheetItemList = cueSheetItemMapper.toEntityList(cueSheetItemDTOList);
+
+        //List<CueSheetItem> cueSheetItemList = cueSheet.getCueSheetItem();
+
+        // 조회된 큐시트 정보를 List<PrompterCueRefreshDTO>빌드 [기사정보가 있는 큐시트아이템 정보를 프롬프트DTO로 빌드 후 리턴]
+        List<PrompterCueSheetDTO> prompterCueSheetDTOList = cueToPrompterCueIncoding(cueSheet);
+
+        //큐시트 예비조회 및 DTO빌드
+        List<PrompterSpareCueSheetDTO> prompterSpareCueSheetDTOList = cueToPrompterSpareCueIncoding(cueSheet);
+
+        //큐시트 아이템 articleDTO 빌드 set
+        prompterCueSheetDataDTO.setCueSheetDTO(prompterCueSheetDTOList);
+        //예비 큐시트 아이템 articleDTO 빌드 set
+        prompterCueSheetDataDTO.setPrompterSpareCueSheetDTOS(prompterSpareCueSheetDTOList);
+
+        return prompterCueSheetDataDTO;
+
+    }
+
     public String prompterCueSheetXml(PrompterCueSheetDataDTO prompterCueSheetDataDTO) {
 
         //프롬프터 큐시트 xml형식으로 변환할 articleDTO
@@ -1617,6 +1647,242 @@ public class InterfaceService {
         return prompterCueSheetDTOList;
     }
 
+    //Base64 Incoding
+    public String base64Incoding(String str){
+
+        /* base64 encoding */
+        byte[] encodedBytes = Base64.getEncoder().encode(str.getBytes());
+
+
+        return new String(encodedBytes);
+    }
+
+
+    // 조회된 큐시트 정보를 List<PrompterCueRefreshDTO>빌드 [기사정보가 있는 큐시트아이템 정보를 프롬프트DTO로 빌드 후 리턴][인코딩 버전]
+    public List<PrompterCueSheetDTO> cueToPrompterCueIncoding(CueSheet cueSheet) {
+
+        Long cueId = cueSheet.getCueId();
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId);
+
+        List<PrompterCueSheetDTO> prompterCueSheetDTOList = new ArrayList<>();
+
+        //Integer newsAcumTime = 0; //누적시간
+        int seq = 1;
+
+        for (CueSheetItem cueSheetItem : cueSheetItemList) { //큐시트 아이템 PrompterCueSheetDTO리스트로 변환[기사(article)이 있는 아이템만 변환]
+
+            Article article = cueSheetItem.getArticle(); //큐시스트 아이템에서 기사 get
+
+            Long cueItemId = cueSheetItem.getCueItemId();
+
+            //큐시트 아이템 방송아이콘 List 조회
+            List<CueSheetItemSymbol> cueSheetItemSymbolList = cueSheetItemSymbolRepository.findSymbol(cueItemId);
+
+            //cmDivCd, cmDivCd 값 구하기 [채널값으로 심볼에 들어가는 NS-1, NS-2, NS-3 값 구하기]
+            String returnSymbolId = "";
+            String returnSymbolNm = "";
+            for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
+                Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+
+                if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+                    String symbolId = symbol.getSymbolId(); //심볼아이디
+                    String symbolNm = symbol.getSymbolNm(); //심볼 명
+
+                    switch (symbolId) { // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                        case "VNS1":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "VNS2":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "VNS3":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                    }
+                }
+            }
+
+            //NS채널이 없고 오디오 채널이 있을경우엔 오디오 채널값을 넣어준다.
+            if (returnSymbolId == null || returnSymbolId.isEmpty()){
+
+                for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
+                    Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+
+                    if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+                        String symbolId = symbol.getSymbolId(); //심볼아이디
+                        String symbolNm = symbol.getSymbolNm(); //심볼 명
+
+                        switch (symbolId) { // ANS1, ANS2, ANS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                            case "ANS1":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                            case "ANS2":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                            case "ANS3":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                        }
+                    }
+                }
+
+            }
+
+
+            if (ObjectUtils.isEmpty(article)) { //기사 정보가 없으면 contiue [프롬프트에서 기사정보만 쓰임]
+
+                //템플릿이 있을경우 템플릿아이디 추가
+                CueSheetTemplate cueSheetTemplate = cueSheetItem.getCueSheetTemplate();
+                Long cueTmpltId = null;
+                if (ObjectUtils.isEmpty(cueSheetTemplate) == false) {
+                    cueTmpltId = cueSheetTemplate.getCueTmpltId();
+                }
+
+                Set<CueSheetItemCap> cueSheetItemCapList = cueSheetItem.getCueSheetItemCap();
+                PrompterArticleCaps prompterArticleCap = getPrompterCueItemCapIncoding(cueSheetItemCapList);
+
+                //제목,내용 Base64 인코딩
+                String title = cueSheetItem.getCueItemTitl();
+                String titleBase64 = null;
+                if (title != null && title.trim().isEmpty() == false){
+                    titleBase64 = base64Incoding(title);
+                }
+                String titlEn = cueSheetItem.getCueItemTitlEn();
+                String titlEnBase64 = null;
+                if (titlEn != null && titlEn.trim().isEmpty() == false){
+                    titlEnBase64 = base64Incoding(titlEn);
+                }
+                String ctt = cueSheetItem.getCueItemCtt();
+                String cttBase64 = null;
+                if (ctt != null && ctt.trim().isEmpty() == false){
+                    cttBase64 = base64Incoding(ctt);
+                }
+
+
+                //조회된 cueSheetItem정보로 PrompterCueSheetDTO생성
+                PrompterCueSheetDTO prompterCueSheetDTO = PrompterCueSheetDTO.builder()
+                        .rdId(cueSheetItem.getCueItemId())
+                        .rdSeq(seq)
+                        .rdOrdMrk(cueSheetItem.getCueItemOrdCd())
+                        .rdOrd(cueSheetItem.getCueItemOrd())
+                        .openYn("")
+                        .artclTitl(titleBase64) //국문제목
+                        .artclTitlEn(titlEnBase64) // 영문제목
+                        .artclCtt(cttBase64)
+                        //.newsAcumTime(newsAcumTime) //누적시간
+                        //.anchorCaps(prompterAnchorCap)//앵커자막
+                        .articleCaps(prompterArticleCap)//기사자막
+                        .cueId(cueSheet.getCueId()) //Topic 사용 큐시트 아이디
+                        .cueItemId(cueSheetItem.getCueItemId()) //Topic 사용 큐시트 아이템 아이디
+                        .cueTmpltId(cueTmpltId)
+                        .cmDivCd(returnSymbolId)
+                        .cmDivNm(returnSymbolNm)
+                        .build();
+
+                //빌드된 PrompterCueSheetDTO를 PrompterCueRefreshDTO List에 add
+                prompterCueSheetDTOList.add(prompterCueSheetDTO);
+
+                seq++;
+            } else { //기사 아이템인 경우
+
+                //Integer articleCttTime = article.getArtclCttTime(); // 기사 소요시간
+                //Integer ancCttTime = article.getAncMentCttTime(); // 앵커 소요시간
+
+                //String articleTypDtlCd = article.getArtclTypDtlCd(); // 기상 유형 상세 코드
+
+                Long artclId = article.getArtclId();
+
+                //기사&앵커자막 조회데이터 get
+                List<ArticleCap> articleCapList = articleCapRepository.findArticleCap(artclId);
+                List<AnchorCap> anchorCapList = anchorCapRepository.findAnchorCapList(artclId);
+                //자박정보 set
+                PrompterArticleCaps prompterArticleCap = getPrompterArticleCapIncoding(articleCapList);
+                PrompterAnchorCaps prompterAnchorCap = getPrompterAnchorCapIncoding(anchorCapList);
+
+                //기상 유형 상세 코드 가 apk,pk인 경우 기사 + 앵커 소요시간 add
+                //if ("apk".equals(articleTypDtlCd) || "pk".equals(articleTypDtlCd)) {
+                // 기사 소요시간 + 앵커 소요시간 + 누적시간 = 누적시간
+                //    newsAcumTime += articleCttTime + ancCttTime;
+
+                //기상 유형 상세 코드 가 telphone,smartphone,news_studio,broll,mng 인 경우 기사소요시간만 add
+                //} else { // 앵커시간이 Null인경우
+                //    newsAcumTime += articleCttTime;
+                //}
+
+                //제목,내용 Base64 인코딩
+                String artclTitl = article.getArtclTitl();
+                String artclTitlBase64 = null;
+                if (artclTitl != null && artclTitl.trim().isEmpty() == false){
+                    artclTitlBase64 = base64Incoding(artclTitl);
+                }
+                String artclTitlEn = article.getArtclTitlEn();
+                String artclTitlEnBase64 = null;
+                if (artclTitlEn != null && artclTitlEn.trim().isEmpty() == false){
+                    artclTitlEnBase64 = base64Incoding(artclTitlEn);
+                }
+                String artclCtt = article.getArtclCtt();
+                String artclCttBase64 = null;
+                if (artclCtt != null && artclCtt.trim().isEmpty() == false){
+                    artclCttBase64 = base64Incoding(artclCtt);
+                }
+                String ancCtt = article.getAncMentCtt();
+                String ancCttBase64 = null;
+                if (ancCtt != null && ancCtt.trim().isEmpty() == false){
+                    ancCttBase64 = base64Incoding(ancCtt);
+                }
+
+
+                //조회된 cueSheet정보의 기사정보로 PrompterCueSheetDTO생성
+                PrompterCueSheetDTO prompterCueSheetDTO = PrompterCueSheetDTO.builder()
+                        .rdId(cueSheetItem.getCueItemId())
+                        .rdSeq(seq)
+                        .chDivCd(article.getChDivCd())
+                        .rdOrd(cueSheetItem.getCueItemOrd()) //순번
+                        .rdOrdMrk(cueSheetItem.getCueItemOrdCd())
+                        .prdDivCd(article.getPrdDivCd())
+                        .openYn("")
+                        .artclId(article.getArtclId())
+                        .artclFldCd(article.getArtclFldCd())
+                        .artclFldNm(article.getArtclFldCdNm())
+                        .artclFrmCd(article.getArtclTypDtlCd())// 비롤, 패키지
+                        .artclFrmNm(article.getArtclTypDtlCdNm())
+                        .artclTitl(artclTitlBase64) //국문제목
+                        .artclTitlEn(artclTitlEnBase64) // 영문제목
+                        .artclCtt(artclCttBase64)
+                        .ancCtt(ancCttBase64)//앵커맨트
+                        .rptrId(article.getRptrId()) //기자 아이디
+                        .rptrNm(article.getRptrNm()) //기자 명
+                        .deptCd(article.getDeptCd())
+                        .artclReqdSec(article.getArtclCttTime()) //기사 소요시간
+                        .ancReqdSec(article.getAncMentCttTime()) //앵커기사 소요시간
+                        //.newsAcumTime(newsAcumTime) //누적시간
+                        .anchorCaps(prompterAnchorCap)//앵커자막
+                        .articleCaps(prompterArticleCap)//기사자막
+                        .cueId(cueSheet.getCueId())
+                        .cueTmpltId(null)
+                        .cueItemId(cueSheetItem.getCueItemId())
+                        .cmDivCd(returnSymbolId)
+                        .cmDivNm(returnSymbolNm)
+                        .build();
+
+
+                //빌드된 PrompterCueSheetDTO를 PrompterCueRefreshDTO List에 add
+                prompterCueSheetDTOList.add(prompterCueSheetDTO);
+
+                seq++;
+            }
+        }
+
+        //PrompterCueRefreshDTO List return
+        return prompterCueSheetDTOList;
+    }
+
     // 조회된 큐시트 정보를 List<PrompterCueRefreshDTO>빌드 [기사정보가 있는 큐시트아이템 정보를 프롬프트DTO로 빌드 후 리턴]
     public List<PrompterSpareCueSheetDTO> cueToPrompterSpareCue(CueSheet cueSheet) {
 
@@ -1702,6 +1968,10 @@ public class InterfaceService {
                     cueTmpltId = cueSheetTemplate.getCueTmpltId();
                 }
 
+                //자막이 필요없다??
+                Set<CueSheetItemCap> cueSheetItemCapList = cueSheetItem.getCueSheetItemCap();
+                PrompterArticleCaps prompterArticleCap = getPrompterCueItemCap(cueSheetItemCapList);
+
                 //조회된 cueSheetItem정보로 PrompterCueSheetDTO생성
                 PrompterSpareCueSheetDTO prompterSpareCueSheetDTO = PrompterSpareCueSheetDTO.builder()
                         .rdId(cueSheetItem.getCueItemId())
@@ -1713,6 +1983,7 @@ public class InterfaceService {
                         .artclTitlEn(cueSheetItem.getCueItemTitlEn()) // 영문제목
                         .artclCtt(cueSheetItem.getCueItemCtt())
                         //.newsAcumTime(newsAcumTime) //누적시간
+                        .articleCaps(prompterArticleCap)
                         .cueId(cueSheet.getCueId())
                         .cueTmpltId(cueTmpltId)
                         .cueItemId(cueSheetItem.getCueItemId())
@@ -1781,6 +2052,213 @@ public class InterfaceService {
         return prompterSpareCueSheetDTOList;
     }
 
+    // 조회된 큐시트 정보를 List<PrompterCueRefreshDTO>빌드 [기사정보가 있는 큐시트아이템 정보를 프롬프트DTO로 빌드 후 리턴][인코딩 버전]
+    public List<PrompterSpareCueSheetDTO> cueToPrompterSpareCueIncoding(CueSheet cueSheet) {
+
+        Long cueId = cueSheet.getCueId();
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findSpareCue(cueId, "N");
+
+        List<PrompterSpareCueSheetDTO> prompterSpareCueSheetDTOList = new ArrayList<>();
+
+        //Integer newsAcumTime = 0; //누적시간
+        int seq = 1;
+
+        for (CueSheetItem cueSheetItem : cueSheetItemList) { //큐시트 아이템 PrompterCueSheetDTO리스트로 변환[기사(article)이 있는 아이템만 변환]
+
+            Article article = cueSheetItem.getArticle(); //큐시스트 아이템에서 기사 get
+
+            Long cueItemId = cueSheetItem.getCueItemId();
+
+            //큐시트 아이템 방송아이콘 List 조회
+            List<CueSheetItemSymbol> cueSheetItemSymbolList = cueSheetItemSymbolRepository.findSymbol(cueItemId);
+
+            //cmDivCd, cmDivCd 값 구하기 [채널값으로 심볼에 들어가는 NS-1, NS-2, NS-3 값 구하기]
+            String returnSymbolId = "";
+            String returnSymbolNm = "";
+            for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
+                Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+
+                if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+                    String symbolId = symbol.getSymbolId(); //심볼아이디
+                    String symbolNm = symbol.getSymbolNm(); //심볼 명
+
+                    switch (symbolId) { // VNS1, VNS2, VNS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                        case "VNS1":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "VNS2":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                        case "VNS3":
+                            returnSymbolId = symbolId;
+                            returnSymbolNm = symbolNm;
+                            break;
+                    }
+                }
+            }
+
+            //NS채널이 없고 오디오 채널이 있을경우엔 오디오 채널값을 넣어준다.
+            if (returnSymbolId == null || returnSymbolId.isEmpty()){
+
+                for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolList) {
+                    Symbol symbol = cueSheetItemSymbol.getSymbol(); //큐시트아이템에 포함된 심볼  get
+
+                    if (ObjectUtils.isEmpty(symbol) == false) {  //심볼이 있을경우
+                        String symbolId = symbol.getSymbolId(); //심볼아이디
+                        String symbolNm = symbol.getSymbolNm(); //심볼 명
+
+                        switch (symbolId) { // ANS1, ANS2, ANS3 채널로 표기된 심볼이 들어가 있을경우 값 셋팅
+                            case "ANS1":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                            case "ANS2":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                            case "ANS3":
+                                returnSymbolId = symbolId;
+                                returnSymbolNm = symbolNm;
+                                break;
+                        }
+                    }
+                }
+
+            }
+
+            if (ObjectUtils.isEmpty(article)) { //기사 정보가 없으면 contiue [프롬프트에서 기사정보만 쓰임]
+
+                //템플릿이 있을경우 템플릿아이디 추가
+                CueSheetTemplate cueSheetTemplate = cueSheetItem.getCueSheetTemplate();
+                Long cueTmpltId = null;
+                if (ObjectUtils.isEmpty(cueSheetTemplate) == false) {
+                    cueTmpltId = cueSheetTemplate.getCueTmpltId();
+                }
+
+                //몰라 빠져있어서 넣었음
+                //Set<CueSheetItemCap> cueSheetItemCapList = cueSheetItem.getCueSheetItemCap();
+                //PrompterArticleCaps prompterArticleCap = getPrompterCueItemCapIncoding(cueSheetItemCapList);
+
+                //제목,내용 Base64 인코딩
+                String title = cueSheetItem.getCueItemTitl();
+                String titleBase64 = null;
+                if (title != null && title.trim().isEmpty() == false){
+                    titleBase64 = base64Incoding(title);
+                }
+                String titlEn = cueSheetItem.getCueItemTitlEn();
+                String titlEnBase64 = null;
+                if (titlEn != null && titlEn.trim().isEmpty() == false){
+                    titlEnBase64 = base64Incoding(titlEn);
+                }
+                String ctt = cueSheetItem.getCueItemCtt();
+                String cttBase64 = null;
+                if (ctt != null && ctt.trim().isEmpty() == false){
+                    cttBase64 = base64Incoding(ctt);
+                }
+
+                //조회된 cueSheetItem정보로 PrompterCueSheetDTO생성
+                PrompterSpareCueSheetDTO prompterSpareCueSheetDTO = PrompterSpareCueSheetDTO.builder()
+                        .rdId(cueSheetItem.getCueItemId())
+                        .rdSeq(seq)
+                        .rdOrdMrk(cueSheetItem.getCueItemOrdCd())
+                        .rdOrd(cueSheetItem.getCueItemOrd())
+                        .openYn("")
+                        .artclTitl(titleBase64) //국문제목
+                        .artclTitlEn(titlEnBase64) // 영문제목
+                        .artclCtt(cttBase64)
+                        //.newsAcumTime(newsAcumTime) //누적시간
+                        //.articleCaps(prompterArticleCap)
+                        .cueId(cueSheet.getCueId())
+                        .cueTmpltId(cueTmpltId)
+                        .cueItemId(cueSheetItem.getCueItemId())
+                        .cmDivCd(returnSymbolId)
+                        .cmDivNm(returnSymbolNm)
+                        .build();
+
+                //빌드된 PrompterCueSheetDTO를 PrompterCueRefreshDTO List에 add
+                prompterSpareCueSheetDTOList.add(prompterSpareCueSheetDTO);
+
+                seq++;
+            } else { //기사 아이템인 경우
+
+                Long artclId = article.getArtclId();
+
+                //기사&앵커자막 조회데이터 get
+                List<ArticleCap> articleCapList = articleCapRepository.findArticleCap(artclId);
+                List<AnchorCap> anchorCapList = anchorCapRepository.findAnchorCapList(artclId);
+                //자박정보 set
+                PrompterArticleCaps prompterArticleCap = getPrompterArticleCapIncoding(articleCapList);
+                PrompterAnchorCaps prompterAnchorCap = getPrompterAnchorCapIncoding(anchorCapList);
+
+                //제목,내용 Base64 인코딩
+                String artclTitl = article.getArtclTitl();
+                String artclTitlBase64 = null;
+                if (artclTitl != null && artclTitl.trim().isEmpty() == false){
+                    artclTitlBase64 = base64Incoding(artclTitl);
+                }
+                String artclTitlEn = article.getArtclTitlEn();
+                String artclTitlEnBase64 = null;
+                if (artclTitlEn != null && artclTitlEn.trim().isEmpty() == false){
+                    artclTitlEnBase64 = base64Incoding(artclTitlEn);
+                }
+                String artclCtt = article.getArtclCtt();
+                String artclCttBase64 = null;
+                if (artclCtt != null && artclCtt.trim().isEmpty() == false){
+                    artclCttBase64 = base64Incoding(artclCtt);
+                }
+                String ancCtt = article.getAncMentCtt();
+                String ancCttBase64 = null;
+                if (ancCtt != null && ancCtt.trim().isEmpty() == false){
+                    ancCttBase64 = base64Incoding(ancCtt);
+                }
+
+                //조회된 cueSheet정보의 기사정보로 PrompterCueSheetDTO생성
+                PrompterSpareCueSheetDTO prompterSpareCueSheetDTO = PrompterSpareCueSheetDTO.builder()
+                        .rdId(cueSheetItem.getCueItemId())
+                        .rdSeq(seq)
+                        .chDivCd(article.getChDivCd())
+                        .rdOrd(cueSheetItem.getCueItemOrd()) //순번
+                        .rdOrdMrk(cueSheetItem.getCueItemOrdCd())
+                        .prdDivCd(article.getPrdDivCd())
+                        .openYn("")
+                        .artclId(article.getArtclId())
+                        .artclFldCd(article.getArtclFldCd())
+                        .artclFldNm(article.getArtclFldCdNm())
+                        .artclFrmCd(article.getArtclTypDtlCd())// 비롤, 패키지
+                        .artclFrmNm(article.getArtclTypDtlCdNm())
+                        .artclTitl(artclTitlBase64) //국문제목
+                        .artclTitlEn(artclTitlEnBase64) // 영문제목
+                        .artclCtt(artclCttBase64)
+                        .ancCtt(ancCttBase64)//앵커맨트
+                        .rptrId(article.getRptrId()) //기자 아이디
+                        .rptrNm(article.getRptrNm()) //기자 명
+                        .deptCd(article.getDeptCd())
+                        .artclReqdSec(article.getArtclCttTime()) //기사 소요시간
+                        .ancReqdSec(article.getAncMentCttTime()) //앵커기사 소요시간
+                        //.newsAcumTime(newsAcumTime) //누적시간
+                        .anchorCaps(prompterAnchorCap)//앵커자막
+                        .articleCaps(prompterArticleCap)//기사자막
+                        .cueId(cueSheet.getCueId())
+                        .cueTmpltId(null)
+                        .cueItemId(cueSheetItem.getCueItemId())
+                        .cmDivCd(returnSymbolId)
+                        .cmDivNm(returnSymbolNm)
+                        .build();
+
+
+                //빌드된 PrompterCueSheetDTO를 PrompterCueRefreshDTO List에 add
+                prompterSpareCueSheetDTOList.add(prompterSpareCueSheetDTO);
+
+                seq++;
+            }
+        }
+
+        //PrompterCueRefreshDTO List return
+        return prompterSpareCueSheetDTOList;
+    }
+
     //프롬프터 기사 자막정보 빌드후 리턴
     public PrompterArticleCaps getPrompterCueItemCap(Set<CueSheetItemCap> cueSheetItemCapList ) {
 
@@ -1810,6 +2288,54 @@ public class InterfaceService {
                     .artclCapId(itemCap.getCueItemCapId())
                     .symbolId(symbolId)
                     .capCtt(itemCap.getCapCtt())
+                    .lnNo(itemCap.getLnNo())
+                    .lnOrd(itemCap.getCapOrd())
+                    .build();
+
+            prompterArticleCapDTOList.add(prompterArticleCapDTO);
+        }
+        prompterArticleCaps.setArticleCapList(prompterArticleCapDTOList);
+
+        return prompterArticleCaps;
+
+    }
+
+    //프롬프터 기사 자막정보 빌드후 리턴
+    public PrompterArticleCaps getPrompterCueItemCapIncoding(Set<CueSheetItemCap> cueSheetItemCapList ) {
+
+        PrompterArticleCaps prompterArticleCaps = new PrompterArticleCaps();
+        List<PrompterArticleCapDTO> prompterArticleCapDTOList = new ArrayList<>();
+
+        //들어온 리스트가 비어있으면 빈 어레이 리스트 리턴.
+        if (CollectionUtils.isEmpty(cueSheetItemCapList)) {
+            return prompterArticleCaps;
+        }
+
+        List<CueSheetItemCap> cueSheetItemCaps = new ArrayList<>(cueSheetItemCapList);
+
+        Collections.sort(cueSheetItemCaps, new CueItemListSortHelper());
+
+        //기사자막&방송아이콘 정보로 프롬프터에 사용되는 자막정보 빌드
+        for (CueSheetItemCap itemCap : cueSheetItemCaps) {
+
+            String symbolId = "";
+            Symbol symbol = itemCap.getSymbol();
+            if (ObjectUtils.isEmpty(symbol) == false) {
+
+                symbolId = symbol.getSymbolId();
+            }
+
+            //내용 Base64 인코딩
+            String cpaCtt = itemCap.getCapCtt();
+            String capCttBase64 = null;
+            if (cpaCtt != null && cpaCtt.trim().isEmpty() == false){
+                capCttBase64 = base64Incoding(cpaCtt);
+            }
+
+            PrompterArticleCapDTO prompterArticleCapDTO = PrompterArticleCapDTO.builder()
+                    .artclCapId(itemCap.getCueItemCapId())
+                    .symbolId(symbolId)
+                    .capCtt(capCttBase64)
                     .lnNo(itemCap.getLnNo())
                     .lnOrd(itemCap.getCapOrd())
                     .build();
@@ -1863,6 +2389,54 @@ public class InterfaceService {
 
     }
 
+    //프롬프터 기사 자막정보 빌드후 리턴 [인코딩버전]
+    public PrompterArticleCaps getPrompterArticleCapIncoding(List<ArticleCap> articleCapList) {
+
+        PrompterArticleCaps prompterArticleCaps = new PrompterArticleCaps();
+        List<PrompterArticleCapDTO> prompterArticleCapDTOList = new ArrayList<>();
+
+        //들어온 리스트가 비어있으면 빈 어레이 리스트 리턴.
+        if (CollectionUtils.isEmpty(articleCapList)) {
+            return prompterArticleCaps;
+        }
+
+        List<ArticleCap> articleCaps = new ArrayList<>(articleCapList);
+
+        Collections.sort(articleCaps, new ListSortHelper());
+
+        //기사자막&방송아이콘 정보로 프롬프터에 사용되는 자막정보 빌드
+        for (ArticleCap articleCap : articleCaps) {
+
+            String symbolId = "";
+            Symbol symbol = articleCap.getSymbol();
+            if (ObjectUtils.isEmpty(symbol) == false) {
+
+                symbolId = symbol.getSymbolId();
+            }
+
+            //내용 Base64 인코딩
+            String cpaCtt = articleCap.getCapCtt();
+            String capCttBase64 = null;
+            if (cpaCtt != null && cpaCtt.trim().isEmpty() == false){
+                capCttBase64 = base64Incoding(cpaCtt);
+            }
+
+            PrompterArticleCapDTO prompterArticleCapDTO = PrompterArticleCapDTO.builder()
+                    .artclCapId(articleCap.getArtclCapId())
+                    .symbolId(symbolId)
+                    .capCtt(capCttBase64)
+                    .lnNo(articleCap.getLnNo())
+                    .lnOrd(articleCap.getLnOrd())
+                    .build();
+
+            prompterArticleCapDTOList.add(prompterArticleCapDTO);
+        }
+        prompterArticleCaps.setArticleCapList(prompterArticleCapDTOList);
+
+        return prompterArticleCaps;
+
+    }
+
     //프롬프터 앵커 자막정보 빌드후 리턴
     public PrompterAnchorCaps getPrompterAnchorCap(List<AnchorCap> anchorCapList) {
 
@@ -1900,6 +2474,49 @@ public class InterfaceService {
         return prompterAnchorCaps;
     }
 
+    //프롬프터 앵커 자막정보 빌드후 리턴[인코딩버전]
+    public PrompterAnchorCaps getPrompterAnchorCapIncoding(List<AnchorCap> anchorCapList) {
+
+        PrompterAnchorCaps prompterAnchorCaps = new PrompterAnchorCaps();
+        List<PrompterAnchorCapDTO> prompterAnchorCapDTOList = new ArrayList<>();
+
+        //들어온 리스트가 비어있으면 빈 어레이 리스트 리턴.
+        if (CollectionUtils.isEmpty(anchorCapList)) {
+            return prompterAnchorCaps;
+        }
+
+        //앵커자막&방송아이콘 정보로 프롬프터에 사용되는 자막정보 빌드
+        for (AnchorCap anchorCap : anchorCapList) {
+
+
+            String symbolId = "";
+            Symbol symbol = anchorCap.getSymbol();
+            if (ObjectUtils.isEmpty(symbol) == false) {
+
+                symbolId = symbol.getSymbolId();
+            }
+
+            //내용 Base64 인코딩
+            String cpaCtt = anchorCap.getCapCtt();
+            String capCttBase64 = null;
+            if (cpaCtt != null && cpaCtt.trim().isEmpty() == false){
+                capCttBase64 = base64Incoding(cpaCtt);
+            }
+
+            PrompterAnchorCapDTO prompterAnchorCapDTO = PrompterAnchorCapDTO.builder()
+                    .artclCapId(anchorCap.getAnchorCapId())
+                    .symbolId(symbolId)
+                    .capCtt(capCttBase64)
+                    .lnNo(anchorCap.getLnNo())
+                    .lnOrd(anchorCap.getLnOrd())
+                    .build();
+
+            prompterAnchorCapDTOList.add(prompterAnchorCapDTO);
+        }
+        prompterAnchorCaps.setAnchorCapList(prompterAnchorCapDTOList);
+
+        return prompterAnchorCaps;
+    }
 
     //테이커 큐시트 아이템 Refresh
     public TakerCueRefreshDataDTO takerCueItemRefresh(Long rd_id, Integer rd_seq) {

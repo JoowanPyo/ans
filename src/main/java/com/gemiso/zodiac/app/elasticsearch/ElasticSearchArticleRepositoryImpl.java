@@ -125,7 +125,7 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
 
                     query.must(QueryBuilders.boolQuery().should(QueryBuilders.multiMatchQuery(search,
                             "artclTitl", "artclTitl.nori", "artclTitl.fulltext", "artclTitlEn", "artclTitlEn.nori",
-                            "artclTitlEn.fulltext", "ancMentCtt.nori", "ancMentCtt.fulltext", "artclCtt.nori", "artclCtt.fulltext"))
+                            "artclTitlEn.fulltext"))
                             .should(QueryBuilders.wildcardQuery("artclTitl.fulltext", "*"+searchWord+"*")) //타이틀 풀텍스트
                             .should(QueryBuilders.wildcardQuery("artclTitlEn.fulltext", "*"+searchWord+"*")));
                 }
@@ -135,9 +135,9 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
             else if ("02".equals(searchDivCd)) {
 
                 Long getArtclId = 0L;
-                boolean isNumeric =  searchDivCd.matches("[+-]?\\d*(\\.\\d+)?");
+                boolean isNumeric =  searchWord.matches("[+-]?\\d*(\\.\\d+)?");
                 if (isNumeric){
-                    getArtclId = Long.parseLong(searchDivCd);
+                    getArtclId = Long.parseLong(searchWord);
                 }
 
                 query.must(QueryBuilders.boolQuery().should(QueryBuilders.termQuery("orgArtclId", getArtclId)));
@@ -307,6 +307,32 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
             query.must(QueryBuilders.rangeQuery("inputDtm").gte(getSdate).lte(getEdate));
 
         }
+
+        //검색어
+        //검색어로 조회
+        if (searchWord != null && searchWord.trim().isEmpty() == false) {
+
+            String[] searchWords = searchWord.split("\\s+");
+
+            for (String search : searchWords) {
+
+                Long getArtclId = 0L;
+                String str = search;
+                boolean isNumeric =  str.matches("[+-]?\\d*(\\.\\d+)?");
+                if (isNumeric){
+                    getArtclId = Long.parseLong(str);
+                }
+
+                query.must(QueryBuilders.boolQuery().should(QueryBuilders.multiMatchQuery(search,
+                        "artclTitl", "artclTitl.nori", "artclTitl.fulltext", "artclTitlEn",
+                        "artclTitlEn.nori", "artclTitlEn.fulltext"))
+                        .should(QueryBuilders.termQuery("orgArtclId", getArtclId))
+                        .should(QueryBuilders.wildcardQuery("artclTitl.fulltext", "*"+searchWord+"*")) //타이틀 풀텍스트
+                        .should(QueryBuilders.wildcardQuery("artclTitlEn.fulltext", "*"+searchWord+"*"))); //영문타이틀 풀텍스트
+
+            }
+        }
+
         //원본 기사 및 복사된 기사 검색조건
         if (copyYn != null && copyYn.trim().isEmpty() == false) {
 
@@ -328,6 +354,10 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
         //방송 프로그램 아이디로 조회
         if (brdcPgmId != null && brdcPgmId.trim().isEmpty() == false) {
             query.must(QueryBuilders.termQuery("brdcPgmId", cueId));
+        }
+        //부서코드
+        if (deptCd != null && deptCd != 0) {
+            query.must(QueryBuilders.termQuery("deptCd", deptCd));
         }
 
         sourceBuilder.query(query);

@@ -24,4 +24,5 @@ public class NodDTO {
     private String brdcPgmId;
     private Date inputDtm;
     private Date updtDtm;
+    private String subrmId;
 }

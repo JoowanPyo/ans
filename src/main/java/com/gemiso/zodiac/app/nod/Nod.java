@@ -54,4 +54,8 @@ public class Nod extends BaseEntity {
 
     @Column(name = "brdc_pgm_id", length = 50, nullable = false)
     private String brdcPgmId;
+
+
+    @Column(name = "subrm_id", length = 1, nullable = false)
+    private String subrmId;
 }

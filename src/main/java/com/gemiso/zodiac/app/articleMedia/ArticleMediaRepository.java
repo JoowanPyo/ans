@@ -16,6 +16,9 @@ public interface ArticleMediaRepository extends JpaRepository<ArticleMedia, Long
     @Query("select a from ArticleMedia a where a.article.artclId = :artclId and a.delYn='N' order by a.artclMediaId desc ")
     List<ArticleMedia> findArticleMediaList(@Param("artclId")Long artclId);
 
+    @Query("select a from ArticleMedia a where a.article.artclId = :artclId and a.delYn='Y' order by a.artclMediaId desc ")
+    List<ArticleMedia> findDeleteArticleMediaList(@Param("artclId")Long artclId);
+
     @Query("select a from ArticleMedia a where a.contId =:contentId and a.delYn='N' order by a.artclMediaId desc ")
     List<ArticleMedia> findArticleMediaListByContentId(@Param("contentId")Integer contentId);
 }

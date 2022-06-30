@@ -66,7 +66,8 @@ public class JwtFilter implements Filter {
                 + ",/interface,/interface/dailypgm,/interface/cuesheet,/interface/code,/interface/mediatransrate,/interface/getmstlistservice"
                 + ",/interface/getcuesheetservice,/interface/pstakerlist,/interface/pstaker,/interface/takerrefresh"
                 + ",/interface/mediatransfer/updatestate,/interface/cuestcdupdate,/interface/takersetcue"
-                + ",/interface/smamfindcue,/interface/smamfindallcue,/interface/homepagecd,/interface/users,/interface/user,/nod";
+                + ",/interface/smamfindcue,/interface/smamfindallcue,/interface/homepagecd,/interface/users,/interface/user"
+                + ",/nod,/interface/getcuesheetservice/prompter";
         excludedUrls = Arrays.asList(excludePattern.split(","));
 
     }
@@ -132,7 +133,7 @@ public class JwtFilter implements Filter {
 
                         } else {
                             httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "토큰이 없거나 토큰정보가 정확하지 않습니다.");
-                            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+                            //throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
                         }
 
                         logMessage.append(" [RESPONSE STATUS:").append(httpServletResponse.getStatus()).append("]"); //코드를 넘겨줌
