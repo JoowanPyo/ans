@@ -133,6 +133,8 @@ public class CueTmpltMediaService {
 
         QCueTmpltMedia qCueTmpltMedia = QCueTmpltMedia.cueTmpltMedia;
 
+        booleanBuilder.and(qCueTmpltMedia.delYn.eq("N"));
+
         if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
             booleanBuilder.and(qCueTmpltMedia.inputDtm.between(sdate, edate));
         }

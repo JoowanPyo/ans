@@ -99,7 +99,7 @@ public class CueSheetMediaService {
         return cueSheetMediaDTO;
     }
 
-    public Long create(CueSheetMediaCreateDTO cueSheetMediaCreateDTO) throws JsonProcessingException {
+    public Long create(CueSheetMediaCreateDTO cueSheetMediaCreateDTO) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();

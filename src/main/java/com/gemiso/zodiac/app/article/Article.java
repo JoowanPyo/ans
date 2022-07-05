@@ -298,6 +298,9 @@ public class Article extends BaseEntity {
     @Column(name = "desk_fix_dtm")
     private Date deskFixDtm;
 
+   /* @Column(name = "device_cd", length = 50)
+    private String deviceCd;*/
+
     /*@Column(name = "cue_id", length = 50)
     private Long cueId;*/
 

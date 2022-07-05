@@ -10,4 +10,8 @@ public interface NodRepository extends JpaRepository<Nod, Long> {
 
     @Query("select a from Nod a where a.nodId =:nodId ")
     Optional<Nod> findNod(@Param("nodId")Long nodId);
+
+
+    @Query("select a from Nod a where a.cueId =:cueId")
+    Optional<Nod> findNodByCue(@Param("cueId")Long cueId);
 }

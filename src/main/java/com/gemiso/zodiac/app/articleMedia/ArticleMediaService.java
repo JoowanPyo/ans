@@ -174,7 +174,7 @@ public class ArticleMediaService {
 
     //큐시트 토픽 메세지 전송
     public void sendCueTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
-                                   String spareYn, String prompterFlag, String videoTakerFlag, Article article) throws JsonProcessingException {
+                                   String spareYn, String prompterFlag, String videoTakerFlag, Article article) throws Exception {
 
         Integer cueVer = 0;
         Integer cueOderVer = 0;

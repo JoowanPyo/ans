@@ -15,6 +15,7 @@ public class DsProgramDTO {
 
     private String pgmCd;
     private String pgmNm;
+    private String pgmOnm;//방송 프로그램 영문명.
     private String chanTp; //01:TV 02:라디오
     private String jenreClf1;//100 보도, 200:교양, 300:오락
     private String productClf;//100:자체제작, 200:외주제작, 300:국내구매, 400:해외구매, 500리패키지, 999:기타

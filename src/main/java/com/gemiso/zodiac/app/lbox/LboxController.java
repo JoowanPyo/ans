@@ -89,7 +89,7 @@ public class LboxController {
                                                               @Parameter(name = "isUrgent", description = "긴급 여부")
                                                               @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
                                                               @Parameter(name = "isRetry", description = "재전송 여부")
-                                                              @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
+                                                              @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws Exception {
 
         log.info("부조전송 = " + "미디어 아이디 : " + mediaId + " 텐츠 아이디 : " + contentId +
                 " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry);
@@ -178,7 +178,7 @@ public class LboxController {
                                                            @Parameter(name = "isUrgent", description = "긴급 여부")
                                                            @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
                                                            @Parameter(name = "isRetry", description = "재전송 여부")
-                                                           @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
+                                                           @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws Exception {
 
         log.info("PS 긴급전송 = " + "미디어 아이디 : " + mediaId + " 텐츠 아이디 : " + contentId +
                 " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry);
@@ -205,7 +205,7 @@ public class LboxController {
                                                                  @Parameter(name = "isRetry", description = "재전송 여부")
                                                                  @RequestParam(value = "isRetry", required = false) Boolean isRetry,
                                                                  @Parameter(name = "isType", description = "일반(T), 백드롭(B)")
-                                                                 @RequestParam(value = "isType", required = false) String isType) throws JsonProcessingException {
+                                                                 @RequestParam(value = "isType", required = false) String isType) throws Exception {
 
         log.info("큐시트 미디어 부조전송 = " + "미디어 아이디 : " + cueMediaId + " 텐츠 아이디 : " + contentId +
                 " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry+" 전송타입 : "+isType);

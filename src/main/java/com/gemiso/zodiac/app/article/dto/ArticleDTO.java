@@ -160,8 +160,8 @@ public class ArticleDTO {
     private Long deptCd;
     @Schema(description = "부서 명")
     private String deptNm;
-    @Schema(description = "")
-    private String deviceCd;
+   /* @Schema(description = "")
+    private String deviceCd;*/
     @Schema(description = "")
     private String memo;
     @Schema(description = "이슈 아이디")

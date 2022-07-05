@@ -283,7 +283,8 @@ public class ArticleService {
 
     public PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> findAllElasticsearchCue(Date sdate, Date edate, String searchWord, Long cueId,
                                                                                                 String brdcPgmId, String artclTypCd, String artclTypDtlCd,
-                                                                                                String copyYn, Long deptCd, Long orgArtclId, Integer page, Integer limit) throws Exception {
+                                                                                                String copyYn, Long deptCd, Long orgArtclId, String rptrId,
+                                                                                                Integer page, Integer limit) throws Exception {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
@@ -291,7 +292,7 @@ public class ArticleService {
 
         //전체조회[page type]
         Page<ElasticSearchArticle> result = elasticSearchArticleRepository.findByElasticSearchArticleListCue(sdate, edate, searchWord, cueId,
-                brdcPgmId, artclTypCd, artclTypDtlCd, copyYn, deptCd, orgArtclId, pageable);
+                brdcPgmId, artclTypCd, artclTypDtlCd, copyYn, deptCd, orgArtclId, rptrId, pageable);
 
 
         Function<ElasticSearchArticle, ElasticSearchArticleDTO> fn = (entity -> elasticSearchArticleMapper.toDto(entity));
@@ -361,7 +362,7 @@ public class ArticleService {
 
         ArticleDTO articleDTO = articleMapper.toDto(article);
 
-        List<ArticleMedia> articleMedia = articleMediaRepository.findArticleMediaList(artclId);
+        List<ArticleMedia> articleMedia = articleMediaRepository.findDeleteArticleMediaList(artclId);
         List<ArticleMediaSimpleDTO> articleMediaDTOList = articleMediaSimpleMapper.toDtoList(articleMedia);
         List<ArticleTag> articleTagList = articleTagRepository.findArticleTag(artclId);
         List<ArticleTagDTO> articleTagDTOList = articleTagMapper.toDtoList(articleTagList);
@@ -661,7 +662,7 @@ public class ArticleService {
     }
 
     //기사 미디어 update
-    public void copyarticleMediaUpdate(Article updateArticle, Long orgArticleId, Long articleHistId, String userId) throws JsonProcessingException {
+    public void copyarticleMediaUpdate(Article updateArticle, Long orgArticleId, Long articleHistId, String userId) throws Exception {
 
         Long artclId = updateArticle.getArtclId();
 
@@ -1364,7 +1365,7 @@ public class ArticleService {
                     anchorCap.setCapTemplate(capTemplate);//템플릿아이디 엔티티set.
                 }
                 String getSymbolId = anchorCapCreateDTO.getSymbolId();//앵커자막에 추가할 방송아이콘 아이디.
-                if (StringUtils.isEmpty(getSymbolId) == false) {
+                if (getSymbolId != null && getSymbolId.trim().isEmpty() == false) {
 
                     Symbol symbol = Symbol.builder().symbolId(getSymbolId).build();//등록할 방송아이콘 아이디 엔티티 빌드.
                     anchorCap.setSymbol(symbol);// 방송아이콘아이디 엔티티set.
@@ -1395,7 +1396,7 @@ public class ArticleService {
                     articleCap.setCapTemplate(capTemplate); //템플릿아이디 엔티티set.
                 }
                 String getSymbolId = articleCapDTO.getSymbolId();//기사자막에 추가할 방송아이콘 아이디.
-                if (StringUtils.isEmpty(getSymbolId) == false) {
+                if (getSymbolId != null && getSymbolId.trim().isEmpty() == false) {
 
                     Symbol symbol = Symbol.builder().symbolId(getSymbolId).build();//등록할 방송아이콘 아이디 엔티티 빌드.
                     articleCap.setSymbol(symbol); // 방송아이콘아이디 엔티티set.
@@ -2614,8 +2615,11 @@ public class ArticleService {
                 throw new UserFailException("기사를 입력한 사용자가 아닙니다. 기사 입력자 아이디 : " + inputr);
             }
         } else {
-            if (userAuthChkService.authChk(AuthEnum.DeskFix.getAuth())) {//관리자 권한 확인. 본인기사가 아니더라도 관리자면 삭제가능
-                throw new UserFailException("관리자 권한 이거나 기사를 입력한 사용자만 기사 삭제가 가능 합니다.");
+            if (userAuthChkService.authChk(AuthEnum.DeskFix.getAuth()) ) {//관리자 권한 확인. 본인기사가 아니더라도 관리자면 삭제가능
+                if (userId.equals(inputr) == false) { //하 잘못짯다 오픈전에 아라서 급하게 또 처리 ....ㅎ
+
+                    throw new UserFailException("관리자 권한 이거나 기사를 입력한 사용자만 기사 삭제가 가능 합니다.");
+                }
             }
         }
 

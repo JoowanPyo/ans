@@ -14,6 +14,7 @@ public class ProgramDTO {
 
     private String brdcPgmId;
     private String brdcPgmNm;
+    private String brdcPgmNmEn; //영문명
     private String chDivCd;
     private String chDivCdNm;
     private String brdcPgmDivCd;

@@ -6,7 +6,9 @@ import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetNodDTO;
 import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetMapper;
+import com.gemiso.zodiac.app.cueSheet.mapper.CueSheetNodMapper;
 import com.gemiso.zodiac.app.nod.dto.NodCreateDTO;
 import com.gemiso.zodiac.app.nod.dto.NodDTO;
 import com.gemiso.zodiac.app.nod.dto.NodScriptSendDTO;
@@ -37,6 +39,7 @@ public class NodService {
     private final NodMapper nodMapper;
     private final CueSheetMapper cueSheetMapper;
     private final NodCreateMapper nodCreateMapper;
+    private final CueSheetNodMapper cueSheetNodMapper;
 
     private final ProgramService programService;
     private final CueSheetService cueSheetService;
@@ -45,7 +48,7 @@ public class NodService {
     //Nod에서 ANS에 등록된 큐시트 정보 목록조회
     //[검색조건이 현재 날짜와 현재날짜 기준으로 전시간, 후시간 으로 들어온다.
     // 현재 날짜에서 before시간을 뺀 시간과 현재 날짜에서 after시간을 더한 값을 between 조회한다/.]
-    public List<CueSheetDTO> findCue(Date nowDate, Integer before, Integer after, String cueDivCd){
+    public List<CueSheetNodDTO> findCue(Date nowDate, Integer before, Integer after, String cueDivCd){
 
 
         Calendar cal = Calendar.getInstance();
@@ -62,7 +65,22 @@ public class NodService {
 
         List<CueSheet>  cueSheetList = cueSheetRepository.findNodCue(sdate, edate, cueDivCd);
 
-        List<CueSheetDTO> cueSheetDTOList = cueSheetMapper.toDtoList(cueSheetList);
+        List<CueSheetNodDTO> cueSheetDTOList = cueSheetNodMapper.toDtoList(cueSheetList);
+
+
+        for (CueSheetNodDTO cueSheetNodDTO : cueSheetDTOList){
+
+            Long cueId = cueSheetNodDTO.getCueId();
+
+            Optional<Nod> nodEntity = nodRepository.findNodByCue(cueId);
+
+            if (nodEntity.isPresent()){
+                Nod nod = nodEntity.get();
+
+                cueSheetNodDTO.setBrdcSt(nod.getBrdcSt());
+            }
+
+        }
 
 
         return cueSheetDTOList;
@@ -90,17 +108,44 @@ public class NodService {
         String brdcPgmId = nodCreateDTO.getBrdcPgmId();
         Program program = programService.programFindOrFail(brdcPgmId);
 
-        Nod nod = nodCreateMapper.toEntity(nodCreateDTO);
+        Nod nod = new Nod();
 
-        nodRepository.save(nod);
+        Optional<Nod> nodEntity = nodRepository.findNodByCue(cueId);
 
+        if (nodEntity.isPresent()){
 
-        sendHomePage(nod.getNodId());
+            nod = nodEntity.get();
+
+            //NodDTO nodDTO = nodMapper.toDto(nod);
+            nod.setBrdcDt(nodCreateDTO.getBrdcDt());
+            nod.setBrdcStartTime(nodCreateDTO.getBrdcStartTime());
+            nod.setBrdcEndTime(nodCreateDTO.getBrdcEndTime());
+            nod.setNodTyp(nodCreateDTO.getNodTyp());
+            nod.setBrdcSt(nodCreateDTO.getBrdcSt());
+            nod.setFileNm(nodCreateDTO.getFileNm());
+            nod.setTransSt(nodCreateDTO.getTransSt());
+            nod.setBrdcPgmNm(nodCreateDTO.getBrdcPgmNm());
+            nod.setBrdcPgmId(nodCreateDTO.getBrdcPgmId());
+            nod.setSubrmId(nodCreateDTO.getSubrmId());
+
+            nodRepository.save(nod);
+
+            sendHomePage(nod.getNodId());
+
+        }else {
+
+            nod = nodCreateMapper.toEntity(nodCreateDTO);
+
+            nodRepository.save(nod);
+
+            sendHomePage(nod.getNodId());
+        }
 
 
         return nod.getNodId();
 
     }
+
 
     //큐시트 화면에서 스크립트 전송 버튼 눌럿을때 스크립트 홈페이지 전송
     public void sendScriptToHomePage(NodScriptSendDTO nodScriptSendDTO) throws JsonProcessingException {

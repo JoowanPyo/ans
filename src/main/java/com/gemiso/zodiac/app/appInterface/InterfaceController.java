@@ -499,7 +499,7 @@ public class InterfaceController {
     @PutMapping(path = "/mediatransfer/updatestate")
     public AnsApiResponse<?> stateChange(@Parameter(description = "필수값<br> lckYn ", required = true)
                                          @RequestBody @Valid MediaTransferDTO mediaTransferDTO,
-                                         @RequestHeader(value = "securityKey") String securityKey) throws JsonProcessingException {
+                                         @RequestHeader(value = "securityKey") String securityKey) throws Exception {
 
         //콘텐츠 아이디로 찾은 정보가 있으면 처리 [ 무조건 성공으로 넘어간다. ]
         log.info("Media State Update : ContentId : " + mediaTransferDTO.getContentId() + " Code : " + mediaTransferDTO.getTrnsfStCd() + " val : "

@@ -70,7 +70,7 @@ public class CueSheetItemController {
     public AnsApiResponse<CueSheetItemResponseDTO> createTemplate(@Parameter(description = "필수값<br> ", required = true)
                                                                   @RequestBody @Valid List<CueSheetItemCreateDTO> cueSheetItemCreateDTOList,
                                                                   @Parameter(name = "cueId", description = "큐시트아이디")
-                                                                  @PathVariable("cueId") Long cueId) throws JsonProcessingException {
+                                                                  @PathVariable("cueId") Long cueId) throws Exception {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
         String userId = userAuthService.authUser.getUserId();
@@ -94,7 +94,7 @@ public class CueSheetItemController {
     public AnsApiResponse<CueSheetItemResponseDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                                           @RequestBody @Valid CueSheetItemCreateDTO cueSheetItemCreateDTO,
                                                           @Parameter(name = "cueId", description = "큐시트아이디")
-                                                          @PathVariable("cueId") Long cueId) throws JsonProcessingException {
+                                                          @PathVariable("cueId") Long cueId) throws Exception {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
         String userId = userAuthService.authUser.getUserId();
@@ -212,7 +212,7 @@ public class CueSheetItemController {
                                                              @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
                                                              @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd,
                                                              @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
-                                                             @RequestParam(value = "spareYn", required = true) String spareYn) throws JsonProcessingException {
+                                                             @RequestParam(value = "spareYn", required = true) String spareYn) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
@@ -370,7 +370,7 @@ public class CueSheetItemController {
                                                                     @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
                                                                     @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd,
                                                                     @Parameter(name = "spareYn", description = "예비여부(Y,N)")
-                                                                    @RequestParam(value = "spareYn", required = false) String spareYn) throws JsonProcessingException {
+                                                                    @RequestParam(value = "spareYn", required = false) String spareYn) throws Exception {
 
         CueSheetItemSimpleDTO cueSheetItemSimpleDTO = cueSheetItemService.updateSpareCueItem(cueId, cueItemId, cueItemOrd, spareYn);
 

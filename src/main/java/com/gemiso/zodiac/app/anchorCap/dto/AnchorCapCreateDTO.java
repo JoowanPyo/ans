@@ -21,13 +21,13 @@ public class AnchorCapCreateDTO {
     private String capDivCd;
     @NotNull
     @Schema(description = "라인 번호")
-    private int lnNo;
+    private Integer lnNo;
     @Schema(description = "자막 내용")
     private String capCtt;
     @Schema(description = "자막 비고")
     private String capRmk;
     @Schema(description = "자막 순번")
-    private int lnOrd;
+    private Integer lnOrd;
     @NotNull
     @Schema(description = "기사 아이디")
     private Long articleId;

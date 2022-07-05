@@ -28,7 +28,7 @@ public class InterfaceTopicService {
 
     //큐시트 아이템 상태 업데이트 [Taker to web]
     //테이커에서 플레이, 선택 정보를 웹으로 전달 웹은 이를 표시
-    public void takerStatusUpdate(TakerToCueBodyDTO takerToCueBodyDTO) throws JsonProcessingException {
+    public void takerStatusUpdate(TakerToCueBodyDTO takerToCueBodyDTO) throws Exception {
 
         List<TakerToCueBodyDataDTO> bodyList = takerToCueBodyDTO.getBody();
         Long cueId = takerToCueBodyDTO.getCue_id();
@@ -47,7 +47,7 @@ public class InterfaceTopicService {
 
             TakerToCueArrayBodyDTO takerToCueArrayBodyDTO = new TakerToCueArrayBodyDTO();
             takerToCueArrayBodyDTO.setCueItemId(body.getRd_id());
-            takerToCueArrayBodyDTO.setStatus(body.getStatus());
+            takerToCueArrayBodyDTO.setStatus(body.getStatus()); //Null값이 오면 상태 초기화
 
             newBodyList.add(takerToCueArrayBodyDTO);
         }
@@ -61,7 +61,7 @@ public class InterfaceTopicService {
     }
 
     //테이커에서 방송상태 업데이트로 들어온 정보를 web에 전송
-    public void cueStatusUpdate(Long cueId, String cueStCd) throws JsonProcessingException {
+    public void cueStatusUpdate(Long cueId, String cueStCd) throws Exception {
 
 
         //클로아이언트로 MQ메세지 전송
@@ -77,7 +77,7 @@ public class InterfaceTopicService {
     }
 
     //기사 잠금시 테이커전송
-    public void articleLock(String eventId , Long artclId) throws JsonProcessingException {
+    public void articleLock(String eventId , Long artclId) throws Exception {
 
         //토픽메세지 ArticleTopicDTO Json으로 변환후 send
         ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();

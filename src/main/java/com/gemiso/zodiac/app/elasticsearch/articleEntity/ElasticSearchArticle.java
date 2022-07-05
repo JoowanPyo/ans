@@ -17,6 +17,7 @@ import javax.persistence.Embedded;
 import java.util.List;
 import java.util.Objects;
 
+//ans_article_prod 운영
 //@TypeAlias("ans_article")
 @Data
 @Document(indexName = "ans_article", writeTypeHint = WriteTypeHint.FALSE)

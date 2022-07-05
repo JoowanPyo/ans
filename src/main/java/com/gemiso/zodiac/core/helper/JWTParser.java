@@ -81,12 +81,11 @@ public class JWTParser {
         Object obj = parser.parse(exp);
         JSONObject jsonObj = (JSONObject) obj;
 
-        // long 변환하여 객체 생성
-        long ext = (long) jsonObj.get("exp");
+        Long ext = (Long) jsonObj.get("exp");
 
         Date date = new Date();
 
-        long DateTime = date.getTime();
+        Long DateTime = date.getTime();
 
         ext = ext * 1000; // 바로 1000을 곱한 수를 넣으면 범위 초과 에러가 나기 때문에.
 
@@ -97,8 +96,37 @@ public class JWTParser {
         if (TokenDate.before(nowDate)) {
             return "";
         }
+
         return refreshToken;
     }
+
+       /* String string = jsonObj.get("exp").toString();
+
+        if (string.contains(".")){
+
+            Double getExt = (Double) jsonObj.get("exp");
+
+            //더블을 롱으로 변화해서 사용.
+            Long ext = Math.round(getExt);
+
+            Date date = new Date();
+
+            Long DateTime = date.getTime();
+
+            ext = ext * 1000; // 바로 1000을 곱한 수를 넣으면 범위 초과 에러가 나기 때문에.
+
+            Date TokenDate = new Date(ext);
+            Date nowDate = new Date(DateTime);
+
+            // 토큰만료 됫을경우 return null
+            if (TokenDate.before(nowDate)) {
+                return "";
+            }
+
+        }else {*/
+
+      /*  }*/
+
 
     public String acTokenParser(String Authorization) throws ParseException {
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.topic.cueSheetTopicDTO.CueSheetTakerTopicDTO;
+import com.gemiso.zodiac.core.topic.cueSheetTopicDTO.CueSheetUnlockTopicDTO;
 import com.gemiso.zodiac.core.topic.cueSheetTopicDTO.CueSheetWebTopicDTO;
 import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerCueSheetTopicDTO;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class CueSheetTopicService {
     private final MarshallingJsonHelper marshallingJsonHelper;
     //큐시트 토픽 메세지 전송
     public void sendCueTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
-                                   String spareYn, String prompterFlag, String videoTakerFlag) throws JsonProcessingException {
+                                   String spareYn, String prompterFlag, String videoTakerFlag) throws Exception {
 
         //토픽메세지 ArticleTopicDTO Json으로 변환후 send
         TakerCueSheetTopicDTO takerCueSheetTopicDTO = new TakerCueSheetTopicDTO();
@@ -57,7 +58,7 @@ public class CueSheetTopicService {
 
     //미디어
     public void sendMediTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
-                                   String spareYn, String prompterFlag, String videoTakerFlag) throws JsonProcessingException {
+                                   String spareYn, String prompterFlag, String videoTakerFlag) throws Exception {
 
 
         CueSheetWebTopicDTO cueSheetWebTopicDTO = new CueSheetWebTopicDTO();
@@ -75,7 +76,7 @@ public class CueSheetTopicService {
     }
 
     //큐시트 토픽 메세지 전송
-    public void sendCueTopic(CueSheet cueSheet, String eventId, Object object) throws JsonProcessingException {
+    public void sendCueTopic(CueSheet cueSheet, String eventId, Object object) throws Exception {
 
         Long cueId = cueSheet.getCueId();
 
@@ -93,6 +94,23 @@ public class CueSheetTopicService {
         topicSendService.topicInterface(json);
         //web에 큐메세지 전송
         //topicSendService.topicWeb(json);
+
+    }
+
+    //언락
+    public void sendUnLockTopic(String eventId, Long cueId, String userId, String userNm) throws Exception {
+
+
+        CueSheetUnlockTopicDTO cueSheetUnlockTopicDTO = new CueSheetUnlockTopicDTO();
+        cueSheetUnlockTopicDTO.setMsg(eventId);
+        cueSheetUnlockTopicDTO.setCueId(cueId);
+        cueSheetUnlockTopicDTO.setUserId(userId);
+        cueSheetUnlockTopicDTO.setUserNm(userNm);
+
+
+        String webJson = marshallingJsonHelper.MarshallingJson(cueSheetUnlockTopicDTO);
+        //web에 큐메세지 전송
+        topicSendService.topicWeb(webJson);
 
     }
 }

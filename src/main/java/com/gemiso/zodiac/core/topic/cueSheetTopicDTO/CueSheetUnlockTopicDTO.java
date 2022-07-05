@@ -7,13 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CueSheetWebTopicDTO {
+public class CueSheetUnlockTopicDTO {
 
-    private String eventId;
+    private String msg;
     private Long cueId;
-    private int cueVer;
-    private int cueOderVer;
-    private Long artclId;
-    private Long cueItemId;
-    private String spareYn;
+    private String userId;
+    private String userNm;
 }

@@ -31,6 +31,9 @@ public class Program {
     @Column(name = "brdc_pgm_nm", length = 450)
     private String brdcPgmNm;
 
+    @Column(name = "brdc_pgm_nm_en", length = 450)
+    private String brdcPgmNmEn;
+
     @Column(name = "ch_div_cd", length = 50)
     private String chDivCd;
 

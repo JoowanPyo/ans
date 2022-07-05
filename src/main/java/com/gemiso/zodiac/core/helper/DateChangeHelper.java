@@ -15,9 +15,9 @@ public class DateChangeHelper {
     //String To Date
     public Date stringToDateNoComma(String str) throws ParseException {
 
-        Date returnDate = new Date();
+        Date returnDate = null;
 
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyymmddhhmmss");
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyyMMddhhmmss");
 
         if (str != null && str.trim().isEmpty() == false){
             returnDate = transFormat.parse(str);
@@ -46,7 +46,7 @@ public class DateChangeHelper {
     //String형식을 Date으로 파싱
     public Date StringToDateNormal(String str) throws ParseException {
 
-        Date returnDate = new Date();
+        Date returnDate = null;
 
         SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -60,7 +60,7 @@ public class DateChangeHelper {
     //String형식을 Date으로 파싱
     public Date StringToDateNoTime(String str) throws ParseException {
 
-        Date returnDate = new Date();
+        Date returnDate = null;
 
         SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
 

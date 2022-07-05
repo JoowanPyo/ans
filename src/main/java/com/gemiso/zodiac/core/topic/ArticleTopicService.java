@@ -1,10 +1,8 @@
 package com.gemiso.zodiac.core.topic;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.ArticleLockTopicDTO;
 import com.gemiso.zodiac.core.topic.articleTopicDTO.ArticleTopicDTO;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +19,7 @@ public class ArticleTopicService {
     private final MarshallingJsonHelper marshallingJsonHelper;
 
 
-    public void articleCreateSendTopic(Long articleId) throws JsonProcessingException {
+    public void articleCreateSendTopic(Long articleId) throws Exception {
 
         ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
         articleTopicDTO.setEventId("AC");
@@ -35,7 +33,7 @@ public class ArticleTopicService {
 
     }
 
-    public void articleTopic(String eventId, Long artclId) throws JsonProcessingException {
+    public void articleTopic(String eventId, Long artclId) throws Exception {
 
         //토픽메세지 ArticleTopicDTO Json으로 변환후 send
         ArticleTopicDTO articleTopicDTO = new ArticleTopicDTO();
@@ -46,7 +44,7 @@ public class ArticleTopicService {
         topicSendService.topicWeb(json);
     }
 
-    public void articleLockTopic(String eventId, Long artclId, String msg, Date lckDtm, String lckrId, String lckrNm) throws JsonProcessingException {
+    public void articleLockTopic(String eventId, Long artclId, String msg, Date lckDtm, String lckrId, String lckrNm) throws Exception {
 
         ArticleLockTopicDTO articleLockTopicDTO = new ArticleLockTopicDTO();
 

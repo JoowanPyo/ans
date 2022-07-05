@@ -63,4 +63,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Queryds
     @Query(value = "SELECT nextval('seq_org_artclId')", nativeQuery = true)
     Long findOrgArticleId(); //할수없이 네이티브 쿼리 사용...
 
+
+    @Query("select a from Article a where a.cueSheet.cueId =:cueId and a.delYn = 'N'")
+    List<Article> findArticleCue(@Param("cueId") Long cueId);
+
 }

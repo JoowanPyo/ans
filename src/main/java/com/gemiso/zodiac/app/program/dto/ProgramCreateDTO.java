@@ -11,6 +11,7 @@ public class ProgramCreateDTO {
 
     private Long brdcPgmId;
     private String brdcPgmNm;
+    private String brdcPgmNmEn; //영문명
     private String chDivCd;
     private String brdcPgmDivCd;
     private String gneDivCd;

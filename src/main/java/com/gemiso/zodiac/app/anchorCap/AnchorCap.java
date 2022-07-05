@@ -33,7 +33,7 @@ public class AnchorCap {
     private String capDivCdNm;*/
 
     @Column(name = "ln_no")
-    private int lnNo;
+    private Integer lnNo;
 
     @Column(name = "cap_ctt", columnDefinition = "text")
     private String capCtt;
@@ -42,7 +42,7 @@ public class AnchorCap {
     private String capRmk;
 
     @Column(name = "ln_ord")
-    private int lnOrd;
+    private Integer lnOrd;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artcl_id")

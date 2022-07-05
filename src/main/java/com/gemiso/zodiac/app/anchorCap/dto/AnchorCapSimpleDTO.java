@@ -20,13 +20,13 @@ public class AnchorCapSimpleDTO {
     @Schema(description = "자막 구분 코드 명")
     private String capDivCdNm;
     @Schema(description = "라인 번호")
-    private int lnNo;
+    private Integer lnNo;
     @Schema(description = "자막 내용")
     private String capCtt;
     @Schema(description = "자막 비고")
     private String capRmk;
     @Schema(description = "자막 순번")
-    private int lnOrd;
+    private Integer lnOrd;
     //@Schema(description = "기사 아이디")
     //private ArticleSimpleDTO article;
     @Schema(description = "자막 템플릿 아이디")

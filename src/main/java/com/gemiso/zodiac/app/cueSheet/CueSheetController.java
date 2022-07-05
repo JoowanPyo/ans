@@ -17,6 +17,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.util.Date;
 
 @Api(description = "큐시트 API")
@@ -113,7 +114,7 @@ public class CueSheetController {
     public AnsApiResponse<CueSheetSimpleDTO> update(@Parameter(name = "cueSheetUpdateDTO", required = true, description = "필수값<br>")
                                                     @Valid @RequestBody CueSheetUpdateDTO cueSheetUpdateDTO,
                                                     @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                                    @PathVariable("cueId") Long cueId) throws JsonProcessingException {
+                                                    @PathVariable("cueId") Long cueId) throws Exception {
         //버전체크
         //토픽메세지
         // 토큰 인증된 사용자 아이디를 입력자로 등록
@@ -155,7 +156,7 @@ public class CueSheetController {
     public AnsApiResponse<CueSheetOrderLockResponsDTO> cueSheetOrderLock(@Parameter(name = "cueSheetOrderLockDTO", required = true, description = "필수값<br>")
                                                                          @Valid @RequestBody CueSheetOrderLockDTO cueSheetOrderLockDTO,
                                                                          @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                                                         @PathVariable("cueId") Long cueId) throws JsonProcessingException {
+                                                                         @PathVariable("cueId") Long cueId) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
@@ -176,14 +177,14 @@ public class CueSheetController {
     @Operation(summary = "큐시트 잠금해제", description = "큐시트 잠금해제")
     @PutMapping(path = "/{cueId}/unLock")
     public AnsApiResponse<CueSheetDTO> cueSheetUnLock(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
-                                                      @PathVariable("cueId") Long cueId) {
+                                                      @PathVariable("cueId") Long cueId) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         String userId = userAuthService.authUser.getUserId();
         log.info("CueSheet Unlock : UserId - " + userId + "CueSheet Id - " + cueId);
 
 
-        cueSheetService.cueSheetUnLock(cueId);
+        cueSheetService.cueSheetUnLock(cueId, userId);
 
         //큐시트 잠금해제 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         CueSheetDTO cueSheetDTO = new CueSheetDTO();

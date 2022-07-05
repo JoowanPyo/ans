@@ -269,7 +269,7 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
     public Page<ElasticSearchArticle> findByElasticSearchArticleListCue(Date sdate, Date edate, String searchWord,
                                                                         Long cueId, String brdcPgmId, String artclTypCd,
                                                                         String artclTypDtlCd, String copyYn, Long deptCd,
-                                                                        Long orgArtclId, Pageable pageable) throws Exception {
+                                                                        Long orgArtclId, String rptrId, Pageable pageable) throws Exception {
 
 
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
@@ -353,11 +353,14 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
         }
         //방송 프로그램 아이디로 조회
         if (brdcPgmId != null && brdcPgmId.trim().isEmpty() == false) {
-            query.must(QueryBuilders.termQuery("brdcPgmId", cueId));
+            query.must(QueryBuilders.termQuery("brdcPgmId", brdcPgmId));
         }
         //부서코드
         if (deptCd != null && deptCd != 0) {
             query.must(QueryBuilders.termQuery("deptCd", deptCd));
+        }
+        if (rptrId != null && rptrId.trim().isEmpty() == false){
+            query.must(QueryBuilders.termsQuery("rptrId", rptrId));
         }
 
         sourceBuilder.query(query);

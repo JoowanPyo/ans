@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface CueSheetItemCapRepotitory extends JpaRepository<CueSheetItemCap, Long>, QuerydslPredicateExecutor<CueSheetItemCap> {
 
@@ -26,5 +27,10 @@ public interface CueSheetItemCapRepotitory extends JpaRepository<CueSheetItemCap
 
     @Query("select a from CueSheetItemCap a where a.cueSheetItem.cueItemId = :cueItemId and a.delYn = 'Y' ")
     List<CueSheetItemCap> findDeleteCueSheetItemCapList(@Param("cueItemId")Long cueItemId);
+
+    @Query("select a from CueSheetItemCap a where a.cueSheetItem.cueItemId = :cueItemId and a.delYn = 'Y' ")
+    Set<CueSheetItemCap> findDeleteCueSheetItemCapSet(@Param("cueItemId")Long cueItemId);
+
+
 
 }

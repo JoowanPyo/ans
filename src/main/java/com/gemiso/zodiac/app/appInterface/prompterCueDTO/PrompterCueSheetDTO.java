@@ -76,10 +76,13 @@ public class PrompterCueSheetDTO {
     private Long deptCd;
 
     @XmlElement(name = "artcl_reqd_sec")
-    private Integer artclReqdSec;
+    private Integer artclReqdSec; //기사소요시간
 
     @XmlElement(name = "anc_reqd_sec")
-    private Integer ancReqdSec;
+    private Integer ancReqdSec;//앵커소요시간
+
+    @XmlElement(name = "extra_time_sec")
+    private Integer extraTimeSec; //앵커소요시간
 
     @XmlElement(name = "news_acum_time")
     private Integer newsAcumTime;

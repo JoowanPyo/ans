@@ -175,6 +175,10 @@ public class CueSheetItemService {
         CueSheetItem cueSheetItem = cueSheetItemEntity.get();
 
 
+        /*Set<CueSheetItemCap> cueSheetItemCapList = cueSheetItemCapRepotitory.findDeleteCueSheetItemCapSet(cueItemId);
+
+        cueSheetItem.setCueSheetItemCap(cueSheetItemCapList);*/
+
         ArticleCueItemDTO articleDTO = new ArticleCueItemDTO();
         Article getArticle = cueSheetItem.getArticle();
         if (ObjectUtils.isEmpty(getArticle) == false) {
@@ -242,7 +246,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 등록
-    public Long create(CueSheetItemCreateDTO cueSheetItemCreateDTO, Long cueId, String userId) throws JsonProcessingException {
+    public Long create(CueSheetItemCreateDTO cueSheetItemCreateDTO, Long cueId, String userId) throws Exception {
 
         //큐시트 아이디로 큐시트 조회 및 존재유무 확인.
         CueSheet cueSheet = cueSheetService.cueSheetFindOrFail(cueId);
@@ -297,7 +301,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 수정 [기사 x]
-    public void update(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId, String userId) throws JsonProcessingException {
+    public void update(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, Long cueId, Long cueItemId, String userId) throws Exception {
 
         //큐시트 아이디로 큐시트 조회 및 존재유무 확인.
         CueSheet cueSheet = cueSheetService.cueSheetFindOrFail(cueId);
@@ -640,7 +644,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 생성[Drag and Drop] By CueTemplateItem
-    public void createCueTemplate(Long cueId, List<CueSheetItemCreateTmplDTO> cueSheetItemCreateTmplDTO, String cueItemDivCd, String spareYn, String userId) throws JsonProcessingException {
+    public void createCueTemplate(Long cueId, List<CueSheetItemCreateTmplDTO> cueSheetItemCreateTmplDTO, String cueItemDivCd, String spareYn, String userId) throws Exception {
 
         //큐시트 아이디로 큐시트 조회 및 존재유무 확인.
         CueSheet cueSheet = cueSheetService.cueSheetFindOrFail(cueId);
@@ -760,7 +764,7 @@ public class CueSheetItemService {
     }
 
     //드레그앤드랍 큐시트 템플릿 미디어 복시
-    public void copyTemplateMedia(List<CueTmpltMedia> cueTmpltMedia, Long copyCueItemId, String userId, CueSheet cueSheet) throws JsonProcessingException {
+    public void copyTemplateMedia(List<CueTmpltMedia> cueTmpltMedia, Long copyCueItemId, String userId, CueSheet cueSheet) throws Exception {
 
         CueSheetItem cueSheetItem = CueSheetItem.builder().cueItemId(copyCueItemId).build();
 
@@ -800,7 +804,7 @@ public class CueSheetItemService {
     }
 
     //드레그앤드랍 큐시트 아이템 미디어 등록
-    public void createMedia(Set<CueSheetMedia> cueSheetMedias, Long copyCueItemId, String userId, CueSheet cueSheet) throws JsonProcessingException {
+    public void createMedia(Set<CueSheetMedia> cueSheetMedias, Long copyCueItemId, String userId, CueSheet cueSheet) throws Exception {
 
         CueSheetItem cueSheetItem = CueSheetItem.builder().cueItemId(copyCueItemId).build();
 
@@ -1113,7 +1117,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 방송완료 후 예비큐시트 추가수정.
-    public CueSheetItemSimpleDTO updateSpareCueItem(Long cueId, Long cueItemId, int cueItemOrd, String spareYn) throws JsonProcessingException {
+    public CueSheetItemSimpleDTO updateSpareCueItem(Long cueId, Long cueItemId, int cueItemOrd, String spareYn) throws Exception {
 
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
@@ -1361,7 +1365,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 등록( 템플릿 ) : 운영참조
-    public void createTemplate(List<CueSheetItemCreateDTO> cueSheetItemCreateDTOList, Long cueId, String userId) throws JsonProcessingException {
+    public void createTemplate(List<CueSheetItemCreateDTO> cueSheetItemCreateDTOList, Long cueId, String userId) throws Exception {
 
         //큐시트 아이디로 큐시트 조회 및 존재유무 확인.
         CueSheet cueSheet = cueSheetService.cueSheetFindOrFail(cueId);
@@ -1415,7 +1419,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 운영참조 미디어 등록
-    public void createTemplateMedia(List<CueSheetMediaCreateDTO> cueSheetMediaCreateDTOS, CueSheet cueSheet, Long cueItemId, String userId) throws JsonProcessingException {
+    public void createTemplateMedia(List<CueSheetMediaCreateDTO> cueSheetMediaCreateDTOS, CueSheet cueSheet, Long cueItemId, String userId) throws Exception {
 
         CueSheetItemSimpleDTO cueSheetItemSimpleDTO = CueSheetItemSimpleDTO.builder().cueItemId(cueItemId).build();
         //부조 정보를 가져온다 = "A, B"
@@ -1620,8 +1624,11 @@ public class CueSheetItemService {
         Article articleEntity = getArticleEntity(article, maxArtclOrd, cueSheet);
         articleRepository.save(articleEntity); //복사된 기사 등록
 
-        Set<ArticleCap> articleCapList = article.getArticleCap(); //기사자막 리스트 get
-        Set<AnchorCap> anchorCapList = article.getAnchorCap(); //앵커자막 리스트 get
+       /* Set<ArticleCap> articleCapList = article.getArticleCap(); //기사자막 리스트 get
+        Set<AnchorCap> anchorCapList = article.getAnchorCap(); //앵커자막 리스트 get*/
+
+        List<ArticleCap> articleCapList = articleCapRepository.findArticleCap(artclId);
+        List<AnchorCap> anchorCapList = anchorCapRepository.findAnchorCapList(artclId);
 
         articleService.articleActionLogCreate(articleEntity, userId); //기사 액션 로그 등록
         Long articleHistId = articleService.createArticleHist(articleEntity);//기사 이력 create
@@ -1937,7 +1944,7 @@ public class CueSheetItemService {
                 .build();
     }
 
-    public void ordUpdate(Long cueId, Long cueItemId, Integer cueItemOrd, String spareYn) throws JsonProcessingException {
+    public void ordUpdate(Long cueId, Long cueItemId, Integer cueItemOrd, String spareYn) throws Exception {
 
 
         CueSheetItem cueSheetItem = cueItemFindOrFail(cueItemId);
@@ -1970,6 +1977,8 @@ public class CueSheetItemService {
             CueSheetItemDTO cueSheetItemDTO = cueSheetItemMapper.toDto(cueSheetItems);
             cueSheetItemDTO.setCueItemOrd(index);//순번 재등록
             cueSheetItemDTO.setCueItemOrdCd(displayCd);
+            //cueSheetItems.setCueItemOrd(index);
+            //cueSheetItems.setCueItemOrdCd(displayCd);
             CueSheetItem setCueSheetItem = cueSheetItemMapper.toEntity(cueSheetItemDTO);
             cueSheetItemRepository.save(setCueSheetItem);//순번 업데이트
             index++;//순번 + 1

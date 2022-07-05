@@ -12,6 +12,6 @@ public class ClipInfoDTO {
 
     private String video_id;
     private String filename;
-    private Integer filesize;
+    private Long filesize;
     private String formatted_filesize;
 }

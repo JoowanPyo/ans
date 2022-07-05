@@ -69,6 +69,8 @@ public class TakerCueSheetSpareDTO {
     private Integer ancReqdSec; //앵커소요시간
     @XmlElement(name = "artcl_smry_ctt")
     private int artclSmryCtt;
+    @XmlElement(name = "extra_time_sec")
+    private Integer extraTimeSec; //앵커소요시간
     @XmlElement(name = "artcl_div_cd")
     private String artclDivCd;
     @XmlElement(name = "artcl_div_nm")

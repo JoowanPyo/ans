@@ -74,7 +74,7 @@ public class CueSheetMediaController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<CueSheetMediaDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                @RequestBody @Valid CueSheetMediaCreateDTO cueSheetMediaCreateDTO) throws JsonProcessingException {
+                                                @RequestBody @Valid CueSheetMediaCreateDTO cueSheetMediaCreateDTO) throws Exception {
 
         Long cueMediaId = cueSheetMediaService.create(cueSheetMediaCreateDTO);
 

@@ -31,7 +31,8 @@ public class YonhapWireRepositoryImpl implements YonhapWireRepositoryCustom {
                                              String svcTyp,
                                              String searchWord,
                                              List<String> imprtList,
-                                             Pageable pageable) {
+                                             Pageable pageable,
+                                               String mediaNo) {
 
         QYonhapWire qYonhapWire = QYonhapWire.yonhapWire;
 
@@ -56,7 +57,7 @@ public class YonhapWireRepositoryImpl implements YonhapWireRepositoryCustom {
             jpaQuery.where(qYonhapWire.svcTyp.eq(svcTyp));
         }
         if (searchWord != null && searchWord.trim().isEmpty() == false){
-            jpaQuery.where(qYonhapWire.artclTitl.contains(searchWord));
+            jpaQuery.where(qYonhapWire.artclTitl.contains(searchWord).or(qYonhapWire.mediaNo.eq(searchWord)));
         }
         if (ObjectUtils.isEmpty(imprtList) == false){
 
@@ -64,7 +65,7 @@ public class YonhapWireRepositoryImpl implements YonhapWireRepositoryCustom {
 
         }
 
-        jpaQuery.orderBy(qYonhapWire.inputDtm.desc());
+        jpaQuery.orderBy(qYonhapWire.trnsfDtm.desc());
 
         Long totalCount = jpaQuery.fetchCount();
         jpaQuery.offset(pageable.getOffset());

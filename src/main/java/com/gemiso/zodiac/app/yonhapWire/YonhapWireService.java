@@ -74,16 +74,17 @@ public class YonhapWireService {
 
 
     public PageResultDTO<YonhapWireDTO, YonhapWire> findAll(Date sdate, Date edate, String agcyCd, String agcyNm,  String source,
-                                       String svcTyp,  String searchWord, List<String> imprtList, Integer page, Integer limit){
+                                       String svcTyp,  String searchWord, List<String> imprtList, Integer page, Integer limit,
+                                                            String mediaNo){
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
         Pageable pageable = pageHelper.getYonhapPage();
 
-        BooleanBuilder booleanBuilder = getSearch(sdate, edate, agcyCd, agcyNm, source, svcTyp, searchWord, imprtList);
+       // BooleanBuilder booleanBuilder = getSearch(sdate, edate, agcyCd, agcyNm, source, svcTyp, searchWord, imprtList);
 
         Page<YonhapWire> yonhapWireList = yonhapWireRepository.findYonhapWireList(sdate, edate, agcyCd, agcyNm, source,
-                svcTyp, searchWord, imprtList, pageable);
+                svcTyp, searchWord, imprtList, pageable, mediaNo);
 
         Function<YonhapWire, YonhapWireDTO> fn = (entity -> yonhapWireMapper.toDto(entity));
         //List<YonhapWireDTO> yonhapWireDTOList = yonhapWireMapper.toDtoList(yonhapWireList);
@@ -402,46 +403,72 @@ public class YonhapWireService {
 
         Long reuterId = null;
 
-        String contId = yonhapReuterCreateDTO.getWire_artcl_id();
+        String contId = yonhapReuterCreateDTO.getWire_artcl_id(); //transmitId [ XML ]
 
-        List<YonhapWire> yonhapWireList = yonhapWireRepository.findYhArtclId(contId);
+
+        //Nam에 보낼 미디어 파일 네임
+        String getCmnt = yonhapReuterCreateDTO.getVideo_nm();
+        //Nam에 미디어 등록 후 id값을 받아온다.
+        YonhapNamResponseDTO mamCont = mamCreateReuterMedia(getCmnt, yonhapReuterCreateDTO);
+
+        NamResponseDTO data = mamCont.getData();
+        String mamContId = "";
+        Long getMamContId = null;
+        if (ObjectUtils.isEmpty(data) == false){
+            getMamContId = data.getId();
+
+            mamContId = String.valueOf(getMamContId);
+        }
+
+        //에딧 넘버로 조회 하기 위해 get
+        String mediaNo = yonhapReuterCreateDTO.getEditor_number();
+
+        //에딧넘버 + namContId로 기존에 등록된 REUTER정보가 있는지 확인 있으면 UPDATE 없으면 CREATE
+        List<YonhapWire> yonhapWireList = yonhapWireRepository.findReuter(mediaNo, mamContId);
 
         if (CollectionUtils.isEmpty(yonhapWireList) == false){
 
-            Date trnsfDtm = dateChangeHelper.stringToDateNoComma(yonhapReuterCreateDTO.getArtcl_lcal_dtm());
+            Date trnsfDtm = dateChangeHelper.stringToDateNoComma(yonhapReuterCreateDTO.getArtcl_stnd_dtm());
 
             reuterId = yonhapWireList.get(0).getWireId();
+            String credit = yonhapWireList.get(0).getCredit();
 
-            String getCmnt = yonhapReuterCreateDTO.getVideo_nm();
+
+           /* String getCmnt = yonhapReuterCreateDTO.getVideo_nm();
 
 
             //Nam에 미디어 등록 후 id값을 받아온다.
-            YonhapNamResponseDTO mamCont = mamCreateReuterMedia(getCmnt, yonhapReuterCreateDTO);
-            NamResponseDTO data = mamCont.getData();
+            YonhapNamResponseDTO mamCont = mamCreateReuterMedia(getCmnt, yonhapReuterCreateDTO);*/
+           /* NamResponseDTO data = mamCont.getData();
             Long mamContId = null;
             if (ObjectUtils.isEmpty(data) == false){
                 mamContId = data.getId();
+            }*/
+
+
+            String cmnt = null;
+            if (getCmnt != null && getCmnt.trim().isEmpty() == false) {
+                cmnt = getCmnt.substring(0, getCmnt.lastIndexOf("."));
             }
-
-
-            int lenth = getCmnt.length();
-            String cmnt = getCmnt.substring(0, getCmnt.lastIndexOf(".") );
 
             YonhapWire yonhapWire = YonhapWire.builder()
                     .wireId(reuterId)
-                    .contId(contId)
+                    .contId(String.valueOf(mamContId))//이게 미디어 넘버로
                     .artclTitl(yonhapReuterCreateDTO.getWire_artcl_titl())
                     .artclCtt(yonhapReuterCreateDTO.getWire_artcl_ctt())
                     .agcyNm("REUTERS")//009
-                    .cmnt(cmnt)
+                    .cmnt(cmnt)//이게 콘텐츠 아이디로?
                     .imprt(yonhapReuterCreateDTO.getImprt())
-                    .mediaNo(yonhapReuterCreateDTO.getEditor_number())
+                    .mediaNo(mediaNo)
                     .source("REUTERS")
                     .svcTyp("R")
                     .agcyCd("R")
+                    .inputDtm(new Date())
                     .trnsfDtm(trnsfDtm)
-                    .mamContId(mamContId)
+                    .mamContId(getMamContId)//실제 nam에서 받은 Long값 nam contentId
+                    .credit(credit+","+contId)//여기에 콘텐츠 정보를 넣는다.
                     .build();
+
 
             try {
                 yonhapWireRepository.save(yonhapWire); //외신 aptn 등록
@@ -451,34 +478,39 @@ public class YonhapWireService {
 
         }else {
 
-            Date trnsfDtm = dateChangeHelper.stringToDateNoComma(yonhapReuterCreateDTO.getArtcl_lcal_dtm());
+            Date trnsfDtm = dateChangeHelper.stringToDateNoComma(yonhapReuterCreateDTO.getArtcl_stnd_dtm());
 
-            String getCmnt = yonhapReuterCreateDTO.getVideo_nm();
+            String cmnt = null;
+            if (getCmnt != null && getCmnt.trim().isEmpty() == false) {
+                cmnt = getCmnt.substring(0, getCmnt.lastIndexOf("."));
+            }
+
+           /* String getCmnt = yonhapReuterCreateDTO.getVideo_nm();
             int lenth = getCmnt.length();
-            String cmnt = getCmnt.substring(0, getCmnt.lastIndexOf(".") );
-
             //Nam에 미디어 등록 후 id값을 받아온다.
             YonhapNamResponseDTO mamCont = mamCreateReuterMedia(getCmnt, yonhapReuterCreateDTO);
             NamResponseDTO data = mamCont.getData();
             Long mamContId = null;
             if (ObjectUtils.isEmpty(data) == false){
                 mamContId = data.getId();
-            }
+            }*/
 
 
             YonhapWire yonhapWire = YonhapWire.builder()
-                    .contId(contId)
+                    .contId(String.valueOf(mamContId))
                     .artclTitl(yonhapReuterCreateDTO.getWire_artcl_titl())
                     .artclCtt(yonhapReuterCreateDTO.getWire_artcl_ctt())
                     .agcyNm("REUTERS")//009
                     .cmnt(cmnt)
                     .imprt(yonhapReuterCreateDTO.getImprt())
-                    .mediaNo(yonhapReuterCreateDTO.getEditor_number())
+                    .mediaNo(mediaNo)
                     .source("REUTERS")
                     .svcTyp("R")
                     .agcyCd("R")
+                    .inputDtm(new Date())
                     .trnsfDtm(trnsfDtm)
-                    .mamContId(mamContId)
+                    .mamContId(getMamContId)//실제 nam에서 받은 Long값 nam contentId
+                    .credit(contId)//여기에 콘텐츠 정보를 넣는다.
                     .build();
 
             try {

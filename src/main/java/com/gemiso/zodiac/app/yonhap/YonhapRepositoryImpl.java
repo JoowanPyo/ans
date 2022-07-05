@@ -59,7 +59,7 @@ public class YonhapRepositoryImpl implements YonhapRepositoryCustom {
             jpaQuery.where(qYonhap.svcTyp.eq(svcTyp));
         }
 
-        jpaQuery.orderBy(qYonhap.inputDtm.desc());
+        jpaQuery.orderBy(qYonhap.trnsfDtm.desc());
 
         Long totalCount = jpaQuery.fetchCount();
         jpaQuery.offset(pageable.getOffset());

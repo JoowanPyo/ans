@@ -17,5 +17,5 @@ public interface ElasticSearchArticleCustom {
 
     Page<ElasticSearchArticle> findByElasticSearchArticleListCue(Date sdate, Date edate, String searchWord, Long cueId,
                                                                  String brdcPgmId, String artclTypCd,String artclTypDtlCd,
-                                                                 String copyYn, Long deptCd, Long orgArtclId, Pageable pageable) throws Exception;
+                                                                 String copyYn, Long deptCd, Long orgArtclId, String rptrId, Pageable pageable) throws Exception;
 }

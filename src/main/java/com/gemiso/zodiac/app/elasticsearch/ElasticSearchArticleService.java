@@ -53,6 +53,8 @@ public class ElasticSearchArticleService {
 
             Date getInputDtm = article.getInputDtm();
 
+            log.info("ElasticSearch Date Format : " + getInputDtm);
+
             String inputDtm = null;
             if (ObjectUtils.isEmpty(getInputDtm) == false) {
 

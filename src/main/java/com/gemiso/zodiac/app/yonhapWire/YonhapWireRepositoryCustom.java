@@ -9,5 +9,5 @@ import java.util.List;
 public interface YonhapWireRepositoryCustom {
 
     Page<YonhapWire> findYonhapWireList(Date sdate, Date edate, String agcyCd, String agcyNm, String source,
-                                      String svcTyp, String searchWord, List<String> imprtList, Pageable pageable);
+                                      String svcTyp, String searchWord, List<String> imprtList, Pageable pageable, String mediaNo);
 }

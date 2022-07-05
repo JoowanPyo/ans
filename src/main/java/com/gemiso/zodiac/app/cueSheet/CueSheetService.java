@@ -1,6 +1,8 @@
 package com.gemiso.zodiac.app.cueSheet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gemiso.zodiac.app.ArticleTag.ArticleTag;
+import com.gemiso.zodiac.app.ArticleTag.ArticleTagRepository;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
 import com.gemiso.zodiac.app.article.Article;
@@ -67,6 +69,9 @@ import com.gemiso.zodiac.app.program.ProgramService;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
+import com.gemiso.zodiac.app.tag.Tag;
+import com.gemiso.zodiac.app.user.User;
+import com.gemiso.zodiac.app.user.UserService;
 import com.gemiso.zodiac.core.enumeration.ActionEnum;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
@@ -107,6 +112,7 @@ public class CueSheetService {
     private final ArticleMediaRepository articleMediaRepository;
     private final CueSheetItemCapRepotitory cueSheetItemCapRepotitory;
     private final CueCapTmpltRepository cueCapTmpltRepository;
+    private final ArticleTagRepository articleTagRepository;
 
     private final CueSheetMapper cueSheetMapper;
     private final CueSheetCreateMapper cueSheetCreateMapper;
@@ -128,6 +134,7 @@ public class CueSheetService {
     private final ProgramService programService;
     //private final UserAuthService userAuthService;
     private final ArticleService articleService;
+    private final UserService userService;
     private final ElasticSearchArticleService elasticSearchArticleService;
 
     private final DailyProgramService dailyProgramService;
@@ -603,7 +610,7 @@ public class CueSheetService {
 
 
     //큐시트 등록
-    public Long create(CueSheetCreateDTO cueSheetCreateDTO, String userId) throws JsonProcessingException {
+    public Long create(CueSheetCreateDTO cueSheetCreateDTO, String userId) throws Exception {
 
         cueSheetCreateDTO.setInputrId(userId);
         cueSheetCreateDTO.setCueOderVer(0);
@@ -643,23 +650,44 @@ public class CueSheetService {
     }
 
     //큐시트 수정
-    public void update(CueSheetUpdateDTO cueSheetUpdateDTO, Long cueId, String userId) throws JsonProcessingException {
+    public void update(CueSheetUpdateDTO cueSheetUpdateDTO, Long cueId, String userId) throws Exception {
 
         //수정! 잠금여부? 잠금사용자, 잠금일시 도 수정할 때 정보를 넣어주나?
 
         CueSheet cueSheet = cueSheetFindOrFail(cueId);
 
+        Long subrmId = cueSheet.getSubrmId();
+        Long updateSubrmId = cueSheetUpdateDTO.getSubrmId();
+
         //프로그램 정보가 새로 들어왔을 시 프로그램 정보 업데이트를 위해 엔티티에서 프로그램 null값으로 셋팅
         ProgramSimpleDTO program = cueSheetUpdateDTO.getProgram();
+        Program orgProgram = cueSheet.getProgram();
 
         //프로그램 정보 update면 기존프로그램 조회된 원본 엔티티에서 제거
         if (ObjectUtils.isEmpty(program) == false) {
             String brdcPgmId = program.getBrdcPgmId();
-            if (brdcPgmId != null && brdcPgmId.trim().isEmpty() == false) {
+            String orgBrdcPgmId = orgProgram.getBrdcPgmId();
+            if (orgBrdcPgmId.equals(Optional.ofNullable(brdcPgmId).orElse("")) == false) {
 
                 //프로그램 정보 업데이트
-                Program updateProgram = Program.builder().brdcPgmId(brdcPgmId).build();
+                Program updateProgram =  programService.programFindOrFail(brdcPgmId);
                 cueSheet.setProgram(updateProgram);
+
+                List<Article> articleList = articleRepository.findArticleCue(cueId);
+
+                for (Article article : articleList){
+
+                    article.setBrdcPgmId(brdcPgmId);
+
+                    articleRepository.save(article);
+                    
+                    //큐시트 프로그램 명 셋팅
+                    CueSheet aritlcCueSheet = article.getCueSheet();
+                    cueSheet.setBrdcPgmNm(updateProgram.getBrdcPgmNm());
+                    article.setCueSheet(aritlcCueSheet);
+
+                    elasticSearchArticleService.elasticPush(article);
+                }
             }
         }
 
@@ -681,6 +709,20 @@ public class CueSheetService {
         cueSheetUpdateMapper.updateFromDto(cueSheetUpdateDTO, cueSheet);
 
         cueSheetRepository.save(cueSheet);
+
+        
+        //부조 정보가 바뀌면 엘라스틱서치 인덱싱 업데이트
+        if (subrmId.equals(Optional.ofNullable(updateSubrmId).orElse(0L)) ==false){
+
+
+            List<Article> articleList = articleRepository.findArticleCue(cueId);
+
+            for (Article article : articleList){
+
+                elasticSearchArticleService.elasticPush(article);
+            }
+
+        }
 
         cueSheetHistUpdate(cueId, cueSheet, userId);
 
@@ -1015,7 +1057,7 @@ public class CueSheetService {
     }
 
     //큐시트 락
-    public CueSheetOrderLockResponsDTO cueSheetOrderLock(CueSheetOrderLockDTO cueSheetOrderLockDTO, Long cueId, String userId) throws JsonProcessingException {
+    public CueSheetOrderLockResponsDTO cueSheetOrderLock(CueSheetOrderLockDTO cueSheetOrderLockDTO, Long cueId, String userId) throws Exception {
 
         Optional<CueSheet> cueSheetEntity = cueSheetRepository.findCueLock(cueId);
 
@@ -1068,7 +1110,7 @@ public class CueSheetService {
     }
 
     //큐시트 잠금 해제
-    public void cueSheetUnLock(Long cueId) {
+    public void cueSheetUnLock(Long cueId, String userId) throws Exception {
 
         CueSheet cueSheet = cueSheetFindOrFail(cueId);
 
@@ -1079,6 +1121,12 @@ public class CueSheetService {
         //cueSheet.setCueStCd(null);
 
         cueSheetRepository.save(cueSheet);
+
+        User user = userService.userFindOrFail(userId);
+
+        String userNm = user.getUserNm();
+
+        cueSheetTopicService.sendUnLockTopic("CueSheet Unlock", cueId, userId, userNm);
 
     }
 
@@ -1109,6 +1157,7 @@ public class CueSheetService {
 
         CueSheet cueSheet = cueSheetCreateMapper.toEntity(cueSheetCreateDTO);
         cueSheetRepository.save(cueSheet);
+
 
         Long newCueId = cueSheet.getCueId(); //복사된 큐시트 아이디 get
 
@@ -1182,13 +1231,16 @@ public class CueSheetService {
             List<CueSheetMediaCreateDTO> cueSheetMedia = cueItemDTO.getCueSheetMedia();
             createMedia(cueSheetMedia, cueItemId, userId, CueSheet);
 
+            //큐시트 생성시 빈 스페어 큐시트 아이템 생성
+            createSpareCueSheetItem(newCueId, userId);
+
 
         }
 
     }
 
     //큐시트 미디어 등록[ 큐시트 복사 ]
-    public void createMedia(List<CueSheetMediaCreateDTO> cueSheetMedia, Long cueItemId, String userId, CueSheet cueSheet) throws JsonProcessingException {
+    public void createMedia(List<CueSheetMediaCreateDTO> cueSheetMedia, Long cueItemId, String userId, CueSheet cueSheet) throws Exception {
 
         CueSheetItemSimpleDTO cueSheetItemSimpleDTO = CueSheetItemSimpleDTO.builder().cueItemId(cueItemId).build();
 
@@ -1358,6 +1410,24 @@ public class CueSheetService {
                 articleMediaRepository.save(articleMediaEntity);
 
             }
+        }
+
+        /*********************/
+        /* 기사 테그를 저장하는 부분 */
+
+        List<ArticleTag> articleTagList = articleTagRepository.findArticleTag(artclId);
+
+        for (ArticleTag articleTag : articleTagList){
+
+            Tag tag = articleTag.getTag();
+
+            ArticleTag articleTagEntity = ArticleTag.builder()
+                    .article(articleEntity)
+                    .tag(tag)
+                    .build();
+
+            articleTagRepository.save(articleTagEntity);
+
         }
 
         return articleEntity;
@@ -1530,6 +1600,7 @@ public class CueSheetService {
         return ArticleCap.builder()
                 .capDivCd(getArticleCap.getCapDivCd())
                 .lnNo(getArticleCap.getLnNo())
+                .lnOrd(getArticleCap.getLnOrd())
                 .capCtt(getArticleCap.getCapCtt())
                 .capRmk(getArticleCap.getCapRmk())
                 .article(articleEntity)
@@ -1544,6 +1615,7 @@ public class CueSheetService {
         return AnchorCap.builder()
                 .capDivCd(articleCap.getCapDivCd())
                 .lnNo(articleCap.getLnNo())
+                .lnOrd(articleCap.getLnOrd())
                 .capCtt(articleCap.getCapCtt())
                 .capRmk(articleCap.getCapRmk())
                 .article(articleEntity)

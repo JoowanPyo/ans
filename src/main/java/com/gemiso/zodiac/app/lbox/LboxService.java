@@ -157,7 +157,7 @@ public class LboxService {
     }
 
     //부조 전송
-    public TransportResponseDTO mediaTransfer(Long mediaId, Integer contentId, String subrmNm, String destination, Boolean isUrgent, Boolean isRetry) throws JsonProcessingException {
+    public TransportResponseDTO mediaTransfer(Long mediaId, Integer contentId, String subrmNm, String destination, Boolean isUrgent, Boolean isRetry) throws Exception {
 
         TransportResponseDTO transportResponseDTO = new TransportResponseDTO(); //리턴해줄 미디어정보, 오류내용 [전송 오류가 있을시.]
         List<TransportFaildDTO> transportFaildDTOList = new ArrayList<>(); //부조전송시 오류가 있을시 오류내용 Respons
@@ -242,6 +242,7 @@ public class LboxService {
                 MediaTransportDataDTO data = responsBody.getData();
                 clipInfoDTO = data.getClip_info(); //이미 전송된 영상이거나 전송완료인 영상 데이터DTO
                 List<TasksDTO> tasksDTO = data.getTasks(); //전송시작시 데이터
+
 
                 if (CollectionUtils.isEmpty(tasksDTO) == false && "NS".equals(dest)) {
                     ++tasksCount; //전송중이 한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
@@ -435,7 +436,7 @@ public class LboxService {
 
     //큐시트 미디어 부조 전송
     public CueMediaTransportResponseDTO cueMediaTransfer(Long cueMediaId, Integer contentId, String subrmNm
-            , Boolean isUrgent, Boolean isRetry, String isType) throws JsonProcessingException {
+            , Boolean isUrgent, Boolean isRetry, String isType) throws Exception {
 
         CueMediaTransportResponseDTO transportResponseDTO = new CueMediaTransportResponseDTO(); //리턴해줄 미디어정보, 오류내용 [전송 오류가 있을시.]
         List<TransportFaildDTO> transportFaildDTOList = new ArrayList<>(); //부조전송시 오류가 있을시 오류내용 Respons
@@ -577,7 +578,7 @@ public class LboxService {
     }
 
     //매칭후 match_completed 이고 일반영상인 경우 테이커에 토픽 전송
-    public void articleTopicSend(ArticleMedia articleMedia) throws JsonProcessingException {
+    public void articleTopicSend(ArticleMedia articleMedia) throws Exception {
 
         String trnsfStCd = articleMedia.getTrnsfStCd();
         String mediaTypCd = articleMedia.getMediaTypCd();
@@ -608,7 +609,7 @@ public class LboxService {
         }
     }
 
-    public void cueTopicSend(CueSheetMedia cueSheetMedia) throws JsonProcessingException {
+    public void cueTopicSend(CueSheetMedia cueSheetMedia) throws Exception {
 
         String trnsfStCd = cueSheetMedia.getTrnsfStCd();
         String mediaTypCd = cueSheetMedia.getMediaTypCd();
@@ -646,7 +647,7 @@ public class LboxService {
 
     //큐시트 토픽 메세지 전송
     public void sendCueTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
-                                   String spareYn, String prompterFlag, String videoTakerFlag, Article article) throws JsonProcessingException {
+                                   String spareYn, String prompterFlag, String videoTakerFlag, Article article) throws Exception {
 
         Integer cueVer = 0;
         Integer cueOderVer = 0;

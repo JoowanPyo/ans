@@ -103,9 +103,7 @@ public class CueSheetRepositoryImpl implements CueSheetRepositoryCustorm {
             jpaQuery.where(qCueSheet.brdcStartTime.loe(newEtime));*/
         }
 
-        //if (cueDivCd != null && cueDivCd.trim().isEmpty() == false){
-        //    jpaQuery.where(qCueSheet.cueDivCd.eq(cueDivCd));
-        //}
+        jpaQuery.where(qCueSheet.program.nodYn.eq("Y"));
 
         jpaQuery.orderBy(qCueSheet.brdcDt.asc(), qCueSheet.brdcStartTime.asc());
 

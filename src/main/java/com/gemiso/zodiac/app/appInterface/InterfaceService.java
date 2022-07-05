@@ -636,6 +636,8 @@ public class InterfaceService {
                         .cueId(cueSheet.getCueId()) //큐시트 아이디 Topic에서 사용
                         .cueTmpltId(cueTmpltId)
                         .cueItemId(cueSheetItem.getCueItemId())
+                        .artclReqdSec(Optional.ofNullable(cueSheetItem.getCueItemTime()).orElse(0))
+                        .extraTimeSec(Optional.ofNullable(cueSheetItem.getArtclExtTime()).orElse(0))
                         .build();
 
                 takerCueSheetSpareDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
@@ -688,8 +690,9 @@ public class InterfaceService {
                         .rptrNm(article.getRptrNm())
                         .deptCd(article.getDeptCd())
                         .deptNm(article.getDeptNm())
-                        .artclReqdSec(article.getArtclCttTime())//기사 소요시간 초
-                        .ancReqdSec(article.getAncMentCttTime())//앵커 소요시간 초
+                        .artclReqdSec(Optional.ofNullable(article.getArtclCttTime()).orElse(0))//기사 소요시간 초
+                        .ancReqdSec(Optional.ofNullable(article.getAncMentCttTime()).orElse(0))//앵커 소요시간 초
+                        .extraTimeSec(Optional.ofNullable(article.getArtclExtTime()).orElse(0))
                         .artclSmryCtt(0)//???
                         .artclDivCd(article.getArtclDivCd())
                         .artclDivNm(article.getArtclDivCdNm())
@@ -938,6 +941,9 @@ public class InterfaceService {
                 .cueId(cueSheet.getCueId()) //큐시트 아이디 Topic에서 사용
                 .cueTmpltId(cueTmpltId)
                 .cueItemId(cueSheetItem.getCueItemId())
+                .artclReqdSec(Optional.ofNullable(cueSheetItem.getCueItemTime()).orElse(0))
+                .extraTimeSec(Optional.ofNullable(cueSheetItem.getArtclExtTime()).orElse(0))
+                //.newsAcumTime(cueSheetItem.getArtclExtTime())
                 //.artclTitl()
                 //.artclTitlEn()
                 .build();
@@ -989,6 +995,7 @@ public class InterfaceService {
                 .deptNm(article.getDeptNm())
                 .artclReqdSec(Optional.ofNullable(article.getArtclCttTime()).orElse(0))//기사 소요시간 초
                 .ancReqdSec(Optional.ofNullable(article.getAncMentCttTime()).orElse(0))//앵커 소요시간 초
+                .extraTimeSec(Optional.ofNullable(article.getArtclExtTime()).orElse(0))
                 .artclSmryCtt(0)//???
                 .artclDivCd(article.getArtclDivCd())
                 .artclDivNm(article.getArtclDivCdNm())
@@ -1569,6 +1576,8 @@ public class InterfaceService {
                         .cueTmpltId(cueTmpltId)
                         .cmDivCd(returnSymbolId)
                         .cmDivNm(returnSymbolNm)
+                        .artclReqdSec(Optional.ofNullable(cueSheetItem.getCueItemTime()).orElse(0))//기사 소요시간 초
+                        .extraTimeSec(Optional.ofNullable(cueSheetItem.getArtclExtTime()).orElse(0))
                         .build();
 
                 //빌드된 PrompterCueSheetDTO를 PrompterCueRefreshDTO List에 add
@@ -1623,8 +1632,6 @@ public class InterfaceService {
                         .rptrId(article.getRptrId()) //기자 아이디
                         .rptrNm(article.getRptrNm()) //기자 명
                         .deptCd(article.getDeptCd())
-                        .artclReqdSec(article.getArtclCttTime()) //기사 소요시간
-                        .ancReqdSec(article.getAncMentCttTime()) //앵커기사 소요시간
                         //.newsAcumTime(newsAcumTime) //누적시간
                         .anchorCaps(prompterAnchorCap)//앵커자막
                         .articleCaps(prompterArticleCap)//기사자막
@@ -1633,6 +1640,9 @@ public class InterfaceService {
                         .cueItemId(cueSheetItem.getCueItemId())
                         .cmDivCd(returnSymbolId)
                         .cmDivNm(returnSymbolNm)
+                        .artclReqdSec(Optional.ofNullable(article.getArtclCttTime()).orElse(0))//기사 소요시간 초
+                        .ancReqdSec(Optional.ofNullable(article.getAncMentCttTime()).orElse(0))//앵커 소요시간 초
+                        .extraTimeSec(Optional.ofNullable(article.getArtclExtTime()).orElse(0))
                         .build();
 
 
@@ -1783,6 +1793,8 @@ public class InterfaceService {
                         .cueTmpltId(cueTmpltId)
                         .cmDivCd(returnSymbolId)
                         .cmDivNm(returnSymbolNm)
+                        .artclReqdSec(Optional.ofNullable(cueSheetItem.getCueItemTime()).orElse(0))//기사 소요시간 초
+                        .extraTimeSec(Optional.ofNullable(cueSheetItem.getArtclExtTime()).orElse(0))
                         .build();
 
                 //빌드된 PrompterCueSheetDTO를 PrompterCueRefreshDTO List에 add
@@ -1859,8 +1871,6 @@ public class InterfaceService {
                         .rptrId(article.getRptrId()) //기자 아이디
                         .rptrNm(article.getRptrNm()) //기자 명
                         .deptCd(article.getDeptCd())
-                        .artclReqdSec(article.getArtclCttTime()) //기사 소요시간
-                        .ancReqdSec(article.getAncMentCttTime()) //앵커기사 소요시간
                         //.newsAcumTime(newsAcumTime) //누적시간
                         .anchorCaps(prompterAnchorCap)//앵커자막
                         .articleCaps(prompterArticleCap)//기사자막
@@ -1869,6 +1879,9 @@ public class InterfaceService {
                         .cueItemId(cueSheetItem.getCueItemId())
                         .cmDivCd(returnSymbolId)
                         .cmDivNm(returnSymbolNm)
+                        .artclReqdSec(Optional.ofNullable(article.getArtclCttTime()).orElse(0))//기사 소요시간 초
+                        .ancReqdSec(Optional.ofNullable(article.getAncMentCttTime()).orElse(0))//앵커 소요시간 초
+                        .extraTimeSec(Optional.ofNullable(article.getArtclExtTime()).orElse(0))
                         .build();
 
 
@@ -1989,6 +2002,8 @@ public class InterfaceService {
                         .cueItemId(cueSheetItem.getCueItemId())
                         .cmDivCd(returnSymbolId)
                         .cmDivNm(returnSymbolNm)
+                        .artclReqdSec(Optional.ofNullable(cueSheetItem.getCueItemTime()).orElse(0))//기사 소요시간 초
+                        .extraTimeSec(Optional.ofNullable(cueSheetItem.getArtclExtTime()).orElse(0))
                         .build();
 
                 //빌드된 PrompterCueSheetDTO를 PrompterCueRefreshDTO List에 add
@@ -2028,8 +2043,6 @@ public class InterfaceService {
                         .rptrId(article.getRptrId()) //기자 아이디
                         .rptrNm(article.getRptrNm()) //기자 명
                         .deptCd(article.getDeptCd())
-                        .artclReqdSec(article.getArtclCttTime()) //기사 소요시간
-                        .ancReqdSec(article.getAncMentCttTime()) //앵커기사 소요시간
                         //.newsAcumTime(newsAcumTime) //누적시간
                         .anchorCaps(prompterAnchorCap)//앵커자막
                         .articleCaps(prompterArticleCap)//기사자막
@@ -2038,6 +2051,9 @@ public class InterfaceService {
                         .cueItemId(cueSheetItem.getCueItemId())
                         .cmDivCd(returnSymbolId)
                         .cmDivNm(returnSymbolNm)
+                        .artclReqdSec(Optional.ofNullable(article.getArtclCttTime()).orElse(0))//기사 소요시간 초
+                        .ancReqdSec(Optional.ofNullable(article.getAncMentCttTime()).orElse(0))//앵커 소요시간 초
+                        .extraTimeSec(Optional.ofNullable(article.getArtclExtTime()).orElse(0))
                         .build();
 
 
@@ -2175,6 +2191,8 @@ public class InterfaceService {
                         .cueItemId(cueSheetItem.getCueItemId())
                         .cmDivCd(returnSymbolId)
                         .cmDivNm(returnSymbolNm)
+                        .artclReqdSec(Optional.ofNullable(cueSheetItem.getCueItemTime()).orElse(0))//기사 소요시간 초
+                        .extraTimeSec(Optional.ofNullable(cueSheetItem.getArtclExtTime()).orElse(0))
                         .build();
 
                 //빌드된 PrompterCueSheetDTO를 PrompterCueRefreshDTO List에 add
@@ -2235,8 +2253,6 @@ public class InterfaceService {
                         .rptrId(article.getRptrId()) //기자 아이디
                         .rptrNm(article.getRptrNm()) //기자 명
                         .deptCd(article.getDeptCd())
-                        .artclReqdSec(article.getArtclCttTime()) //기사 소요시간
-                        .ancReqdSec(article.getAncMentCttTime()) //앵커기사 소요시간
                         //.newsAcumTime(newsAcumTime) //누적시간
                         .anchorCaps(prompterAnchorCap)//앵커자막
                         .articleCaps(prompterArticleCap)//기사자막
@@ -2245,6 +2261,9 @@ public class InterfaceService {
                         .cueItemId(cueSheetItem.getCueItemId())
                         .cmDivCd(returnSymbolId)
                         .cmDivNm(returnSymbolNm)
+                        .artclReqdSec(Optional.ofNullable(article.getArtclCttTime()).orElse(0))//기사 소요시간 초
+                        .ancReqdSec(Optional.ofNullable(article.getAncMentCttTime()).orElse(0))//앵커 소요시간 초
+                        .extraTimeSec(Optional.ofNullable(article.getArtclExtTime()).orElse(0))
                         .build();
 
 
@@ -2885,7 +2904,7 @@ public class InterfaceService {
     }
 
     //전송상태 업데이트
-    public void stateChange(MediaTransferDTO mediaTransferDTO) throws JsonProcessingException {
+    public void stateChange(MediaTransferDTO mediaTransferDTO) throws Exception {
 
         Integer contentId = mediaTransferDTO.getContentId();
         String trnsfStCd = mediaTransferDTO.getTrnsfStCd();
@@ -2988,7 +3007,7 @@ public class InterfaceService {
 
     //큐시트 토픽 메세지 전송
     public void sendCueTopicCreate(CueSheet cueSheet, Long cueId, Long cueItemId, Long artclId, Long cueTmpltId, String eventId,
-                                   String spareYn, String prompterFlag, String videoTakerFlag, Article article) throws JsonProcessingException {
+                                   String spareYn, String prompterFlag, String videoTakerFlag, Article article) throws Exception {
 
         Integer cueVer = 0;
         Integer cueOderVer = 0;
@@ -3033,7 +3052,7 @@ public class InterfaceService {
     }
 
     //큐시트 방송상태 업데이트[taker]
-    public ParentProgramDTO cueStCdUpdate(Long cueId, TakerCdUpdateDTO takerCdUpdateDTO) throws JsonProcessingException {
+    public ParentProgramDTO cueStCdUpdate(Long cueId, TakerCdUpdateDTO takerCdUpdateDTO) throws Exception {
 
 
         String cueStCd = takerCdUpdateDTO.getCue_st_cd();
@@ -3065,7 +3084,7 @@ public class InterfaceService {
     }
 
     //방송중 테이커 큐시트 동기화
-    public void takerSetCue(TakerToCueBody2DTO takerToCueBodyDTO) throws JsonProcessingException {
+    public void takerSetCue(TakerToCueBody2DTO takerToCueBodyDTO) throws Exception {
 
         //interfaceTopicService.takerStatusUpdate(takerToCueBodyDTO);
 
@@ -3088,7 +3107,7 @@ public class InterfaceService {
     }
 
     //방송중 테이커 큐시트 동기화
-    public void takerSetCue2(TakerToCueBodyDTO takerToCueBodyDTO) throws JsonProcessingException {
+    public void takerSetCue2(TakerToCueBodyDTO takerToCueBodyDTO) throws Exception {
 
         interfaceTopicService.takerStatusUpdate(takerToCueBodyDTO);
 

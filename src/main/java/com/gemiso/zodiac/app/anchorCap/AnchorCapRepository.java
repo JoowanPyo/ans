@@ -13,6 +13,6 @@ public interface AnchorCapRepository extends JpaRepository<AnchorCap, Long>, Que
     @Query("select a from AnchorCap a where a.anchorCapId=:anchorCapId")
     Optional<AnchorCap> findAnchorCap(@Param("anchorCapId")Long anchorCapId);
 
-    @Query("select a from AnchorCap a where a.article.artclId =:artclId")
+    @Query("select a from AnchorCap a where a.article.artclId =:artclId order by a.lnOrd asc ")
     List<AnchorCap> findAnchorCapList(@Param("artclId")Long artclId);
 }

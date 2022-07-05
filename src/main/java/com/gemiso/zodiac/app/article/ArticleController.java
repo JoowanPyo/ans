@@ -175,6 +175,8 @@ public class ArticleController {
                                                                       @RequestParam(value = "deptCd", required = false) Long deptCd,
                                                                       @Parameter(name = "orgArtclId", description = "원본기사 아이디")
                                                                       @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,
+                                                                      @Parameter(name = "rptrId", description = "기자 아이디")
+                                                                      @RequestParam(value = "rptrId", required = false) String rptrId,
                                                                       @Parameter(name = "page", description = "시작페이지")
                                                                       @RequestParam(value = "page", required = false) Integer page,
                                                                       @Parameter(name = "limit", description = "한 페이지에 데이터 수")
@@ -184,7 +186,7 @@ public class ArticleController {
         SearchDate searchDate = new SearchDate(sdate, edate);
 
         PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> pageList = articleService.findAllElasticsearchCue(searchDate.getStartDate(), searchDate.getEndDate(),
-                searchWord, cueId, brdcPgmId, artclTypCd, artclTypDtlCd, copyYn, deptCd, orgArtclId, page, limit);
+                searchWord, cueId, brdcPgmId, artclTypCd, artclTypDtlCd, copyYn, deptCd, orgArtclId, rptrId, page, limit);
 
         pageList = articleService.confirmArticleListElastic(pageList, cueId);
 
@@ -309,6 +311,8 @@ public class ArticleController {
         //기사 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
         articleDTO.setArtclId(article.getArtclId());
+        articleDTO.setOrgArtclId(article.getOrgArtclId());
+
 
         log.info("Article Create Success ID : " + articleDTO);
 
@@ -365,6 +369,21 @@ public class ArticleController {
 
         return AnsApiResponse.noContent();
 
+    }
+
+    @Operation(summary = "기사 삭제자 확인", description = "기사 삭제자 확인")
+    @PutMapping(path = "/{artclId}/confirmuser")
+    public AnsApiResponse<?> confirmUser(@Parameter(description = "필수값<br> lckYn ", required = true)
+                                         @RequestBody @Valid ArticleDeleteConfirmDTO articleDeleteConfirmDTO,
+                                         @Parameter(name = "artclId", description = "기사 아이디")
+                                         @PathVariable("artclId") Long artclId) throws NoSuchAlgorithmException {
+
+        String userId = userAuthService.authUser.getUserId(); //토큰에서 유저 아이디를 가져온다.
+        log.info(" Article Delete User Confirm : Article Id - " + artclId + "User Id :" + userId);
+
+        articleService.confirmUser(articleDeleteConfirmDTO, artclId, userId);
+
+        return AnsApiResponse.ok();
     }
 
     @Operation(summary = "기사 수정권한 확인", description = "기사 수정권한 확인")
@@ -460,20 +479,5 @@ public class ArticleController {
         ArticleDTO articleDTO = articleService.find(artclId);
 
         return new AnsApiResponse<>(articleDTO);
-    }
-
-    @Operation(summary = "기사 삭제자 확인", description = "기사 삭제자 확인")
-    @PutMapping(path = "/{artclId}/confirmuser")
-    public AnsApiResponse<?> confirmUser(@Parameter(description = "필수값<br> lckYn ", required = true)
-                                         @RequestBody @Valid ArticleDeleteConfirmDTO articleDeleteConfirmDTO,
-                                         @Parameter(name = "artclId", description = "기사 아이디")
-                                         @PathVariable("artclId") Long artclId) throws NoSuchAlgorithmException {
-
-        String userId = userAuthService.authUser.getUserId(); //토큰에서 유저 아이디를 가져온다.
-        log.info(" Article Delete User Confirm : Article Id - " + artclId + "User Id :" + userId);
-
-        articleService.confirmUser(articleDeleteConfirmDTO, artclId, userId);
-
-        return AnsApiResponse.ok();
     }
 }

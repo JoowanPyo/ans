@@ -84,7 +84,7 @@ public class ArticleCreateDTO {
     private Integer videoTime;
     private Long deptCd;
     //private String deptNm;
-    private String deviceCd;
+    //private String deviceCd;
     private String memo;
     private IssueDTO issue;
     private Long parentArtlcId;

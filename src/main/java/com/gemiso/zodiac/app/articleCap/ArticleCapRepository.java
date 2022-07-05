@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface ArticleCapRepository extends JpaRepository<ArticleCap, Long>, QuerydslPredicateExecutor<ArticleCap> {
 
-    @Query("select a from ArticleCap a where a.article.artclId = :artclId")
+    @Query("select a from ArticleCap a where a.article.artclId = :artclId order by a.lnOrd asc ")
     List<ArticleCap> findArticleCap(@Param("artclId") Long artclId);
 
 }

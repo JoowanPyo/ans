@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.elasticsearchPush;
 
-import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
@@ -8,7 +7,6 @@ import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleRepository;
 import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasricSearchArticleMedia;
 import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticle;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
-import com.gemiso.zodiac.core.page.PageResultDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

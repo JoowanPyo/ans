@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/yonhapinternational")
@@ -60,7 +61,9 @@ public class YonhapWireController {
                                      @Parameter(name = "page", description = "시작페이지")
                                      @RequestParam(value = "page", required = false) Integer page,
                                      @Parameter(name = "limit", description = "한 페이지에 데이터 수")
-                                     @RequestParam(value = "limit", required = false) Integer limit) throws Exception {
+                                     @RequestParam(value = "limit", required = false) Integer limit,
+                                     @Parameter(name = "mediaNo", description = "미디어 넘버", required = false)
+                                     @RequestParam(value = "mediaNo", required = false) String mediaNo) throws Exception {
 
         PageResultDTO<YonhapWireDTO, YonhapWire> yonhapWireDTOList = null;
 
@@ -69,12 +72,12 @@ public class YonhapWireController {
             SearchDate searchDate = new SearchDate(sdate, edate);
 
             yonhapWireDTOList = yonhapWireService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), agcyCd,
-                    agcyNm, source, svcTyp, searchWord, imprtList, page, limit);
+                    agcyNm, source, svcTyp, searchWord, imprtList, page, limit, mediaNo);
 
         } else {
 
             yonhapWireDTOList = yonhapWireService.findAll(null, null, agcyCd,
-                    agcyNm, source, svcTyp, searchWord, imprtList, page, limit);
+                    agcyNm, source, svcTyp, searchWord, imprtList, page, limit, mediaNo);
         }
         return new AnsApiResponse<>(yonhapWireDTOList);
     }
@@ -121,8 +124,8 @@ public class YonhapWireController {
 
         YonhapExceptionDomain yonhapExceptionDomain = yonhapWireService.createAptn(yonhapAptnCreateDTO);
 
-        if (yonhapExceptionDomain.getCode().equals("2000") == false) {
-            return new ResponseEntity<YonhapExceptionDomain>(yonhapExceptionDomain, HttpStatus.CREATED);
+        if ("2000".equals(Optional.ofNullable(yonhapExceptionDomain.getCode()).orElse("")) == false) {
+            return new ResponseEntity<YonhapExceptionDomain>(yonhapExceptionDomain, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         YonhapWireDTO yonhapWireDTO = yonhapWireService.find(yonhapExceptionDomain.getId());
@@ -144,6 +147,11 @@ public class YonhapWireController {
         YonhapWireDTO yonhapWireDTO = yonhapWireService.find(yonhapExceptionDomain.getId());
         YonhapReuterDTO yonhapReuterDTO = yonhapWireService.formatReuter(yonhapWireDTO);
 
+        if ( "5001".equals(Optional.ofNullable(yonhapExceptionDomain.getCode()).orElse("")) ){
+
+            return new ResponseEntity<>(yonhapReuterDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
 
         return new ResponseEntity<>(yonhapReuterDTO, HttpStatus.CREATED);
     }

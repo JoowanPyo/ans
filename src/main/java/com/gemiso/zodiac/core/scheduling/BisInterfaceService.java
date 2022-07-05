@@ -113,11 +113,14 @@ public class BisInterfaceService {
                 String pgmCd = dsProgramDTO.getPgmCd(); // BIS 프로그램 아이디를 가져온다.
                 String newsYn = dsProgramDTO.getNewsYn();
 
-                if ("Y".equals(newsYn)) {
+                String pgmOnm = dsProgramDTO.getPgmOnm();
+
+                if ("Y".equals(newsYn) || "PG2190007K".equals(pgmCd)) {
                     if (brdcPgmId.equals(pgmCd)) {// ANS프로그램 아이디와 BIS프로그램 아이디가 같으면 BIS프로그램 리스트에서 삭제.
 
                         //Bis에서 들어온 정보 사용여부 Y
                         program.setUseYn("Y");
+                        program.setBrdcPgmNmEn(pgmOnm);
 
                         programRepository.save(program);
                         iter.remove();
@@ -130,7 +133,9 @@ public class BisInterfaceService {
             for (DsProgramDTO dsProgramDTO : dsProgramDTOList) {
 
                 String newsYn = dsProgramDTO.getNewsYn();
-                if ("Y".equals(newsYn)) {
+                String pgmCd = dsProgramDTO.getPgmCd();
+
+                if ("Y".equals(newsYn) || "PG2190007K".equals(pgmCd)) {
                     String chanTp = dsProgramDTO.getChanTp(); //Bis에서 조회된 채널정보 get
                     String jenreClf1 = dsProgramDTO.getJenreClf1();//Bis에서 조회된 장르구분 get
                     String productClf = dsProgramDTO.getProductClf();//Bis에서 조회된 제작구분 get
@@ -149,6 +154,7 @@ public class BisInterfaceService {
                             .gneDivCd(gneDivCd)//장르구분
                             .prdDivCd(prdDivCd)//제작구분
                             .useYn("Y")
+                            .brdcPgmNmEn(dsProgramDTO.getPgmOnm())
                             /*.inputrId(userId)*/
                             .build();
 
@@ -284,7 +290,7 @@ public class BisInterfaceService {
         httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
         httpHeaders.add("Session_user_id", "ans");
 
-        for (int i = 3; i < 10; i++/*int i = 0; i < 7; i++*/) {
+        for (/*int i = 3; i < 10; i++*/int i = 1; i < 8; i++) {
             Calendar cal = Calendar.getInstance();
             //현재 날짜 구하기
             Date now = new Date();
@@ -300,6 +306,7 @@ public class BisInterfaceService {
             dmParam.put("chanId", "CH_K");
             dmParam.put("broadYmd", nowDate);
             dmParam.put("planNo", "1");
+            //dmParam.put("broadType", "L");
 
             //Object Mapper를 통한 Json바인딩할 data생성
             Map<String, Object> data = new HashMap<>();
@@ -350,6 +357,7 @@ public class BisInterfaceService {
         dmParam.put("chanId", "CH_K");
         dmParam.put("broadYmd", nowDate);
         dmParam.put("planNo", "1");
+        //dmParam.put("broadType", "L");
 
         //Object Mapper를 통한 Json바인딩할 data생성
         Map<String, Object> data = new HashMap<>();
@@ -387,7 +395,6 @@ public class BisInterfaceService {
 
             //Bis에서 조회하여 담아온 DTO에서 데이터 주간편성 데이터 리스트를 가져온다.
             List<DschWeekDTO> dschWeekDTOList = bisDailyScheduleDTO.getDsSchWeek();
-
 
             createDailyProgram(dschWeekDTOList, bisProgramDTO);
 
