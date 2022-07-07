@@ -1163,6 +1163,8 @@ public class CueSheetService {
 
         copyCueItem(cueId, newCueId, userId, getCueSheet);//복사된 큐시트의 아이템 리스트 복사
 
+        //큐시트 생성시 빈 스페어 큐시트 아이템 생성
+        createSpareCueSheetItem(newCueId, userId);
 
         return newCueId;
 
@@ -1172,7 +1174,7 @@ public class CueSheetService {
     public Long cueItemcopy(Long cueId, Long newCueId, String userId) throws Exception {
 
         CueSheet getCueSheet = cueSheetFindOrFail(cueId);//원본 큐시트 get
-        CueSheet newCueSheet = cueSheetFindOrFail(newCueId);//원본 큐시트 get
+        CueSheet newCueSheet = cueSheetFindOrFail(newCueId);//새로운 큐시트 get
 
         //Long newCueId = cueSheet.getCueId(); //복사된 큐시트 아이디 get
 
@@ -1187,6 +1189,13 @@ public class CueSheetService {
     public void copyCueItem(Long orgCueId, Long newCueId, String userId, CueSheet CueSheet) throws Exception { //복사된 큐시트의 아이템 리스트 복사
 
         List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(orgCueId); //원본 큐시트에 입력된 아이템 get
+
+        Optional<Integer> cueItemMaxOrder = cueSheetItemRepository.findCueItemMaxOrder(newCueId);
+
+        Integer ord = 0;
+        if (cueItemMaxOrder.isPresent()){
+            ord = cueItemMaxOrder.get();
+        }
 
         List<CueSheetItemCreateDTO> cueSheetCreateDTOS = cueSheetItemCreateMapper.toDtoList(cueSheetItemList); //큐시트아이템 리스트 get
 
@@ -1211,6 +1220,19 @@ public class CueSheetService {
             }
 
             cueItemDTO.setCueSheet(cueSheetDTO); //복사된 큐시트 아이디 set
+
+            Integer setDisplayCd = 0;
+            if (ord == 0){
+                cueItemDTO.setCueItemOrd(ord);
+                setDisplayCd = ord+1;
+            }else {
+                cueItemDTO.setCueItemOrd(ord + 1);
+                setDisplayCd = ord+2;
+            }
+
+            String displayCd = Integer.toString(setDisplayCd);
+
+            cueItemDTO.setCueItemOrdCd(displayCd);
             CueSheetItem cueSheetItem = cueSheetItemCreateMapper.toEntity(cueItemDTO);
             cueSheetItemRepository.save(cueSheetItem);
 
@@ -1231,10 +1253,7 @@ public class CueSheetService {
             List<CueSheetMediaCreateDTO> cueSheetMedia = cueItemDTO.getCueSheetMedia();
             createMedia(cueSheetMedia, cueItemId, userId, CueSheet);
 
-            //큐시트 생성시 빈 스페어 큐시트 아이템 생성
-            createSpareCueSheetItem(newCueId, userId);
-
-
+            ++ord;
         }
 
     }
@@ -1357,6 +1376,10 @@ public class CueSheetService {
         // 기사 저장하기 위한 기사복사 엔터티 생성
         Article articleEntity = getArticleEntity(article, artclOrd, cueSheet);
         articleRepository.save(articleEntity); //복사된 기사 등록
+
+
+        //큐시트 복사시 검색엔진 인덱싱.
+        elasticSearchArticleService.elasticPush(articleEntity);
 
         Set<ArticleCap> articleCapList = article.getArticleCap(); //기사자막 리스트 get
         Set<AnchorCap> anchorCapList = article.getAnchorCap(); //앵커자막 리스트 get
@@ -1566,7 +1589,7 @@ public class CueSheetService {
                     .delYn(article.getDelYn())
                     .notiYn(article.getNotiYn())
                     .regAppTyp(article.getRegAppTyp())
-                    .brdcPgmId(article.getBrdcPgmId())
+                    .brdcPgmId(brdcPgmId)
                     .brdcSchdDtm(article.getBrdcSchdDtm())
                     .inputrId(article.getInputrId())
                     .updtrId(article.getUpdtrId())

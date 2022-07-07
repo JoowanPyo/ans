@@ -785,7 +785,7 @@ public class ArticleService {
         //copyArticle.setDelYn();
         copyArticle.setNotiYn(article.getNotiYn());
         copyArticle.setRegAppTyp(article.getRegAppTyp());
-        copyArticle.setBrdcPgmId(article.getBrdcPgmId());
+        //copyArticle.setBrdcPgmId(article.getBrdcPgmId());
         copyArticle.setBrdcSchdDtm(article.getBrdcSchdDtm());
         //copyArticle.setInputrId();
         //copyArticle.setUpdtrId();
@@ -854,7 +854,7 @@ public class ArticleService {
         //copyArticle.setDelYn();
         copyArticle.setNotiYn(article.getNotiYn());
         copyArticle.setRegAppTyp(article.getRegAppTyp());
-        copyArticle.setBrdcPgmId(article.getBrdcPgmId());
+        //copyArticle.setBrdcPgmId(article.getBrdcPgmId());
         copyArticle.setBrdcSchdDtm(article.getBrdcSchdDtm());
         //copyArticle.setInputrId();
         //copyArticle.setUpdtrId();

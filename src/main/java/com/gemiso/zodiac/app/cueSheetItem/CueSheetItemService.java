@@ -157,7 +157,7 @@ public class CueSheetItemService {
 
         long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
         long secDiffTime = (afterTime - beforeTime); //두 시간에 차 계산
-        System.out.println("시간차이(m) : "+secDiffTime);
+        System.out.println("시간차이(m) : " + secDiffTime);
 
         return cueSheetItemDTOList;
     }
@@ -168,7 +168,7 @@ public class CueSheetItemService {
         //큐시트 아이템 조회
         Optional<CueSheetItem> cueSheetItemEntity = cueSheetItemRepository.findDeleteCueItemList(cueItemId);
 
-        if (cueSheetItemEntity.isPresent() == false){
+        if (cueSheetItemEntity.isPresent() == false) {
             throw new ResourceNotFoundException("삭제된 큐시트 아이템을 찾을 수 없습니다. 큐시트 아이템 아이디 : " + cueItemId);
         }
 
@@ -185,7 +185,7 @@ public class CueSheetItemService {
             Long artclId = getArticle.getArtclId();
             Optional<Article> articleEntity = articleRepository.findDeleteArticle(artclId);
 
-            if (articleEntity.isPresent() == false){
+            if (articleEntity.isPresent() == false) {
                 throw new ResourceNotFoundException("삭제된 기사 아이디가 없습니다. 기사 아이디  : " + artclId);
             }
 
@@ -347,7 +347,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 아이템 컬럼들만 업데이트
-    public void updateItem(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, String cueItemDivCd, Long cueId, Long cueItemId){
+    public void updateItem(CueSheetItemUpdateDTO cueSheetItemUpdateDTO, String cueItemDivCd, Long cueId, Long cueItemId) {
 
         //큐시트 아이디로 큐시트 조회 및 존재유무 확인.
         CueSheet cueSheet = cueSheetService.cueSheetFindOrFail(cueId);
@@ -377,7 +377,6 @@ public class CueSheetItemService {
 
 
         cueSheetItemRepository.save(cueSheetItem);
-
 
 
     }
@@ -474,6 +473,8 @@ public class CueSheetItemService {
 
                 articleRepository.save(article);
 
+                elasticSearchArticleService.elasticPush(article);
+
                 //기사가 삭제될때 포함된 미디어정보도 같이 삭제처리 ( delYn = "Y")
                 Set<ArticleMedia> articleMedia = article.getArticleMedia();
                 deleteArticleMedia(articleMedia, userId);
@@ -518,12 +519,26 @@ public class CueSheetItemService {
 
         cueSheetTopicService.sendCueTopicCreate(cueSheet, cueId, cueItemId, artclId, cueTmpltId, "Update CueSheetItem-Article",
                 spareYn, "Y", "Y");
+
+
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemListSpareYn(cueId, spareYn);
+
+        for (CueSheetItem cueSheetItemEntity : cueSheetItemList) {
+
+            Long getCueiTemId = cueSheetItemEntity.getCueItemId();
+            Integer cueItemOrd = cueSheetItemEntity.getCueItemOrd();
+            //ordUpdateDrop();
+            ordUpdate(cueId, getCueiTemId, cueItemOrd, spareYn);
+
+            break;
+        }
+
     }
 
     //삭제되 아이템이 포함된 방송아이콘 삭제
-    public void deleteItemSymbol(Set<CueSheetItemSymbol> cueSheetItemSymbolSet){
+    public void deleteItemSymbol(Set<CueSheetItemSymbol> cueSheetItemSymbolSet) {
 
-        for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolSet){
+        for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbolSet) {
 
             Long id = cueSheetItemSymbol.getId();
 
@@ -532,9 +547,9 @@ public class CueSheetItemService {
     }
 
     //기사가 삭제될때 포함된 미디어정보도 같이 삭제처리 ( delYn = "Y")
-    public void deleteArticleMedia(Set<ArticleMedia> articleMediaSet, String userId){
+    public void deleteArticleMedia(Set<ArticleMedia> articleMediaSet, String userId) {
 
-        for (ArticleMedia articleMedia : articleMediaSet){
+        for (ArticleMedia articleMedia : articleMediaSet) {
 
             ArticleMediaDTO articleMediaDTO = articleMediaMapper.toDto(articleMedia);
             articleMediaDTO.setDelYn("Y");
@@ -549,9 +564,9 @@ public class CueSheetItemService {
     }
 
     //삭제되 아이템이 포함된 자막 삭제 플레그 처리 ( delYn = "Y")
-    public void deleteItemCap(Set<CueSheetItemCap> cueSheetItemCapSet, String userId){
+    public void deleteItemCap(Set<CueSheetItemCap> cueSheetItemCapSet, String userId) {
 
-        for (CueSheetItemCap cueSheetItemCap : cueSheetItemCapSet){
+        for (CueSheetItemCap cueSheetItemCap : cueSheetItemCapSet) {
 
             CueSheetItemCapDTO cueSheetItemCapDTO = cueSheetItemCapMapper.toDto(cueSheetItemCap);
             cueSheetItemCapDTO.setDelYn("Y");
@@ -566,9 +581,9 @@ public class CueSheetItemService {
     }
 
     //삭제되 아이템이 포함된 미디어정보 삭제 플레그 처리 ( delYn = "Y")
-    public void deleteMedia(Set<CueSheetMedia> cueSheetMediaSet, String userId){
+    public void deleteMedia(Set<CueSheetMedia> cueSheetMediaSet, String userId) {
 
-        for (CueSheetMedia cueSheetMedia :  cueSheetMediaSet){
+        for (CueSheetMedia cueSheetMedia : cueSheetMediaSet) {
 
             CueSheetMediaDTO cueSheetMediaDTO = cueSheetMediaMapper.toDto(cueSheetMedia);
             cueSheetMediaDTO.setDelYn("Y");
@@ -691,14 +706,14 @@ public class CueSheetItemService {
     }
 
     //드레그앤드랍 큐시트 템플릿 아이템
-    public CueSheetItem copyTmpltItem(CueTmpltItem cueTmpltItem, Long cueId, String userId, String spareYn){
+    public CueSheetItem copyTmpltItem(CueTmpltItem cueTmpltItem, Long cueId, String userId, String spareYn) {
 
         CueSheet cueSheet = CueSheet.builder().cueId(cueId).build();
 
         //큐시트 템플릿이 들어가 있을 경우 검증후 추가
         CueSheetTemplate cueSheetTemplate = cueTmpltItem.getCueSheetTemplate();
         CueSheetTemplate cueSheetTemplateEntity = new CueSheetTemplate();
-        if (ObjectUtils.isEmpty(cueSheetTemplate) == false){
+        if (ObjectUtils.isEmpty(cueSheetTemplate) == false) {
             Long cueTmpltId = cueSheetTemplate.getCueTmpltId();
             cueSheetTemplateEntity = cueSheetTemplateService.cueSheetTemplateFindOrFail(cueTmpltId);
         }
@@ -729,7 +744,7 @@ public class CueSheetItemService {
                     .cueSheetTemplate(cueSheetTemplateEntity)
                     .rmk(userId)
                     .build();
-        }else {
+        } else {
 
             cueSheetItemEntity = CueSheetItem.builder()
                     .cueItemTitl(cueTmpltItem.getCueItemTitl())
@@ -813,7 +828,7 @@ public class CueSheetItemService {
         FacilityManage facilityManage = facilityManageService.findFacility(subrmId);
         String subrmNm = facilityManage.getFcltyDivCd();
 
-        for (CueSheetMedia cueSheetMedia : cueSheetMedias){
+        for (CueSheetMedia cueSheetMedia : cueSheetMedias) {
 
             CueSheetMedia cueSheetMediaEntity = CueSheetMedia.builder()
                     .mediaTypCd(cueSheetMedia.getMediaTypCd())
@@ -839,13 +854,13 @@ public class CueSheetItemService {
             Integer contentId = cueSheetMediaEntity.getContId();
 
             //추후에 T는 클라우드 콘피그 교체
-            lboxService.cueMediaTransfer(mediaId, contentId, subrmNm,  false, false, "T");
+            lboxService.cueMediaTransfer(mediaId, contentId, subrmNm, false, false, "T");
 
         }
     }
 
     //드레그앤드랍 큐시트 템플릿 자막 복사
-    public void copyTemplateCap(List<CueTmpltItemCap> cueSheetItemCaps, Long copyCueItemId, String userId){
+    public void copyTemplateCap(List<CueTmpltItemCap> cueSheetItemCaps, Long copyCueItemId, String userId) {
 
         CueSheetItem cueSheetItem = CueSheetItem.builder().cueItemId(copyCueItemId).build();
 
@@ -878,11 +893,11 @@ public class CueSheetItemService {
     }
 
     //드레그앤드랍 큐시트 아이템 자막등록
-    public void createItemCap(Set<CueSheetItemCap> cueSheetItemCaps, Long copyCueItemId, String userId){
+    public void createItemCap(Set<CueSheetItemCap> cueSheetItemCaps, Long copyCueItemId, String userId) {
 
         CueSheetItem cueSheetItem = CueSheetItem.builder().cueItemId(copyCueItemId).build();
 
-        for (CueSheetItemCap cueSheetItemCap : cueSheetItemCaps){
+        for (CueSheetItemCap cueSheetItemCap : cueSheetItemCaps) {
 
           /*  CapTemplate capTemplate = new CapTemplate();
             CapTemplate copyCapTemplate = cueSheetItemCap.getCapTemplate();*/
@@ -959,7 +974,7 @@ public class CueSheetItemService {
                     .article(article)
                     .cueSheetTemplate(cueSheetTemplate)
                     .build();
-        }else {
+        } else {
             cueSheetItemEntity = CueSheetItem.builder()
                     .cueItemTitl(cueSheetItem.getCueItemTitl())
                     .cueItemTitlEn(cueSheetItem.getCueItemTitlEn())
@@ -1009,7 +1024,7 @@ public class CueSheetItemService {
     }
 
     //드레그앤드랍 큐시트 템플릿 심볼 복사
-    public void copyTemplateSymbol(List<CueTmplSymbol> cueTmplSymbol, Long copyCueItemId){
+    public void copyTemplateSymbol(List<CueTmplSymbol> cueTmplSymbol, Long copyCueItemId) {
 
         CueSheetItem cueSheetItem = CueSheetItem.builder().cueItemId(copyCueItemId).build();
 
@@ -1033,7 +1048,7 @@ public class CueSheetItemService {
 
         CueSheetItem cueSheetItem = CueSheetItem.builder().cueItemId(copyCueItemId).build();
 
-        for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbols){
+        for (CueSheetItemSymbol cueSheetItemSymbol : cueSheetItemSymbols) {
 
             Symbol symbol = cueSheetItemSymbol.getSymbol();
             Integer ord = cueSheetItemSymbol.getOrd();
@@ -1083,7 +1098,7 @@ public class CueSheetItemService {
                     .spareYn(spareYn)//예비큐시트 값
                     .rmk(userId)
                     .build();
-        }else{
+        } else {
 
             cueSheetItem = CueSheetItem.builder()
                     .cueSheet(cueSheet)
@@ -1265,11 +1280,11 @@ public class CueSheetItemService {
     }
 
     //삭제된 큐시트 아이템이 복구될시 포함된 큐시트 자막 정보도 함께 복구 ( delYn = "N" )
-    public void cueSheetItemCapRestore(Long cueItemId){
+    public void cueSheetItemCapRestore(Long cueItemId) {
 
         List<CueSheetItemCap> cueSheetItemCapList = cueSheetItemCapRepotitory.findDeleteCueSheetItemCapList(cueItemId);
 
-        for (CueSheetItemCap cueSheetItemCap : cueSheetItemCapList){
+        for (CueSheetItemCap cueSheetItemCap : cueSheetItemCapList) {
 
             CueSheetItemCapDTO cueSheetItemCapDTO = cueSheetItemCapMapper.toDto(cueSheetItemCap);
             cueSheetItemCapDTO.setDelYn("N");
@@ -1283,11 +1298,11 @@ public class CueSheetItemService {
     }
 
     //삭제된 큐시트 아이템이 복구될시 포함된 큐시트 미디어 정보도 함께 복구 ( delYn = "N" )
-    public void cueSheetMediaRestore(Long cueItemId){
+    public void cueSheetMediaRestore(Long cueItemId) {
 
         List<CueSheetMedia> cueSheetMediaList = cueSheetMediaRepository.findDeleteCueMediaList(cueItemId);
 
-        for (CueSheetMedia cueSheetMedia : cueSheetMediaList){
+        for (CueSheetMedia cueSheetMedia : cueSheetMediaList) {
 
             CueSheetMediaDTO cueSheetMediaDTO = cueSheetMediaMapper.toDto(cueSheetMedia);
             cueSheetMediaDTO.setDelYn("N");
@@ -1400,7 +1415,7 @@ public class CueSheetItemService {
 
             //큐시트 미디어 등록
             List<CueSheetMediaCreateDTO> cueSheetMediaCreateDTOS = cueSheetItemCreateDTO.getCueSheetMedia();
-            if (CollectionUtils.isEmpty(cueSheetMediaCreateDTOS) == false){
+            if (CollectionUtils.isEmpty(cueSheetMediaCreateDTOS) == false) {
                 createTemplateMedia(cueSheetMediaCreateDTOS, cueSheet, cueItemId, userId);
             }
 
@@ -1427,7 +1442,7 @@ public class CueSheetItemService {
         FacilityManage facilityManage = facilityManageService.findFacility(subrmId);
         String subrmNm = facilityManage.getFcltyDivCd();
 
-        for (CueSheetMediaCreateDTO cueSheetMediaDTO : cueSheetMediaCreateDTOS){
+        for (CueSheetMediaCreateDTO cueSheetMediaDTO : cueSheetMediaCreateDTOS) {
 
             cueSheetMediaDTO.setCueSheetItem(cueSheetItemSimpleDTO);
             cueSheetMediaDTO.setInputrId(userId);
@@ -1608,7 +1623,7 @@ public class CueSheetItemService {
         //조회된 기사 빈값 검사.
 
         if (getArticle.isPresent() == false) {
-            throw new ResourceNotFoundException("기사아이디에 해당하는 기사가 없습니다. 기사 아이디:" +artclId);
+            throw new ResourceNotFoundException("기사아이디에 해당하는 기사가 없습니다. 기사 아이디:" + artclId);
         }
 
         //큐시트 아이디로 큐시트 조회 및 존재유무 확인.
@@ -1702,8 +1717,8 @@ public class CueSheetItemService {
 
         List<ArticleTag> articleTagList = articleTagRepository.findArticleTag(artclId);
 
-        for (ArticleTag articleTag : articleTagList){
-            
+        for (ArticleTag articleTag : articleTagList) {
+
             Tag tag = articleTag.getTag();
 
             ArticleTag articleTagEntity = ArticleTag.builder()
@@ -1770,8 +1785,8 @@ public class CueSheetItemService {
         //원본 픽스구분값이 앵커픽스,데이커 픽스일 경우 article_fix, editor_fix 로변경
         //에디터 픽스자가 있을경우 에디터픽스로, 아닐경우 기사픽스로 셋팅
         if ("anchor_fix".equals(getOrgApprvDivCd) || "desk_fix".equals(getOrgApprvDivCd) || "editor_fix".equals(getOrgApprvDivCd)) {
-           
-                newApprvDivCd = "article_fix";
+
+            newApprvDivCd = "article_fix";
 
         } else {
             newApprvDivCd = getOrgApprvDivCd; //none_fix값 처리
@@ -1854,7 +1869,7 @@ public class CueSheetItemService {
                     .artclReqdSecDivYn(article.getArtclReqdSecDivYn())
                     .artclReqdSec(article.getArtclReqdSec())
                     .apprvDtm(article.getApprvDtm())
-                    .artclOrd(maxArtclOrd )//기사 시퀀스 +1
+                    .artclOrd(maxArtclOrd)//기사 시퀀스 +1
                     .brdcCnt(article.getBrdcCnt())
                     .orgArtclId(article.getOrgArtclId())//원본기사 아이디set
                     .urgYn(article.getUrgYn())
@@ -2073,7 +2088,7 @@ public class CueSheetItemService {
     }
 
     //큐시트 순번버전 카운트 증가
-    public CueSheet addOrdVer(CueSheet cueSheet){
+    public CueSheet addOrdVer(CueSheet cueSheet) {
 
         CueSheetDTO cueSheetDTO = cueSheetMapper.toDto(cueSheet);
         cueSheetDTO.setCueOderVer(cueSheet.getCueOderVer() + 1);
@@ -2131,7 +2146,7 @@ public class CueSheetItemService {
 
         Optional<Article> articleEntity = articleRepository.findDeleteArticle(artclId);
 
-        if (articleEntity.isPresent() == false){
+        if (articleEntity.isPresent() == false) {
             throw new ResourceNotFoundException("삭제된 기사 아이디가 없습니다. 기사 아이디  : " + artclId);
         }
 
@@ -2143,7 +2158,7 @@ public class CueSheetItemService {
 
         List<ArticleMedia> articleMediaList = articleMediaRepository.findDeleteArticleMediaList(artclId);
 
-        for (ArticleMedia articleMedia : articleMediaList){
+        for (ArticleMedia articleMedia : articleMediaList) {
 
             articleMedia.setDelYn("N");
 
@@ -2230,7 +2245,7 @@ public class CueSheetItemService {
         }
     }
 
-    public CueSheetItemMediaListDTO findAllMedia(Long cueId){
+    public CueSheetItemMediaListDTO findAllMedia(Long cueId) {
 
 
         List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueSheetItemMediaList(cueId);
@@ -2238,18 +2253,18 @@ public class CueSheetItemService {
         List<ArticleMedia> articleMediaList = new ArrayList<>();
         List<CueSheetMedia> cueSheetMediaList = new ArrayList<>();
 
-        for (CueSheetItem cueSheetItem : cueSheetItemList){
+        for (CueSheetItem cueSheetItem : cueSheetItemList) {
 
             /*******기사 미디어 ********/
             Article article = cueSheetItem.getArticle();
 
-            if (ObjectUtils.isEmpty(article) == false){
+            if (ObjectUtils.isEmpty(article) == false) {
 
                 Set<ArticleMedia> articleMedias = article.getArticleMedia();
 
-                if (CollectionUtils.isEmpty(articleMedias) == false){
+                if (CollectionUtils.isEmpty(articleMedias) == false) {
 
-                    for (ArticleMedia articleMedia : articleMedias){
+                    for (ArticleMedia articleMedia : articleMedias) {
 
                         articleMediaList.add(articleMedia);
                     }
@@ -2260,9 +2275,9 @@ public class CueSheetItemService {
             /*******큐시트 미디어 ********/
             Set<CueSheetMedia> cueSheetMedias = cueSheetItem.getCueSheetMedia();
 
-            if (CollectionUtils.isEmpty(cueSheetMedias) == false){
+            if (CollectionUtils.isEmpty(cueSheetMedias) == false) {
 
-                for (CueSheetMedia cueSheetMedia : cueSheetMedias){
+                for (CueSheetMedia cueSheetMedia : cueSheetMedias) {
                     cueSheetMediaList.add(cueSheetMedia);
                 }
             }
