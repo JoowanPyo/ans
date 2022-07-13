@@ -97,6 +97,9 @@ public class YonhapWireController {
     public ResponseEntity<?> create(@Parameter(description = "필수값<br> ", required = true)
                                     @RequestBody YonhapWireCreateDTO yonhapWireCreateDTO, UriComponentsBuilder ucBuilder
     ) throws Exception {
+
+        log.info(" Yonhap Wire :  Yonhap Wire Create DTO - " + yonhapWireCreateDTO.toString());
+
         HttpHeaders headers = null;
 
         YonhapWireResponseDTO yonhapWireResponseDTO = new YonhapWireResponseDTO();

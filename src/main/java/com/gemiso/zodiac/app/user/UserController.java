@@ -13,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -140,5 +142,17 @@ public class UserController {
 
         return new AnsApiResponse<>(userDto);
     }
+
+    @Operation(summary = "사용자 목록 엑셀출력", description = "사용자 목록 엑셀출력")
+    @GetMapping(path = "/excel")
+    public void excelDownload(HttpServletResponse response) throws IOException {
+
+        List<UserDTO> userDTOList = userService.findAll(null, null, null, null, "N");
+
+
+        userService.excelDownload(response, userDTOList);
+
+    }
+
 
 }

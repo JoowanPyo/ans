@@ -1,7 +1,7 @@
 package com.gemiso.zodiac.app.article.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.articleTag.dto.ArticleTagDTO;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;

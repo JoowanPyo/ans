@@ -14,5 +14,5 @@ public class CueSheetItemSymbolUpdateDTO {
     //private Long id;
     private CueSheetItemSimpleDTO cueSheetItem;
     private SymbolSimpleDTO symbol;
-    private int ord;
+    private Integer ord;
 }

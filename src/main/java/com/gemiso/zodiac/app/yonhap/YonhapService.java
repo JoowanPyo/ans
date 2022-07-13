@@ -318,7 +318,6 @@ public class YonhapService {
             UploadFileBean ub = new UploadFileBean();
 
             ub = xu.getUploadInfo("FileAttach.xml", fileDivCd);
-            System.out.println("11111111111111111");
             int uploadsize = Integer.parseInt(ub.getMaxsize().substring(0, ub.getMaxsize().indexOf("MB")));
 
 

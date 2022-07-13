@@ -14,7 +14,9 @@ public enum ActionMesg {
     articleLOCK("article Lock"),
     articleUNLOCK("article UnLock"),
     articleForcedLock("Overriden"),
-    fixM("Status Changed");
+    fixM("Status Changed"),
+    mediaC("Linked Video"),
+    mediaD("UnLinked Video");
 
     String mesg;
 

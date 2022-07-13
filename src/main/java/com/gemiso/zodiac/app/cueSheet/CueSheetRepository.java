@@ -20,8 +20,9 @@ public interface CueSheetRepository extends JpaRepository<CueSheet, Long>, Query
     Optional<CueSheet> findTakerCue(@Param("cueId") Long cueId, @Param("del_yn") String del_yn);
 
     @Query("select count(a) from CueSheet a where a.brdcDt =:brdcDt and a.brdcStartTime =:brdcStartTime " +
-            "and a.program.brdcPgmId =:brdcPgmId and a.delYn = 'N'")
-    int findCueProgram(@Param("brdcDt")String brdcDt,@Param("brdcPgmId")String brdcPgmId,@Param("brdcStartTime")String brdcStartTime);
+            "and a.program.brdcPgmId =:brdcPgmId and a.delYn = 'N' ")
+    int findCueProgram(@Param("brdcDt")String brdcDt,@Param("brdcPgmId")String brdcPgmId,@Param("brdcStartTime")String brdcStartTime
+            /*, @Param("brdcEndTime")String brdcEndTime*/);
 
     @Query("select count(a) from CueSheet a where a.brdcDt =:brdcDt and a.program.brdcPgmId =:brdcPgmId and a.delYn = 'N'")
     int findCueProgram2(@Param("brdcDt")String brdcDt,@Param("brdcPgmId")String brdcPgmId);

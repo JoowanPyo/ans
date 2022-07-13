@@ -96,6 +96,15 @@ dependencies {
     //implementation 'co.elastic.clients:elasticsearch-java:7.16.2'
 
 
+    //excel
+    // https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans
+    //implementation 'org.apache.xmlbeans:xmlbeans:2.6.0'
+    implementation group: 'org.apache.poi', name: 'poi', version: '4.1.2'        // HSSFWorkbook 사용가능
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'  // XSSFWorkbook 사용가능
+    //implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+
+    // https://mvnrepository.com/artifact/commons-net/commons-net
+    implementation 'commons-net:commons-net:3.6'
 
 }
 
@@ -107,7 +116,7 @@ dependencies {
 }*/
 bootJar {
     archiveBaseName = 'ans'
-    archiveVersion = "0.5_07-06"
+    archiveVersion = "0.1_07-12"
 }
 
 

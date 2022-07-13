@@ -13,19 +13,28 @@ import com.gemiso.zodiac.app.scrollNewsDetail.dto.ScrollNewsDetailCreateDTO;
 import com.gemiso.zodiac.app.scrollNewsDetail.dto.ScrollNewsDetailCttJsonDTO;
 import com.gemiso.zodiac.app.scrollNewsDetail.mapper.ScrollNewsDetailCreateMapper;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
+import com.gemiso.zodiac.core.helper.SearchDate;
+import com.gemiso.zodiac.core.service.FTPconnectService;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
-import java.util.Collection;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +42,6 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class ScrollNewsService {
 
     private final ScrollNewsRepository scrollNewsRepository;
@@ -43,29 +51,47 @@ public class ScrollNewsService {
     private final ScrollNewsCreateMapper scrollNewsCreateMapper;
     private final ScrollNewsUpdateMapper scrollNewsUpdateMapper;
     private final ScrollNewsDetailCreateMapper scrollNewsDetailCreateMapper;
-    
+
     private final UserAuthService userAuthService;
 
     private final MarshallingJsonHelper marshallingJsonHelper;
 
+    @Value("${ftp1.ip:ftp1Ip}")
+    private String ftp1Ip;
+    @Value("${ftp1.port:ftp1Port}")
+    private Integer ftp1Port;
+    @Value("${ftp1.id:ftp1Id}")
+    private String ftp1Id;
+    @Value("${ftp1.pw:ftp1Pw}")
+    private String ftp1Pw;
+    @Value("${ftp1.path:ftp1Ip}")
+    private String ftp1Path;
+
+
+    //FTP코드 생성자
+    FTPconnectService ftp = new FTPconnectService();
+    FileInputStream fis = null;
+
     //스크롤 뉴스 목록조회
-    public List<ScrollNewsDTO> findAll(Date sdate, Date edate, String delYn){
+    @Transactional
+    public List<ScrollNewsDTO> findAll(Date sdate, Date edate, String delYn) {
 
         //스크롤 뉴스 조회조건 빌드
         BooleanBuilder booleanBuilder = getSearch(sdate, edate, delYn);
 
         //빌드된 조회조건으로 스크롤 뉴스 엔티티 목록 조회
-        List<ScrollNews> scrollNews = 
+        List<ScrollNews> scrollNews =
                 (List<ScrollNews>) scrollNewsRepository.findAll(booleanBuilder, Sort.by(Sort.Direction.ASC, "inputDtm"));
-        
+
         //목록조회된 엔티티 리스트 DTO변환
         List<ScrollNewsDTO> scrollNewsDTOList = scrollNewsMapper.toDtoList(scrollNews);
-        
+
         //articleDTO 리스트 리턴
         return scrollNewsDTOList;
     }
 
     //스크롤 뉴스 상세조회
+    @Transactional
     public ScrollNewsDTO find(Long scrlNewsId) {
 
         ScrollNews scrollNews = findScrollNews(scrlNewsId); //스크롤뉴스 아이디로 조회 및 존재유무 확인
@@ -76,11 +102,212 @@ public class ScrollNewsService {
 
     }
 
+    public void send(ScrollNewsDTO scrollNewsDTO) {
+
+        String fileNm = scrollNewsDTO.getFileNm();
+        String scrlFrmCd = scrollNewsDTO.getScrlFrmCd();
+        Long scrlNewsId = scrollNewsDTO.getScrlNewsId();
+        List<ScrollNewsDetail> scrollNewsDetailList = scrollNewsDetailRepository.findDetailsList(scrlNewsId);
+
+        String makeFileNm = fileNm + ".txt";
+
+        try {
+
+            File makeForder = new File(System.getProperty("user.dir") + File.separator + "storage" + File.separator + "send_text");
+            //File makeForder = new File(System.getProperty("user.dir")+File.separator+"storage"+File.separator+"send_text");
+
+            if (makeForder.exists() == false) {
+
+                try {
+
+                    Path directoryPath = Paths.get(System.getProperty("user.dir") + File.separator + "storage" + File.separator + "send_text");
+                    Files.createDirectories(directoryPath);//폴더 생성합니다.
+                    System.out.println("폴더가 생성되었습니다.");
+                } catch (Exception e) {
+                    e.getStackTrace();
+                }
+            }
+
+            // 1. 파일 객체 생성
+            File file = new File(System.getProperty("user.dir") + File.separator + "storage" + File.separator + "send_text" + File.separator + makeFileNm);
+            //File file = new File(System.getProperty("user.dir")+File.separator+"storage"+File.separator+"send_text"+File.separator+fileNm+".txt");
+
+            // 2. 파일 존재여부 체크 및 생성
+            if (file.exists() == false) {
+                file.createNewFile();
+            }
+
+            //Writer 생성
+            FileWriter fw = new FileWriter(file);
+            PrintWriter writer = new PrintWriter(fw);
+
+            if ("scroll_typ_scroll".equals(scrlFrmCd)) {
+
+                //파일에 쓰기
+                writer.write("{#SC}\n");
+                writer.println();
+
+                for (ScrollNewsDetail entity : scrollNewsDetailList) {
+
+                    String cttJson = entity.getCttJson();
+                    String title = entity.getTitl();
+
+                    writer.println("*sc " + title);
+
+                    JSONParser parser = new JSONParser();
+                    Object obj = parser.parse(cttJson);
+                    JSONArray jsonObj = (JSONArray) obj;
+
+                    for (int i = 0; i < jsonObj.size(); i++) {
+                        JSONObject object = (JSONObject) jsonObj.get(i);
+                        String line = (String) object.get("line");
+                        writer.println("=" + line);
+                    }
+                    writer.println();
+                }
+
+
+            } else if ("scroll_typ_standup".equals(scrlFrmCd)) {
+
+                //파일에 쓰기
+                writer.write("{#RU}\n");
+                writer.println();
+
+                for (ScrollNewsDetail entity : scrollNewsDetailList) {
+
+                    String cttJson = entity.getCttJson();
+                    String title = entity.getTitl();
+
+                    writer.println("*sc " + title);
+
+                    JSONParser parser = new JSONParser();
+                    Object obj = parser.parse(cttJson);
+                    JSONArray jsonObj = (JSONArray) obj;
+
+                    for (int i = 0; i < jsonObj.size(); i++) {
+                        JSONObject object = (JSONObject) jsonObj.get(i);
+                        String line = (String) object.get("line");
+                        writer.println("=" + line);
+                    }
+
+                    writer.println();
+                }
+
+
+            } else {
+                log.error(" 스크롤 뉴스 타입이 맞지 않습니다 . scrlFrmCd - " + scrlFrmCd);
+            }
+
+            writer.print("####");
+            writer.close();
+
+
+        } catch (IOException | ParseException e) {
+
+            log.error(" 스크롤 뉴스 에러 : massage - " + e.getMessage());
+
+        }
+
+        sendTextFile(makeFileNm);
+
+    }
+
+    //FTP전송 [ 전송장비 총 5개 ]
+    public void sendTextFile(String makeFileNm) {
+
+
+        //FTP전송 [ 1 ]
+        sendFile1(makeFileNm);
+
+
+    }
+
+    //FTP전송 [ 전송장비 1 ]
+    public void sendFile1(String makeFileNm) {
+
+        try {
+            //nam ftp 커넥트
+            ftp.connect(ftp1Ip, ftp1Port, ftp1Id, ftp1Pw, ftp1Path);
+
+            File file = new File(System.getProperty("user.dir") + File.separator + "storage" + File.separator + "send_text" + File.separator +makeFileNm);
+
+            try {
+
+                /*
+                 * if(file.equals(file_nm)) { throw new Exception("이미 존재하는 파일명입니다."); }
+                 */
+
+                if(file.exists()) {
+
+
+                    fis = new FileInputStream(file);
+                    ftp.storeFile(makeFileNm, fis); //파일명
+
+                    log.info("FTP1 파일명 : "+makeFileNm+" fis : "+fis.toString());
+
+                }
+            } catch (Exception e) {
+                log.info("FTP1 file NumberFormatException : "+ e.getMessage());
+                // TODO: handle exception
+            } finally {
+
+                if(fis != null) {
+                    fis.close();
+                }
+
+            }
+
+            ftp.disconnect();
+
+        } catch (NumberFormatException e) {
+
+            log.info("FTP1 file NumberFormatException : "+ e.getMessage());
+
+        } catch (Exception e) {
+
+            log.info("FTP1 file NumberFormatException : "+ e.getMessage());
+
+        }
+
+
+    }
+
     //스크롤 뉴스 등록
+    @Transactional
     public Long create(ScrollNewsCreateDTO scrollNewsCreateDTO) throws Exception {
 
         String userId = userAuthService.authUser.getUserId(); //토큰 사용자 아이디 get
         scrollNewsCreateDTO.setInputrId(userId); //입력자 set
+
+        String fileNm = scrollNewsCreateDTO.getFileNm();
+        String disasterFileNm = null;
+        //재난으로 들어왔을 경우 파일명 + 00 넘버 시퀀스 추가
+        String scrlDivCd = scrollNewsCreateDTO.getScrlDivCd();
+        if ("scroll_disaster".equals(scrlDivCd)){
+
+            Integer count = 0;
+
+            Date nowDate = new Date();
+            SearchDate searchDate = new SearchDate(nowDate, nowDate);
+
+            Optional<Integer> scrollNewsCount = scrollNewsRepository.findScrollNewsCount(searchDate.getStartDate(), searchDate.getEndDate());
+
+            if (scrollNewsCount.isPresent() == false){
+                count = 0;
+            }else {
+                count = scrollNewsCount.get();
+            }
+
+            String stringNumber = Integer.toString(count);
+
+            if (stringNumber.length() > 1){
+                disasterFileNm = fileNm+stringNumber;
+            }else {
+                disasterFileNm = fileNm+"0"+stringNumber;
+            }
+
+            scrollNewsCreateDTO.setFileNm(disasterFileNm);
+        }
 
         ScrollNews scrollNews = scrollNewsCreateMapper.toEntity(scrollNewsCreateDTO);//등록DTO 엔티티 빌드.
         scrollNewsRepository.save(scrollNews);// 등록
@@ -94,6 +321,7 @@ public class ScrollNewsService {
         return scrlNewsId;
     }
 
+    @Transactional
     public void update(ScrollNewsUpdateDTO scrollNewsUpdateDTO, Long scrlNewsId) throws Exception {
 
         ScrollNews scrollNews = findScrollNews(scrlNewsId); //스크롤뉴스 아이디로 조회 및 존재유무 확인
@@ -113,6 +341,7 @@ public class ScrollNewsService {
     }
 
     //스크롤 뉴스 삭제
+    @Transactional
     public void delete(Long scrlNewsId) {
 
         ScrollNews scrollNews = findScrollNews(scrlNewsId); //스크롤뉴스 아이디로 조회 및 존재유무 확인
@@ -130,6 +359,7 @@ public class ScrollNewsService {
     }
 
     //스크롤 뉴스 상세 업데이트
+    @Transactional
     public void updateDetail(List<ScrollNewsDetailCreateDTO> scrollNewsDetailCreateDTO, Long scrlNewsId) throws Exception {
 
         //스크롤뉴스 상세 List조회[기존에 등록되어 있던 스크롤뉴스 상세 삭재 후 재등록]
@@ -146,6 +376,7 @@ public class ScrollNewsService {
     }
 
     //스크롤 뉴스 상세 리스트 등록
+    @Transactional
     public void createDetail(List<ScrollNewsDetailCreateDTO> scrollNewsDetailCreateDTO, Long scrlNewsId) throws Exception {
 
         //스크롤 뉴스 상세에 등록할 스크롤 뉴스 아이디 빌드
@@ -157,11 +388,11 @@ public class ScrollNewsService {
             //내용 Json타입으로 변환
             List<ScrollNewsDetailCttJsonDTO> ctts = dto.getCttJsons();
             String returnCtt = "";
-            if (CollectionUtils.isEmpty(ctts) == false){
+            if (CollectionUtils.isEmpty(ctts) == false) {
                 returnCtt = marshallingJsonHelper.MarshallingJson(ctts);
             }
 
-           //dto.setCttJson(returnCtt);//내용 Json타입으로 변환
+            //dto.setCttJson(returnCtt);//내용 Json타입으로 변환
             dto.setScrollNews(scrollNewsSimpleDTO);//스크롤 뉴스 아이디 set
             ScrollNewsDetail scrollNewsDetail = scrollNewsDetailCreateMapper.toEntity(dto);//스크롤 뉴스 상세DTO 엔티티 변환
             scrollNewsDetail.setCttJson(returnCtt);
@@ -184,6 +415,7 @@ public class ScrollNewsService {
 
 
     //스크롤뉴스 아이디로 조회 및 존재유무 확인
+    @Transactional
     public ScrollNews findScrollNews(Long scrlNewsId) {
 
         //null방지를 위해 옵셔널로 스크롤 뉴스 조회[조회 조건 스크롤 뉴스 아이디 && 삭제여부 N]
@@ -197,22 +429,22 @@ public class ScrollNewsService {
     }
 
     //스크롤 뉴스 목록조회 조건 빌드
-    public BooleanBuilder getSearch(Date sdate, Date edate, String delYn){
+    @Transactional
+    public BooleanBuilder getSearch(Date sdate, Date edate, String delYn) {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         QScrollNews qScrollNews = QScrollNews.scrollNews;
 
         //조회조건이 날짜로 들어온 경우
-        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false){
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
             booleanBuilder.and(qScrollNews.brdcDtm.between(sdate, edate));
         }
 
         //조회조건이 삭제 여부값으로 들어온 경우
-        if (delYn != null && delYn.trim().isEmpty() ==false){
+        if (delYn != null && delYn.trim().isEmpty() == false) {
             booleanBuilder.and(qScrollNews.delYn.eq(delYn));
-        }
-        else { //삭제 여부값이 안들어왔을 경우 디폴트 N
+        } else { //삭제 여부값이 안들어왔을 경우 디폴트 N
             booleanBuilder.and(qScrollNews.delYn.eq("N"));
         }
 

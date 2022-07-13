@@ -158,6 +158,7 @@ public class MisService {
             String misUserId = misUserIdDTO.getUserIdxx(); //Mis사용자 아이디
             String misPassword = misUser.getScrtNumb(); //Mis사용자 비밀번호
             String misDeptCode = Optional.ofNullable(misUser.getDeptCode()).orElse(""); //Mis사용자 부서코트
+            String email = Optional.ofNullable(misUser.getEltrMlad()).orElse("");
 
 
             for (User user : userList){
@@ -165,6 +166,7 @@ public class MisService {
                 String ansUserId = user.getUserId(); //Ans사용자 아이디
                 String ansPassword = user.getPwd(); // Ans사용자 비밀번호
                 String ansDeptCode = Optional.ofNullable(user.getDeptCd()).orElse(""); //Ans사용자 부서코드
+                String ansEmail = user.getEmail();
 
 
                 if (misUserId.equals(ansUserId)){ //사용자 아디디가 같으면
@@ -180,6 +182,10 @@ public class MisService {
                         updateUserDept(user, misDeptCode);
 
                         log.info("Mis User Dept Code Update : userId - "+ ansUserId+" Dept Code - "+misDeptCode);
+                    }
+
+                    if (email.equals(ansEmail) == false){
+                        updateUserEmail(user, email);
                     }
 
                 }
@@ -247,6 +253,17 @@ public class MisService {
         userGroupUserRepository.save(userGroupUser);
 
 
+    }
+
+    //사용자 이메일 업데이트
+    public void updateUserEmail(User user, String email){
+
+        UserDTO userDTO = userMapper.toDto(user);
+        userDTO.setEmail(email);
+
+        userMapper.updateFromDto(userDTO, user);
+
+        userRepository.save(user);
     }
 
     //사용자 부서정보 업데이트

@@ -347,7 +347,7 @@ public class Article extends BaseEntity {
 
    /* @OneToMany(mappedBy = "article")
     @JsonManagedReference
-    private List<ArticleTag> articleTag = new ArrayList<>();*/
+    private List<articleTag> articleTag = new ArrayList<>();*/
 
     @PrePersist
     public void prePersist() {

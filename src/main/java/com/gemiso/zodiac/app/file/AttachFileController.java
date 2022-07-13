@@ -41,6 +41,16 @@ public class AttachFileController {
         return new AnsApiResponse<>(statusCodeFileDTO);
     }
 
+    @Operation(summary = "파일 업로드[ 외부 ]", description = "파일 업로드[ 외부 ]")
+    @PostMapping(path = "/interface", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public AnsApiResponse<StatusCodeFileDTO> createFile(@RequestPart MultipartFile file, @RequestParam String fileDivCd, @RequestParam String fileNm) {
+
+        StatusCodeFileDTO statusCodeFileDTO = attachFileService.createFile(file, fileDivCd, fileNm);
+
+        return new AnsApiResponse<>(statusCodeFileDTO);
+    }
+
 
     @Operation(summary = "파일 다운로드", description = "파일 다운로드")
     @GetMapping(path = "/{fileId}")

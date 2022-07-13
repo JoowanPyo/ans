@@ -1,15 +1,13 @@
-package com.gemiso.zodiac.app.ArticleTag;
+package com.gemiso.zodiac.app.articleTag;
 
-import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagCreateDTO;
-import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagDTO;
-import com.gemiso.zodiac.app.ArticleTag.mapper.ArticleTagCreateMapper;
-import com.gemiso.zodiac.app.ArticleTag.mapper.ArticleTagMapper;
-import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.articleTag.dto.ArticleTagCreateDTO;
+import com.gemiso.zodiac.app.articleTag.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.articleTag.mapper.ArticleTagCreateMapper;
+import com.gemiso.zodiac.app.articleTag.mapper.ArticleTagMapper;
 import com.gemiso.zodiac.app.article.ArticleRepository;
 import com.gemiso.zodiac.app.article.ArticleService;
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleRepository;
-import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticleTags;
 import com.gemiso.zodiac.app.tag.Tag;
 import com.gemiso.zodiac.app.tag.TagRepository;
 import com.gemiso.zodiac.app.tag.TagService;
@@ -26,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

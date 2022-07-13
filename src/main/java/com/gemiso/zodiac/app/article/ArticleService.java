@@ -1,10 +1,10 @@
 package com.gemiso.zodiac.app.article;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gemiso.zodiac.app.ArticleTag.ArticleTag;
-import com.gemiso.zodiac.app.ArticleTag.ArticleTagRepository;
-import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagDTO;
-import com.gemiso.zodiac.app.ArticleTag.mapper.ArticleTagMapper;
+import com.gemiso.zodiac.app.articleTag.ArticleTag;
+import com.gemiso.zodiac.app.articleTag.ArticleTagRepository;
+import com.gemiso.zodiac.app.articleTag.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.articleTag.mapper.ArticleTagMapper;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapCreateDTO;
@@ -42,12 +42,10 @@ import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaCreateMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
-import com.gemiso.zodiac.app.code.CodeRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemRepository;
-import com.gemiso.zodiac.app.dept.DeptsRepository;
 import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleRepository;
 import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleService;
 import com.gemiso.zodiac.app.elasticsearch.articleDTO.ElasticSearchArticleDTO;
@@ -64,7 +62,6 @@ import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.tag.Tag;
 import com.gemiso.zodiac.app.user.QUser;
 import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.user.UserRepository;
 import com.gemiso.zodiac.app.user.UserService;
 import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuth;
 import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuthRepository;
@@ -99,7 +96,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.NoSuchAlgorithmException;
@@ -459,6 +455,18 @@ public class ArticleService {
         return article;
     }
 
+    //기사 Extra Time 수정
+    public Article updateExtraTime(ArticleExtraTimeUpdateDTO articleExtraTimeUpdateDTO, Long artclId, String userId){
+
+        Article article = articleFindOrFail(artclId);
+
+        article.setArtclExtTime(articleExtraTimeUpdateDTO.getArtclExtTime());
+
+        articleRepository.save(article);
+
+        return article;
+    }
+
     //기사 수정
     public Article update(ArticleUpdateDTO articleUpdateDTO, Long artclId, String userId) throws Exception {
 
@@ -601,7 +609,7 @@ public class ArticleService {
                         Long articleHistId = updateArticleHist(updateCopyArticle);
 
                         //기사 미디어 update
-                        copyarticleMediaUpdate(updateCopyArticle, articleId, articleHistId, userId);
+                        //copyarticleMediaUpdate(updateCopyArticle, articleId, articleHistId, userId);
 
                         //기사 자막 Update
                         copyArticleCapUpdate(updateCopyArticle, articleUpdateDTO, articleHistId);

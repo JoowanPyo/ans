@@ -1,7 +1,5 @@
 package com.gemiso.zodiac.core.helper;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import java.security.NoSuchAlgorithmException;
 
 public class EncodingHelper{

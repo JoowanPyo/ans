@@ -614,12 +614,23 @@ public class InterfaceService {
                     cueTmpltId = cueSheetTemplate.getCueTmpltId();
                 }
 
+                String typCd = cueSheetItem.getCueItemTypCd();
+                String setTypCd = null;
+                String setTypNm = null;
+                if (typCd != null && typCd.trim().isEmpty() == false){
+                    setTypCd = cueSheetItem.getCueItemTypCd();
+                    setTypNm = cueSheetItem.getCueItemTypCdNm();
+                }
+
+
                 //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
                 TakerCueSheetSpareDTO takerCueSheetDTO = TakerCueSheetSpareDTO.builder()
                         .rdId(cueSheetItem.getCueItemId())
                         .rdSeq(rdSeq)
                         .chDivCd(cueSheet.getChDivCd()) // 채널구분코드
                         .cueDivCdNm(cueSheet.getCueDivCdNm()) //채널구분코드 명
+                        .artclFrmCd(setTypCd)
+                        .artclFrmNm(setTypNm)
                         .rdOrd(cueSheetItem.getCueItemOrd())//순번
                         .rdOrdMrk(cueSheetItem.getCueItemOrdCd())//표시되는 순번
                         .rdDtlDivCd(cueSheetItem.getCueItemDivCd()) //큐시트아이템 구분 코드
@@ -638,6 +649,7 @@ public class InterfaceService {
                         .cueItemId(cueSheetItem.getCueItemId())
                         .artclReqdSec(Optional.ofNullable(cueSheetItem.getCueItemTime()).orElse(0))
                         .extraTimeSec(Optional.ofNullable(cueSheetItem.getArtclExtTime()).orElse(0))
+                        .rmk(cueSheetItem.getRmk())//비고
                         .build();
 
                 takerCueSheetSpareDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
@@ -666,6 +678,17 @@ public class InterfaceService {
                     brdcPgmId = program.getBrdcPgmId();
                 }
 
+                String typCd = cueSheetItem.getCueItemTypCd();
+                String setTypCd = null;
+                String setTypNm = null;
+                if (typCd != null && typCd.trim().isEmpty() == false){
+                    setTypCd = cueSheetItem.getCueItemTypCd();
+                    setTypNm = cueSheetItem.getCueItemTypCdNm();
+                }else {
+                    setTypCd = article.getArtclTypDtlCd();
+                    setTypNm = article.getArtclTypDtlCdNm();
+                }
+
                 //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
                 TakerCueSheetSpareDTO takerCueSheetDTO = TakerCueSheetSpareDTO.builder()
                         .rdId(cueSheetItem.getCueItemId())
@@ -681,8 +704,8 @@ public class InterfaceService {
                         .mcStNm(cueSheet.getCueStCdNm())//방송상태 명
                         .cmDivNm(returnSymbolNm)//심볼 아이디 명 (채널명) ex NS-1, NS-2, NS-3
                         .artclId(article.getArtclId())
-                        .artclFrmCd(article.getArtclTypDtlCd())
-                        .artclFrmNm(article.getArtclTypDtlCdNm())
+                        .artclFrmCd(setTypCd)//Broll, Pkg
+                        .artclFrmNm(setTypNm)
                         .artclFldCd(article.getArtclFldCd())
                         .artclFldNm(article.getArtclFldCdNm())
                         .artclTitl(article.getArtclTitl())
@@ -725,6 +748,7 @@ public class InterfaceService {
                         .cueId(cueSheet.getCueId())
                         .cueItemId(cueSheetItem.getCueItemId())
                         .cueTmpltId(null)
+                        .rmk(cueSheetItem.getRmk())//비고
                         .build();
 
                 takerCueSheetSpareDTOList.add(takerCueSheetDTO); //빌드된 큐시트테이커DTO 리턴할 큐시트테이커 리스트에 add
@@ -919,12 +943,22 @@ public class InterfaceService {
             cueTmpltId = cueSheetTemplate.getCueTmpltId();
         }
 
+        String typCd = cueSheetItem.getCueItemTypCd();
+        String setTypCd = null;
+        String setTypNm = null;
+        if (typCd != null && typCd.trim().isEmpty() == false){
+            setTypCd = cueSheetItem.getCueItemTypCd();
+            setTypNm = cueSheetItem.getCueItemTypCdNm();
+        }
+
         //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
         TakerCueSheetDTO takerCueSheetDTO = TakerCueSheetDTO.builder()
                 .rdId(cueSheetItem.getCueItemId())
                 .rdSeq(rdSeq)
                 .chDivCd(cueSheet.getChDivCd()) // 채널구분코드
                 .cueDivCdNm(cueSheet.getCueDivCdNm()) //채널구분코드 명
+                .artclFrmCd(setTypCd)
+                .artclFrmNm(setTypNm)
                 .rdOrd(cueSheetItem.getCueItemOrd())//순번
                 .rdOrdMrk(cueSheetItem.getCueItemOrdCd())//표시되는 순번(알파벳? 숫자 같이 들어가 있고 안들어가는 부분이 있음)
                 .rdDtlDivCd(cueSheetItem.getCueItemDivCd()) //큐시트아이템 구분 코드
@@ -946,6 +980,7 @@ public class InterfaceService {
                 //.newsAcumTime(cueSheetItem.getArtclExtTime())
                 //.artclTitl()
                 //.artclTitlEn()
+                .rmk(cueSheetItem.getRmk()) //비고
                 .build();
 
         return takerCueSheetDTO;
@@ -969,6 +1004,17 @@ public class InterfaceService {
             brdcPgmId = program.getBrdcPgmId();
         }
 
+        String typCd = cueSheetItem.getCueItemTypCd();
+        String setTypCd = null;
+        String setTypNm = null;
+        if (typCd != null && typCd.trim().isEmpty() == false){
+            setTypCd = cueSheetItem.getCueItemTypCd();
+            setTypNm = cueSheetItem.getCueItemTypCdNm();
+        }else {
+            setTypCd = article.getArtclTypDtlCd();
+            setTypNm = article.getArtclTypDtlCdNm();
+        }
+
         //테이커큐시트 정보 큐시트 엔티티 정보로 빌드
         TakerCueSheetDTO takerCueSheetDTO = TakerCueSheetDTO.builder()
                 .rdId(cueSheetItem.getCueItemId())
@@ -984,8 +1030,8 @@ public class InterfaceService {
                 .rdDtlDivNm(cueSheetItem.getCueItemDivCdNm())//큐시트아이템 구분 코드 명
                 .mcStNm(cueSheet.getCueStCdNm())//방송상태 명
                 .artclId(article.getArtclId())
-                .artclFrmCd(article.getArtclTypDtlCd())
-                .artclFrmNm(article.getArtclTypDtlCdNm())
+                .artclFrmCd(setTypCd)//broll, pkg
+                .artclFrmNm(setTypNm)
                 .artclFldCd(article.getArtclFldCd())
                 .artclFldNm(article.getArtclFldCdNm())
                 .artclTitl(article.getArtclTitl())
@@ -1029,6 +1075,7 @@ public class InterfaceService {
                 .cueId(cueSheet.getCueId())
                 .cueTmpltId(null)
                 .cueItemId(cueSheetItem.getCueItemId())
+                .rmk(cueSheetItem.getRmk())//비고
                 .build();
 
 

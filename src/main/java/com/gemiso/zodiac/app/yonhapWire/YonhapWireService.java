@@ -143,13 +143,13 @@ public class YonhapWireService {
         Date inputDtm = null;
         Date trnsfDtm = null;
         if(!StringUtils.isEmpty(yonhapWireCreateDTO.getEmbg_dtm())) {
-            embgDtm = dateChangeHelper.stringToDateNoComma(yonhapWireCreateDTO.getEmbg_dtm());
+            embgDtm = dateChangeHelper.stringToDateComma(yonhapWireCreateDTO.getEmbg_dtm());
         }
         if(!StringUtils.isEmpty(yonhapWireCreateDTO.getInput_dtm())) {
-            inputDtm = dateChangeHelper.stringToDateNoComma(yonhapWireCreateDTO.getInput_dtm());
+            inputDtm = dateChangeHelper.stringToDateComma(yonhapWireCreateDTO.getInput_dtm());
         }
         if(!StringUtils.isEmpty(yonhapWireCreateDTO.getTrnsf_dtm())) {
-            trnsfDtm = dateChangeHelper.stringToDateNoComma(yonhapWireCreateDTO.getTrnsf_dtm());
+            trnsfDtm = dateChangeHelper.stringToDateComma(yonhapWireCreateDTO.getTrnsf_dtm());
         }
         int artclqnty = Integer.parseInt(yonhapWireCreateDTO.getArtclqnty());
 

@@ -26,6 +26,20 @@ public class DateChangeHelper {
         return returnDate;
     }
 
+    //String To Date
+    public Date stringToDateComma(String str) throws ParseException {
+
+        Date returnDate = null;
+
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        if (str != null && str.trim().isEmpty() == false){
+            returnDate = transFormat.parse(str);
+        }
+
+        return returnDate;
+    }
+
     //Date To Date
     public Date DateToDate(Date date) throws ParseException {
 

@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.ArticleTag;
+package com.gemiso.zodiac.app.articleTag;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gemiso.zodiac.app.article.Article;

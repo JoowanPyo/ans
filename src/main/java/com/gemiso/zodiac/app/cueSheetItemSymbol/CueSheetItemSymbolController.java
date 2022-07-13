@@ -43,6 +43,8 @@ public class CueSheetItemSymbolController {
                                                                 @Parameter(description = "필수값<br> ", required = true)
                                                                 @RequestBody @Valid CueSheetItemSymbolCreateDTO cueSheetItemSymbolCreateDTO) {
 
+        log.info("CueSheet Item Symbol Create : CueItemId - "+cueItemId + " DTO - "+ cueSheetItemSymbolCreateDTO.toString() );
+
         CueSheetItemSymbolResponseDTO cueSheetItemSymbolDTO = new CueSheetItemSymbolResponseDTO();
 
         Long id = cueSheetItemSymbolService.create(cueSheetItemSymbolCreateDTO, cueItemId);

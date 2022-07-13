@@ -72,7 +72,6 @@ public class CueSheetItemSymbolService {
         //큐시트 아이템 아이디 set
         CueSheetItemSimpleDTO cueSheetItemSimpleDTO = CueSheetItemSimpleDTO.builder().cueItemId(cueItemId).build();
         cueSheetItemSymbolCreateDTO.setCueSheetItem(cueSheetItemSimpleDTO);
-
         CueSheetItemSymbol cueSheetItemSymbolEntity = cueSheetItemSymbolCreateMapper.toEntity(cueSheetItemSymbolCreateDTO);
 
         cueSheetItemSymbolRepository.save(cueSheetItemSymbolEntity);

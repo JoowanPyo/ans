@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.app.cueSheetTemplateSymbol;
 
+import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
+import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolCreateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplate.CueSheetTemplate;
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
@@ -63,6 +65,9 @@ public class CueTmplSymbolService {
     //큐시트 템플릿 아이템 방송아이콘 등록 단건
     public CueTmplSymbolSimpleDTO create(Long cueTmpltItemId, CueTmplSymbolCreateDTO cueTmplSymbolCreateDTO){
 
+
+        findSymbolList(cueTmplSymbolCreateDTO, cueTmpltItemId);
+
         //큐시트 아이템 방송아이콘에 넣어줄 큐시트아이템 아이디 빌드
         CueTmpltItemSimpleDTO cueTmpltItemSimpleDTO = CueTmpltItemSimpleDTO.builder().cueTmpltItemId(cueTmpltItemId).build();
 
@@ -76,6 +81,29 @@ public class CueTmplSymbolService {
         cueTmplSymbolSimpleDTO.setId(id);
 
         return cueTmplSymbolSimpleDTO;
+
+    }
+
+    public void findSymbolList(CueTmplSymbolCreateDTO cueTmplSymbolCreateDTO, Long cueTmpltItemId){
+
+        //큐시트아이템 방송아이콘 List 조회
+        List<CueTmplSymbol> cueSheetTmplSymbol = cueTmplSymbolRepository.findCueTmplSymbol(cueTmpltItemId);
+
+        int newOrd = cueTmplSymbolCreateDTO.getOrd();//새로 등록할 큐시트아이템 방송아이콘 순번 get
+        String newTypCd = cueTmplSymbolCreateDTO.getSymbol().getTypCd();// "tv", "radio" new구분코드
+
+        if (ObjectUtils.isEmpty(cueSheetTmplSymbol) == false){
+            for (CueTmplSymbol getCueItemSymbol : cueSheetTmplSymbol){
+                int orgOrd = getCueItemSymbol.getOrd(); //등록되어 있던 큐시트아이템 방송아이콘 순번 get.
+                Long orgId = getCueItemSymbol.getId();//기존아이디 get
+                String ordTypCd = getCueItemSymbol.getSymbol().getTypCd();//기본 구분코드 get
+                if (orgOrd == newOrd && ordTypCd.equals(newTypCd)){ //새로등록할 큐시트아이템 방송아이콘 순번과,그분타입 이미등록되어있던 방손아이콘 순번이 같으면 에러.
+                    cueTmplSymbolRepository.deleteById(orgId); //새로 들어온 순번에 들어가 있던 방송아이콘 삭제.
+                }
+            }
+
+        }
+
 
     }
 

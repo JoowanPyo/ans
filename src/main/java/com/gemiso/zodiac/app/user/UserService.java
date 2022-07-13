@@ -19,6 +19,11 @@ import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +31,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -413,6 +420,78 @@ public class UserService {
         return userGroup.get();
     }
 
+    public void excelDownload(HttpServletResponse response, List<UserDTO> userDTOList) throws IOException {
+
+        Workbook wb = new XSSFWorkbook();
+        Sheet sheet = wb.createSheet("ANS 사용자 정보");
+        sheet.setColumnWidth(0, 6000);
+        sheet.setColumnWidth(1, 8000);
+        sheet.setColumnWidth(2, 4000);
+        sheet.setColumnWidth(3, 2000);
+        sheet.setColumnWidth(4, 5000);
+        sheet.setColumnWidth(5, 10000);
+        sheet.setColumnWidth(6, 4000);
+        Row row = null;
+        Cell cell = null;
+        int rowNum = 0;
+
+
+        // Header
+        row = sheet.createRow(rowNum++);
+        cell = row.createCell(0);
+        cell.setCellValue("사용자 아이디");
+        cell = row.createCell(1);
+        cell.setCellValue("사용자 명");
+        cell = row.createCell(2);
+        cell.setCellValue("사원 번호");
+        cell = row.createCell(3);
+        cell.setCellValue("프리랜서 여부");
+        cell = row.createCell(4);
+        cell.setCellValue("부서");
+        cell = row.createCell(5);
+        cell.setCellValue("이메일");
+        cell = row.createCell(6);
+        cell.setCellValue("전화번호");
+        /*cell = row.createCell(7);
+        cell.setCellValue("등록 일시");
+        cell = row.createCell(8);
+        cell.setCellValue("사내 번호");*/
+
+
+        // Body
+        for (UserDTO userDTO : userDTOList) {
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue(userDTO.getUserId());
+            cell = row.createCell(1);
+            cell.setCellValue(userDTO.getUserNm());
+            cell = row.createCell(2);
+            cell.setCellValue(userDTO.getEmplNo());
+            cell = row.createCell(3);
+            cell.setCellValue(userDTO.getFreeYn());
+            cell = row.createCell(4);
+            cell.setCellValue(userDTO.getDeptNm());
+            cell = row.createCell(5);
+            cell.setCellValue(userDTO.getEmail());
+            cell = row.createCell(6);
+            cell.setCellValue(userDTO.getTel());
+           /* cell = row.createCell(7);
+            cell.setCellValue(userDTO.getInputDtm());
+            cell = row.createCell(8);
+            cell.setCellValue(userDTO.getInphonNo());*/
+        }
+
+        // 컨텐츠 타입과 파일명 지정
+        response.setContentType("ms-vnd/excel");
+//        response.setHeader("Content-Disposition", "attachment;filename=example.xls");
+        response.setHeader("Content-Disposition", "attachment;filename=example.xlsx");
+
+        // Excel File Output
+        wb.write(response.getOutputStream());
+        wb.close();
+
+
+    }
 
 
 }

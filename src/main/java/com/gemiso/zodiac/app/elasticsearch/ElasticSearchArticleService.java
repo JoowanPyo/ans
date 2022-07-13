@@ -1,7 +1,7 @@
 package com.gemiso.zodiac.app.elasticsearch;
 
-import com.gemiso.zodiac.app.ArticleTag.ArticleTag;
-import com.gemiso.zodiac.app.ArticleTag.ArticleTagRepository;
+import com.gemiso.zodiac.app.articleTag.ArticleTag;
+import com.gemiso.zodiac.app.articleTag.ArticleTagRepository;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;

@@ -1,4 +1,4 @@
-package com.gemiso.zodiac.app.ArticleTag.dto;
+package com.gemiso.zodiac.app.articleTag.dto;
 
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.tag.dto.TagDTO;

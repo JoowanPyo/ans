@@ -352,6 +352,34 @@ public class ArticleController {
 
     }
 
+    @Operation(summary = "기사 수정[extra time]", description = "기사 수정[extra time]")
+    @PutMapping(path = "/{artclId}/extratime")
+    public AnsApiResponse<?> updateExtraTime(@Parameter(description = "필수값<br> ", required = true)
+                                    @RequestBody @Valid ArticleExtraTimeUpdateDTO articleExtraTimeUpdateDTO,
+                                    @Parameter(name = "artclId", required = true, description = "기사 아이디")
+                                    @PathVariable("artclId") Long artclId) throws Exception {
+
+        String userId = userAuthService.authUser.getUserId();
+        log.info("Article Extra Time Update : User Id - " + userId + "<br>" +
+                " Article Update Model -" + articleExtraTimeUpdateDTO.toString());
+
+        //수정. 잠금사용자확인
+
+        Article article = articleService.updateExtraTime(articleExtraTimeUpdateDTO, artclId, userId);
+
+        //엘라스틱서치 등록
+        elasticSearchArticleService.elasticPush(article);
+
+        //기사 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
+        articleDTO.setArtclId(artclId);
+
+        log.info("Article Extra Time Update Success Id : " + artclId + "Update Model" + articleDTO);
+
+        return new AnsApiResponse<>(articleDTO);
+
+    }
+
     @Operation(summary = "기사 삭제", description = "기사 삭제")
     @DeleteMapping(path = "/{artclId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

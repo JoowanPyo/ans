@@ -87,6 +87,8 @@ public class YonhapController {
                                     UriComponentsBuilder ucBuilder
     ) throws Exception {
 
+        log.info(" Yonhap  :  Yonhap Create DTO - " + yonhapCreateDTO.toString());
+
 
         YonhapExceptionDomain yonhapExceptionDomain = yonhapService.create(yonhapCreateDTO);
 
@@ -106,7 +108,8 @@ public class YonhapController {
     @Operation(summary = "파일 업로드", description = "파일 업로드")
     @PostMapping(path = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public AnsApiResponse<YonhapFileResponseDTO> fileCreate(@RequestPart MultipartFile file, @RequestParam String fileDivCd) {
+    public AnsApiResponse<YonhapFileResponseDTO> fileCreate(@RequestPart MultipartFile file, @RequestParam String fileDivCd
+            , @RequestParam String fileNm) {
 
         YonhapFileResponseDTO DTO = yonhapService.fileCreate(file, fileDivCd);
 

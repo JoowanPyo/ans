@@ -12,7 +12,7 @@ public class ScrollNewsDetailUpdateDTO {
 
     private Long id;
     private String titl;
-    private int cttOrd;
+    private Integer cttOrd;
     private String cttJson;
     private ScrollNewsSimpleDTO scrollNews;
 }

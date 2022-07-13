@@ -1,8 +1,7 @@
 package com.gemiso.zodiac.app.cueSheet;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gemiso.zodiac.app.ArticleTag.ArticleTag;
-import com.gemiso.zodiac.app.ArticleTag.ArticleTagRepository;
+import com.gemiso.zodiac.app.articleTag.ArticleTag;
+import com.gemiso.zodiac.app.articleTag.ArticleTagRepository;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
 import com.gemiso.zodiac.app.article.Article;
@@ -875,13 +874,15 @@ public class CueSheetService {
 
         String brdcStartTime = cueSheetCreateDTO.getBrdcStartTime();
 
+        String brdcEndTime = cueSheetCreateDTO.getBrdcEndTime();
+
         ProgramSimpleDTO program = cueSheetCreateDTO.getProgram();
 
         if (ObjectUtils.isEmpty(program) == false) {
 
             String brdcPgmId = program.getBrdcPgmId();
 
-            cueCnt = cueSheetRepository.findCueProgram(brdcDt, brdcPgmId, brdcStartTime);
+            cueCnt = cueSheetRepository.findCueProgram(brdcDt, brdcPgmId, brdcStartTime/*, brdcEndTime*/);
 
         }
 
@@ -1514,8 +1515,8 @@ public class CueSheetService {
                     .userGrpId(article.getUserGrpId())
                     .artclReqdSecDivYn(article.getArtclReqdSecDivYn())
                     .artclReqdSec(article.getArtclReqdSec())
-                    .lckYn(article.getLckYn())
-                    .lckDtm(article.getLckDtm())
+                    //.lckYn(article.getLckYn())
+                    //.lckDtm(article.getLckDtm())
                     .apprvDtm(article.getApprvDtm())
                     .artclOrd(artclOrd)//기사 시퀀스 +1
                     .brdcCnt(article.getBrdcCnt())
@@ -1531,10 +1532,10 @@ public class CueSheetService {
                     .brdcPgmId(brdcPgmId) //프로그램 아이디
                     .brdcSchdDtm(article.getBrdcSchdDtm())//방송시간
                     .inputrId(article.getInputrId())
-                    .updtrId(article.getUpdtrId())
-                    .delrId(article.getDelrId())
+                    //.updtrId(article.getUpdtrId())
+                    //.delrId(article.getDelrId())
                     .apprvrId(article.getApprvrId())
-                    .lckrId(article.getLckrId())
+                    //.lckrId(article.getLckrId())
                     .rptrId(article.getRptrId())
                     .artclCttTime(article.getArtclCttTime())
                     .ancMentCttTime(article.getAncMentCttTime())
@@ -1575,8 +1576,8 @@ public class CueSheetService {
                     .userGrpId(article.getUserGrpId())
                     .artclReqdSecDivYn(article.getArtclReqdSecDivYn())
                     .artclReqdSec(article.getArtclReqdSec())
-                    .lckYn(article.getLckYn())
-                    .lckDtm(article.getLckDtm())
+                    //.lckYn(article.getLckYn())
+                    //.lckDtm(article.getLckDtm())
                     .apprvDtm(article.getApprvDtm())
                     .artclOrd(artclOrd)//기사 시퀀스 +1
                     .brdcCnt(article.getBrdcCnt())
@@ -1592,10 +1593,10 @@ public class CueSheetService {
                     .brdcPgmId(brdcPgmId)
                     .brdcSchdDtm(article.getBrdcSchdDtm())
                     .inputrId(article.getInputrId())
-                    .updtrId(article.getUpdtrId())
-                    .delrId(article.getDelrId())
+                    //.updtrId(article.getUpdtrId())
+                    //.delrId(article.getDelrId())
                     .apprvrId(article.getApprvrId())
-                    .lckrId(article.getLckrId())
+                    //.lckrId(article.getLckrId())
                     .rptrId(article.getRptrId())
                     .artclCttTime(article.getArtclCttTime())
                     .ancMentCttTime(article.getAncMentCttTime())

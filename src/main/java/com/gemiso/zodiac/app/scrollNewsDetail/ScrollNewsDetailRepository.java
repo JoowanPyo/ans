@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface ScrollNewsDetailRepository extends JpaRepository<ScrollNewsDetail, Long>, QuerydslPredicateExecutor<ScrollNewsDetail> {
 
-    @Query("select a from ScrollNewsDetail a where a.scrollNews.scrlNewsId=:scrlNewsId")
+    @Query("select a from ScrollNewsDetail a where a.scrollNews.scrlNewsId=:scrlNewsId order by a.cttOrd asc ")
     List<ScrollNewsDetail> findDetailsList(@Param("scrlNewsId")Long scrlNewsId);
 
     @Query("select a from ScrollNewsDetail a where a.id=:id")

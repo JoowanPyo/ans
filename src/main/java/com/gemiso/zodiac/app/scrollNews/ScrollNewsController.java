@@ -118,4 +118,16 @@ public class ScrollNewsController {
         return new AnsApiResponse<>(scrollNewsDTO);
     }*/
 
+    @Operation(summary = "스크롤 뉴스 FTP 전송", description = "스크롤 뉴스 FTP 전송")
+    @GetMapping(path = "/{scrlNewsId}/send")
+    public AnsApiResponse<ScrollNewsDTO> send(@Parameter(name = "scrlNewsId", required = true, description = "스크롤 뉴스 아이디", in = ParameterIn.PATH)
+                                              @PathVariable("scrlNewsId") Long scrlNewsId) {
+
+        ScrollNewsDTO scrollNewsDTO = scrollNewsService.find(scrlNewsId);
+
+        scrollNewsService.send(scrollNewsDTO);
+
+        return new AnsApiResponse<>(scrollNewsDTO);
+    }
+
 }

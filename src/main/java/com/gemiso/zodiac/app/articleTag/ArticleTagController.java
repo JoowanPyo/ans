@@ -1,6 +1,6 @@
-package com.gemiso.zodiac.app.ArticleTag;
+package com.gemiso.zodiac.app.articleTag;
 
-import com.gemiso.zodiac.app.ArticleTag.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.articleTag.dto.ArticleTagDTO;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.ArticleService;
 import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleService;
