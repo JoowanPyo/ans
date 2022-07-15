@@ -868,7 +868,7 @@ public class CueSheetService {
     //이미등록된 큐시트가 있는지 체크
     public int getCueSheetCount(CueSheetCreateDTO cueSheetCreateDTO) {
 
-        int cueCnt = 0;
+        Integer cueCnt = 0;
 
         String brdcDt = cueSheetCreateDTO.getBrdcDt();
 
@@ -880,9 +880,9 @@ public class CueSheetService {
 
         if (ObjectUtils.isEmpty(program) == false) {
 
-            String brdcPgmId = program.getBrdcPgmId();
+            //String brdcPgmId = program.getBrdcPgmId();
 
-            cueCnt = cueSheetRepository.findCueProgram(brdcDt, brdcPgmId, brdcStartTime/*, brdcEndTime*/);
+            cueCnt = cueSheetRepository.findCueProgram(brdcDt, brdcStartTime, brdcEndTime);
 
         }
 
@@ -1375,7 +1375,7 @@ public class CueSheetService {
         int artclOrd = article.getArtclOrd() + 1;
 
         // 기사 저장하기 위한 기사복사 엔터티 생성
-        Article articleEntity = getArticleEntity(article, artclOrd, cueSheet);
+        Article articleEntity = getArticleEntity(article, artclOrd, cueSheet, userId);
         articleRepository.save(articleEntity); //복사된 기사 등록
 
 
@@ -1429,7 +1429,7 @@ public class CueSheetService {
 
             for (ArticleMedia articleMedia : articleMediaList) {
 
-                ArticleMedia articleMediaEntity = getArticleMediaEntity(articleMedia, articleEntity);
+                ArticleMedia articleMediaEntity = getArticleMediaEntity(articleMedia, articleEntity, userId);
 
                 articleMediaRepository.save(articleMediaEntity);
 
@@ -1459,7 +1459,7 @@ public class CueSheetService {
     }
 
     // 기사 저장하기 위한 엔터티 만들기 2021-10-27
-    private Article getArticleEntity(Article article, int artclOrd, CueSheet cueSheet) {
+    private Article getArticleEntity(Article article, int artclOrd, CueSheet cueSheet, String userId) {
 
         Program program = cueSheet.getProgram();
         String brdcPgmId = "";
@@ -1525,7 +1525,7 @@ public class CueSheetService {
                     .frnotiYn(article.getFrnotiYn())
                     .embgYn(article.getEmbgYn())
                     .embgDtm(article.getEmbgDtm())
-                    .inputrNm(article.getInputrNm())
+                    //.inputrNm(article.getInputrNm())
                     .delYn(article.getDelYn())
                     .notiYn(article.getNotiYn())
                     .regAppTyp(article.getRegAppTyp())
@@ -1586,7 +1586,7 @@ public class CueSheetService {
                     .frnotiYn(article.getFrnotiYn())
                     .embgYn(article.getEmbgYn())
                     .embgDtm(article.getEmbgDtm())
-                    .inputrNm(article.getInputrNm())
+                    //.inputrNm(article.getInputrNm())
                     .delYn(article.getDelYn())
                     .notiYn(article.getNotiYn())
                     .regAppTyp(article.getRegAppTyp())
@@ -1649,7 +1649,7 @@ public class CueSheetService {
 
     }
 
-    public ArticleMedia getArticleMediaEntity(ArticleMedia articleMedia, Article articleEntity) {
+    public ArticleMedia getArticleMediaEntity(ArticleMedia articleMedia, Article articleEntity, String userId) {
 
         return ArticleMedia.builder()
                 .mediaTypCd(articleMedia.getMediaTypCd())
@@ -1663,7 +1663,7 @@ public class CueSheetService {
                 .videoEdtrNm(articleMedia.getVideoEdtrNm())
                 .delYn(articleMedia.getDelYn())
                 .delDtm(articleMedia.getDelDtm())
-                .inputrId(articleMedia.getInputrId())
+                .inputrId(userId)
                 .updtrId(articleMedia.getUpdtrId())
                 .delrId(articleMedia.getDelrId())
                 .videoEdtrId(articleMedia.getVideoEdtrId())

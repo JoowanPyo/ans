@@ -811,13 +811,13 @@ public class ArticleService {
         copyArticle.setMemo(article.getMemo());
         copyArticle.setEditorId(article.getEditorId());
         copyArticle.setArtclFixUser(article.getArtclFixUser());
-        copyArticle.setEditorFixUser(article.getEditorFixUser());
-        copyArticle.setAnchorFixUser(article.getAnchorFixUser());
-        copyArticle.setDeskFixUser(article.getDeskFixUser());
+        //copyArticle.setEditorFixUser(article.getEditorFixUser());
+      //  copyArticle.setAnchorFixUser(article.getAnchorFixUser());
+       // copyArticle.setDeskFixUser(article.getDeskFixUser());
         copyArticle.setArtclFixDtm(article.getArtclFixDtm());
-        copyArticle.setEditorFixDtm(article.getEditorFixDtm());
-        copyArticle.setAnchorFixDtm(article.getAnchorFixDtm());
-        copyArticle.setDeskFixDtm(article.getDeskFixDtm());
+        //copyArticle.setEditorFixDtm(article.getEditorFixDtm());
+        //copyArticle.setAnchorFixDtm(article.getAnchorFixDtm());
+        //copyArticle.setDeskFixDtm(article.getDeskFixDtm());
         copyArticle.setIssue(getIssue);
         //copyArticle.setCueSheet(cueSheet);
 

@@ -12,6 +12,9 @@ import com.gemiso.zodiac.app.scrollNewsDetail.ScrollNewsDetailRepository;
 import com.gemiso.zodiac.app.scrollNewsDetail.dto.ScrollNewsDetailCreateDTO;
 import com.gemiso.zodiac.app.scrollNewsDetail.dto.ScrollNewsDetailCttJsonDTO;
 import com.gemiso.zodiac.app.scrollNewsDetail.mapper.ScrollNewsDetailCreateMapper;
+import com.gemiso.zodiac.app.scrollNewsFtpInfo.ScrollNewsFtpInfo;
+import com.gemiso.zodiac.app.scrollNewsFtpInfo.ScrollNewsFtpInfoService;
+import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.service.FTPconnectService;
@@ -53,10 +56,12 @@ public class ScrollNewsService {
     private final ScrollNewsDetailCreateMapper scrollNewsDetailCreateMapper;
 
     private final UserAuthService userAuthService;
+    private final ScrollNewsFtpInfoService scrollNewsFtpInfoService;
 
+    private final DateChangeHelper dateChangeHelper;
     private final MarshallingJsonHelper marshallingJsonHelper;
 
-    @Value("${ftp1.ip:ftp1Ip}")
+   /* @Value("${ftp1.ip:ftp1Ip}")
     private String ftp1Ip;
     @Value("${ftp1.port:ftp1Port}")
     private Integer ftp1Port;
@@ -64,8 +69,52 @@ public class ScrollNewsService {
     private String ftp1Id;
     @Value("${ftp1.pw:ftp1Pw}")
     private String ftp1Pw;
-    @Value("${ftp1.path:ftp1Ip}")
+    @Value("${ftp1.path:ftp1Path}")
     private String ftp1Path;
+
+    @Value("${ftp2.ip:ftp2Ip}")
+    private String ftp2Ip;
+    @Value("${ftp2.port:ftp2Port}")
+    private Integer ftp2Port;
+    @Value("${ftp2.id:ftp2Id}")
+    private String ftp2Id;
+    @Value("${ftp2.pw:ftp2Pw}")
+    private String ftp2Pw;
+    @Value("${ftp2.path:ftp2Path}")
+    private String ftp2Path;
+
+    @Value("${ftp3.ip:ftp3Ip}")
+    private String ftp3Ip;
+    @Value("${ftp3.port:ftp3Port}")
+    private Integer ftp3Port;
+    @Value("${ftp3.id:ftp3Id}")
+    private String ftp3Id;
+    @Value("${ftp3.pw:ftp3Pw}")
+    private String ftp3Pw;
+    @Value("${ftp3.path:ftp3Path}")
+    private String ftp3Path;
+
+    @Value("${ftp4.ip:ftp4Ip}")
+    private String ftp4Ip;
+    @Value("${ftp4.port:ftp4Port}")
+    private Integer ftp4Port;
+    @Value("${ftp4.id:ftp4Id}")
+    private String ftp4Id;
+    @Value("${ftp4.pw:ftp4Pw}")
+    private String ftp4Pw;
+    @Value("${ftp4.path:ftp4Path}")
+    private String ftp4Path;
+
+    @Value("${ftp5.ip:ftp5Ip}")
+    private String ftp5Ip;
+    @Value("${ftp5.port:ftp5Port}")
+    private Integer ftp5Port;
+    @Value("${ftp5.id:ftp5Id}")
+    private String ftp5Id;
+    @Value("${ftp5.pw:ftp5Pw}")
+    private String ftp5Pw;
+    @Value("${ftp5.path:ftp5Path}")
+    private String ftp5Path;*/
 
 
     //FTP코드 생성자
@@ -215,61 +264,271 @@ public class ScrollNewsService {
     //FTP전송 [ 전송장비 총 5개 ]
     public void sendTextFile(String makeFileNm) {
 
-
         //FTP전송 [ 1 ]
         sendFile1(makeFileNm);
 
+        //FTP전송 [ 2 ]
+        sendFile2(makeFileNm);
+
+        //FTP전송 [ 3 ]
+        sendFile3(makeFileNm);
+
+        //FTP전송 [ 4 ]
+        sendFile4(makeFileNm);
+
+        //FTP전송 [ 5 ]
+        sendFile5(makeFileNm);
+
 
     }
+    //FTP전송 [ 전송장비 5 ]
+    public void sendFile5(String makeFileNm) {
 
-    //FTP전송 [ 전송장비 1 ]
-    public void sendFile1(String makeFileNm) {
+
+        Long id = 5L;
+
+        ScrollNewsFtpInfo scrollNewsFtpInfo = scrollNewsFtpInfoService.findScrollFtpInfo(id);
+
+
+        String ftpIp = scrollNewsFtpInfo.getFtpIp();
+        Integer ftpPort = scrollNewsFtpInfo.getFtpPort();
+        String ftpId = scrollNewsFtpInfo.getFtpId();
+        String ftpPw = scrollNewsFtpInfo.getFtpPw();
+        String ftpPath = scrollNewsFtpInfo.getFtpPath();
+        String ftpType = scrollNewsFtpInfo.getFtpType();
 
         try {
             //nam ftp 커넥트
-            ftp.connect(ftp1Ip, ftp1Port, ftp1Id, ftp1Pw, ftp1Path);
+            if ("active".equals(ftpType)) {
+                ftp.connectActive(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
+
+            }else if ("passive".equals(ftpType)){
+                ftp.connectPassive(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
+            }
 
             File file = new File(System.getProperty("user.dir") + File.separator + "storage" + File.separator + "send_text" + File.separator +makeFileNm);
 
             try {
-
-                /*
-                 * if(file.equals(file_nm)) { throw new Exception("이미 존재하는 파일명입니다."); }
-                 */
-
                 if(file.exists()) {
-
-
                     fis = new FileInputStream(file);
                     ftp.storeFile(makeFileNm, fis); //파일명
 
-                    log.info("FTP1 파일명 : "+makeFileNm+" fis : "+fis.toString());
-
+                    log.info("FTP5 파일명 : "+makeFileNm+" fis : "+fis.toString());
                 }
             } catch (Exception e) {
-                log.info("FTP1 file NumberFormatException : "+ e.getMessage());
+                log.info("FTP5 file handle exception : "+ e.getMessage());
+                // TODO: handle exception
+            } finally {
+                if(fis != null) {
+                    fis.close();
+                }
+            }
+            ftp.disconnect();
+        } catch (NumberFormatException e) {
+            log.info("FTP5 file NumberFormatException : "+ e.getMessage());
+        } catch (Exception e) {
+            log.info("FTP5 file Exception : "+ e.getMessage());
+        }
+    }
+
+    //FTP전송 [ 전송장비 4 ]
+    public void sendFile4(String makeFileNm) {
+
+
+        Long id = 4L;
+
+        ScrollNewsFtpInfo scrollNewsFtpInfo = scrollNewsFtpInfoService.findScrollFtpInfo(id);
+
+
+        String ftpIp = scrollNewsFtpInfo.getFtpIp();
+        Integer ftpPort = scrollNewsFtpInfo.getFtpPort();
+        String ftpId = scrollNewsFtpInfo.getFtpId();
+        String ftpPw = scrollNewsFtpInfo.getFtpPw();
+        String ftpPath = scrollNewsFtpInfo.getFtpPath();
+        String ftpType = scrollNewsFtpInfo.getFtpType();
+
+        try {
+            //nam ftp 커넥트
+            if ("active".equals(ftpType)) {
+                ftp.connectActive(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
+
+            }else if ("passive".equals(ftpType)){
+                ftp.connectPassive(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
+            }
+
+            File file = new File(System.getProperty("user.dir") + File.separator + "storage" + File.separator + "send_text" + File.separator +makeFileNm);
+
+            try {
+                if(file.exists()) {
+                    fis = new FileInputStream(file);
+                    ftp.storeFile(makeFileNm, fis); //파일명
+
+                    log.info("FTP4 파일명 : "+makeFileNm+" fis : "+fis.toString());
+                }
+            } catch (Exception e) {
+                log.info("FTP4 file handle exception : "+ e.getMessage());
                 // TODO: handle exception
             } finally {
 
                 if(fis != null) {
                     fis.close();
                 }
+            }
+            ftp.disconnect();
+        } catch (NumberFormatException e) {
+            log.info("FTP4 file NumberFormatException : "+ e.getMessage());
+        } catch (Exception e) {
+            log.info("FTP4 file Exception : "+ e.getMessage());
+        }
+    }
 
+    //FTP전송 [ 전송장비 3 ]
+    public void sendFile3(String makeFileNm) {
+
+
+        Long id = 3L;
+
+        ScrollNewsFtpInfo scrollNewsFtpInfo = scrollNewsFtpInfoService.findScrollFtpInfo(id);
+
+
+        String ftpIp = scrollNewsFtpInfo.getFtpIp();
+        Integer ftpPort = scrollNewsFtpInfo.getFtpPort();
+        String ftpId = scrollNewsFtpInfo.getFtpId();
+        String ftpPw = scrollNewsFtpInfo.getFtpPw();
+        String ftpPath = scrollNewsFtpInfo.getFtpPath();
+        String ftpType = scrollNewsFtpInfo.getFtpType();
+
+        try {
+            //nam ftp 커넥트
+            if ("active".equals(ftpType)) {
+                ftp.connectActive(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
+
+            }else if ("passive".equals(ftpType)){
+                ftp.connectPassive(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
             }
 
+            File file = new File(System.getProperty("user.dir") + File.separator + "storage" + File.separator + "send_text" + File.separator +makeFileNm);
+
+            try {
+
+                if(file.exists()) {
+                    fis = new FileInputStream(file);
+                    ftp.storeFile(makeFileNm, fis); //파일명
+
+                    log.info("FTP3 파일명 : "+makeFileNm+" fis : "+fis.toString());
+                }
+            } catch (Exception e) {
+                log.info("FTP3 file handle exception : "+ e.getMessage());
+                // TODO: handle exception
+            } finally {
+                if(fis != null) {
+                    fis.close();
+                }
+            }
             ftp.disconnect();
-
         } catch (NumberFormatException e) {
-
-            log.info("FTP1 file NumberFormatException : "+ e.getMessage());
-
+            log.info("FTP3 file NumberFormatException : "+ e.getMessage());
         } catch (Exception e) {
-
-            log.info("FTP1 file NumberFormatException : "+ e.getMessage());
-
+            log.info("FTP3 file Exception : "+ e.getMessage());
         }
+    }
+
+    //FTP전송 [ 전송장비 2 ]
+    public void sendFile2(String makeFileNm) {
+
+        Long id = 2L;
+
+        ScrollNewsFtpInfo scrollNewsFtpInfo = scrollNewsFtpInfoService.findScrollFtpInfo(id);
 
 
+        String ftpIp = scrollNewsFtpInfo.getFtpIp();
+        Integer ftpPort = scrollNewsFtpInfo.getFtpPort();
+        String ftpId = scrollNewsFtpInfo.getFtpId();
+        String ftpPw = scrollNewsFtpInfo.getFtpPw();
+        String ftpPath = scrollNewsFtpInfo.getFtpPath();
+        String ftpType = scrollNewsFtpInfo.getFtpType();
+
+        try {
+            //nam ftp 커넥트
+            if ("active".equals(ftpType)) {
+                ftp.connectActive(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
+
+            }else if ("passive".equals(ftpType)){
+                ftp.connectPassive(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
+            }
+            File file = new File(System.getProperty("user.dir") + File.separator + "storage" + File.separator + "send_text" + File.separator +makeFileNm);
+
+            try {
+
+                if(file.exists()) {
+                    fis = new FileInputStream(file);
+                    ftp.storeFile(makeFileNm, fis); //파일명
+
+                    log.info("FTP2 파일명 : "+makeFileNm+" fis : "+fis.toString());
+                }
+            } catch (Exception e) {
+                log.info("FTP2 file handle exception : "+ e.getMessage());
+                // TODO: handle exception
+            } finally {
+                if(fis != null) {
+                    fis.close();
+                }
+            }
+            ftp.disconnect();
+        } catch (NumberFormatException e) {
+            log.info("FTP2 file NumberFormatException : "+ e.getMessage());
+        } catch (Exception e) {
+            log.info("FTP2 file Exception : "+ e.getMessage());
+        }
+    }
+
+    //FTP전송 [ 전송장비 1 ]
+    public void sendFile1(String makeFileNm) {
+
+        Long id = 1L;
+
+        ScrollNewsFtpInfo scrollNewsFtpInfo = scrollNewsFtpInfoService.findScrollFtpInfo(id);
+
+
+        String ftpIp = scrollNewsFtpInfo.getFtpIp();
+        Integer ftpPort = scrollNewsFtpInfo.getFtpPort();
+        String ftpId = scrollNewsFtpInfo.getFtpId();
+        String ftpPw = scrollNewsFtpInfo.getFtpPw();
+        String ftpPath = scrollNewsFtpInfo.getFtpPath();
+        String ftpType = scrollNewsFtpInfo.getFtpType();
+
+        try {
+            //nam ftp 커넥트
+            if ("active".equals(ftpType)) {
+                ftp.connectActive(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
+
+            }else if ("passive".equals(ftpType)){
+                ftp.connectPassive(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
+            }
+
+            File file = new File(System.getProperty("user.dir") + File.separator + "storage" + File.separator + "send_text" + File.separator +makeFileNm);
+
+            try {
+                if(file.exists()) {
+                    fis = new FileInputStream(file);
+                    ftp.storeFile(makeFileNm, fis); //파일명
+
+                    log.info("FTP1 파일명 : "+makeFileNm+" fis : "+fis.toString());
+                }
+            } catch (Exception e) {
+                log.info("FTP1 file handle exception : "+ e.getMessage());
+                // TODO: handle exception
+            } finally {
+                if(fis != null) {
+                    fis.close();
+                }
+            }
+            ftp.disconnect();
+        } catch (NumberFormatException e) {
+            log.info("FTP1 file NumberFormatException : "+ e.getMessage());
+        } catch (Exception e) {
+            log.info("FTP1 file Exception : "+ e.getMessage());
+        }
     }
 
     //스크롤 뉴스 등록
@@ -287,10 +546,17 @@ public class ScrollNewsService {
 
             Integer count = 0;
 
-            Date nowDate = new Date();
-            SearchDate searchDate = new SearchDate(nowDate, nowDate);
+            Date nowDate = scrollNewsCreateDTO.getBrdcDtm();
 
-            Optional<Integer> scrollNewsCount = scrollNewsRepository.findScrollNewsCount(searchDate.getStartDate(), searchDate.getEndDate());
+            String stringDate = dateChangeHelper.dateToStringNoTime(nowDate);
+            Date dateDate = dateChangeHelper.StringToDateNoTime(stringDate);
+
+            SearchDate searchDate = new SearchDate(dateDate, dateDate);
+
+            Date ddd = searchDate.getStartDate();
+            Date eee = searchDate.getEndDate();
+
+            Optional<Integer> scrollNewsCount = scrollNewsRepository.findScrollNewsCount(searchDate.getStartDate(), searchDate.getEndDate(), scrlDivCd);
 
             if (scrollNewsCount.isPresent() == false){
                 count = 0;

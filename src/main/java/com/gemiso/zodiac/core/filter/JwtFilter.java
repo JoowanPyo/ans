@@ -129,6 +129,13 @@ public class JwtFilter implements Filter {
 
                             userAuthService.authUser = UserDTO.builder().userId(user.getUserId()).build();
 
+                            /*********** ip 가져오기 ************/
+
+                            String userIp = httpServletRequest.getRemoteAddr();
+                            userAuthService.userip = userIp;
+
+                            /*********** ip 가져오기 ************/
+
                             logMessage.append(" [TOKEN USER ID:").append(user.getUserId().toString()).append("]");
 
                         } else {

@@ -10,6 +10,7 @@ import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import com.gemiso.zodiac.core.service.UserAuthChkService;
 import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,11 +19,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -295,10 +298,20 @@ public class ArticleController {
     @PostMapping(name = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<ArticleSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                   @RequestBody @Valid ArticleCreateDTO articleCreateDTO) throws Exception {
+                                                   @RequestBody @Valid ArticleCreateDTO articleCreateDTO,
+                                                   @Parameter(name = "userId", description = "사용자 아이디")
+                                                   @RequestParam(value = "userId", required = false) String userId,
+                                                   HttpServletRequest httpServletRequest) throws Exception {
 
 
-        String userId = userAuthService.authUser.getUserId();
+        String getUserId = userAuthService.authUser.getUserId();
+        String getuserIp = userAuthService.userip;
+
+        if (getUserId.equals(userId) == false){
+
+            log.error("User Un matching client userId : " + userId + " serverUserId : "+getUserId + " token : "+httpServletRequest.getHeader("Authorization")
+                    + " server user ip : "+ getuserIp + " client user ip : "+ httpServletRequest.getRemoteAddr()+" dto : "+articleCreateDTO);
+        }
 
         log.info("Article Create : User Id - " + userId + "<br>" + "Create Model - " + articleCreateDTO);
 

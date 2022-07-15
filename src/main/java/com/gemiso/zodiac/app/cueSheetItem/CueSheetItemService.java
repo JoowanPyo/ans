@@ -1630,7 +1630,7 @@ public class CueSheetItemService {
 
         // 기사 저장하기 위한 기사복사 엔터티 생성
         Article articleEntity = getArticleEntity(article, maxArtclOrd, cueSheet);
-        articleRepository.save(articleEntity); //복사된 기사 등록
+        //articleRepository.save(articleEntity); //복사된 기사 등록
 
        /* Set<ArticleCap> articleCapList = article.getArticleCap(); //기사자막 리스트 get
         Set<AnchorCap> anchorCapList = article.getAnchorCap(); //앵커자막 리스트 get*/
@@ -1691,7 +1691,7 @@ public class CueSheetItemService {
 
                 //빽드롭 빼고 일반영상만 매칭
                 if ("media_typ_001".equals(mediaTypCd)) {
-                    ArticleMedia articleMediaEntity = getArticleMediaEntity(articleMedia, articleEntity);
+                    ArticleMedia articleMediaEntity = getArticleMediaEntity(articleMedia, articleEntity, userId);
 
                     articleMediaRepository.save(articleMediaEntity);
 
@@ -1785,9 +1785,11 @@ public class CueSheetItemService {
             newApprvDivCd = getOrgApprvDivCd; //none_fix값 처리
         }
 
+        Article articleEntity = null;
+
         if (artclOrd == 0) { //원본기사가 아이디가없고 최초 복사일시
 
-            return Article.builder()
+             articleEntity = Article.builder()
                     .chDivCd(article.getChDivCd())
                     .artclKindCd(article.getArtclKindCd())
                     .artclFrmCd(article.getArtclFrmCd())
@@ -1814,7 +1816,7 @@ public class CueSheetItemService {
                     .frnotiYn(article.getFrnotiYn())
                     .embgYn(article.getEmbgYn())
                     .embgDtm(article.getEmbgDtm())
-                    .inputrNm(article.getInputrNm())
+                    //.inputrNm(article.getInputrNm())
                     .notiYn(article.getNotiYn())
                     .regAppTyp(article.getRegAppTyp())
                     .brdcPgmId(brdcPgmId) //프로그램 아이디
@@ -1840,9 +1842,12 @@ public class CueSheetItemService {
                     //.anchorFixDtm(article.getAnchorFixDtm())
                     //.deskFixDtm(article.getDeskFixDtm())
                     .build();
+
+            articleRepository.save(articleEntity);
+
         } else { //원본기사 아이디가 있을시[복사된 기사 다시 복사일시]
 
-            return Article.builder()
+            articleEntity = Article.builder()
                     .chDivCd(article.getChDivCd())
                     .artclKindCd(article.getArtclKindCd())
                     .artclFrmCd(article.getArtclFrmCd())
@@ -1869,7 +1874,7 @@ public class CueSheetItemService {
                     .frnotiYn(article.getFrnotiYn())
                     .embgYn(article.getEmbgYn())
                     .embgDtm(article.getEmbgDtm())
-                    .inputrNm(article.getInputrNm())
+                    //.inputrNm(article.getInputrNm())
                     .notiYn(article.getNotiYn())
                     .regAppTyp(article.getRegAppTyp())
                     .brdcPgmId(brdcPgmId)
@@ -1895,7 +1900,11 @@ public class CueSheetItemService {
                     //.anchorFixDtm(article.getAnchorFixDtm())
                     //.deskFixDtm(article.getDeskFixDtm())
                     .build();
+
+            articleRepository.save(articleEntity);
         }
+
+        return articleEntity;
     }
 
     //기사자막 빌드
@@ -1928,7 +1937,7 @@ public class CueSheetItemService {
 
     }
 
-    public ArticleMedia getArticleMediaEntity(ArticleMedia articleMedia, Article articleEntity) {
+    public ArticleMedia getArticleMediaEntity(ArticleMedia articleMedia, Article articleEntity, String userId) {
 
         return ArticleMedia.builder()
                 .mediaTypCd(articleMedia.getMediaTypCd())

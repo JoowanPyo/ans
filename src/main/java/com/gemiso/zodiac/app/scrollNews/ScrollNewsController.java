@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.scrollNews;
 
-import com.gemiso.zodiac.app.issue.dto.IssueCreateDTO;
 import com.gemiso.zodiac.app.scrollNews.dto.ScrollNewsCreateDTO;
 import com.gemiso.zodiac.app.scrollNews.dto.ScrollNewsDTO;
 import com.gemiso.zodiac.app.scrollNews.dto.ScrollNewsSimpleDTO;

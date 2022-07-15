@@ -19,13 +19,15 @@ public interface CueSheetRepository extends JpaRepository<CueSheet, Long>, Query
     @Query("select a from CueSheet a where a.cueId =:cueId and a.delYn =:del_yn ")
     Optional<CueSheet> findTakerCue(@Param("cueId") Long cueId, @Param("del_yn") String del_yn);
 
-    @Query("select count(a) from CueSheet a where a.brdcDt =:brdcDt and a.brdcStartTime =:brdcStartTime " +
-            "and a.program.brdcPgmId =:brdcPgmId and a.delYn = 'N' ")
-    int findCueProgram(@Param("brdcDt")String brdcDt,@Param("brdcPgmId")String brdcPgmId,@Param("brdcStartTime")String brdcStartTime
-            /*, @Param("brdcEndTime")String brdcEndTime*/);
+    @Query("select count(a) from CueSheet a where a.brdcDt =:brdcDt and " +
+            "((a.brdcStartTime > :brdcStartTime and a.brdcStartTime < :brdcEndTime)" +
+            " or (a.brdcEndTime > :brdcStartTime and a.brdcEndTime < :brdcEndTime) or " +
+            "(a.brdcStartTime <=:brdcStartTime and a.brdcEndTime >=:brdcEndTime)) and a.delYn = 'N' ")
+    Integer findCueProgram(@Param("brdcDt")String brdcDt,@Param("brdcStartTime")String brdcStartTime
+            , @Param("brdcEndTime")String brdcEndTime);
 
     @Query("select count(a) from CueSheet a where a.brdcDt =:brdcDt and a.program.brdcPgmId =:brdcPgmId and a.delYn = 'N'")
-    int findCueProgram2(@Param("brdcDt")String brdcDt,@Param("brdcPgmId")String brdcPgmId);
+    Integer findCueProgram2(@Param("brdcDt")String brdcDt,@Param("brdcPgmId")String brdcPgmId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select a from CueSheet a where a.cueId =:cueId and a.delYn ='N' ")

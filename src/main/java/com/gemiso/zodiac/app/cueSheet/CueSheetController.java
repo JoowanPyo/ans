@@ -91,7 +91,7 @@ public class CueSheetController {
         //큐시트 생성 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         CueSheetSimpleDTO cueSheetSimpleDTO = new CueSheetSimpleDTO();
 
-        int cueCnt = cueSheetService.getCueSheetCount(cueSheetCreateDTO);
+        Integer cueCnt = cueSheetService.getCueSheetCount(cueSheetCreateDTO);
 
         //이미 같은날짜에 같은프로그램으로 큐시트 생성되어 있을시 error ( 409 )
         if (cueCnt != 0) {

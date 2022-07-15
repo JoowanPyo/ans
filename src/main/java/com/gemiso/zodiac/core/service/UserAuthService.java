@@ -6,4 +6,5 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserAuthService {
     public UserDTO authUser;
+    public String userip;
 }
