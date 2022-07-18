@@ -866,7 +866,7 @@ public class CueSheetService {
     }
 
     //이미등록된 큐시트가 있는지 체크
-    public int getCueSheetCount(CueSheetCreateDTO cueSheetCreateDTO) {
+    public Integer getCueSheetCount(CueSheetCreateDTO cueSheetCreateDTO) {
 
         Integer cueCnt = 0;
 
@@ -877,6 +877,11 @@ public class CueSheetService {
         String brdcEndTime = cueSheetCreateDTO.getBrdcEndTime();
 
         ProgramSimpleDTO program = cueSheetCreateDTO.getProgram();
+
+        //블레틴 큐시트 같은 경우를 위해서.
+        if ("00:00:00".equals(brdcStartTime) && "00:00:00".equals(brdcEndTime)){
+            return cueCnt;
+        }
 
         if (ObjectUtils.isEmpty(program) == false) {
 

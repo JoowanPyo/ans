@@ -16,6 +16,6 @@ public interface ScrollNewsRepository extends JpaRepository<ScrollNews, Long>, Q
     Optional<ScrollNews> findScrollNews(@Param("scrlNewsId")Long scrlNewsId);
 
 
-    @Query("select count(a.scrlNewsId) from ScrollNews a where a.brdcDtm between :sdate and :edate and  a.scrlDivCd =:scrlDivCd")
+    @Query("select count(a.scrlNewsId) from ScrollNews a where a.brdcDtm between :sdate and :edate and  a.scrlDivCd =:scrlDivCd ")
     Optional<Integer> findScrollNewsCount(@Param("sdate") Date sdate, @Param("edate") Date edate, @Param("scrlDivCd")String scrlDivCd);
 }

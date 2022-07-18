@@ -73,7 +73,7 @@ public class ArticleUpdateDTO {
     //private String delrNm;
     private String apprvrId;
     //private String apprvrNm;
-    private String lckrId;
+    //private String lckrId;
     //private String lckrNm;
     private String rptrId;
     private Integer artclCttTime;

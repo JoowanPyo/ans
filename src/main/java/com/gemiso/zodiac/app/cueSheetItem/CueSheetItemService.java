@@ -1606,7 +1606,8 @@ public class CueSheetItemService {
 
     }
 
-    public Article copyArticle(Long artclId, Long cueId, String userId) throws Exception {
+    public Article
+    copyArticle(Long artclId, Long cueId, String userId) throws Exception {
 
         /*********************/
         /* 기사를 저장하는 부분 */
@@ -2229,8 +2230,16 @@ public class CueSheetItemService {
             cueSheetItemList.remove(i);//신규 등록된 큐시트 아이템 리스트에서 삭제
         }
 
-        cueSheetItemList.add(cueItemOrd, cueSheetItem); //신규등록하려는 큐시트 아이템 원하는 순번에 리스트 추가
+        //만약 순서값이 잘못들어왔을 경우 맨 마지막 인덱스로 추가
+        Integer listSize = Optional.ofNullable(cueSheetItemList.size()).orElse(0);
 
+        if (cueItemOrd > listSize) {
+
+            cueSheetItemList.add(listSize, cueSheetItem); //신규등록하려는 큐시트 아이템 원하는 순번에 리스트 추가
+        }else {
+            
+            cueSheetItemList.add(cueItemOrd, cueSheetItem); //신규등록하려는 큐시트 아이템 원하는 순번에 리스트 추가
+        }
         //조회된 큐시트 아이템 Ord 업데이트
         int index = 0;
         for (CueSheetItem cueSheetItems : cueSheetItemList) {
