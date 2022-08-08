@@ -25,13 +25,17 @@ public class ArticleHistCreateDTO {
     @Schema(description = "앵커 멘트 내용")
     private String ancMentCtt;
     @Schema(description = "기사 순번")
-    private int artclOrd;
+    private Integer artclOrd;
     @Schema(description = "원본 기사 아이디")
     private Long orgArtclId;
     //@Schema(description = "입력 일시")
     //private Date inputDtm;
     @Schema(description = "버전")
-    private int ver;
+    private Integer ver;
+    @Schema(description = "입력자")
+    private String inputrId;
+    @Schema(description = "입력자 명")
+    private String inputrNm;
     @Schema(description = "기사 아이디")
     private ArticleDTO article;
 

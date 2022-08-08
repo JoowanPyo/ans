@@ -7,7 +7,6 @@ import com.gemiso.zodiac.app.code.dto.CodeUpdateDTO;
 import com.gemiso.zodiac.app.code.mapper.CodeCreateMapper;
 import com.gemiso.zodiac.app.code.mapper.CodeMapper;
 import com.gemiso.zodiac.app.code.mapper.CodeUpdateMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,7 @@ public class CodeService {
     private final CodeCreateMapper codeCreateMapper;
     private final CodeUpdateMapper codeUpdateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
 
     public List<CodeDTO> findAll(String searchWord, String useYn, List<String> hrnkCdIds) {
@@ -84,7 +83,7 @@ public class CodeService {
 
     }
 
-    public Long create(CodeCreateDTO codeCreateDTO) {
+    public Long create(CodeCreateDTO codeCreateDTO, String userId) {
 
         String hrnkCd = codeCreateDTO.getHrnkCdId(); //상위코드값 get
 
@@ -110,7 +109,7 @@ public class CodeService {
         }
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         codeCreateDTO.setInputrId(userId);
 
         Code codeEntity = codeCreateMapper.toEntity(codeCreateDTO);
@@ -122,12 +121,12 @@ public class CodeService {
 
     }
 
-    public void update(CodeUpdateDTO codeUpdateDTO, Long cdId) {
+    public void update(CodeUpdateDTO codeUpdateDTO, Long cdId, String userId) {
 
         Code code = codeFindOrFail(cdId);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         codeUpdateDTO.setCdId(cdId);
         codeUpdateDTO.setUpdtrId(userId);
 
@@ -136,14 +135,14 @@ public class CodeService {
 
     }
 
-    public void delete(Long cdId) {
+    public void delete(Long cdId, String userId) {
 
         Code code = codeFindOrFail(cdId);
 
         CodeDTO codeDTO = codeMapper.toDto(code);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         codeDTO.setDelrId(userId);
         codeDTO.setDelYn("Y");
         codeDTO.setDelDtm(new Date());

@@ -6,7 +6,6 @@ import com.gemiso.zodiac.app.dictionary.dto.DictionaryUpdateDTO;
 import com.gemiso.zodiac.app.dictionary.mapper.DictionaryCreateMapper;
 import com.gemiso.zodiac.app.dictionary.mapper.DictionaryMapper;
 import com.gemiso.zodiac.app.dictionary.mapper.DictionaryUpdateMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -33,7 +31,7 @@ public class DictionaryService {
     private final DictionaryCreateMapper dictionaryCreateMapper;
     private final DictionaryUpdateMapper dictionaryUpdateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
 
     public List<DictionaryDTO> findAll(Date sdate, Date edate, String searchWord) throws Exception { //목록조회
@@ -62,10 +60,10 @@ public class DictionaryService {
         return dictionaryDTO;
     }
 
-    public Long create(DictionaryCreateDTO dictionaryCreateDTO){ //등록
+    public Long create(DictionaryCreateDTO dictionaryCreateDTO, String userId){ //등록
 
         //등록하는 사용자 아이디 set
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         dictionaryCreateDTO.setInputrId(userId);
 
         Dictionary dictionary = dictionaryCreateMapper.toEntity(dictionaryCreateDTO);
@@ -77,12 +75,12 @@ public class DictionaryService {
 
     }
 
-    public void update(DictionaryUpdateDTO dictionaryUpdateDTO, Long id){ //수정
+    public void update(DictionaryUpdateDTO dictionaryUpdateDTO, Long id, String userId){ //수정
 
         Dictionary dictionary = findDictionary(id);
 
         //수정자 정보 set
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         dictionaryUpdateDTO.setUpdtrId(userId);
 
         dictionaryUpdateMapper.updateFromDto(dictionaryUpdateDTO, dictionary);
@@ -92,14 +90,14 @@ public class DictionaryService {
 
     }
 
-    public void delete(Long dicId){ //삭제.
+    public void delete(Long dicId, String userId){ //삭제.
 
         Dictionary dictionary = findDictionary(dicId);
 
         DictionaryDTO dictionaryDTO = dictionaryMapper.toDto(dictionary);
 
         //삭제정보 set.
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         dictionaryDTO.setDelrId(userId);
         dictionaryDTO.setDelDtm(new Date());
         dictionaryDTO.setDelYn("Y");

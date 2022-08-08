@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.articleOrder;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.articleOrderFile.ArticleOrderFile;
 import com.gemiso.zodiac.core.entity.BaseEntity;
@@ -87,10 +86,11 @@ public class ArticleOrder extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artcl_id")
-    @JsonBackReference
+    //@JsonBackReference
     private Article article;
 
     @OneToMany(mappedBy = "articleOrder")//cascade = CascadeType.ALL은 부모가 삭제될때 자식도 같이 삭제?
+    //@JsonBackReference
     private List<ArticleOrderFile> articleOrderFile = new ArrayList<>();
 
 

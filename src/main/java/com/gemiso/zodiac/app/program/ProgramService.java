@@ -6,15 +6,12 @@ import com.gemiso.zodiac.app.program.dto.ProgramUpdateDTO;
 import com.gemiso.zodiac.app.program.mapper.ProgramCrateMapper;
 import com.gemiso.zodiac.app.program.mapper.ProgramMapper;
 import com.gemiso.zodiac.app.program.mapper.ProgramUpdateMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -32,7 +29,7 @@ public class ProgramService {
     private final ProgramCrateMapper programCrateMapper;
     private final ProgramUpdateMapper programUpdateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
     public List<ProgramDTO> findAll(String brdcPgmNm, String useYn) {
 
@@ -57,10 +54,10 @@ public class ProgramService {
 
     }
 
-    public String create(ProgramCreateDTO programCreateDTO) {
+    public String create(ProgramCreateDTO programCreateDTO, String userId) {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         programCreateDTO.setInputrId(userId);
 
         Program program = programCrateMapper.toEntity(programCreateDTO);
@@ -71,12 +68,12 @@ public class ProgramService {
 
     }
 
-    public void update(ProgramUpdateDTO programUpdateDTO, String brdcPgmId) {
+    public void update(ProgramUpdateDTO programUpdateDTO, String brdcPgmId, String userId) {
 
         Program program = programFindOrFail(brdcPgmId);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         programUpdateDTO.setUpdtrId(userId);
 
         programUpdateMapper.updateFromDto(programUpdateDTO, program);
@@ -84,14 +81,14 @@ public class ProgramService {
 
     }
 
-    public void delete(String brdcPgmId) {
+    public void delete(String brdcPgmId, String userId) {
 
         Program program = programFindOrFail(brdcPgmId);
 
         ProgramDTO programDTO = programMapper.toDto(program);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         programDTO.setDelrId(userId);
         programDTO.setDelDtm(new Date());
         programDTO.setDelYn("Y");

@@ -5,6 +5,7 @@ import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapUpdateDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @Api(description = "큐시트 템플릿 아이템 자막 API")
@@ -25,6 +27,7 @@ public class CueTmpltItemCapController {
 
     private final CueTmpltItemCapService cueTmpltItemCapService;
 
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "큐시트 템플릿 아이템 자막 목록조회", description = "큐시트 템플릿 아이템 자막 목록조회")
     @GetMapping(path = "")
@@ -54,10 +57,13 @@ public class CueTmpltItemCapController {
     public AnsApiResponse<CueTmpltItemCapSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                                            @RequestBody @Valid CueTmpltItemCapCreateDTO cueTmpltItemCapCreateDTO,
                                                            @Parameter(name = "cueTmpltItemId", description = "큐시트 템플릿 아이템 아이디")
-                                                           @PathVariable("cueTmpltItemId") Long cueTmpltItemId) {
+                                                           @PathVariable("cueTmpltItemId") Long cueTmpltItemId,
+                                                           @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+
+        String userId =jwtGetUserService.getUser(Authorization);
 
         //아이디를 담아 리털할 articleDTO
-        CueTmpltItemCapSimpleDTO cueTmpltItemCapSimpleDTO = cueTmpltItemCapService.create(cueTmpltItemCapCreateDTO, cueTmpltItemId);
+        CueTmpltItemCapSimpleDTO cueTmpltItemCapSimpleDTO = cueTmpltItemCapService.create(cueTmpltItemCapCreateDTO, cueTmpltItemId, userId);
 
         return new AnsApiResponse<>(cueTmpltItemCapSimpleDTO);
 
@@ -68,9 +74,12 @@ public class CueTmpltItemCapController {
     public AnsApiResponse<CueTmpltItemCapSimpleDTO> update(@Parameter(description = "필수값<br> ", required = true)
                                                            @RequestBody @Valid CueTmpltItemCapUpdateDTO cueTmpltItemCapUpdateDTO,
                                                            @Parameter(name = "cueItemCapId", description = "큐시트 템플릿 아이템 자막 아이디")
-                                                           @PathVariable("cueItemCapId") Long cueItemCapId) {
+                                                           @PathVariable("cueItemCapId") Long cueItemCapId,
+                                                           @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        cueTmpltItemCapService.update(cueTmpltItemCapUpdateDTO, cueItemCapId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        cueTmpltItemCapService.update(cueTmpltItemCapUpdateDTO, cueItemCapId, userId);
 
         //아이디 리턴.
         CueTmpltItemCapSimpleDTO cueTmpltItemCapSimpleDTO = new CueTmpltItemCapSimpleDTO();
@@ -82,9 +91,12 @@ public class CueTmpltItemCapController {
     @Operation(summary = "큐시트 템플릿 아이템 자막 삭제", description = "큐시트 템플릿 아이템 자막 삭제")
     @DeleteMapping(path = "/{cueItemCapId}")
     public AnsApiResponse<?> delete(@Parameter(name = "cueItemCapId", description = "큐시트 템플릿 아이템 자막 아이디")
-                                    @PathVariable("cueItemCapId") Long cueItemCapId) {
+                                    @PathVariable("cueItemCapId") Long cueItemCapId,
+                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        cueTmpltItemCapService.delete(cueItemCapId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        cueTmpltItemCapService.delete(cueItemCapId, userId);
 
         return AnsApiResponse.noContent();
     }

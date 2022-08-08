@@ -5,14 +5,12 @@ import com.gemiso.zodiac.app.facilityManage.dto.FacilityManageDTO;
 import com.gemiso.zodiac.app.facilityManage.dto.FacilityManageUpdateDTO;
 import com.gemiso.zodiac.app.facilityManage.mapper.FacilityManageCreateMapper;
 import com.gemiso.zodiac.app.facilityManage.mapper.FacilityManageMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +26,7 @@ public class FacilityManageService {
     private final FacilityManageMapper facilityManageMapper;
     private final FacilityManageCreateMapper facilityManageCreateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
 
     public List<FacilityManageDTO> findAll(String searchWord, String fcltyDivCd){ //시설관리 목록조회
@@ -53,10 +51,10 @@ public class FacilityManageService {
         return facilityManageDTO;
     }
 
-    public Long create(FacilityManageCreateDTO facilityManageCreateDTO){ //시설관리 등록
+    public Long create(FacilityManageCreateDTO facilityManageCreateDTO, String userId){ //시설관리 등록
 
         //입력자 아이디 등록.
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         facilityManageCreateDTO.setInputrId(userId);
 
         //등록DTO 엔티티변환후 시설save.

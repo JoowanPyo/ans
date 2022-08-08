@@ -5,6 +5,7 @@ import com.gemiso.zodiac.app.dictionary.dto.DictionaryDTO;
 import com.gemiso.zodiac.app.dictionary.dto.DictionaryUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +17,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,6 +30,8 @@ import java.util.List;
 public class DictionaryController {
 
     private final DictionaryService dictionaryService;
+
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "단어사전 목록조회", description = "단어사전 목록조회")
     @GetMapping(path = "")
@@ -67,9 +71,12 @@ public class DictionaryController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<DictionaryDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                @RequestBody @Valid DictionaryCreateDTO dictionaryCreateDTO) {
+                                                @RequestBody @Valid DictionaryCreateDTO dictionaryCreateDTO,
+                                                @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        Long id = dictionaryService.create(dictionaryCreateDTO);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        Long id = dictionaryService.create(dictionaryCreateDTO, userId);
 
         DictionaryDTO dictionaryDTO = dictionaryService.find(id);
 
@@ -81,9 +88,12 @@ public class DictionaryController {
     public AnsApiResponse<DictionaryDTO> update(@Parameter(description = "필수값<br> ", required = true)
                                                 @RequestBody @Valid DictionaryUpdateDTO dictionaryUpdateDTO,
                                                 @Parameter(name = "id", required = true, description = "단어사전 아이디")
-                                                @PathVariable("id") long id) {
+                                                @PathVariable("id") long id,
+                                                @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        dictionaryService.update(dictionaryUpdateDTO, id);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        dictionaryService.update(dictionaryUpdateDTO, id, userId);
 
         DictionaryDTO dictionaryDTO = dictionaryService.find(id);
 
@@ -95,9 +105,12 @@ public class DictionaryController {
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "id", required = true, description = "단어사전 아이디")
-                                    @PathVariable("id") long id) {
+                                    @PathVariable("id") long id,
+                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        dictionaryService.delete(id);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        dictionaryService.delete(id, userId);
 
         return AnsApiResponse.noContent();
     }

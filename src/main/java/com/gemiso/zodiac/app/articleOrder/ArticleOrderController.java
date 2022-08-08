@@ -3,7 +3,7 @@ package com.gemiso.zodiac.app.articleOrder;
 import com.gemiso.zodiac.app.articleOrder.dto.*;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
-import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,7 +28,7 @@ public class ArticleOrderController {
 
     private final ArticleOrderService articleOrderService;
 
-    private final UserAuthService userAuthService;
+    private final JwtGetUserService jwtGetUserService;
 
 
     @Operation(summary = "기사의뢰 목록조회", description = "기사의뢰 목록조회")
@@ -48,7 +48,9 @@ public class ArticleOrderController {
                                                          @Parameter(name = "artclId", description = "기사 아이디")
                                                          @RequestParam(value = "artclId", required = false) Long artclId,
                                                          @Parameter(name = "orgArtclId", description = "원본기사 아이디")
-                                                         @RequestParam(value = "orgArtclId", required = false) Long orgArtclId) throws Exception {
+                                                         @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,
+                                                         @Parameter(name = "rptrId", description = "기자 아이디")
+                                                         @RequestParam(value = "rptrId", required = false) String rptrId) throws Exception {
 
         List<ArticleOrderDTO> articleOrderDTOList = new ArrayList<>();
 
@@ -58,11 +60,11 @@ public class ArticleOrderController {
             SearchDate searchDate = new SearchDate(sdate, edate);
 
             articleOrderDTOList = articleOrderService.findAll(searchDate.getStartDate(), searchDate.getEndDate(),
-                    orderDivCd, orderStatus, workrId, inputrId, artclId, orgArtclId);
+                    orderDivCd, orderStatus, workrId, inputrId, artclId, orgArtclId, rptrId);
         } else {
 
             articleOrderDTOList = articleOrderService.findAll(null, null,
-                    orderDivCd, orderStatus, workrId, inputrId, artclId, orgArtclId);
+                    orderDivCd, orderStatus, workrId, inputrId, artclId, orgArtclId, rptrId);
         }
 
         return new AnsApiResponse<>(articleOrderDTOList);
@@ -82,10 +84,11 @@ public class ArticleOrderController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<ArticleOrderResponseDTO> create(@Parameter(description = "필수값<br>", required = true)
-                                                          @RequestBody @Valid ArticleOrderCreateDTO articleOrderCreateDTO) {
+                                                          @RequestBody @Valid ArticleOrderCreateDTO articleOrderCreateDTO,
+                                                          @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info(" Update Article Order : User Id - " + userId + " Order Id -" + articleOrderCreateDTO.toString());
 
         ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();
@@ -102,10 +105,11 @@ public class ArticleOrderController {
     public AnsApiResponse<ArticleOrderResponseDTO> update(@Parameter(description = "필수값<br>", required = true)
                                                           @RequestBody @Valid ArticleOrderUpdateDTO articleOrderUpdateDTO,
                                                           @Parameter(name = "orderId", required = true, description = "의뢰 아이디")
-                                                          @PathVariable("orderId") Long orderId) {
+                                                          @PathVariable("orderId") Long orderId,
+                                                          @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info(" Update Article Order : User Id - " + userId + " Order Id -" + articleOrderUpdateDTO.toString());
 
         ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();
@@ -122,10 +126,11 @@ public class ArticleOrderController {
     @DeleteMapping(path = "/{orderId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "orderId", required = true, description = "의뢰 아이디")
-                                    @PathVariable("orderId") Long orderId) {
+                                    @PathVariable("orderId") Long orderId,
+                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info(" Delete Article Order : User Id - " + userId + " Order Id -" + orderId);
 
         articleOrderService.delete(orderId);
@@ -138,10 +143,11 @@ public class ArticleOrderController {
     public AnsApiResponse<ArticleOrderResponseDTO> updateStatus(@Parameter(description = "필수값<br>", required = true)
                                                                 @RequestBody @Valid ArticleOrderStatusDTO articleOrderStatusDTO,
                                                                 @Parameter(name = "orderId", required = true, description = "의뢰 아이디")
-                                                                @PathVariable("orderId") Long orderId) {
+                                                                @PathVariable("orderId") Long orderId,
+                                                                @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info(" Update Article Order : User Id - " + userId + " Order Status -" + articleOrderStatusDTO.getOrderStatus());
 
         ArticleOrderResponseDTO responseDTO = new ArticleOrderResponseDTO();

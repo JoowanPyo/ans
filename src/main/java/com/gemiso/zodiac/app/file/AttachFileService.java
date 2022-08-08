@@ -3,7 +3,6 @@ package com.gemiso.zodiac.app.file;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.dto.StatusCodeFileDTO;
 import com.gemiso.zodiac.app.file.mapper.AttachFileMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.core.util.PropertyUtil;
 import com.gemiso.zodiac.core.util.UploadFileBean;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -15,13 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import java.io.*;
 import java.net.FileNameMap;
 import java.net.URLConnection;
@@ -44,11 +40,11 @@ public class AttachFileService {
 
     private final AttachFileMapper attachFileMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
 
     //파일 업로드
-    public StatusCodeFileDTO create(MultipartFile file, String fileDivCd){
+    public StatusCodeFileDTO create(MultipartFile file, String fileDivCd, String userId){
 
         int code = 200;
 
@@ -109,7 +105,7 @@ public class AttachFileService {
             fb.setFileSize((int) file.getSize());
             fb.setFileLoc(upDir);
             // 토큰 인증된 사용자 아이디를 입력자로 등록
-            String userId = userAuthService.authUser.getUserId();
+            //String userId = userAuthService.authUser.getUserId();
             fb.setInputrId(userId);
             fb.setFileUpldDtm(new Date());
             fb.setInputDtm(new Date());
@@ -200,7 +196,7 @@ public class AttachFileService {
     }
 
     //파일 업로드
-    public StatusCodeFileDTO createFile(MultipartFile file, String fileDivCd, String fileNm){
+    public StatusCodeFileDTO createFile(MultipartFile file, String fileDivCd, String fileNm, String userId){
 
         int code = 200;
 
@@ -261,7 +257,7 @@ public class AttachFileService {
             fb.setFileSize((int) file.getSize());
             fb.setFileLoc(upDir);
             // 토큰 인증된 사용자 아이디를 입력자로 등록
-            String userId = userAuthService.authUser.getUserId();
+            //String userId = userAuthService.authUser.getUserId();
             fb.setInputrId(userId);
             fb.setFileUpldDtm(new Date());
             fb.setInputDtm(new Date());

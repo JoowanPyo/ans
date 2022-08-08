@@ -2,7 +2,6 @@ package com.gemiso.zodiac.app.articleHist;
 
 import com.gemiso.zodiac.app.articleHist.dto.ArticleHistDTO;
 import com.gemiso.zodiac.app.articleHist.mapper.ArticleHistMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +24,7 @@ public class ArticleHistService {
 
     private final ArticleHistMapper articleHistMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
 
     public List<ArticleHistDTO> findAll(Long artclId, Long orgArtclId, String searchWord){

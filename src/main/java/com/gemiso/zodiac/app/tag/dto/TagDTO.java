@@ -12,5 +12,5 @@ public class TagDTO {
 
     private Long tagId;
     private String tag;
-    private int tagClicked;
+    private Integer tagClicked;
 }

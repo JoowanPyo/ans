@@ -18,7 +18,6 @@ import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.service.FTPconnectService;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +53,7 @@ public class ScrollNewsService {
     private final ScrollNewsUpdateMapper scrollNewsUpdateMapper;
     private final ScrollNewsDetailCreateMapper scrollNewsDetailCreateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
     private final ScrollNewsFtpInfoService scrollNewsFtpInfoService;
 
     private final DateChangeHelper dateChangeHelper;
@@ -533,9 +531,9 @@ public class ScrollNewsService {
 
     //스크롤 뉴스 등록
     @Transactional
-    public Long create(ScrollNewsCreateDTO scrollNewsCreateDTO) throws Exception {
+    public Long create(ScrollNewsCreateDTO scrollNewsCreateDTO, String userId) throws Exception {
 
-        String userId = userAuthService.authUser.getUserId(); //토큰 사용자 아이디 get
+        //String userId = userAuthService.authUser.getUserId(); //토큰 사용자 아이디 get
         scrollNewsCreateDTO.setInputrId(userId); //입력자 set
 
         String fileNm = scrollNewsCreateDTO.getFileNm();
@@ -588,11 +586,11 @@ public class ScrollNewsService {
     }
 
     @Transactional
-    public void update(ScrollNewsUpdateDTO scrollNewsUpdateDTO, Long scrlNewsId) throws Exception {
+    public void update(ScrollNewsUpdateDTO scrollNewsUpdateDTO, Long scrlNewsId, String userId) throws Exception {
 
         ScrollNews scrollNews = findScrollNews(scrlNewsId); //스크롤뉴스 아이디로 조회 및 존재유무 확인
 
-        String userId = userAuthService.authUser.getUserId();//토큰 사용자 아이디 get
+        //String userId = userAuthService.authUser.getUserId();//토큰 사용자 아이디 get
         scrollNewsUpdateDTO.setUpdtrId(userId); //수정자 등록
 
         scrollNewsUpdateMapper.updateFromDto(scrollNewsUpdateDTO, scrollNews);//스크롤뉴스 정보 업데이트
@@ -608,11 +606,11 @@ public class ScrollNewsService {
 
     //스크롤 뉴스 삭제
     @Transactional
-    public void delete(Long scrlNewsId) {
+    public void delete(Long scrlNewsId, String userId) {
 
         ScrollNews scrollNews = findScrollNews(scrlNewsId); //스크롤뉴스 아이디로 조회 및 존재유무 확인
 
-        String userId = userAuthService.authUser.getUserId();//토큰 사용자 아이디 get
+        //String userId = userAuthService.authUser.getUserId();//토큰 사용자 아이디 get
 
         ScrollNewsDTO scrollNewsDTO = scrollNewsMapper.toDto(scrollNews);
         scrollNewsDTO.setDelDtm(new Date()); //삭제 일시 set

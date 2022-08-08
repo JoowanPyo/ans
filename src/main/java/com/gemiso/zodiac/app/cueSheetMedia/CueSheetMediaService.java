@@ -12,7 +12,6 @@ import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaCreateMapper;
 import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaMapper;
 import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaUpdateMapper;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.core.topic.CueSheetTopicService;
 import com.gemiso.zodiac.core.topic.TopicSendService;
 import com.gemiso.zodiac.core.topic.cueSheetTopicDTO.CueSheetWebTopicDTO;
@@ -43,7 +42,7 @@ public class CueSheetMediaService {
     private final CueSheetMediaCreateMapper cueSheetMediaCreateMapper;
     private final CueSheetMediaUpdateMapper cueSheetMediaUpdateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
     private final TopicSendService topicSendService;
     private final CueSheetTopicService cueSheetTopicService;
@@ -99,10 +98,10 @@ public class CueSheetMediaService {
         return cueSheetMediaDTO;
     }
 
-    public Long create(CueSheetMediaCreateDTO cueSheetMediaCreateDTO) throws Exception {
+    public Long create(CueSheetMediaCreateDTO cueSheetMediaCreateDTO, String userId) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         cueSheetMediaCreateDTO.setInputrId(userId);
 
         CueSheetMedia cueSheetMedia = cueSheetMediaCreateMapper.toEntity(cueSheetMediaCreateDTO);
@@ -143,12 +142,12 @@ public class CueSheetMediaService {
         return cueSheetMedia.getCueMediaId();
     }
 
-    public void update(CueSheetMediaUpdateDTO cueSheetMediaUpdateDTO, Long cueMediaId) {
+    public void update(CueSheetMediaUpdateDTO cueSheetMediaUpdateDTO, Long cueMediaId, String userId) {
 
         CueSheetMedia cueSheetMedia = cueSheetMediaFindOrFail(cueMediaId);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         cueSheetMediaUpdateDTO.setUpdtrId(userId);
 
         cueSheetMediaUpdateMapper.updateFromDto(cueSheetMediaUpdateDTO, cueSheetMedia);
@@ -157,14 +156,14 @@ public class CueSheetMediaService {
 
     }
 
-    public void delete(Long cueMediaId) throws JsonProcessingException {
+    public void delete(Long cueMediaId, String userId) throws JsonProcessingException {
 
         CueSheetMedia cueSheetMedia = cueSheetMediaFindOrFail(cueMediaId);
 
         CueSheetMediaDTO cueSheetMediaDTO = cueSheetMediaMapper.toDto(cueSheetMedia);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         cueSheetMediaDTO.setDelrId(userId);
         cueSheetMediaDTO.setDelDtm(new Date());
         cueSheetMediaDTO.setDelYn("Y");

@@ -7,6 +7,7 @@ import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaUpdateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateMedia.dto.CueTmpltMediaDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +19,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +32,8 @@ import java.util.List;
 public class CueSheetMediaController {
 
     private final CueSheetMediaService cueSheetMediaService;
+
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "큐시트 템플릿 미디어 목록조회", description = "큐시트 템플릿 미디어 목록조회")
     @GetMapping(path = "")
@@ -44,7 +48,7 @@ public class CueSheetMediaController {
                                                           @Parameter(name = "mediaTypCd", description = "미디어 유형 코드[media_typ_001 : 영상, media_typ_002 : 백드롭]")
                                                           @RequestParam(value = "mediaTypCd", required = false) String mediaTypCd,
                                                           @Parameter(name = "delYn", description = "큐시트 미디어 삭제 여부 ( N, Y )")
-                                                              @RequestParam(value = "delYn", required = false) String delYn) throws Exception {
+                                                          @RequestParam(value = "delYn", required = false) String delYn) throws Exception {
 
         List<CueSheetMediaDTO> cueSheetMediaDTOList = new ArrayList<>();
 
@@ -63,7 +67,7 @@ public class CueSheetMediaController {
     @Operation(summary = "큐시트 미디어 상세조회", description = "큐시트 미디어 상세조회")
     @GetMapping("/{cueMediaId}")
     public AnsApiResponse<CueSheetMediaDTO> find(@Parameter(name = "cueMediaId", required = true, description = "큐시트 미디어 아이디")
-                                              @PathVariable("cueMediaId") long cueMediaId) {
+                                                 @PathVariable("cueMediaId") long cueMediaId) {
 
         CueSheetMediaDTO cueSheetMediaDTO = cueSheetMediaService.find(cueMediaId);
 
@@ -74,9 +78,12 @@ public class CueSheetMediaController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<CueSheetMediaDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                @RequestBody @Valid CueSheetMediaCreateDTO cueSheetMediaCreateDTO) throws Exception {
+                                                   @RequestBody @Valid CueSheetMediaCreateDTO cueSheetMediaCreateDTO,
+                                                   @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        Long cueMediaId = cueSheetMediaService.create(cueSheetMediaCreateDTO);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        Long cueMediaId = cueSheetMediaService.create(cueSheetMediaCreateDTO, userId);
 
         CueSheetMediaDTO cueSheetMediaDTO = cueSheetMediaService.find(cueMediaId);
 
@@ -87,11 +94,14 @@ public class CueSheetMediaController {
     @Operation(summary = "큐시트 미디어 수정", description = "큐시트 미디어 수정")
     @PutMapping(path = "/{cueMediaId}")
     public AnsApiResponse<CueSheetMediaDTO> update(@Parameter(description = "필수값<br> ", required = true)
-                                                @RequestBody @Valid CueSheetMediaUpdateDTO cueSheetMediaUpdateDTO,
+                                                   @RequestBody @Valid CueSheetMediaUpdateDTO cueSheetMediaUpdateDTO,
                                                    @Parameter(name = "cueMediaId", required = true, description = "큐시트 미디어 아이디")
-                                                @PathVariable("cueMediaId") long cueMediaId) {
+                                                   @PathVariable("cueMediaId") long cueMediaId,
+                                                   @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        cueSheetMediaService.update(cueSheetMediaUpdateDTO, cueMediaId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        cueSheetMediaService.update(cueSheetMediaUpdateDTO, cueMediaId, userId);
 
         CueSheetMediaDTO cueSheetMediaDTO = cueSheetMediaService.find(cueMediaId);
 
@@ -103,9 +113,12 @@ public class CueSheetMediaController {
     @DeleteMapping(path = "/{cueMediaId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "cueMediaId", required = true, description = "큐시트 미디어 아이디")
-                                 @PathVariable("cueMediaId") long cueMediaId) throws JsonProcessingException {
+                                    @PathVariable("cueMediaId") long cueMediaId,
+                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        cueSheetMediaService.delete(cueMediaId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        cueSheetMediaService.delete(cueMediaId, userId);
 
         return AnsApiResponse.noContent();
     }

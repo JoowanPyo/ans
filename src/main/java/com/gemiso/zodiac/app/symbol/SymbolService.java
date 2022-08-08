@@ -9,7 +9,6 @@ import com.gemiso.zodiac.app.symbol.dto.SymbolUpdateDTO;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolCreateMapper;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolMapper;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolUpdateMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +38,7 @@ public class SymbolService {
     private final SymbolUpdateMapper symbolUpdateMapper;
     //private final AttachFileMapper attachFileMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
     @Value("${files.url-key}")
     private String fileUrl;
@@ -87,10 +86,10 @@ public class SymbolService {
         return symbolDTO;
     }
 
-    public String create(SymbolCreateDTO symbolCreateDTO){ //방송 아이콘 등록 서비스
+    public String create(SymbolCreateDTO symbolCreateDTO, String userId){ //방송 아이콘 등록 서비스
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         symbolCreateDTO.setInputrId(userId); //등록자 추가.
 
         Symbol symbol = symbolCreateMapper.toEntity(symbolCreateDTO); //articleDTO -> Entity로 변환
@@ -101,11 +100,11 @@ public class SymbolService {
 
     }
 
-    public void update(SymbolUpdateDTO symbolUpdateDTO, String symbolId){
+    public void update(SymbolUpdateDTO symbolUpdateDTO, String symbolId, String userId){
 
         Symbol symbol = symbolFindOrFail(symbolId);
 
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         symbolUpdateDTO.setUpdtrId(userId); // 수정자 추가.
 
         //수정.
@@ -123,7 +122,7 @@ public class SymbolService {
 
     }
 
-    public void delete(String symbolId){
+    public void delete(String symbolId, String userId){
 
         Symbol symbol = symbolFindOrFail(symbolId);
 
@@ -131,7 +130,7 @@ public class SymbolService {
 
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         symbolDTO.setDelrId(userId);
         symbolDTO.setDelYn("Y");
         symbolDTO.setDelDtm(new Date());

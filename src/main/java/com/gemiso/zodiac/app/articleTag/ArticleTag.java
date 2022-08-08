@@ -33,6 +33,6 @@ public class ArticleTag {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artcl_id")
-    @JsonBackReference
+    //@JsonBackReference
     private Article article;
 }

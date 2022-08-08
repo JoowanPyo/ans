@@ -1,11 +1,9 @@
 package com.gemiso.zodiac.app.articleHist;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gemiso.zodiac.app.article.Article;
-import com.gemiso.zodiac.app.code.Code;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -45,7 +43,7 @@ public class ArticleHist {
     private String ancMentCtt;
 
     @Column(name = "artcl_ord")
-    private int artclOrd;
+    private Integer artclOrd;
 
     @Column(name = "org_artcl_id", length = 21)
     private Long orgArtclId;
@@ -54,11 +52,19 @@ public class ArticleHist {
     private Date inputDtm;
 
     @Column(name = "ver")
-    private int ver;
+    private Integer ver;
+
+    @Column(name = "inputr_id", length = 50)
+    private String inputrId;
+
+    @Column(name = "inputr_nm", length = 100)
+    @Basic(fetch = FetchType.EAGER)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = inputr_id)")
+    private String inputrNm;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artcl_id")
-    @JsonBackReference
+    //@JsonBackReference
     private Article article;
 
 

@@ -1,13 +1,10 @@
 package com.gemiso.zodiac.app.articleTag;
 
+import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.articleTag.dto.ArticleTagCreateDTO;
 import com.gemiso.zodiac.app.articleTag.dto.ArticleTagDTO;
 import com.gemiso.zodiac.app.articleTag.mapper.ArticleTagCreateMapper;
 import com.gemiso.zodiac.app.articleTag.mapper.ArticleTagMapper;
-import com.gemiso.zodiac.app.article.ArticleRepository;
-import com.gemiso.zodiac.app.article.ArticleService;
-import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
-import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleRepository;
 import com.gemiso.zodiac.app.tag.Tag;
 import com.gemiso.zodiac.app.tag.TagRepository;
 import com.gemiso.zodiac.app.tag.TagService;
@@ -15,7 +12,6 @@ import com.gemiso.zodiac.app.tag.dto.TagCreateDTO;
 import com.gemiso.zodiac.app.tag.dto.TagDTO;
 import com.gemiso.zodiac.app.tag.dto.TagIdDTO;
 import com.gemiso.zodiac.app.tag.mapper.TagMapper;
-import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,17 +31,17 @@ public class ArticleTagService {
 
     private final ArticleTagRepository articleTagRepository;
     private final TagRepository tagRepository;
-    private final ElasticSearchArticleRepository elasticSearchArticleRepository;
-    private final ArticleRepository articleRepository;
+    //private final ElasticSearchArticleRepository elasticSearchArticleRepository;
+    //private final ArticleRepository articleRepository;
 
     private final ArticleTagMapper articleTagMapper;
     private final ArticleTagCreateMapper articleTagCreateMapper;
     private final TagMapper tagMapper;
 
     private final TagService tagService;
-    private final ArticleService articleService;
+    //private final ArticleService articleService;
 
-    private final DateChangeHelper dateChangeHelper;
+    //private final DateChangeHelper dateChangeHelper;
 
 
     public List<ArticleTagDTO> findAll(Long artclId){
@@ -115,6 +111,14 @@ public class ArticleTagService {
         //기존에 등록되어 있던 기사테그 List 삭제
         if (CollectionUtils.isEmpty(articleTagList) == false){
             for (ArticleTag articleTag : articleTagList){
+
+                Tag tag = articleTag.getTag();
+                Integer clicked = tag.getTagClicked();
+                if (clicked != 0) {
+                    tag.setTagClicked(clicked - 1);
+                    tagRepository.save(tag);
+                }
+
                 Long articleTagId = articleTag.getId();
 
                 articleTagRepository.deleteById(articleTagId);

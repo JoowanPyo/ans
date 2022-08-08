@@ -2,8 +2,10 @@ package com.gemiso.zodiac.app.capTemplate;
 
 import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateCreateDTO;
 import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateDTO;
+import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateOrdUpdateDTO;
 import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateUpdateDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @Api(description = "자막템플릿 API")
@@ -23,6 +26,8 @@ import java.util.List;
 public class CapTemplateController {
 
     private final CapTemplateService capTemplateService;
+
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "자막 템플릿 조회", description = "자막 템플릿 조회")
     @GetMapping(path = "")
@@ -59,9 +64,12 @@ public class CapTemplateController {
     public AnsApiResponse<CapTemplateDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                                  @RequestBody @Valid CapTemplateCreateDTO capTemplateCreateDTO,
                                                  @Parameter(name = "tmpltGrpId", description = "자막 템플릿 아이디")
-                                                 @PathVariable("tmpltGrpId") Long tmpltGrpId) {
+                                                 @PathVariable("tmpltGrpId") Long tmpltGrpId,
+                                                 @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        Long capTmpltId = capTemplateService.create(capTemplateCreateDTO, tmpltGrpId);
+        String userId = jwtGetUserService.getUser(Authorization);
+
+        Long capTmpltId = capTemplateService.create(capTemplateCreateDTO, tmpltGrpId, userId);
 
         //자막템플릿 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         CapTemplateDTO capTemplateDTO = new CapTemplateDTO();
@@ -76,9 +84,12 @@ public class CapTemplateController {
     public AnsApiResponse<CapTemplateDTO> update(@Parameter(description = "필수값<br> ", required = true)
                                                  @RequestBody @Valid CapTemplateUpdateDTO capTemplateUpdateDTO,
                                                  @Parameter(name = "capTmpltId", description = "자막 템플릿 아이디")
-                                                 @PathVariable("capTmpltId") Long capTmpltId) {
+                                                 @PathVariable("capTmpltId") Long capTmpltId,
+                                                 @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        capTemplateService.update(capTemplateUpdateDTO, capTmpltId);
+        String userId = jwtGetUserService.getUser(Authorization);
+
+        capTemplateService.update(capTemplateUpdateDTO, capTmpltId, userId);
 
         //자막템플릿 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         CapTemplateDTO capTemplateDTO = new CapTemplateDTO();
@@ -92,11 +103,34 @@ public class CapTemplateController {
     @DeleteMapping(path = "/{capTmpltId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "capTmpltId", description = "자막 템플릿 아이디")
-                                    @PathVariable("capTmpltId") Long[] capTmpltId) {
+                                    @PathVariable("capTmpltId") Long[] capTmpltId,
+                                    @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        capTemplateService.delete(capTmpltId);
+        String userId = jwtGetUserService.getUser(Authorization);
+
+        capTemplateService.delete(capTmpltId, userId);
 
         return AnsApiResponse.noContent();
+    }
+
+    @Operation(summary = "자막 템플릿 순번 수정", description = "자막 템플릿 순번 수정")
+    @PutMapping(path = "/{capTmpltId}/ord")
+    public AnsApiResponse<CapTemplateDTO> orderUpdate(@Parameter(description = "필수값<br> ", required = true)
+                                                      @RequestBody @Valid CapTemplateOrdUpdateDTO capTemplateOrdUpdateDTO,
+                                                      @Parameter(name = "capTmpltId", description = "자막 템플릿 아이디")
+                                                      @PathVariable("capTmpltId") Long capTmpltId,
+                                                      @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
+
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        capTemplateService.orderUpdate(capTemplateOrdUpdateDTO, capTmpltId, userId);
+
+        //자막템플릿 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+        CapTemplateDTO capTemplateDTO = new CapTemplateDTO();
+        capTemplateDTO.setCapTmpltId(capTmpltId);
+
+        return new AnsApiResponse<>(capTemplateDTO);
+
     }
 
 

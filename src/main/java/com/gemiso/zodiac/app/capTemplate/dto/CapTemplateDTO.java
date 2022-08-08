@@ -19,14 +19,14 @@ public class CapTemplateDTO {
     private String capTmpltFileNm;
     private String capClassCd;
     private String capClassCdNm;
-    private int capLnNum;
-    private int capLttrNum;
+    private Integer capLnNum;
+    private Integer capLttrNum;
     private String capCellDlmtr;
     private String capTmpltHelp;
-    private int capTmpltOrd;
-    private int varCnt;
+    private Integer capTmpltOrd;
+    private Integer varCnt;
     private String varNm;
-    private int takeCount;
+    private Integer takeCount;
     /*private Long brdcPgmId;
     private String brdcPgmNm;*///맵핑테이블로대처.
     private String prvwYn;

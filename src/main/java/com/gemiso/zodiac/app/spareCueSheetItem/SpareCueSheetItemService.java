@@ -1,13 +1,8 @@
 package com.gemiso.zodiac.app.spareCueSheetItem;
 
-import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
-import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
-import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
-import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
 import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.spareCueSheetItem.dto.SpareCueSheetItemCreateDTO;
 import com.gemiso.zodiac.app.spareCueSheetItem.dto.SpareCueSheetItemDTO;
 import com.gemiso.zodiac.app.spareCueSheetItem.dto.SpareCueSheetItemSimpleDTO;

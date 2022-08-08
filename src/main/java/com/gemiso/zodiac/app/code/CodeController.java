@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.code;
 
 import com.gemiso.zodiac.app.code.dto.*;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @Api(description = "코드 API")
@@ -23,6 +25,8 @@ import java.util.List;
 public class CodeController {
 
     private final CodeService codeService;
+
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "코드 목록조회", description = "코드 목록조회")
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -61,9 +65,12 @@ public class CodeController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<CodeDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                          @RequestBody CodeCreateDTO codeCreateDTO) {
+                                          @RequestBody CodeCreateDTO codeCreateDTO,
+                                          @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        Long cdId = codeService.create(codeCreateDTO);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        Long cdId = codeService.create(codeCreateDTO, userId);
 
         //코드 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         /*CodeDTO returnCodeDTO = new CodeDTO();
@@ -78,9 +85,12 @@ public class CodeController {
     @PutMapping(path = "/{cdId}")
     public AnsApiResponse<CodeDTO> update(@Parameter(name = "codeUpdateDTO", required = true, description = "필수값<br>")
                                           @Valid @RequestBody CodeUpdateDTO codeUpdateDTO,
-                                          @Parameter(name = "cdId", required = true) @PathVariable("cdId") Long cdId) {
+                                          @Parameter(name = "cdId", required = true) @PathVariable("cdId") Long cdId,
+                                          @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        codeService.update(codeUpdateDTO, cdId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        codeService.update(codeUpdateDTO, cdId, userId);
 
         //코드 수정 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
         //CodeDTO codeDTO = new CodeDTO();
@@ -94,9 +104,13 @@ public class CodeController {
     @Operation(summary = "코드 삭제", description = "코드 삭제")
     @DeleteMapping(path = "/{cdId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public AnsApiResponse<CodeDTO> delete(@Parameter(name = "cdId", description = "코드 아이디") @PathVariable("cdId") Long cdId) {
+    public AnsApiResponse<CodeDTO> delete(@Parameter(name = "cdId", description = "코드 아이디") @PathVariable("cdId") Long cdId,
+                                          @RequestHeader(value = "Authorization", required = false)String Authorization
+    ) throws Exception {
 
-        codeService.delete(cdId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        codeService.delete(cdId, userId);
 
         return AnsApiResponse.noContent();
     }

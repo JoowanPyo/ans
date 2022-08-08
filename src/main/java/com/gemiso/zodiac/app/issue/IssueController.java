@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.issue.dto.IssueDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import com.gemiso.zodiac.core.service.UserAuthService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +34,8 @@ public class IssueController {
 
     private final IssueService issueService;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "이슈 목록 조회", description = "조회조건으로 이슈 목록 조회")
     @GetMapping(path = "")
@@ -73,10 +76,11 @@ public class IssueController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<IssueDTO> create(
-            @Parameter(description = "필수값<br>이슈제목, 이슈일자", required = true) @RequestBody IssueCreateDTO issueCreateDTO) throws Exception {
+            @Parameter(description = "필수값<br>이슈제목, 이슈일자", required = true) @RequestBody IssueCreateDTO issueCreateDTO,
+            @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info(" Issue Create : userId - "+userId +"<br>" +" Issue Model - "+issueCreateDTO);
 
         IssueDTO issuDto = issueService.create(issueCreateDTO, userId);
@@ -88,10 +92,11 @@ public class IssueController {
     @PutMapping(path = "/{issuId}")
     public AnsApiResponse<IssueDTO> update(
             @Parameter(description = "Update issue object", required = true) @RequestBody IssueUpdateDTO issueDTO,
-            @Parameter(description = "이슈 아이디", required = true) @PathVariable("issuId") Long issuId) {
+            @Parameter(description = "이슈 아이디", required = true) @PathVariable("issuId") Long issuId,
+            @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info(" Issue Update : userId - "+userId +"<br>" +" Issue Model - "+issueDTO);
 
         issueService.update(issueDTO, issuId, userId);
@@ -105,10 +110,11 @@ public class IssueController {
     @PatchMapping(path = "/{issuId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(
-            @Parameter(name = "issuId", required = true, description = "이슈아이디") @PathVariable("issuId") Long issuId) {
+            @Parameter(name = "issuId", required = true, description = "이슈아이디") @PathVariable("issuId") Long issuId,
+            @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info(" Issue Delete : userId - "+userId +"<br>" +" Issue Id - "+issuId);
 
         issueService.delete(issuId, userId);
@@ -121,11 +127,12 @@ public class IssueController {
     public AnsApiResponse<List<IssueDTO>> copy(
             @Parameter(description = "복사할 날짜(yyyy-MM-dd HH:mm:ss)", required = true)
             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @PathVariable("targetDate") Date targetDate,
-            @Parameter(description = "복사할 이슈", required = true) @RequestBody List<IssueCopyDTO> issueCopyDTO
+            @Parameter(description = "복사할 이슈", required = true) @RequestBody List<IssueCopyDTO> issueCopyDTO,
+            @RequestHeader(value = "Authorization", required = false)String Authorization
     ) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info(" Issue Copy : userId - "+userId +" targetDate - "+targetDate+"<br>" +" Issue Model - "+issueCopyDTO.toString());
 
         Date endDate = issueService.copy(issueCopyDTO, targetDate, userId);
@@ -141,10 +148,11 @@ public class IssueController {
     public AnsApiResponse<List<IssueDTO>> changeOrder(@Parameter(name = "issuId", required = true, description = "이슈아이디")
                                                       @PathVariable("issuId") Long issuId,
                                                       @Parameter(name = "issuOrd", required = true, description = "이슈 순번")
-                                                      @RequestParam(value = "issuOrd") Integer issuOrd) throws Exception {
+                                                      @RequestParam(value = "issuOrd") Integer issuOrd,
+                                                      @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info(" Issue Change Ord : userId - "+userId +" Issue Id - "+issuId + " IssueOrd - "+issuOrd);
 
 
@@ -156,10 +164,11 @@ public class IssueController {
     @Operation(summary = "삭제 이슈 복구", description = "삭제 이슈 복구")
     @PutMapping(path = "/{issuId}/restore")
     public AnsApiResponse<IssueDTO> restoreIssue(@Parameter(name = "issuId", required = true, description = "이슈아이디")
-                                                 @PathVariable("issuId") Long issuId) {
+                                                 @PathVariable("issuId") Long issuId,
+                                                 @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info(" Issue Restore : userId - "+userId +" Issue Id - "+issuId );
 
         issueService.restoreIssue(issuId);

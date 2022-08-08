@@ -6,7 +6,6 @@ import com.gemiso.zodiac.app.yonhapAssign.dto.YonhapAssignUpdateDTO;
 import com.gemiso.zodiac.app.yonhapAssign.mapper.YonhapAssignCreateMapper;
 import com.gemiso.zodiac.app.yonhapAssign.mapper.YonhapAssignMapper;
 import com.gemiso.zodiac.app.yonhapAssign.mapper.YonhapAssignUpdateMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -33,7 +31,7 @@ public class YonhapAssignService {
     private final YonhapAssignCreateMapper yonhapAssignCreateMapper;
     private final YonhapAssignUpdateMapper yonhapAssignUpdateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
 
     public List<YonhapAssignDTO> findAll(Date sdate, Date edate, Long yonhapId, Long wireId, String designatorId, String assignerId){
@@ -83,10 +81,10 @@ public class YonhapAssignService {
         return yonhapAssignDTO;
     }
 
-    public Long create(YonhapAssignCreateDTO yonhapAssignCreateDTO){
+    public Long create(YonhapAssignCreateDTO yonhapAssignCreateDTO, String userId){
 
         //연합기사 담당자 지정자 아이디set
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         yonhapAssignCreateDTO.setDesignatorId(userId);
 
         YonhapAssign yonhapAssign = yonhapAssignCreateMapper.toEntity(yonhapAssignCreateDTO);

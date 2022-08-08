@@ -1,15 +1,14 @@
 package com.gemiso.zodiac.app.userGroup;
 
-import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuth;
-import com.gemiso.zodiac.app.userGroupAuth.dto.UserGroupAuthDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupCreateDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupUpdateDTO;
-import com.gemiso.zodiac.app.userGroupAuth.mapper.UserGroupAuthMapper;
 import com.gemiso.zodiac.app.userGroup.mapper.UserGroupCreateMapper;
 import com.gemiso.zodiac.app.userGroup.mapper.UserGroupMapper;
 import com.gemiso.zodiac.app.userGroup.mapper.UserGroupUpdateMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuth;
+import com.gemiso.zodiac.app.userGroupAuth.dto.UserGroupAuthDTO;
+import com.gemiso.zodiac.app.userGroupAuth.mapper.UserGroupAuthMapper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -36,7 +34,7 @@ public class UserGroupService {
     private final UserGroupUpdateMapper userGroupUpdateMapper;
     private final UserGroupAuthMapper userGroupAuthMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
 
     public List<UserGroupDTO> findAll(String userGrpNm,String useYn){
@@ -51,10 +49,10 @@ public class UserGroupService {
     }
 
 
-    public UserGroupDTO create(UserGroupCreateDTO userGroupCreateDTO) {
+    public UserGroupDTO create(UserGroupCreateDTO userGroupCreateDTO, String userId) {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         userGroupCreateDTO.setInputrId(userId);
 
         UserGroup userGroup = userGroupCreateMapper.toEntity(userGroupCreateDTO);
@@ -80,14 +78,14 @@ public class UserGroupService {
         return userGroupDTO;
     }
 
-    public void update(UserGroupUpdateDTO userGroupUpdateDTO, Long userGrpId){
+    public void update(UserGroupUpdateDTO userGroupUpdateDTO, Long userGrpId, String userId){
 
         UserGroup userGroup = userGrouupFindOrFail(userGrpId);
 
         userGroupUpdateDTO.setUserGrpId(userGrpId);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         userGroupUpdateDTO.setUpdtrId(userId);
 
         userGroupUpdateMapper.updateFromDto(userGroupUpdateDTO, userGroup);
@@ -96,14 +94,14 @@ public class UserGroupService {
 
     }
 
-    public void delete(Long userGrpId){
+    public void delete(Long userGrpId, String userId){
 
         UserGroup userGroupEntity = userGrouupFindOrFail(userGrpId);
 
         UserGroupDTO userGroupDTO = userGroupMapper.toDto(userGroupEntity);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         userGroupDTO.setDelrId(userId);
         userGroupDTO.setDelDtm(new Date());
         userGroupDTO.setDelYn("Y");

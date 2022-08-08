@@ -1,9 +1,5 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItemCap;
 
-import com.gemiso.zodiac.app.cueSheetItem.CueSheetItem;
-import com.gemiso.zodiac.app.cueSheetItemCap.CueSheetItemCap;
-import com.gemiso.zodiac.app.cueSheetTemplateItem.CueTmpltItem;
-import com.gemiso.zodiac.app.cueSheetTemplateItem.QCueTmpltItem;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapCreateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapDTO;
@@ -12,7 +8,6 @@ import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapUpdateDT
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.mapper.CueTmpltItemCapCreateMapper;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.mapper.CueTmpltItemCapMapper;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.mapper.CueTmpltItemCapUpdateMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +33,7 @@ public class CueTmpltItemCapService {
     private final CueTmpltItemCapCreateMapper cueTmpltItemCapCreateMapper;
     private final CueTmpltItemCapUpdateMapper cueTmpltItemCapUpdateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
     //큐시트 템플릿 아이템 자막 목록조회
     public List<CueTmpltItemCapDTO> findAll(Long cueTmpltItemId, String cueItemCapDivCd){
@@ -64,9 +59,9 @@ public class CueTmpltItemCapService {
     }
 
     //큐시트 템플릿 아이템 자막 등록
-    public CueTmpltItemCapSimpleDTO create(CueTmpltItemCapCreateDTO cueTmpltItemCapCreateDTO, Long cueTmpltItemId){
+    public CueTmpltItemCapSimpleDTO create(CueTmpltItemCapCreateDTO cueTmpltItemCapCreateDTO, Long cueTmpltItemId, String userId){
 
-        String userId = userAuthService.authUser.getUserId(); //사용자 아이디 get
+        //String userId = userAuthService.authUser.getUserId(); //사용자 아이디 get
         cueTmpltItemCapCreateDTO.setInputrId(userId); //템플릿 아이템 자막 입력자 등록
 
         //큐시트 템플릿 아이템 아이디 빌드
@@ -86,11 +81,11 @@ public class CueTmpltItemCapService {
     }
 
     //큐시트 템플릿 아이템 자막 수정
-    public void update(CueTmpltItemCapUpdateDTO cueTmpltItemCapUpdateDTO, Long cueItemCapId){
+    public void update(CueTmpltItemCapUpdateDTO cueTmpltItemCapUpdateDTO, Long cueItemCapId, String userId){
 
         CueTmpltItemCap cueTmpltItemCap = findCueTmplItemCap(cueItemCapId); //큐시트 템플릿 아이템 자막 조회 및 존재유무 확인.
 
-        String userId = userAuthService.authUser.getUserId(); //사용자 아이디 get
+        //String userId = userAuthService.authUser.getUserId(); //사용자 아이디 get
         cueTmpltItemCapUpdateDTO.setUpdtrId(userId);
 
         cueTmpltItemCapUpdateMapper.updateFromDto(cueTmpltItemCapUpdateDTO, cueTmpltItemCap);
@@ -99,13 +94,13 @@ public class CueTmpltItemCapService {
     }
 
     //큐시트 템플릿 아이템 자막 삭제
-    public void delete(Long cueItemCapId){
+    public void delete(Long cueItemCapId, String userId){
 
         CueTmpltItemCap cueTmpltItemCap = findCueTmplItemCap(cueItemCapId); //큐시트 템플릿 아이템 자막 조회 및 존재유무 확인.
 
         CueTmpltItemCapDTO cueTmpltItemCapDTO = cueTmpltItemCapMapper.toDto(cueTmpltItemCap);
 
-        String userId = userAuthService.authUser.getUserId(); //사용자 아이디 get
+        //String userId = userAuthService.authUser.getUserId(); //사용자 아이디 get
         cueTmpltItemCapDTO.setDelrId(userId); //삭제자 등록
         cueTmpltItemCapDTO.setDelYn("Y"); //삭제여부값 "Y"
         cueTmpltItemCapDTO.setDelDtm(new Date());//삭제 일시 등록

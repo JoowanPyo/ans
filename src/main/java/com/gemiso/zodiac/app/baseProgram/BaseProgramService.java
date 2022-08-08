@@ -7,7 +7,6 @@ import com.gemiso.zodiac.app.baseProgram.dto.BaseProgramUpdateDTO;
 import com.gemiso.zodiac.app.baseProgram.mapper.BaseProgramCreateMapper;
 import com.gemiso.zodiac.app.baseProgram.mapper.BaseProgramMapper;
 import com.gemiso.zodiac.app.baseProgram.mapper.BaseProgramUpdateMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,7 @@ public class BaseProgramService {
     private final BaseProgramCreateMapper baseProgramCreateMapper;
     private final BaseProgramUpdateMapper baseProgramUpdateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
     //기본편성 목록조회
     public List<BaseProgramDTO> findAll(Long basPgmschId, String brdcStartDt,
@@ -60,9 +59,9 @@ public class BaseProgramService {
     }
 
     //기본편성 등록
-    public BaseProgramSimpleDTO create(BaseProgramCreateDTO baseProgramCreateDTO){
+    public BaseProgramSimpleDTO create(BaseProgramCreateDTO baseProgramCreateDTO, String userId){
 
-        String userId = userAuthService.authUser.getUserId();//로그인 토큰에서 사용자 정보를 가져온다.
+        //String userId = userAuthService.authUser.getUserId();//로그인 토큰에서 사용자 정보를 가져온다.
 
         baseProgramCreateDTO.setInputrId(userId);//입력자 set
 
@@ -81,11 +80,11 @@ public class BaseProgramService {
     }
 
     //기본편성 업데이트
-    public BaseProgramSimpleDTO update(BaseProgramUpdateDTO baseProgramUpdateDTO, Long basePgmschId){
+    public BaseProgramSimpleDTO update(BaseProgramUpdateDTO baseProgramUpdateDTO, Long basePgmschId, String userId){
 
         BaseProgram baseProgram = findBasepgm(basePgmschId);//기본편성 조회 및 존재유무 확인.
 
-        String userId = userAuthService.authUser.getUserId();//로그인 토큰에서 사용자 정보를 가져온다.
+        //String userId = userAuthService.authUser.getUserId();//로그인 토큰에서 사용자 정보를 가져온다.
         baseProgramUpdateDTO.setUpdtrId(userId); //수정자 아이디 등록
 
         baseProgramUpdateMapper.updateFromDto(baseProgramUpdateDTO, baseProgram);//업데이트 정보 set
@@ -101,13 +100,13 @@ public class BaseProgramService {
     }
 
     //기본편성 삭제
-    public void delete(Long basePgmschId){
+    public void delete(Long basePgmschId, String userId){
 
         BaseProgram baseProgram = findBasepgm(basePgmschId);//기본편성 조회 및 존재유무 확인.
 
         BaseProgramDTO baseProgramDTO = baseProgramMapper.toDto(baseProgram); // 엔티티 DTO변환
 
-        String userId = userAuthService.authUser.getUserId();//로그인 토큰에서 사용자 정보를 가져온다.
+        //String userId = userAuthService.authUser.getUserId();//로그인 토큰에서 사용자 정보를 가져온다.
         baseProgramDTO.setDelrId(userId); //삭제자 등록
         baseProgramDTO.setDelDtm(new Date()); //삭제일시 등록
         baseProgramDTO.setDelYn("Y"); //여제여부값 Y

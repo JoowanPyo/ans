@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.symbol;
 
 import com.gemiso.zodiac.app.symbol.dto.*;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @Api(description = "방송아이콘 API")
@@ -21,6 +23,8 @@ import java.util.List;
 public class SymbolController {
 
     private final SymbolService symbolService;
+
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "방송아이콘 목록조회", description = "방송아이콘 목록조회")
     @GetMapping(path = "")
@@ -49,9 +53,13 @@ public class SymbolController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<SymbolDTO> create(@Parameter(name = "symbolCreateDTO", required = true, description = "방송아이콘 아이디")
-                                            @Valid @RequestBody SymbolCreateDTO symbolCreateDTO) {
+                                            @Valid @RequestBody SymbolCreateDTO symbolCreateDTO,
+                                            @RequestHeader(value = "Authorization", required = false)String Authorization
+    ) throws Exception {
 
-        String symbolId = symbolService.create(symbolCreateDTO);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        String symbolId = symbolService.create(symbolCreateDTO, userId);
 
         SymbolDTO symbolDTO = symbolService.find(symbolId);
 
@@ -64,9 +72,12 @@ public class SymbolController {
     public AnsApiResponse<SymbolDTO> update(@Parameter(name = "symbolCreateDTO", required = true, description = "필수값<br>")
                                             @Valid @RequestBody SymbolUpdateDTO symbolUpdateDTO,
                                             @Parameter(name = "symbolId", required = true, description = "방송아이콘 아이디")
-                                            @PathVariable("symbolId") String symbolId) {
+                                            @PathVariable("symbolId") String symbolId,
+                                            @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        symbolService.update(symbolUpdateDTO, symbolId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        symbolService.update(symbolUpdateDTO, symbolId, userId);
 
         SymbolDTO symbolDTO = symbolService.find(symbolId);
 
@@ -78,9 +89,12 @@ public class SymbolController {
     @DeleteMapping(path = "/{symbolId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "symbolId", required = true, description = "방송아이콘 아이디")
-                                    @PathVariable("symbolId") String symbolId) {
+                                    @PathVariable("symbolId") String symbolId,
+                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        symbolService.delete(symbolId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        symbolService.delete(symbolId, userId);
 
         return AnsApiResponse.noContent();
     }

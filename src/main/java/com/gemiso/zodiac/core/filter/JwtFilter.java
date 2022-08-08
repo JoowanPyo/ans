@@ -1,15 +1,9 @@
 package com.gemiso.zodiac.core.filter;
 
-import com.gemiso.zodiac.app.user.User;
-import com.gemiso.zodiac.app.user.UserRepository;
-import com.gemiso.zodiac.app.user.dto.UserDTO;
-import com.gemiso.zodiac.core.service.UserAuthService;
-import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -31,11 +25,11 @@ import java.util.List;
 public class JwtFilter implements Filter {
 
 
-    @Autowired
-    private UserRepository userRepository;
+    //@Autowired
+    //private UserRepository userRepository;
 
-    @Autowired
-    private UserAuthService userAuthService;
+    //@Autowired
+    //private UserAuthService userAuthService;
 
    /* @Autowired //강제로 filer error잡는방법, 필터는 서블릿 전단계라 exceptionhandler가 못잡는다.
     @Qualifier("handlerExceptionResolver")
@@ -121,22 +115,27 @@ public class JwtFilter implements Filter {
                                 logMessage.append(" [TOKEN EXPIRATION TIME:").append(expiration.toString()).append("]");
                             }
 
-                            String userId = claims.get("userId", String.class);
+                            //SecurityContextHolder.getContext().setAuthentication();
+
+                            /*String userId = claims.get("userId", String.class);
 
 
                             User user = userRepository.findById(userId)
                                     .orElseThrow(() -> new ResourceNotFoundException("UserId not found. UserId : " + userId));
 
-                            userAuthService.authUser = UserDTO.builder().userId(user.getUserId()).build();
+                            UserDTO userDTO = UserDTO.builder().userId(user.getUserId()).build();
 
-                            /*********** ip 가져오기 ************/
+                            userAuthService.authUser= userDTO;
+                            //userAuthService.authUser = user;
+
+                            *//*********** ip 가져오기 ************//*
 
                             String userIp = httpServletRequest.getRemoteAddr();
                             userAuthService.userip = userIp;
 
-                            /*********** ip 가져오기 ************/
+                            *//*********** ip 가져오기 ************/
 
-                            logMessage.append(" [TOKEN USER ID:").append(user.getUserId().toString()).append("]");
+                            //logMessage.append(" [TOKEN USER ID:").append(user.getUserId().toString()).append("]");
 
                         } else {
                             httpServletResponse.sendError(httpServletResponse.SC_UNAUTHORIZED, "토큰이 없거나 토큰정보가 정확하지 않습니다.");

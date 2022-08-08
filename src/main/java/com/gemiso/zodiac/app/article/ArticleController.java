@@ -2,15 +2,14 @@ package com.gemiso.zodiac.app.article;
 
 import com.gemiso.zodiac.app.article.dto.*;
 import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleService;
-import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticle;
 import com.gemiso.zodiac.app.elasticsearch.articleDTO.ElasticSearchArticleDTO;
+import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticle;
 import com.gemiso.zodiac.core.enumeration.AuthEnum;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import com.gemiso.zodiac.core.service.UserAuthChkService;
-import com.gemiso.zodiac.core.service.UserAuthService;
-import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,15 +18,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,8 +39,9 @@ public class ArticleController {
     private final ArticleService articleService;
     private final ElasticSearchArticleService elasticSearchArticleService;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
     private final UserAuthChkService userAuthChkService;
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "기사 목록조회", description = "기사 목록조회")
     @GetMapping(path = "")
@@ -156,34 +155,136 @@ public class ArticleController {
         return new AnsApiResponse<>(pageList);
     }
 
+    @Operation(summary = "기사 통계 엑셀 다운로드", description = "기사 통계 엑셀 다운로드")
+    @GetMapping(path = "/statistics")
+    public AnsApiResponse<?> findAllStatistics(
+            @Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+            @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+            @Parameter(name = "rptrId", description = "기자 아이디") @RequestParam(value = "rptrId", required = false) String rptrId,
+            @Parameter(name = "inputrId", description = "등록자 아이디") @RequestParam(value = "inputrId", required = false) String inputrId,
+            @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디") @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
+            @Parameter(name = "artclDivCd", description = "기사구분코드(01:일반, 02:전체, 03:이슈)") @RequestParam(value = "artclDivCd", required = false) String artclDivCd,
+            @Parameter(name = "artclTypCd", description = "기사유형코드(01:스트레이트, 02:리포트, 03:C/T, 04:하단롤, 05:긴급자막)") @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
+            @Parameter(name = "searchDivCd", description = "검색구분코드<br>01 - 기사제목<br>02 - 원본 기사 아이디") @RequestParam(value = "searchDivCd", required = false) String searchDivCd,
+            @Parameter(name = "searchWord", description = "검색키워드") @RequestParam(value = "searchWord", required = false) String searchWord,
+            @Parameter(name = "apprvDivCdList", description = "픽스구분코드(fix_none,article_fix,editor_fix,anchor_fix,desk_fix)") @RequestParam(value = "apprvDivCdList", required = false) List<String> apprvDivCdList,
+            @Parameter(name = "deptCd", description = "부서코드") @RequestParam(value = "deptCd", required = false) Long deptCd,
+            @Parameter(name = "artclCateCd", description = "기사 카테고리 코드") @RequestParam(value = "artclCateCd", required = false) String artclCateCd,
+            @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
+            @Parameter(name = "delYn", description = "삭제 여부") @RequestParam(value = "delYn", required = false) String delYn,
+            @Parameter(name = "artclId", description = "기사아이디") @RequestParam(value = "artclId", required = false) Long artclId,
+            @Parameter(name = "orgArtclId", description = "원본기사 아이디") @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,
+            @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]") @RequestParam(value = "copyYn", required = false) String copyYn,
+            @Parameter(name = "cueId", description = "큐시트 아이디") @RequestParam(value = "cueId", required = false) Long cueId,
+            @Parameter(name = "page", description = "시작페이지") @RequestParam(value = "page", required = false) Integer page,
+            HttpServletResponse response) throws Exception {
+
+        List<ElasticSearchArticle> articleList = new ArrayList<>();
+
+        //검색조건 날짜형식이 들어왔을경우
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
+
+            SearchDate searchDate = new SearchDate(sdate, edate);
+
+            articleList = articleService.findAllStatistics(searchDate.getStartDate(), searchDate.getEndDate(), rptrId, inputrId,
+                    brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, apprvDivCdList, deptCd,
+                    artclCateCd, artclTypDtlCd, delYn, artclId, copyYn, orgArtclId, cueId, page);
+
+            articleService.excelDownload(response, articleList, sdate);
+
+            //엘라스틱서치 lock데이터 추가
+            //pageList = articleService.lockInfoAdd(pageList);
+            //검색조건 날짜형식이 안들어왔을경우
+        } else {
+
+            articleList = articleService.findAllStatistics(null, null, rptrId, inputrId, brdcPgmId, artclDivCd,
+                    artclTypCd, searchDivCd, searchWord, apprvDivCdList, deptCd, artclCateCd,
+                    artclTypDtlCd, delYn, artclId, copyYn, orgArtclId, cueId, page);
+
+            articleService.excelDownload(response, articleList, sdate);
+
+            //엘라스틱서치 lock데이터 추가
+            //pageList = articleService.lockInfoAdd(pageList);
+
+        }
+
+        return null;
+    }
+
+    @Operation(summary = "기사 통계 엑셀 다운로드[ count ]", description = "기사 통계 엑셀 다운로드[ count ]")
+    @GetMapping(path = "/count")
+    public AnsApiResponse<?> findAllStatisticsCount(
+            @Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+            @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+            @Parameter(name = "rptrId", description = "기자 아이디") @RequestParam(value = "rptrId", required = false) String rptrId,
+            @Parameter(name = "inputrId", description = "등록자 아이디") @RequestParam(value = "inputrId", required = false) String inputrId,
+            @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디") @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
+            @Parameter(name = "artclDivCd", description = "기사구분코드(01:일반, 02:전체, 03:이슈)") @RequestParam(value = "artclDivCd", required = false) String artclDivCd,
+            @Parameter(name = "artclTypCd", description = "기사유형코드(01:스트레이트, 02:리포트, 03:C/T, 04:하단롤, 05:긴급자막)") @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
+            @Parameter(name = "searchDivCd", description = "검색구분코드<br>01 - 기사제목<br>02 - 원본 기사 아이디") @RequestParam(value = "searchDivCd", required = false) String searchDivCd,
+            @Parameter(name = "searchWord", description = "검색키워드") @RequestParam(value = "searchWord", required = false) String searchWord,
+            @Parameter(name = "apprvDivCdList", description = "픽스구분코드(fix_none,article_fix,editor_fix,anchor_fix,desk_fix)") @RequestParam(value = "apprvDivCdList", required = false) List<String> apprvDivCdList,
+            @Parameter(name = "deptCd", description = "부서코드") @RequestParam(value = "deptCd", required = false) Long deptCd,
+            @Parameter(name = "artclCateCd", description = "기사 카테고리 코드") @RequestParam(value = "artclCateCd", required = false) String artclCateCd,
+            @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드") @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
+            @Parameter(name = "delYn", description = "삭제 여부") @RequestParam(value = "delYn", required = false) String delYn,
+            @Parameter(name = "artclId", description = "기사아이디") @RequestParam(value = "artclId", required = false) Long artclId,
+            @Parameter(name = "orgArtclId", description = "원본기사 아이디") @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,
+            @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]") @RequestParam(value = "copyYn", required = false) String copyYn,
+            @Parameter(name = "cueId", description = "큐시트 아이디") @RequestParam(value = "cueId", required = false) Long cueId) throws Exception {
+
+        Long count = 0L;
+
+        //검색조건 날짜형식이 들어왔을경우
+        if (ObjectUtils.isEmpty(sdate) == false && ObjectUtils.isEmpty(edate) == false) {
+
+            SearchDate searchDate = new SearchDate(sdate, edate);
+
+            count = articleService.findAllStatisticsCount(searchDate.getStartDate(), searchDate.getEndDate(), rptrId, inputrId,
+                    brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, apprvDivCdList, deptCd,
+                    artclCateCd, artclTypDtlCd, delYn, artclId, copyYn, orgArtclId, cueId);
+
+
+        } else {
+
+            count = articleService.findAllStatisticsCount(null, null, rptrId, inputrId, brdcPgmId, artclDivCd,
+                    artclTypCd, searchDivCd, searchWord, apprvDivCdList, deptCd, artclCateCd,
+                    artclTypDtlCd, delYn, artclId, copyYn, orgArtclId, cueId);
+
+
+        }
+
+        return new AnsApiResponse<>(count);
+    }
+
     @Operation(summary = "기사 목록조회[큐시트]", description = "기사 목록조회[큐시트]")
     @GetMapping(path = "/searchcue")
     public AnsApiResponse<PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle>> findAllElasticsearchCue(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = true)
-                                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
-                                                                      @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = true)
-                                                                      @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                                      @Parameter(name = "searchWord", description = "검색키워드")
-                                                                      @RequestParam(value = "searchWord", required = false) String searchWord,
-                                                                      @Parameter(name = "cueId", description = "검색키워드", required = false)
-                                                                      @RequestParam(value = "cueId") Long cueId,
-                                                                      @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디")
-                                                                      @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
-                                                                      @Parameter(name = "artclTypCd", description = "기사유형코드(01:스트레이트, 02:리포트, 03:C/T, 04:하단롤, 05:긴급자막)")
-                                                                      @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
-                                                                      @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드")
-                                                                      @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
-                                                                      @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]")
-                                                                      @RequestParam(value = "copyYn", required = false) String copyYn,
-                                                                      @Parameter(name = "deptCd", description = "부서 코드")
-                                                                      @RequestParam(value = "deptCd", required = false) Long deptCd,
-                                                                      @Parameter(name = "orgArtclId", description = "원본기사 아이디")
-                                                                      @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,
-                                                                      @Parameter(name = "rptrId", description = "기자 아이디")
-                                                                      @RequestParam(value = "rptrId", required = false) String rptrId,
-                                                                      @Parameter(name = "page", description = "시작페이지")
-                                                                      @RequestParam(value = "page", required = false) Integer page,
-                                                                      @Parameter(name = "limit", description = "한 페이지에 데이터 수")
-                                                                      @RequestParam(value = "limit", required = false) Integer limit) throws Exception {
+                                                                                                                @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                                                                                @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = true)
+                                                                                                                @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                                                                                @Parameter(name = "searchWord", description = "검색키워드")
+                                                                                                                @RequestParam(value = "searchWord", required = false) String searchWord,
+                                                                                                                @Parameter(name = "cueId", description = "검색키워드", required = false)
+                                                                                                                @RequestParam(value = "cueId") Long cueId,
+                                                                                                                @Parameter(name = "brdcPgmId", description = "방송프로그램 아이디")
+                                                                                                                @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
+                                                                                                                @Parameter(name = "artclTypCd", description = "기사유형코드(01:스트레이트, 02:리포트, 03:C/T, 04:하단롤, 05:긴급자막)")
+                                                                                                                @RequestParam(value = "artclTypCd", required = false) String artclTypCd,
+                                                                                                                @Parameter(name = "artclTypDtlCd", description = "기사 유형 상세 코드")
+                                                                                                                @RequestParam(value = "artclTypDtlCd", required = false) String artclTypDtlCd,
+                                                                                                                @Parameter(name = "copyYn", description = "기사 복사여부[오리지날 기사 : N, 복사기사 : Y]")
+                                                                                                                @RequestParam(value = "copyYn", required = false) String copyYn,
+                                                                                                                @Parameter(name = "deptCd", description = "부서 코드")
+                                                                                                                @RequestParam(value = "deptCd", required = false) Long deptCd,
+                                                                                                                @Parameter(name = "orgArtclId", description = "원본기사 아이디")
+                                                                                                                @RequestParam(value = "orgArtclId", required = false) Long orgArtclId,
+                                                                                                                @Parameter(name = "rptrId", description = "기자 아이디")
+                                                                                                                @RequestParam(value = "rptrId", required = false) String rptrId,
+                                                                                                                @Parameter(name = "page", description = "시작페이지")
+                                                                                                                @RequestParam(value = "page", required = false) Integer page,
+                                                                                                                @Parameter(name = "limit", description = "한 페이지에 데이터 수")
+                                                                                                                @RequestParam(value = "limit", required = false) Integer limit) throws Exception {
 
 
         SearchDate searchDate = new SearchDate(sdate, edate);
@@ -287,7 +388,7 @@ public class ArticleController {
     @Operation(summary = "기사 상세조회[ 삭제 기사 ]", description = "기사 상세조회[ 삭제 기사 ]")
     @GetMapping(path = "/{artclId}/deletearticle")
     public AnsApiResponse<ArticleDTO> findDeleteArticle(@Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                           @PathVariable("artclId") Long artclId) {
+                                                        @PathVariable("artclId") Long artclId) {
 
         ArticleDTO articleDTO = articleService.findDeleteArticle(artclId);
 
@@ -301,22 +402,57 @@ public class ArticleController {
                                                    @RequestBody @Valid ArticleCreateDTO articleCreateDTO,
                                                    @Parameter(name = "userId", description = "사용자 아이디")
                                                    @RequestParam(value = "userId", required = false) String userId,
-                                                   HttpServletRequest httpServletRequest) throws Exception {
+                                                   @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
 
-        String getUserId = userAuthService.authUser.getUserId();
-        String getuserIp = userAuthService.userip;
+        String getUserId = jwtGetUserService.getUser(Authorization);
 
-        if (getUserId.equals(userId) == false){
+        //String getuserIp = userAuthService.userip;
+        //String filterPasingUserId = userAuthService.authUser.getUserId();
 
-            log.error("User Un matching client userId : " + userId + " serverUserId : "+getUserId + " token : "+httpServletRequest.getHeader("Authorization")
-                    + " server user ip : "+ getuserIp + " client user ip : "+ httpServletRequest.getRemoteAddr()+" dto : "+articleCreateDTO);
+        if (getUserId.equals(userId) == false) {
+
+            log.error("User Un matching client userId : " + userId + " serverUserId : " + getUserId + " token : " + Authorization);
+
+            if (userId == null || userId.trim().isEmpty()) {
+
+                Article article = articleService.create(articleCreateDTO, getUserId);
+
+                //엘라스틱서치 등록
+                elasticSearchArticleService.elasticPush(article);
+
+                //기사 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+                ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
+                articleDTO.setArtclId(article.getArtclId());
+                articleDTO.setOrgArtclId(article.getOrgArtclId());
+
+
+                log.info("Article Create Success ID : " + articleDTO);
+
+                return new AnsApiResponse<>(articleDTO);
+
+            }
+
+            Article article = articleService.create(articleCreateDTO, userId);
+
+            //엘라스틱서치 등록
+            elasticSearchArticleService.elasticPush(article);
+
+            //기사 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+            ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
+            articleDTO.setArtclId(article.getArtclId());
+            articleDTO.setOrgArtclId(article.getOrgArtclId());
+
+
+            log.info("Article Create Success ID : " + articleDTO);
+
+            return new AnsApiResponse<>(articleDTO);
         }
 
-        log.info("Article Create : User Id - " + userId + "<br>" + "Create Model - " + articleCreateDTO);
+        log.info("Article Create : User Id - " + getUserId + "<br>" + "Create Model - " + articleCreateDTO);
 
 
-        Article article = articleService.create(articleCreateDTO, userId);
+        Article article = articleService.create(articleCreateDTO, getUserId);
 
         //엘라스틱서치 등록
         elasticSearchArticleService.elasticPush(article);
@@ -335,18 +471,20 @@ public class ArticleController {
     @Operation(summary = "기사 수정", description = "기사 수정")
     @PutMapping(path = "/{artclId}")
     public AnsApiResponse<?> update(@Parameter(description = "필수값<br> ", required = true)
-                                                   @RequestBody @Valid ArticleUpdateDTO articleUpdateDTO,
-                                                   @Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                                   @PathVariable("artclId") Long artclId) throws Exception {
+                                    @RequestBody @Valid ArticleUpdateDTO articleUpdateDTO,
+                                    @Parameter(name = "artclId", required = true, description = "기사 아이디")
+                                    @PathVariable("artclId") Long artclId,
+                                    @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        String userId = userAuthService.authUser.getUserId();
+        String userId = jwtGetUserService.getUser(Authorization);
+
         log.info("Article Update : User Id - " + userId + "<br>" +
                 " Article Model -" + articleUpdateDTO);
 
         //수정. 잠금사용자확인
         ArticleAuthConfirmDTO articleAuthConfirmDTO = articleService.chkOrderLock(artclId, userId);
 
-        if (ObjectUtils.isEmpty(articleAuthConfirmDTO) == false){
+        if (ObjectUtils.isEmpty(articleAuthConfirmDTO) == false) {
             return new AnsApiResponse<>(articleAuthConfirmDTO);
         }
 
@@ -368,11 +506,13 @@ public class ArticleController {
     @Operation(summary = "기사 수정[extra time]", description = "기사 수정[extra time]")
     @PutMapping(path = "/{artclId}/extratime")
     public AnsApiResponse<?> updateExtraTime(@Parameter(description = "필수값<br> ", required = true)
-                                    @RequestBody @Valid ArticleExtraTimeUpdateDTO articleExtraTimeUpdateDTO,
-                                    @Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                    @PathVariable("artclId") Long artclId) throws Exception {
+                                             @RequestBody @Valid ArticleExtraTimeUpdateDTO articleExtraTimeUpdateDTO,
+                                             @Parameter(name = "artclId", required = true, description = "기사 아이디")
+                                             @PathVariable("artclId") Long artclId,
+                                             @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        String userId = userAuthService.authUser.getUserId();
+        String userId = jwtGetUserService.getUser(Authorization);
+
         log.info("Article Extra Time Update : User Id - " + userId + "<br>" +
                 " Article Update Model -" + articleExtraTimeUpdateDTO.toString());
 
@@ -397,9 +537,10 @@ public class ArticleController {
     @DeleteMapping(path = "/{artclId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                    @PathVariable("artclId") Long artclId) throws Exception {
+                                    @PathVariable("artclId") Long artclId,
+                                    @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        String userId = userAuthService.authUser.getUserId();
+        String userId = jwtGetUserService.getUser(Authorization);
         log.info("Article Delete  : User Id - " + userId + "<br>" +
                 " Article Id" + artclId);
 
@@ -417,9 +558,11 @@ public class ArticleController {
     public AnsApiResponse<?> confirmUser(@Parameter(description = "필수값<br> lckYn ", required = true)
                                          @RequestBody @Valid ArticleDeleteConfirmDTO articleDeleteConfirmDTO,
                                          @Parameter(name = "artclId", description = "기사 아이디")
-                                         @PathVariable("artclId") Long artclId) throws NoSuchAlgorithmException {
+                                         @PathVariable("artclId") Long artclId,
+                                         @RequestHeader(value = "Authorization", required = false) String Authorization
+    ) throws Exception {
 
-        String userId = userAuthService.authUser.getUserId(); //토큰에서 유저 아이디를 가져온다.
+        String userId =jwtGetUserService.getUser(Authorization); //토큰에서 유저 아이디를 가져온다.
         log.info(" Article Delete User Confirm : Article Id - " + artclId + "User Id :" + userId);
 
         articleService.confirmUser(articleDeleteConfirmDTO, artclId, userId);
@@ -430,10 +573,11 @@ public class ArticleController {
     @Operation(summary = "기사 수정권한 확인", description = "기사 수정권한 확인")
     @PutMapping(path = "/{artclId}/confirm")
     public AnsApiResponse<ArticleAuthConfirmDTO> articleConfirm(@Parameter(name = "artclId", required = true, description = "기사 아이디")
-                                                                @PathVariable("artclId") Long artclId) {
+                                                                @PathVariable("artclId") Long artclId,
+                                                                @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 사용자 정보
-        String userId = userAuthService.authUser.getUserId();//토큰에서 유저 아이디를 가져온다.
+        String userId =jwtGetUserService.getUser(Authorization);//토큰에서 유저 아이디를 가져온다.
 
         //권한 확인 로그
         log.info("Article Confirm : Article Id" + artclId + " User Id: " + userId);
@@ -455,14 +599,15 @@ public class ArticleController {
     public AnsApiResponse<?> articleLock(@Parameter(name = "artclId", required = true, description = "기사 아이디")
                                          @PathVariable("artclId") Long artclId,
                                          @Parameter(description = "필수값<br> lckYn ", required = true)
-                                         @RequestBody @Valid ArticleLockDTO articleLockDTO) throws Exception {
+                                         @RequestBody @Valid ArticleLockDTO articleLockDTO,
+                                         @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("Article Lock : ArticleId - " + artclId + " User Id - " + userId
                 + "<br>" + " Lock Info : " + articleLockDTO);
 
         //권한체크(기사 쓰기)
-        if (userAuthChkService.authChk(AuthEnum.ArticleWrite.getAuth())) {
+        if (userAuthChkService.authChk(AuthEnum.ArticleWrite.getAuth(), userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -482,9 +627,10 @@ public class ArticleController {
     public AnsApiResponse<ArticleDTO> articleUnlock(@Parameter(name = "artclId", required = true, description = "기사 아이디")
                                                     @PathVariable("artclId") Long artclId,
                                                     @Parameter(description = "필수값<br> lckYn ", required = true)
-                                                    @RequestBody @Valid ArticleLockDTO articleLockDTO) throws Exception {
+                                                    @RequestBody @Valid ArticleLockDTO articleLockDTO,
+                                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("Article Unlock : ArticleId = " + artclId + " User Id - " + userId + "" +
                 "<br>" + " Unlock Info : " + articleLockDTO);
 
@@ -503,10 +649,11 @@ public class ArticleController {
                                           @PathVariable("artclId") Long artclId,
                                           @Parameter(name = "apprvDivCd", description = "픽스 상태 코드(fix_none[픽스가 없는상태]" +
                                                   ", article_fix[기자 픽스], editor_fix[에디터 픽스], anchor_fix[앵커 픽스], desk_fix[데스크 픽스])")
-                                          @RequestParam(value = "apprvDivCd", required = true) String apprvDivCd) throws Exception {
+                                          @RequestParam(value = "apprvDivCd", required = true) String apprvDivCd,
+                                          @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 사용자 정보
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
 
         //픽스정보
         log.info("Article Fix Info : ArticleId = " + artclId /*+" OrgApprvDivcd : " + orgApprvDivcd*/ + "NewApprvDivcd : " + apprvDivCd

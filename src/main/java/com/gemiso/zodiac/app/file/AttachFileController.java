@@ -3,6 +3,7 @@ package com.gemiso.zodiac.app.file;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.app.file.dto.StatusCodeFileDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 @Api(description = "파일 API")
@@ -30,13 +32,17 @@ public class AttachFileController {
 
     private final AttachFileService attachFileService;
 
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "파일 업로드", description = "파일 업로드")
     @PostMapping(path = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public AnsApiResponse<StatusCodeFileDTO> create(@RequestPart MultipartFile file, @RequestParam String fileDivCd) {
+    public AnsApiResponse<StatusCodeFileDTO> create(@RequestPart MultipartFile file, @RequestParam String fileDivCd,
+                                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        StatusCodeFileDTO statusCodeFileDTO = attachFileService.create(file, fileDivCd);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        StatusCodeFileDTO statusCodeFileDTO = attachFileService.create(file, fileDivCd, userId);
 
         return new AnsApiResponse<>(statusCodeFileDTO);
     }
@@ -44,9 +50,12 @@ public class AttachFileController {
     @Operation(summary = "파일 업로드[ 외부 ]", description = "파일 업로드[ 외부 ]")
     @PostMapping(path = "/interface", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public AnsApiResponse<StatusCodeFileDTO> createFile(@RequestPart MultipartFile file, @RequestParam String fileDivCd, @RequestParam String fileNm) {
+    public AnsApiResponse<StatusCodeFileDTO> createFile(@RequestPart MultipartFile file, @RequestParam String fileDivCd, @RequestParam String fileNm,
+                                                        @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        StatusCodeFileDTO statusCodeFileDTO = attachFileService.createFile(file, fileDivCd, fileNm);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        StatusCodeFileDTO statusCodeFileDTO = attachFileService.createFile(file, fileDivCd, fileNm, userId);
 
         return new AnsApiResponse<>(statusCodeFileDTO);
     }

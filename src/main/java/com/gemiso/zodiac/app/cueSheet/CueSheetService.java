@@ -69,6 +69,7 @@ import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramSimpleDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.tag.Tag;
+import com.gemiso.zodiac.app.tag.TagRepository;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserService;
 import com.gemiso.zodiac.core.enumeration.ActionEnum;
@@ -112,6 +113,7 @@ public class CueSheetService {
     private final CueSheetItemCapRepotitory cueSheetItemCapRepotitory;
     private final CueCapTmpltRepository cueCapTmpltRepository;
     private final ArticleTagRepository articleTagRepository;
+    private final TagRepository tagRepository;
 
     private final CueSheetMapper cueSheetMapper;
     private final CueSheetCreateMapper cueSheetCreateMapper;
@@ -1290,7 +1292,7 @@ public class CueSheetService {
                 Integer contentId = cueSheetMediaEntity.getContId();
 
                 //추후에 T는 클라우드 콘피그 교체
-                lboxService.cueMediaTransfer(mediaId, contentId, subrmNm, false, false, "T");
+                lboxService.cueMediaTransfer(mediaId, contentId, subrmNm, false, false, "T", userId);
 
             }
 
@@ -1377,10 +1379,12 @@ public class CueSheetService {
         Article article = getArticle.get();
 
         //기사 시퀀스[오리지널 기사 0 = 그밑으로 복사된 기사 + 1 증가]
-        int artclOrd = article.getArtclOrd() + 1;
+        //int artclOrd = article.getArtclOrd() + 1;
+        //기사 시퀀스[오리지널 기사 0 = 그밑으로 복사된 기사 + 1 증가]
+        Integer maxArtclOrd = getArticleOrd(article, artclId);
 
         // 기사 저장하기 위한 기사복사 엔터티 생성
-        Article articleEntity = getArticleEntity(article, artclOrd, cueSheet, userId);
+        Article articleEntity = getArticleEntity(article, maxArtclOrd, cueSheet, userId);
         articleRepository.save(articleEntity); //복사된 기사 등록
 
 
@@ -1390,8 +1394,8 @@ public class CueSheetService {
         Set<ArticleCap> articleCapList = article.getArticleCap(); //기사자막 리스트 get
         Set<AnchorCap> anchorCapList = article.getAnchorCap(); //앵커자막 리스트 get
 
-        articleService.articleActionLogCreate(article, userId); //기사 액션 로그 등록
-        Long articleHistId = articleService.createArticleHist(article);//기사 이력 create
+        articleService.articleActionLogCreate(articleEntity, userId); //기사 액션 로그 등록
+        Long articleHistId = articleService.createArticleHist(articleEntity, userId);//기사 이력 create
 
         /*********************/
         /* 기사 자막을 저장하는 부분 */
@@ -1457,14 +1461,54 @@ public class CueSheetService {
 
             articleTagRepository.save(articleTagEntity);
 
+            //테그 클릭수 증가
+            Integer clicked = tag.getTagClicked();
+            tag.setTagClicked(clicked + 1);
+
+            tagRepository.save(tag);
         }
 
         return articleEntity;
 
     }
 
+    //기사시퀀스값 get
+    public Integer getArticleOrd(Article article, Long artclId) {
+
+        Long orgArtclId = article.getOrgArtclId();
+        Integer artclOrd = article.getArtclOrd();
+
+
+        if (artclOrd == 0) { //원본일경우
+
+            Optional<Integer> getMaxOrd = articleRepository.findArticleOrd(orgArtclId);
+
+            if (getMaxOrd.isPresent() == false) {
+
+                return 0;
+            }
+
+            return getMaxOrd.get() + 1;
+        } else {
+
+
+            Optional<Integer> getMaxOrd = articleRepository.findArticleOrd(orgArtclId);
+
+            if (getMaxOrd.isPresent() == false) {
+
+                return 0;
+            }
+
+            return getMaxOrd.get() + 1;
+
+
+        }
+
+
+    }
+
     // 기사 저장하기 위한 엔터티 만들기 2021-10-27
-    private Article getArticleEntity(Article article, int artclOrd, CueSheet cueSheet, String userId) {
+    private Article getArticleEntity(Article article, Integer maxArtclOrd, CueSheet cueSheet, String userId) {
 
         Program program = cueSheet.getProgram();
         String brdcPgmId = "";
@@ -1523,7 +1567,7 @@ public class CueSheetService {
                     //.lckYn(article.getLckYn())
                     //.lckDtm(article.getLckDtm())
                     .apprvDtm(article.getApprvDtm())
-                    .artclOrd(artclOrd)//기사 시퀀스 +1
+                    .artclOrd(maxArtclOrd)//기사 시퀀스 +1
                     .brdcCnt(article.getBrdcCnt())
                     .orgArtclId(article.getOrgArtclId())//원본기사 아이디set
                     .urgYn(article.getUrgYn())
@@ -1584,7 +1628,7 @@ public class CueSheetService {
                     //.lckYn(article.getLckYn())
                     //.lckDtm(article.getLckDtm())
                     .apprvDtm(article.getApprvDtm())
-                    .artclOrd(artclOrd)//기사 시퀀스 +1
+                    .artclOrd(maxArtclOrd)//기사 시퀀스 +1
                     .brdcCnt(article.getBrdcCnt())
                     .orgArtclId(article.getOrgArtclId())//원본기사 아이디set
                     .urgYn(article.getUrgYn())

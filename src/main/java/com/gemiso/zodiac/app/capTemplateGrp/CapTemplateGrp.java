@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.capTemplateGrp;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.code.Code;
@@ -61,6 +62,7 @@ public class CapTemplateGrp extends BaseEntity {
     private String delYn;
 
     @OneToMany(mappedBy="capTemplateGrp")
+    @JsonBackReference
     private List<CapTemplate> capTemplate ;
 
     @PrePersist

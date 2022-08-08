@@ -18,7 +18,6 @@ import com.gemiso.zodiac.app.cueSheetMedia.dto.CueSheetMediaDTO;
 import com.gemiso.zodiac.app.cueSheetMedia.mapper.CueSheetMediaMapper;
 import com.gemiso.zodiac.app.lbox.mediaTransportDTO.*;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.core.topic.TopicSendService;
 import com.gemiso.zodiac.core.topic.interfaceTopicDTO.TakerCueSheetTopicDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -35,7 +34,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -56,7 +54,7 @@ public class LboxService {
     private final ArticleMediaMapper articleMediaMapper;
     private final CueSheetMediaMapper cueSheetMediaMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
     private final CueSheetMediaService cueSheetMediaService;
     private final TopicSendService topicSendService;
@@ -157,12 +155,12 @@ public class LboxService {
     }
 
     //부조 전송
-    public TransportResponseDTO mediaTransfer(Long mediaId, Integer contentId, String subrmNm, String destination, Boolean isUrgent, Boolean isRetry) throws Exception {
+    public TransportResponseDTO mediaTransfer(Long mediaId, Integer contentId, String subrmNm, String destination, Boolean isUrgent, Boolean isRetry, String userId) throws Exception {
 
         TransportResponseDTO transportResponseDTO = new TransportResponseDTO(); //리턴해줄 미디어정보, 오류내용 [전송 오류가 있을시.]
         List<TransportFaildDTO> transportFaildDTOList = new ArrayList<>(); //부조전송시 오류가 있을시 오류내용 Respons
 
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
 
         //헤더 설정
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -303,12 +301,12 @@ public class LboxService {
     }
 
     //부조 전송
-    public TransportResponseDTO emergencyTransfer(Integer contentId, String subrmNm, String destination, Boolean isUrgent, Boolean isRetry) throws JsonProcessingException {
+    public TransportResponseDTO emergencyTransfer(Integer contentId, String subrmNm, String destination, Boolean isUrgent, Boolean isRetry, String userId) throws JsonProcessingException {
 
         TransportResponseDTO transportResponseDTO = new TransportResponseDTO(); //리턴해줄 미디어정보, 오류내용 [전송 오류가 있을시.]
         List<TransportFaildDTO> transportFaildDTOList = new ArrayList<>(); //부조전송시 오류가 있을시 오류내용 Respons
 
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
 
         //헤더 설정
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -436,12 +434,12 @@ public class LboxService {
 
     //큐시트 미디어 부조 전송
     public CueMediaTransportResponseDTO cueMediaTransfer(Long cueMediaId, Integer contentId, String subrmNm
-            , Boolean isUrgent, Boolean isRetry, String isType) throws Exception {
+            , Boolean isUrgent, Boolean isRetry, String isType, String userId) throws Exception {
 
         CueMediaTransportResponseDTO transportResponseDTO = new CueMediaTransportResponseDTO(); //리턴해줄 미디어정보, 오류내용 [전송 오류가 있을시.]
         List<TransportFaildDTO> transportFaildDTOList = new ArrayList<>(); //부조전송시 오류가 있을시 오류내용 Respons
 
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
 
         //헤더 설정
         HttpHeaders httpHeaders = new HttpHeaders();

@@ -4,6 +4,7 @@ import com.gemiso.zodiac.app.userGroup.dto.UserGroupCreateDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupDTO;
 import com.gemiso.zodiac.app.userGroup.dto.UserGroupUpdateDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 //@Tag(name = "userGroup", description = "사용자 그룹 API")
@@ -28,13 +30,15 @@ public class UserGroupController {
 
     private final UserGroupService userGroupService;
 
+    private final JwtGetUserService jwtGetUserService;
+
     @Operation(summary = "사용자 그룹 목록조회", description = "사용자 그룹 목록조회")
     @GetMapping(path = "")
     @CrossOrigin(origins = "*")
     public AnsApiResponse<List<UserGroupDTO>> findAll(@Parameter(name = "userGrpNm", description = "그룹 명")
-                                                   @RequestParam(value = "userGrpNm", required = false) String userGrpNm,
+                                                      @RequestParam(value = "userGrpNm", required = false) String userGrpNm,
                                                       @Parameter(name = "useYn", description = "사용 여부")
-                                                   @RequestParam(value = "useYn", required = false) String useYn) {
+                                                      @RequestParam(value = "useYn", required = false) String useYn) {
 
         List<UserGroupDTO> userGroupUserDtoList = userGroupService.findAll(userGrpNm, useYn);
 
@@ -44,7 +48,7 @@ public class UserGroupController {
     @Operation(summary = "사용자 그룹 상세 조회", description = "사용자 그룹 상세 조회")
     @GetMapping(path = "/{userGrpId}")
     public AnsApiResponse<UserGroupDTO> find(@Parameter(name = "userGrpId", description = "그룹 아이디")
-                                          @PathVariable("userGrpId") Long userGrpId) {
+                                             @PathVariable("userGrpId") Long userGrpId) {
 
         UserGroupDTO userGroupDTO = userGroupService.find(userGrpId);
 
@@ -59,10 +63,13 @@ public class UserGroupController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<UserGroupDTO> create(
-            @Parameter(description = "필수값<br> ", required = true) @RequestBody @Valid UserGroupCreateDTO userGroupCreateDTO
-    ) {
+            @Parameter(description = "필수값<br> ", required = true) @RequestBody @Valid UserGroupCreateDTO userGroupCreateDTO,
+            @RequestHeader(value = "Authorization", required = false) String Authorization
+    ) throws Exception {
 
-        UserGroupDTO userGroupDTO = userGroupService.create(userGroupCreateDTO);
+        String userId = jwtGetUserService.getUser(Authorization);
+
+        UserGroupDTO userGroupDTO = userGroupService.create(userGroupCreateDTO, userId);
 
         return new AnsApiResponse<UserGroupDTO>(userGroupDTO);
     }
@@ -70,15 +77,18 @@ public class UserGroupController {
     @Operation(summary = "사용자 그룹 정보 수정", description = "사용자 그룹 정보 수정")
     @PutMapping(path = "/{userGrpId}")
     public AnsApiResponse<UserGroupDTO> update(@Parameter(name = "userDto", required = true, description = "필수값<br>")
-                                            @Valid @RequestBody UserGroupUpdateDTO userGroupUpdateDTO,
-                                               @Parameter(name = "userGrpId", required = true) @PathVariable("userGrpId") Long userGrpId) {
+                                               @Valid @RequestBody UserGroupUpdateDTO userGroupUpdateDTO,
+                                               @Parameter(name = "userGrpId", required = true) @PathVariable("userGrpId") Long userGrpId,
+                                               @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
+
+        String userId =jwtGetUserService.getUser(Authorization);
 
         UserGroupDTO userGroupIdCheck = userGroupService.find(userGrpId);
         if (ObjectUtils.isEmpty(userGroupIdCheck)) {
             throw new ResourceNotFoundException("유저 그룹을 찾을 수 없습니다. 유저 그룹 아이디 : " + userGrpId);
         }
 
-        userGroupService.update(userGroupUpdateDTO, userGrpId);
+        userGroupService.update(userGroupUpdateDTO, userGrpId, userId);
 
         UserGroupDTO userGroupDTO = userGroupService.find(userGrpId);
 
@@ -89,14 +99,17 @@ public class UserGroupController {
     @DeleteMapping(path = "/{userGrpId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(
-            @Parameter(name = "userGrpId", description = "사용자 아이디") @PathVariable("userGrpId") Long userGrpId) {
+            @Parameter(name = "userGrpId", description = "사용자 아이디") @PathVariable("userGrpId") Long userGrpId,
+            @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+
+        String userId =jwtGetUserService.getUser(Authorization);
 
         UserGroupDTO userGroupIdCheck = userGroupService.find(userGrpId);
         if (ObjectUtils.isEmpty(userGroupIdCheck)) {
             throw new ResourceNotFoundException("유저 그룹을 찾을 수 없습니다. 유저 그룹 아이디 : " + userGrpId);
         }
 
-        userGroupService.delete(userGrpId);
+        userGroupService.delete(userGrpId, userId);
 
         return AnsApiResponse.noContent();
 

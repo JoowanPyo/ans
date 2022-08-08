@@ -5,7 +5,7 @@ import com.gemiso.zodiac.app.cueSheetTemplateMedia.dto.CueTmpltMediaDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateMedia.dto.CueTmpltMediaUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
-import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,21 +30,22 @@ public class CueTmpltMediaController {
 
     private final CueTmpltMediaService cueTmpltMediaService;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
+    private final JwtGetUserService jwtGetUserService;
 
 
     @Operation(summary = "큐시트 템플릿 미디어 목록조회", description = "큐시트 템플릿 미디어 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<CueTmpltMediaDTO>> findAll(@Parameter(description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
-                                                         @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
-                                                         @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
-                                                         @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
-                                                         @Parameter(name = "trnsfFileNm", description = "전송 파일 명")
-                                                         @RequestParam(value = "trnsfFileNm", required = false) String trnsfFileNm,
-                                                         @Parameter(name = "cueTmpltItemId", description = "큐시트 템플릿 미디어 아이디")
-                                                         @RequestParam(value = "cueTmpltItemId", required = false) Long cueTmpltItemId,
-                                                         @Parameter(name = "mediaTypCd", description = "미디어 유형 코드[media_typ_001 : 영상, media_typ_002 : 백드롭]")
-                                                         @RequestParam(value = "mediaTypCd", required = false) String mediaTypCd) throws Exception {
+                                                          @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                          @Parameter(description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
+                                                          @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                          @Parameter(name = "trnsfFileNm", description = "전송 파일 명")
+                                                          @RequestParam(value = "trnsfFileNm", required = false) String trnsfFileNm,
+                                                          @Parameter(name = "cueTmpltItemId", description = "큐시트 템플릿 미디어 아이디")
+                                                          @RequestParam(value = "cueTmpltItemId", required = false) Long cueTmpltItemId,
+                                                          @Parameter(name = "mediaTypCd", description = "미디어 유형 코드[media_typ_001 : 영상, media_typ_002 : 백드롭]")
+                                                          @RequestParam(value = "mediaTypCd", required = false) String mediaTypCd) throws Exception {
 
         List<CueTmpltMediaDTO> cueTmpltMediaDTOList = new ArrayList<>();
 
@@ -63,7 +64,7 @@ public class CueTmpltMediaController {
     @Operation(summary = "큐시트 템플릿 미디어 상세조회", description = "큐시트 템플릿 미디어 상세조회")
     @GetMapping(path = "/{cueTmpltMediaId}")
     public AnsApiResponse<CueTmpltMediaDTO> find(@Parameter(name = "cueTmpltMediaId", description = "큐시트 템플릿 미디어 아이디")
-                                                @PathVariable("cueTmpltMediaId") Long artclMediaId) {
+                                                 @PathVariable("cueTmpltMediaId") Long artclMediaId) {
 
         CueTmpltMediaDTO cueTmpltMediaDTO = cueTmpltMediaService.find(artclMediaId);
 
@@ -73,12 +74,13 @@ public class CueTmpltMediaController {
     @Operation(summary = "큐시트 템플릿 미디어 등록", description = "큐시트 템플릿 미디어 등록")
     @PostMapping(path = "")
     public AnsApiResponse<CueTmpltMediaDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                  @RequestBody @Valid CueTmpltMediaCreateDTO cueTmpltMediaCreateDTO) {
+                                                   @RequestBody @Valid CueTmpltMediaCreateDTO cueTmpltMediaCreateDTO,
+                                                   @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
 
-        log.info(" Create CueSheet Template Media : User Id - "+userId+" Media Model -"+cueTmpltMediaCreateDTO.toString());
+        log.info(" Create CueSheet Template Media : User Id - " + userId + " Media Model -" + cueTmpltMediaCreateDTO.toString());
 
         CueTmpltMediaDTO cueTmpltMediaDTO = cueTmpltMediaService.create(cueTmpltMediaCreateDTO, userId);
 
@@ -88,13 +90,14 @@ public class CueTmpltMediaController {
     @Operation(summary = "큐시트 템플릿 미디어 수정", description = "큐시트 템플릿 미디어 수정")
     @PutMapping(path = "/{cueTmpltMediaId}")
     public AnsApiResponse<CueTmpltMediaDTO> update(@Parameter(description = "필수값<br> ", required = true)
-                                                  @RequestBody @Valid CueTmpltMediaUpdateDTO cueTmpltMediaUpdateDTO,
-                                                  @Parameter(name = "cueTmpltMediaId", description = "큐시트 템플릿 미디어 아이디")
-                                                  @PathVariable("cueTmpltMediaId") Long cueTmpltMediaId) {
+                                                   @RequestBody @Valid CueTmpltMediaUpdateDTO cueTmpltMediaUpdateDTO,
+                                                   @Parameter(name = "cueTmpltMediaId", description = "큐시트 템플릿 미디어 아이디")
+                                                   @PathVariable("cueTmpltMediaId") Long cueTmpltMediaId,
+                                                   @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
-        log.info(" Update CueSheet Template Media : User Id - "+userId+" Media Model -"+cueTmpltMediaUpdateDTO.toString());
+        String userId =jwtGetUserService.getUser(Authorization);
+        log.info(" Update CueSheet Template Media : User Id - " + userId + " Media Model -" + cueTmpltMediaUpdateDTO.toString());
 
         CueTmpltMediaDTO cueTmpltMediaDTO = cueTmpltMediaService.update(cueTmpltMediaUpdateDTO, cueTmpltMediaId, userId);
 
@@ -106,11 +109,12 @@ public class CueTmpltMediaController {
     @DeleteMapping(path = "/{cueTmpltMediaId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "cueTmpltMediaId", description = "큐시트 템플릿 미디어 아이디")
-                                    @PathVariable("cueTmpltMediaId") Long cueTmpltMediaId) {
+                                    @PathVariable("cueTmpltMediaId") Long cueTmpltMediaId,
+                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
-        log.info(" Delete ueSheet Template Media : User Id - "+userId+" Media Id -"+cueTmpltMediaId);
+        String userId =jwtGetUserService.getUser(Authorization);
+        log.info(" Delete ueSheet Template Media : User Id - " + userId + " Media Id -" + cueTmpltMediaId);
 
 
         cueTmpltMediaService.delete(cueTmpltMediaId, userId);

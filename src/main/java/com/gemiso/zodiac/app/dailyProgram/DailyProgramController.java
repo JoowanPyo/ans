@@ -5,6 +5,7 @@ import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramCreateDTO;
 import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,6 +16,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +29,8 @@ import java.util.List;
 public class DailyProgramController {
 
     private final DailyProgramService dailyProgramService;
+
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "일일편성 목록조회", description = "일일편성 목록조회")
     @GetMapping(path = "")
@@ -79,9 +83,12 @@ public class DailyProgramController {
     @Operation(summary = "일일편성 등록", description = "일일편성 등록")
     @PostMapping(path = "")
     public AnsApiResponse<DailyProgramDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                  @RequestBody @Valid DailyProgramCreateDTO dailyProgramCreateDTO) {
+                                                  @RequestBody @Valid DailyProgramCreateDTO dailyProgramCreateDTO,
+                                                  @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        Long id = dailyProgramService.create(dailyProgramCreateDTO);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        Long id = dailyProgramService.create(dailyProgramCreateDTO, userId);
 
         DailyProgramDTO dailyProgramDTO = dailyProgramService.find(id);
 

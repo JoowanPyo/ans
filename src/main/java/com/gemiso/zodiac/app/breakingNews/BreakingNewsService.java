@@ -11,7 +11,6 @@ import com.gemiso.zodiac.app.breakingNewsDetail.BreakingNewsDtl;
 import com.gemiso.zodiac.app.breakingNewsDetail.BreakingNewsDtlRepository;
 import com.gemiso.zodiac.app.breakingNewsDetail.dto.BreakingNewsDtlCreateDTO;
 import com.gemiso.zodiac.app.breakingNewsDetail.mapper.BreakingNewsDtlCreateMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -40,7 +38,7 @@ public class BreakingNewsService {
     private final BreakingNewsUpdateMapper breakingNewsUpdateMapper;
     private final BreakingNewsDtlCreateMapper breakingNewsDtlCreateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
 
     //속보뉴스 목록조회
@@ -71,9 +69,9 @@ public class BreakingNewsService {
     }
     
     //속보뉴스 등록
-    public Long create(BreakingNewsCreateDTO breakingNewsCreateDTO){
+    public Long create(BreakingNewsCreateDTO breakingNewsCreateDTO, String userId){
         
-        String userId = userAuthService.authUser.getUserId();//토큰에서 사용자 아이디 get
+        //String userId = userAuthService.authUser.getUserId();//토큰에서 사용자 아이디 get
         breakingNewsCreateDTO.setInputrId(userId); //등록자 set
         
         //등록DTO 엔티티 변환
@@ -94,11 +92,11 @@ public class BreakingNewsService {
     }
 
     //속보뉴스 수정
-    public void update(BreakingNewsUpdateDTO breakingNewsUpdateDTO, Long breakingNewsId){
+    public void update(BreakingNewsUpdateDTO breakingNewsUpdateDTO, Long breakingNewsId, String userId){
 
         BreakingNews breakingNews = findBreakingNews(breakingNewsId);//속보뉴스 조회 및 존재유무 확인 [조회조건 속보뉴스 아이디]
 
-        String userId = userAuthService.authUser.getUserId();//토큰에서 사용자 아이디 get
+        //String userId = userAuthService.authUser.getUserId();//토큰에서 사용자 아이디 get
         breakingNewsUpdateDTO.setUpdtrId(userId);//수정자 set
 
         breakingNewsUpdateMapper.updateFromDto(breakingNewsUpdateDTO, breakingNews);//기존정보에 업데이트 정보 set
@@ -111,12 +109,12 @@ public class BreakingNewsService {
     }
 
     //속보뉴스 삭제.
-    public void delete(Long breakingNewsId){
+    public void delete(Long breakingNewsId, String userId){
 
         BreakingNews breakingNews = findBreakingNews(breakingNewsId);//속보뉴스 조회 및 존재유무 확인 [조회조건 속보뉴스 아이디]
 
         BreakingNewsDTO breakingNewsDTO = breakingNewsMapper.toDto(breakingNews);
-        String userId = userAuthService.authUser.getUserId();//토큰에서 사용자 아이디 get
+        //String userId = userAuthService.authUser.getUserId();//토큰에서 사용자 아이디 get
         breakingNewsDTO.setDelrId(userId);//삭제자 set
         breakingNewsDTO.setDelDtm(new Date()); //삭제일시 set
         breakingNewsDTO.setDelYn("Y");//삭제여부값 "Y" set

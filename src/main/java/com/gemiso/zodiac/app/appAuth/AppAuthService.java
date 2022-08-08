@@ -6,7 +6,6 @@ import com.gemiso.zodiac.app.appAuth.dto.AppAuthUpdateDTO;
 import com.gemiso.zodiac.app.appAuth.mapper.AppAuthCreateMapper;
 import com.gemiso.zodiac.app.appAuth.mapper.AppAuthMapper;
 import com.gemiso.zodiac.app.appAuth.mapper.AppAuthUpdateMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,7 @@ public class AppAuthService{
     private final AppAuthCreateMapper appAuthCreateMapper;
     private final AppAuthUpdateMapper appAuthUpdateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
     public List<AppAuthDTO> findAll(String useYn, String delYn, String hrnkAppAuthCd, String searchWord){
 
@@ -45,7 +44,7 @@ public class AppAuthService{
         return appAuthDtoList;
     }
 
-    public Long create(AppAuthCreateDTO appAuthCreatDTO) {
+    public Long create(AppAuthCreateDTO appAuthCreatDTO, String userId) {
 
         String hrnkCd = appAuthCreatDTO.getHrnkAppAuthCd();
 
@@ -72,7 +71,7 @@ public class AppAuthService{
 
         }
 
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         //UserSimpleDTO userSimpleDTO = UserSimpleDTO.builder().userId(userId).build();
         appAuthCreatDTO.setInputrId(userId);
 
@@ -93,12 +92,12 @@ public class AppAuthService{
         return appAuthDTO;
     }
 
-    public void update(AppAuthUpdateDTO appAuthUpdateDTO, Long appAuthId){
+    public void update(AppAuthUpdateDTO appAuthUpdateDTO, Long appAuthId, String userId){
 
         AppAuth appAuth = appAuthFindOrFail(appAuthId);
 
         appAuthUpdateDTO.setAppAuthId(appAuthId);
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         appAuthUpdateDTO.setUpdtrId(userId);
 
         appAuthUpdateMapper.updateFromDto(appAuthUpdateDTO, appAuth);
@@ -107,13 +106,13 @@ public class AppAuthService{
 
     }
 
-    public void delete(Long appAuthId){
+    public void delete(Long appAuthId, String userId){
 
         AppAuth appAuthEntity = appAuthFindOrFail(appAuthId);
         AppAuthDTO appAuthDTO = appAuthMapper.toDto(appAuthEntity);
 
         appAuthDTO.setDelYn("Y");
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         appAuthDTO.setDelrId(userId);
         appAuthDTO.setDelDtm(new Date());
 

@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.scrollNews.dto.ScrollNewsSimpleDTO;
 import com.gemiso.zodiac.app.scrollNews.dto.ScrollNewsUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +19,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +32,8 @@ import java.util.List;
 public class ScrollNewsController {
 
     private final ScrollNewsService scrollNewsService;
+
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "스크롤 뉴스 목록조회", description = "스크롤 뉴스 목록조회")
     @GetMapping(path = "")
@@ -47,8 +51,7 @@ public class ScrollNewsController {
             SearchDate searchDate = new SearchDate(sdate, edate);
 
             scrollNewsDTOList = scrollNewsService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), delYn);
-        }
-        else {
+        } else {
             scrollNewsDTOList = scrollNewsService.findAll(null, null, delYn);
         }
 
@@ -69,9 +72,12 @@ public class ScrollNewsController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<ScrollNewsSimpleDTO> create(@Parameter(description = "필수값<br> titl[제목], fileNm[파일명]" +
-            ",trnsfStCd[전송상태]", required = true) @RequestBody @Valid ScrollNewsCreateDTO scrollNewsCreateDTO) throws Exception {
+            ",trnsfStCd[전송상태]", required = true) @RequestBody @Valid ScrollNewsCreateDTO scrollNewsCreateDTO,
+                                                      @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        Long scrlNewsId = scrollNewsService.create(scrollNewsCreateDTO);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        Long scrlNewsId = scrollNewsService.create(scrollNewsCreateDTO, userId);
 
         ScrollNewsSimpleDTO scrollNewsSimpleDTO = new ScrollNewsSimpleDTO();
         scrollNewsSimpleDTO.setScrlNewsId(scrlNewsId);
@@ -84,9 +90,12 @@ public class ScrollNewsController {
     public AnsApiResponse<ScrollNewsSimpleDTO> update(@Parameter(name = "scrlNewsId", required = true, description = "스크롤 뉴스 아이디", in = ParameterIn.PATH)
                                                       @PathVariable("scrlNewsId") Long scrlNewsId,
                                                       @Parameter(description = "필수값<br> titl[제목], fileNm[파일명],trnsfStCd[전송상태]", required = true)
-                                                      @RequestBody @Valid ScrollNewsUpdateDTO scrollNewsUpdateDTO) throws Exception {
+                                                      @RequestBody @Valid ScrollNewsUpdateDTO scrollNewsUpdateDTO,
+                                                      @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        scrollNewsService.update(scrollNewsUpdateDTO, scrlNewsId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        scrollNewsService.update(scrollNewsUpdateDTO, scrlNewsId, userId);
 
         ScrollNewsSimpleDTO scrollNewsSimpleDTO = new ScrollNewsSimpleDTO();
         scrollNewsSimpleDTO.setScrlNewsId(scrlNewsId);
@@ -98,9 +107,12 @@ public class ScrollNewsController {
     @DeleteMapping(path = "/{scrlNewsId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "scrlNewsId", required = true, description = "스크롤 뉴스 아이디", in = ParameterIn.PATH)
-                                    @PathVariable("scrlNewsId") Long scrlNewsId) {
+                                    @PathVariable("scrlNewsId") Long scrlNewsId,
+                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        scrollNewsService.delete(scrlNewsId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        scrollNewsService.delete(scrlNewsId, userId);
 
         return AnsApiResponse.noContent();
     }

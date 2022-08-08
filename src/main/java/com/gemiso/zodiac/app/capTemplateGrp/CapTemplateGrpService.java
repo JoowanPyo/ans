@@ -6,7 +6,6 @@ import com.gemiso.zodiac.app.capTemplateGrp.dto.CapTemplateGrpUpdateDTO;
 import com.gemiso.zodiac.app.capTemplateGrp.mapper.CapTemplateGrpCreateMapper;
 import com.gemiso.zodiac.app.capTemplateGrp.mapper.CapTemplateGrpMapper;
 import com.gemiso.zodiac.app.capTemplateGrp.mapper.CapTemplateGrpUpdateMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +29,7 @@ public class CapTemplateGrpService {
     private final CapTemplateGrpCreateMapper capTemplateGrpCreateMapper;
     private final CapTemplateGrpUpdateMapper capTemplateGrpUpdateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
 
 
@@ -56,10 +54,10 @@ public class CapTemplateGrpService {
 
     }
 
-    public Long create(CapTemplateGrpCreateDTO capTemplateGrpCreateDTO){
+    public Long create(CapTemplateGrpCreateDTO capTemplateGrpCreateDTO, String userId){
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         capTemplateGrpCreateDTO.setInputrId(userId);//입력자 추가.
 
         CapTemplateGrp capTemplateGrp = capTemplateGrpCreateMapper.toEntity(capTemplateGrpCreateDTO);
@@ -70,12 +68,12 @@ public class CapTemplateGrpService {
 
     }
 
-    public void update(CapTemplateGrpUpdateDTO capTemplateGrpUpdateDTO, Long tmplGrpId){
+    public void update(CapTemplateGrpUpdateDTO capTemplateGrpUpdateDTO, Long tmplGrpId, String userId){
         
         CapTemplateGrp capTemplateGrp = templateFindOrFail(tmplGrpId);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         capTemplateGrpUpdateDTO.setUpdtrId(userId);//수정자 추가.
 
         capTemplateGrpUpdateMapper.updateFromDto(capTemplateGrpUpdateDTO, capTemplateGrp);

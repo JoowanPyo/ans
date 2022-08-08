@@ -1,13 +1,12 @@
 package com.gemiso.zodiac.app.articleMedia;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaCreateDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
-import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +31,7 @@ public class ArticleMediaController {
 
     private final ArticleMediaService articleMediaService;
 
-    private final UserAuthService userAuthService;
+    private final JwtGetUserService jwtGetUserService;
 
 
     @Operation(summary = "기사 미디어 목록조회", description = "기사 미디어 목록조회")
@@ -76,10 +75,11 @@ public class ArticleMediaController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<ArticleMediaDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                  @RequestBody @Valid ArticleMediaCreateDTO articleMediaCreateDTO) throws Exception {
+                                                  @RequestBody @Valid ArticleMediaCreateDTO articleMediaCreateDTO,
+                                                  @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
 
         log.info(" Create Article Media : User Id - "+userId+" Media Model -"+articleMediaCreateDTO.toString());
 
@@ -94,10 +94,12 @@ public class ArticleMediaController {
     public AnsApiResponse<ArticleMediaDTO> update(@Parameter(description = "필수값<br> ", required = true)
                                                   @RequestBody @Valid ArticleMediaUpdateDTO articleMediaUpdateDTO,
                                                   @Parameter(name = "artclMediaId", description = "기사미디어 아이디")
-                                                  @PathVariable("artclMediaId") Long artclMediaId) {
+                                                  @PathVariable("artclMediaId") Long artclMediaId,
+                                                  @RequestHeader(value = "Authorization", required = false)String Authorization
+    ) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info(" Update Article Media : User Id - "+userId+" Media Model -"+articleMediaUpdateDTO.toString());
 
         articleMediaService.update(articleMediaUpdateDTO, artclMediaId, userId);
@@ -114,10 +116,11 @@ public class ArticleMediaController {
     @DeleteMapping(path = "/{artclMediaId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "artclMediaId", description = "기사미디어 아이디")
-                                    @PathVariable("artclMediaId") Long artclMediaId) throws Exception {
+                                    @PathVariable("artclMediaId") Long artclMediaId,
+                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info(" Delete Article Media : User Id - "+userId+" Media Id -"+artclMediaId);
 
 

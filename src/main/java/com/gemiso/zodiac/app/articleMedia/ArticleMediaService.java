@@ -346,7 +346,7 @@ public class ArticleMediaService {
                 //추후에 T는 클라우드 콘피그 교체
                 //부조전송
                 if (subrmNm != null && subrmNm.trim().isEmpty() == false) {
-                    lboxService.mediaTransfer(mediaId, contentId, subrmNm, "T", false, false);
+                    lboxService.mediaTransfer(mediaId, contentId, subrmNm, "T", false, false, userId);
                 }
             }
         }

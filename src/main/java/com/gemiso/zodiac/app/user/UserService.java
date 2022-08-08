@@ -12,8 +12,8 @@ import com.gemiso.zodiac.app.userGroupUser.UserGroupUserRepository;
 import com.gemiso.zodiac.app.userGroupUser.dto.UserGroupUserDTO;
 import com.gemiso.zodiac.app.userGroupUser.dto.UserToGroupUdateDTO;
 import com.gemiso.zodiac.app.userGroupUser.mapper.UserGroupUserMapper;
+import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.helper.EncodingHelper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.PasswordFailedException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
@@ -55,8 +55,9 @@ public class UserService {
     private final UserGroupUserMapper userGroupUserMapper;
 
     private final PasswordEncoder passwordEncoder;
+    private final DateChangeHelper dateChangeHelper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
     @Value("${password.salt.key:saltKey}")
     private String saltKey;
@@ -126,7 +127,7 @@ public class UserService {
         return userDTO;
     }
 
-    public void create(UserCreateDTO userCreateDTO) throws NoSuchAlgorithmException {
+    public void create(UserCreateDTO userCreateDTO, String tokenUserId) throws NoSuchAlgorithmException {
 
         //들어온 패스워드 해싱[sha256]
         String getPwd = userCreateDTO.getPwd();
@@ -138,7 +139,7 @@ public class UserService {
         userCreateDTO.setPwd(password);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String tokenUserId = userAuthService.authUser.getUserId();
+        //String tokenUserId = userAuthService.authUser.getUserId();
         userCreateDTO.setInputrId(tokenUserId);
 
         User userEntity = userCreateMapper.toEntity(userCreateDTO);
@@ -190,7 +191,7 @@ public class UserService {
         return userDto;
     }*/
 
-    public void update(UserUpdateDTO userUpdateDTO, String userId) throws NoSuchAlgorithmException {
+    public void update(UserUpdateDTO userUpdateDTO, String userId, String tokenUserId) throws NoSuchAlgorithmException {
 
         User user = userFindOrFail(userId);
 
@@ -208,7 +209,7 @@ public class UserService {
         }
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String tokenUserId = userAuthService.authUser.getUserId();
+        //String tokenUserId = userAuthService.authUser.getUserId();
         userUpdateDTO.setUpdtrId(tokenUserId);
         userUpdateDTO.setUserId(userId);
        // MisUser userEntity = userUpdateMapper.toEntity(userUpdateDTO);
@@ -273,7 +274,7 @@ public class UserService {
 
     }
 
-    public void delete(String userId) {
+    public void delete(String userId, String tokenUserId) {
 
         User user = userFindOrFail(userId);
 
@@ -281,7 +282,7 @@ public class UserService {
         userDTO.setDelYn("Y");
         userDTO.setDelDtm(new Date());
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String tokenUserId = userAuthService.authUser.getUserId();
+        //String tokenUserId = userAuthService.authUser.getUserId();
         userDTO.setDelrId(tokenUserId);
 
         userMapper.updateFromDto(userDTO, user);
@@ -289,12 +290,12 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void passwordConfirm(UserConfirmDTO userConfirmDTO) throws NoSuchAlgorithmException {
+    public void passwordConfirm(UserConfirmDTO userConfirmDTO, String tokenUserId) throws NoSuchAlgorithmException {
 
         String comfirm = userConfirmDTO.getComfirm();
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String tokenUserId = userAuthService.authUser.getUserId();
+        //String tokenUserId = userAuthService.authUser.getUserId();
 
         User user = userFindOrFail(tokenUserId);
 
@@ -427,10 +428,10 @@ public class UserService {
         sheet.setColumnWidth(0, 6000);
         sheet.setColumnWidth(1, 8000);
         sheet.setColumnWidth(2, 4000);
-        sheet.setColumnWidth(3, 2000);
+        sheet.setColumnWidth(3, 5000);
         sheet.setColumnWidth(4, 5000);
         sheet.setColumnWidth(5, 10000);
-        sheet.setColumnWidth(6, 4000);
+        //sheet.setColumnWidth(6, 4000);
         Row row = null;
         Cell cell = null;
         int rowNum = 0;
@@ -445,13 +446,13 @@ public class UserService {
         cell = row.createCell(2);
         cell.setCellValue("사원 번호");
         cell = row.createCell(3);
-        cell.setCellValue("프리랜서 여부");
+        cell.setCellValue("최종 로그인 일시");
         cell = row.createCell(4);
         cell.setCellValue("부서");
         cell = row.createCell(5);
         cell.setCellValue("이메일");
-        cell = row.createCell(6);
-        cell.setCellValue("전화번호");
+        /*cell = row.createCell(6);
+        cell.setCellValue("전화번호");*/
         /*cell = row.createCell(7);
         cell.setCellValue("등록 일시");
         cell = row.createCell(8);
@@ -460,6 +461,9 @@ public class UserService {
 
         // Body
         for (UserDTO userDTO : userDTOList) {
+
+            Date lastLoginDtm = userDTO.getLastLoginDtm();
+            String dtm = dateChangeHelper.dateToStringNormal(lastLoginDtm);
             row = sheet.createRow(rowNum++);
             cell = row.createCell(0);
             cell.setCellValue(userDTO.getUserId());
@@ -468,13 +472,13 @@ public class UserService {
             cell = row.createCell(2);
             cell.setCellValue(userDTO.getEmplNo());
             cell = row.createCell(3);
-            cell.setCellValue(userDTO.getFreeYn());
+            cell.setCellValue(dtm);
             cell = row.createCell(4);
             cell.setCellValue(userDTO.getDeptNm());
             cell = row.createCell(5);
             cell.setCellValue(userDTO.getEmail());
-            cell = row.createCell(6);
-            cell.setCellValue(userDTO.getTel());
+            /*cell = row.createCell(6);
+            cell.setCellValue(userDTO.getTel());*/
            /* cell = row.createCell(7);
             cell.setCellValue(userDTO.getInputDtm());
             cell = row.createCell(8);

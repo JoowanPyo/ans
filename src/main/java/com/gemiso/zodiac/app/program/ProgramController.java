@@ -4,6 +4,7 @@ import com.gemiso.zodiac.app.program.dto.ProgramCreateDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramDTO;
 import com.gemiso.zodiac.app.program.dto.ProgramUpdateDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,6 +24,8 @@ import java.util.List;
 public class ProgramController {
 
     private final ProgramService programService;
+
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "프로그램 목록조회", description = "프로그램 목록조회")
     @GetMapping(path = "")
@@ -53,9 +56,12 @@ public class ProgramController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<ProgramDTO> create(@Parameter(name = "programCreateDTO", required = true, description = "필수값<br>  , ")
-                                             @Valid @RequestBody ProgramCreateDTO programCreateDTO) throws Exception {
+                                             @Valid @RequestBody ProgramCreateDTO programCreateDTO,
+                                             @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        String programId = programService.create(programCreateDTO);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        String programId = programService.create(programCreateDTO, userId);
 
         ProgramDTO programDTO = programService.find(programId);
 
@@ -67,9 +73,12 @@ public class ProgramController {
     @PutMapping(path = "/{brdcPgmId}")
     public AnsApiResponse<ProgramDTO> update(@Parameter(name = "programUpdateDTO", required = true, description = "필수값<br>")
                                              @Valid @RequestBody ProgramUpdateDTO programUpdateDTO,
-                                             @Parameter(name = "brdcPgmId", required = true) @PathVariable("brdcPgmId") String brdcPgmId) throws Exception {
+                                             @Parameter(name = "brdcPgmId", required = true) @PathVariable("brdcPgmId") String brdcPgmId,
+                                             @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        programService.update(programUpdateDTO, brdcPgmId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        programService.update(programUpdateDTO, brdcPgmId, userId);
 
         ProgramDTO programDTO = programService.find(brdcPgmId);
 
@@ -80,9 +89,12 @@ public class ProgramController {
     @DeleteMapping(path = "/{brdcPgmId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "brdcPgmId", description = "방송프로그램 아이디")
-                                    @PathVariable("brdcPgmId") String brdcPgmId) throws Exception {
+                                    @PathVariable("brdcPgmId") String brdcPgmId,
+                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        programService.delete(brdcPgmId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        programService.delete(brdcPgmId, userId);
 
 
         return AnsApiResponse.noContent();

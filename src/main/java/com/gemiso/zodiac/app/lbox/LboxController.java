@@ -7,6 +7,7 @@ import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.lbox.mediaTransportDTO.CueMediaTransportResponseDTO;
 import com.gemiso.zodiac.app.lbox.mediaTransportDTO.TransportResponseDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @Api(description = "엘박스 API")
@@ -25,6 +27,8 @@ import java.util.List;
 public class LboxController {
 
     private final LboxService lboxService;
+
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "엘박스 영상 목록 조회", description = "엘박스 영상 목록 조회")
     @GetMapping(path = "")
@@ -89,13 +93,16 @@ public class LboxController {
                                                               @Parameter(name = "isUrgent", description = "긴급 여부")
                                                               @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
                                                               @Parameter(name = "isRetry", description = "재전송 여부")
-                                                              @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws Exception {
+                                                              @RequestParam(value = "isRetry", required = false) Boolean isRetry,
+                                                              @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
+
+        String userId = jwtGetUserService.getUser(Authorization);
 
         log.info("부조전송 = " + "미디어 아이디 : " + mediaId + " 텐츠 아이디 : " + contentId +
                 " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry);
 
         String destinations = "T";
-        TransportResponseDTO transportResponseDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
+        TransportResponseDTO transportResponseDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry, userId);
 
 
         return new AnsApiResponse<>(transportResponseDTO);
@@ -112,13 +119,16 @@ public class LboxController {
                                                                     @Parameter(name = "isUrgent", description = "긴급 여부")
                                                                     @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
                                                                     @Parameter(name = "isRetry", description = "재전송 여부")
-                                                                    @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
+                                                                    @RequestParam(value = "isRetry", required = false) Boolean isRetry,
+                                                                    @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
+
+        String userId = jwtGetUserService.getUser(Authorization);
 
         log.info("PS 긴급전송 = " + " 텐츠 아이디 : " + contentId +
                 " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry);
 
         String destinations = "P";
-        TransportResponseDTO transportResponseDTO = lboxService.emergencyTransfer(contentId, subrmNm, destinations, isUrgent, isRetry);
+        TransportResponseDTO transportResponseDTO = lboxService.emergencyTransfer(contentId, subrmNm, destinations, isUrgent, isRetry, userId);
 
 
         return new AnsApiResponse<>(transportResponseDTO);
@@ -135,13 +145,16 @@ public class LboxController {
                                                                     @Parameter(name = "isUrgent", description = "긴급 여부")
                                                                     @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
                                                                     @Parameter(name = "isRetry", description = "재전송 여부")
-                                                                    @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws JsonProcessingException {
+                                                                    @RequestParam(value = "isRetry", required = false) Boolean isRetry,
+                                                                    @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
+
+        String userId = jwtGetUserService.getUser(Authorization);
 
         log.info("NS 긴급전송 = " + " 텐츠 아이디 : " + contentId +
                 " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry);
 
         String destinations = "N";
-        TransportResponseDTO transportResponseDTO = lboxService.emergencyTransfer(contentId, subrmNm, destinations, isUrgent, isRetry);
+        TransportResponseDTO transportResponseDTO = lboxService.emergencyTransfer(contentId, subrmNm, destinations, isUrgent, isRetry, userId);
 
 
         return new AnsApiResponse<>(transportResponseDTO);
@@ -178,13 +191,15 @@ public class LboxController {
                                                            @Parameter(name = "isUrgent", description = "긴급 여부")
                                                            @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
                                                            @Parameter(name = "isRetry", description = "재전송 여부")
-                                                           @RequestParam(value = "isRetry", required = false) Boolean isRetry) throws Exception {
+                                                           @RequestParam(value = "isRetry", required = false) Boolean isRetry,
+                                                           @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
+        String userId = jwtGetUserService.getUser(Authorization);
         log.info("PS 긴급전송 = " + "미디어 아이디 : " + mediaId + " 텐츠 아이디 : " + contentId +
                 " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry);
 
         String destinations = "B";
-        TransportResponseDTO transportResponseDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry);
+        TransportResponseDTO transportResponseDTO = lboxService.mediaTransfer(mediaId, contentId, subrmNm, destinations, isUrgent, isRetry, userId);
 
 
         return new AnsApiResponse<>(transportResponseDTO);
@@ -193,25 +208,27 @@ public class LboxController {
     @Operation(summary = "큐시트 미디어 부조전송", description = "큐시트 미디어 부조전송")
     @PutMapping(path = "/cuemediatransfer/{cueMediaId}")
     public AnsApiResponse<CueMediaTransportResponseDTO> cueMediaTransfer(@Parameter(name = "cueMediaId", required = true, description = "cueMediaId")
-                                                                 @PathVariable("cueMediaId") Long cueMediaId,
-                                                                 @Parameter(name = "contentId", description = "콘텐츠 아이디")
-                                                                 @RequestParam(value = "contentId", required = true) Integer contentId,
-                                                                 @Parameter(name = "subrmNm", description = "부조명")
-                                                                 @RequestParam(value = "subrmNm", required = true) String subrmNm,
+                                                                         @PathVariable("cueMediaId") Long cueMediaId,
+                                                                         @Parameter(name = "contentId", description = "콘텐츠 아이디")
+                                                                         @RequestParam(value = "contentId", required = true) Integer contentId,
+                                                                         @Parameter(name = "subrmNm", description = "부조명")
+                                                                         @RequestParam(value = "subrmNm", required = true) String subrmNm,
                                                                 /*@Parameter(name = "destinations", description = "전송대상(NS, PS_A, PS_B, PS_C) required.")
                                                                 @RequestParam(value = "destinations", required = false) List<String> destinations,*/
-                                                                 @Parameter(name = "isUrgent", description = "긴급 여부")
-                                                                 @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
-                                                                 @Parameter(name = "isRetry", description = "재전송 여부")
-                                                                 @RequestParam(value = "isRetry", required = false) Boolean isRetry,
-                                                                 @Parameter(name = "isType", description = "일반(T), 백드롭(B)")
-                                                                 @RequestParam(value = "isType", required = false) String isType) throws Exception {
+                                                                         @Parameter(name = "isUrgent", description = "긴급 여부")
+                                                                         @RequestParam(value = "isUrgent", required = false) Boolean isUrgent,
+                                                                         @Parameter(name = "isRetry", description = "재전송 여부")
+                                                                         @RequestParam(value = "isRetry", required = false) Boolean isRetry,
+                                                                         @Parameter(name = "isType", description = "일반(T), 백드롭(B)")
+                                                                         @RequestParam(value = "isType", required = false) String isType,
+                                                                         @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("큐시트 미디어 부조전송 = " + "미디어 아이디 : " + cueMediaId + " 텐츠 아이디 : " + contentId +
-                " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry+" 전송타입 : "+isType);
+                " 부조명 : " + subrmNm + " 긴급 여부 : " + isUrgent + " 재전송 여부 : " + isRetry + " 전송타입 : " + isType);
 
         //String destinations = "P";
-        CueMediaTransportResponseDTO transportResponseDTO = lboxService.cueMediaTransfer(cueMediaId, contentId, subrmNm, isUrgent, isRetry, isType);
+        CueMediaTransportResponseDTO transportResponseDTO = lboxService.cueMediaTransfer(cueMediaId, contentId, subrmNm, isUrgent, isRetry, isType, userId);
 
 
         return new AnsApiResponse<>(transportResponseDTO);

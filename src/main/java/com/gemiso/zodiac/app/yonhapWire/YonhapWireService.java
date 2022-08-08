@@ -96,10 +96,47 @@ public class YonhapWireService {
     public Long create(YonhapWireCreateDTO yonhapWireCreateDTO) throws Exception {
 
         Long yhWireId = null;
+        String mamContId = "";
 
         //새로 들어온 연합에 contId로 기존에 데이터가 있는지 조회.
-        String contId = yonhapWireCreateDTO.getCont_id();
-        List<YonhapWire> yonhapWireList = yonhapWireRepository.findYhArtclId(contId);
+        //String contId = yonhapWireCreateDTO.getCont_id();
+
+
+        List<YonhapWire> yonhapWireList = new ArrayList<>();
+        //Nam에 보낼 미디어 파일 네임
+        String getCmnt = yonhapWireCreateDTO.getCmnt();
+        String mediaNo = yonhapWireCreateDTO.getMedia_no();
+        Long getMamContId = null;
+        if (getCmnt != null && getCmnt.trim().isEmpty() == false) {
+            //Nam에 미디어 등록 후 id값을 받아온다.
+            YonhapNamResponseDTO mamCont = mamCreateAptnMedia(getCmnt, yonhapWireCreateDTO);
+
+            NamResponseDTO data = mamCont.getData();
+            if (ObjectUtils.isEmpty(data) == false) {
+                getMamContId = data.getId();
+
+                mamContId = String.valueOf(getMamContId);
+            }
+
+            yonhapWireList = yonhapWireRepository.findYhArtcl(mamContId, mediaNo);
+        }else {
+
+            Date now = new Date();
+
+            //rcvDt(수신일자)검색을 위해 +1 days
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(now);
+            calendar.add(Calendar.DATE, -2);
+            Date sdate = calendar.getTime();
+
+
+            yonhapWireList = yonhapWireRepository.findYhArtclDate(mediaNo, sdate, now);
+        }
+
+        String cmnt = null;
+        if (getCmnt != null && getCmnt.trim().isEmpty() == false) {
+            cmnt = getCmnt.substring(0, getCmnt.lastIndexOf("."));
+        }
 
         //기존연합이 있을경우 updqte
         if (CollectionUtils.isEmpty(yonhapWireList) == false) {
@@ -114,10 +151,7 @@ public class YonhapWireService {
                 mamContId = data.getId();
             }*/
 
-            Long OrgYhArtclId = yonhapWireList.get(0).getWireId();
-            yonhapWireCreateDTO.setWire_id(OrgYhArtclId);
-
-            YonhapWire yonhapWire = updateBuildToEntity(yonhapWireCreateDTO);
+            YonhapWire yonhapWire = updateBuildToEntity(yonhapWireList, yonhapWireCreateDTO, mamContId, getMamContId, cmnt);
 
             yonhapWireRepository.save(yonhapWire);
 
@@ -125,7 +159,7 @@ public class YonhapWireService {
 
         } else { //기존연합이 없는경우 post
 
-            YonhapWire yonhapWire = postBuildToEntity(yonhapWireCreateDTO);
+            YonhapWire yonhapWire = postBuildToEntity(yonhapWireCreateDTO, mamContId, getMamContId, cmnt);
 
             yonhapWireRepository.save(yonhapWire);
 
@@ -135,68 +169,73 @@ public class YonhapWireService {
         return yhWireId;
     }
 
-    public YonhapWire updateBuildToEntity(YonhapWireCreateDTO yonhapWireCreateDTO) throws Exception {
+    public YonhapWire updateBuildToEntity(List<YonhapWire> yonhapWireList, YonhapWireCreateDTO yonhapWireCreateDTO, String mamContId, Long getMamContId, String cmnt) throws Exception {
 
         //SimpleDateFormat transFormat = new SimpleDateFormat("yyyymmddhhmmss");
 
+        //Long OrgYhArtclId = yonhapWireList.get(0).getWireId();
+        String credit = yonhapWireList.get(0).getCredit();
+        YonhapWire yonhapWire = yonhapWireList.get(0);
+
         Date embgDtm = null;
-        Date inputDtm = null;
+        //Date inputDtm = null;
         Date trnsfDtm = null;
         if(!StringUtils.isEmpty(yonhapWireCreateDTO.getEmbg_dtm())) {
             embgDtm = dateChangeHelper.stringToDateComma(yonhapWireCreateDTO.getEmbg_dtm());
         }
-        if(!StringUtils.isEmpty(yonhapWireCreateDTO.getInput_dtm())) {
+       /* if(!StringUtils.isEmpty(yonhapWireCreateDTO.getInput_dtm())) {
             inputDtm = dateChangeHelper.stringToDateComma(yonhapWireCreateDTO.getInput_dtm());
-        }
+        }*/
         if(!StringUtils.isEmpty(yonhapWireCreateDTO.getTrnsf_dtm())) {
             trnsfDtm = dateChangeHelper.stringToDateComma(yonhapWireCreateDTO.getTrnsf_dtm());
         }
         int artclqnty = Integer.parseInt(yonhapWireCreateDTO.getArtclqnty());
 
-        YonhapWire yonhapWire = YonhapWire.builder()
-                .wireId(yonhapWireCreateDTO.getWire_id())
-                .contId(yonhapWireCreateDTO.getCont_id())
+
+        yonhapWire = YonhapWire.builder()
+                //.wireId(OrgYhArtclId)
+                //.contId(yonhapWire.get)
                 .imprt(yonhapWireCreateDTO.getImprt())
                 .svcTyp(yonhapWireCreateDTO.getSvc_typ())
                 .artclTitl(yonhapWireCreateDTO.getArtcl_titl())
                 .artclCtt(yonhapWireCreateDTO.getArtcl_ctt())
                 .agcyCd(yonhapWireCreateDTO.getAgcy_cd())
                 .agcyNm(yonhapWireCreateDTO.getAgcy_nm())
-                .credit(yonhapWireCreateDTO.getCredit())
+                .credit(credit+","+yonhapWireCreateDTO.getCont_id())
                 .artclqnty(artclqnty)
                 .source(yonhapWireCreateDTO.getSource())
-                .cmnt(yonhapWireCreateDTO.getCmnt())
+                .cmnt(cmnt)
                 .embgDtm(embgDtm)
                 .trnsfDtm(trnsfDtm)
-                .inputDtm(inputDtm)
+                //.inputDtm(new Date())
                 .action(yonhapWireCreateDTO.getAction())
-                .mamContId(yonhapWireCreateDTO.getMam_cont_id())
+                //.mamContId(getMamContId)
                 .mediaNo(yonhapWireCreateDTO.getMedia_no())
                 .build();
 
         return yonhapWire;
     }
 
-    public YonhapWire postBuildToEntity(YonhapWireCreateDTO yonhapWireCreateDTO) throws Exception {
+    public YonhapWire postBuildToEntity(YonhapWireCreateDTO yonhapWireCreateDTO, String mamContId, Long getMamContId, String cmnt) throws Exception {
 
         //SimpleDateFormat transFormat = new SimpleDateFormat("yyyymmddhhmmss");
 
         Date embgDtm = null;
-        Date inputDtm = null;
+        //Date inputDtm = null;
         Date trnsfDtm = null;
         if(!StringUtils.isEmpty(yonhapWireCreateDTO.getEmbg_dtm())) {
-            embgDtm = dateChangeHelper.stringToDateNoComma(yonhapWireCreateDTO.getEmbg_dtm());
+            embgDtm = dateChangeHelper.stringToDateComma(yonhapWireCreateDTO.getEmbg_dtm());
         }
-        if(!StringUtils.isEmpty(yonhapWireCreateDTO.getInput_dtm())) {
-            inputDtm = dateChangeHelper.stringToDateNoComma(yonhapWireCreateDTO.getInput_dtm());
-        }
+      /*  if(!StringUtils.isEmpty(yonhapWireCreateDTO.getInput_dtm())) {
+            inputDtm = dateChangeHelper.stringToDateComma(yonhapWireCreateDTO.getInput_dtm());
+        }*/
         if(!StringUtils.isEmpty(yonhapWireCreateDTO.getTrnsf_dtm())) {
-            trnsfDtm = dateChangeHelper.stringToDateNoComma(yonhapWireCreateDTO.getTrnsf_dtm());
+            trnsfDtm = dateChangeHelper.stringToDateComma(yonhapWireCreateDTO.getTrnsf_dtm());
         }
         int artclqnty = Integer.parseInt(yonhapWireCreateDTO.getArtclqnty());
 
         YonhapWire yonhapWire = YonhapWire.builder()
-                .contId(yonhapWireCreateDTO.getCont_id())
+                .contId(mamContId)
                 .imprt(yonhapWireCreateDTO.getImprt())
                 .svcTyp(yonhapWireCreateDTO.getSvc_typ())
                 .artclTitl(yonhapWireCreateDTO.getArtcl_titl())
@@ -206,11 +245,14 @@ public class YonhapWireService {
                 .credit(yonhapWireCreateDTO.getCredit())
                 .artclqnty(artclqnty)
                 .source(yonhapWireCreateDTO.getSource())
-                .cmnt(yonhapWireCreateDTO.getCmnt())
+                .cmnt(cmnt)
                 .embgDtm(embgDtm)
                 .trnsfDtm(trnsfDtm)
-                .inputDtm(inputDtm)
+                //.inputDtm(new Date())
+                .mamContId(getMamContId)
+                .mediaNo(yonhapWireCreateDTO.getMedia_no())
                 .action(yonhapWireCreateDTO.getAction())
+                .credit(yonhapWireCreateDTO.getCont_id())
                 .build();
 
         return yonhapWire;
@@ -536,6 +578,40 @@ public class YonhapWireService {
         param.put("title", yonhapReuterCreateDTO.getWire_artcl_titl());
         param.put("content", yonhapReuterCreateDTO.getWire_artcl_ctt());
         param.put("edit_no", yonhapReuterCreateDTO.getEditor_number());
+        param.put("user_id", "");
+        param.put("filename", mediaNm);
+        param.put("org_filename", mediaNm);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String params = objectMapper.writeValueAsString(param);
+
+        //httpEntity에 헤더 및 params 설정
+        HttpEntity entity = new HttpEntity(params, httpHeaders);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<YonhapNamResponseDTO> responseEntity =
+                restTemplate.exchange(namUrl, HttpMethod.POST,
+                        entity, YonhapNamResponseDTO.class);
+
+        YonhapNamResponseDTO results = responseEntity.getBody();
+
+
+        return results;
+
+    }
+
+    public YonhapNamResponseDTO mamCreateAptnMedia(String mediaNm, YonhapWireCreateDTO yonhapWireCreateDTO) throws JsonProcessingException {
+
+        //헤더 설정
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        httpHeaders.add("Session_user_id", "ans");
+
+        //Object Mapper를 통한 Json바인딩할 dmParam생성
+        Map<String, Object> param = new HashMap<>();
+        param.put("title", yonhapWireCreateDTO.getArtcl_titl());
+        param.put("content", yonhapWireCreateDTO.getArtcl_ctt());
+        param.put("edit_no", yonhapWireCreateDTO.getMedia_no());
         param.put("user_id", "");
         param.put("filename", mediaNm);
         param.put("org_filename", mediaNm);

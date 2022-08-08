@@ -163,7 +163,7 @@ public class YonhapService {
                         .relContId(yonhapCreateDTO.getRel_cont_id())
                         .refContInfo(yonhapCreateDTO.getRef_cont_info())
                         .embgDtm(embgDtm)
-                        .inputDtm(inputDtm)
+                        //.inputDtm(inputDtm)
                         .trnsfDtm(trnsfDtm)
                         .action(yonhapCreateDTO.getAction())
                         .build();
@@ -198,7 +198,7 @@ public class YonhapService {
                     .artclCtt(yonhapCreateDTO.getArtcl_ctt())
                     .credit(yonhapCreateDTO.getCredit())
                     .source(yonhapCreateDTO.getSource())
-                    .artclCateCd(yonhapCreateDTO.getArtcl_cate_nm())
+                    .artclCateCd(yonhapCreateDTO.getArtcl_cate_cd())
                     .regionNm(yonhapCreateDTO.getRegion_nm())
                     .cttClassCd(yonhapCreateDTO.getCtt_class_nm())
                     .cttClassAddCd(yonhapCreateDTO.getCtt_class_add_cd())

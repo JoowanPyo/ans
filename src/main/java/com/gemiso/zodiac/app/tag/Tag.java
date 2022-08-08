@@ -30,5 +30,5 @@ public class Tag {
     private String tag;
 
     @Column(name = "tag_clicked")
-    private int tagClicked;
+    private Integer tagClicked;
 }

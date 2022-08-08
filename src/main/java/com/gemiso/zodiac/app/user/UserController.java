@@ -2,6 +2,7 @@ package com.gemiso.zodiac.app.user;
 
 import com.gemiso.zodiac.app.user.dto.*;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import com.gemiso.zodiac.exception.UserAlreadyExistException;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -27,6 +29,8 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "사용자 목록 조회", description = "조회조건으로 사용자 목록 조회")
     @GetMapping(path = "")
@@ -72,9 +76,11 @@ public class UserController {
     @Operation(summary = "사용자 등록", description = "사용자 등록")
     @PostMapping(path = "/createuser")
     @ResponseStatus(HttpStatus.CREATED)
-    public AnsApiResponse<UserDTO> create(
-            @Parameter(name = "userCreateDTO", required = true, description = "필수값<br> userNm , password") @Valid @RequestBody UserCreateDTO userCreateDTO
-    ) throws NoSuchAlgorithmException {
+    public AnsApiResponse<UserDTO> create(@Parameter(name = "userCreateDTO", required = true, description = "필수값<br> userNm , password")
+                                          @Valid @RequestBody UserCreateDTO userCreateDTO,
+                                          @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
+
+        String tokenUserId = jwtGetUserService.getUser(Authorization);
 
         String userId = userCreateDTO.getUserId();
         if (userService.checkUser(userId)) {
@@ -89,7 +95,7 @@ public class UserController {
             }
         }
 
-        userService.create(userCreateDTO);
+        userService.create(userCreateDTO, tokenUserId);
 
         UserDTO userDto = userService.find(userId);
 
@@ -99,10 +105,12 @@ public class UserController {
     @Operation(summary = "사용자 정보 수정", description = "사용자 정보 수정")
     @PutMapping(path = "/{userId}")
     public AnsApiResponse<UserDTO> update(@Parameter(name = "userDto", required = true, description = "필수값<br>") @Valid @RequestBody UserUpdateDTO userUpdateDTO,
-                                          @Parameter(name = "userId", required = true) @PathVariable("userId") String userId) throws NoSuchAlgorithmException {
+                                          @Parameter(name = "userId", required = true) @PathVariable("userId") String userId,
+                                          @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
+        String tokenUserId = jwtGetUserService.getUser(Authorization);
 
-        userService.update(userUpdateDTO, userId);
+        userService.update(userUpdateDTO, userId, tokenUserId);
 
         UserDTO userDTO = userService.find(userId);
         //UserDTO userDTO = userService.getUser(userId);
@@ -114,9 +122,12 @@ public class UserController {
     @DeleteMapping(path = "/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(
-            @Parameter(name = "userId", description = "사용자 아이디") @PathVariable("userId") String userId) {
+            @Parameter(name = "userId", description = "사용자 아이디") @PathVariable("userId") String userId,
+            @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        userService.delete(userId);
+        String tokenUserId = jwtGetUserService.getUser(Authorization);
+
+        userService.delete(userId, tokenUserId);
 
         return AnsApiResponse.noContent();
     }
@@ -124,9 +135,12 @@ public class UserController {
     @Operation(summary = "사용자 비밀번호 확인", description = "사용자 비밀번호 확인")
     @GetMapping(path = "/confirm")
     public AnsApiResponse<?> passwordConfirm(@Parameter(name = "userCreateDTO", required = true, description = "필수값<br> userNm , password")
-                                             @Valid @RequestBody UserConfirmDTO userConfirmDTO) throws NoSuchAlgorithmException {
+                                             @Valid @RequestBody UserConfirmDTO userConfirmDTO,
+                                             @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        userService.passwordConfirm(userConfirmDTO);
+        String userId = jwtGetUserService.getUser(Authorization);
+
+        userService.passwordConfirm(userConfirmDTO, userId);
 
         return AnsApiResponse.ok();
     }

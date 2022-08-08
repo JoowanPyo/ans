@@ -132,7 +132,7 @@ public class User extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
     private String delrNm;
 
-    @LastModifiedDate
+    //@LastModifiedDate
     @Column(name = "del_dtm")
     private Date delDtm;
 

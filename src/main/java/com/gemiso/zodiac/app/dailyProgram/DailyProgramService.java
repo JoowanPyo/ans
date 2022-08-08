@@ -5,7 +5,6 @@ import com.gemiso.zodiac.app.dailyProgram.dto.DailyProgramDTO;
 import com.gemiso.zodiac.app.dailyProgram.mapper.DailyProgramCreateMapper;
 import com.gemiso.zodiac.app.dailyProgram.mapper.DailyProgramMapper;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class DailyProgramService {
     private final DailyProgramMapper dailyProgramMapper;
     private final DailyProgramCreateMapper dailyProgramCreateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
     private final DateChangeHelper dateChangeHelper;
 
@@ -67,10 +66,10 @@ public class DailyProgramService {
         return dailyProgramDTO;
     }
     //일일편성 등록
-    public Long create(DailyProgramCreateDTO dailyProgramCreateDTO){
+    public Long create(DailyProgramCreateDTO dailyProgramCreateDTO, String userId){
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         dailyProgramCreateDTO.setInputrId(userId);
 
         DailyProgram dailyProgram = dailyProgramCreateMapper.toEntity(dailyProgramCreateDTO);

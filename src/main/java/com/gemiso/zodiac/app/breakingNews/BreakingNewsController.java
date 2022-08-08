@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.breakingNews.dto.BreakingNewsSimplerDTO;
 import com.gemiso.zodiac.app.breakingNews.dto.BreakingNewsUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +18,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +31,8 @@ import java.util.List;
 public class BreakingNewsController {
 
     private final BreakingNewsService breakingNewsService;
+
+    private final JwtGetUserService jwtGetUserService;
 
     @Operation(summary = "속보뉴스 목록조회", description = "속보뉴스 목록조회")
     @GetMapping(path = "")
@@ -69,9 +73,12 @@ public class BreakingNewsController {
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<BreakingNewsSimplerDTO> create(@Parameter(description = "필수값<br>방송일자[brdcDtm],제목[titl]," +
             "속보구분[breakingNewsDiv],라인형식[lnTypCd],전송상태[trnsfStCd] ", required = true)
-                                                         @RequestBody @Valid BreakingNewsCreateDTO breakingNewsCreateDTO) {
+                                                         @RequestBody @Valid BreakingNewsCreateDTO breakingNewsCreateDTO,
+                                                         @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        Long breakingNewsId = breakingNewsService.create(breakingNewsCreateDTO);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        Long breakingNewsId = breakingNewsService.create(breakingNewsCreateDTO, userId);
 
         //속보뉴스 등록 후 만들어진 아이디 set
         BreakingNewsSimplerDTO breakingNewsSimplerDTO = new BreakingNewsSimplerDTO();
@@ -87,9 +94,12 @@ public class BreakingNewsController {
                     "전송상태[trnsfStCd] ", required = true)
             @RequestBody @Valid BreakingNewsUpdateDTO breakingNewsUpdateDTO,
             @Parameter(name = "breakingNewsId", required = true, description = "속보뉴스 아이디")
-            @PathVariable("breakingNewsId") Long breakingNewsId) {
+            @PathVariable("breakingNewsId") Long breakingNewsId,
+            @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        breakingNewsService.update(breakingNewsUpdateDTO, breakingNewsId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        breakingNewsService.update(breakingNewsUpdateDTO, breakingNewsId, userId);
 
         //들어온 속보뉴스 아이디 다시 리턴.
         BreakingNewsSimplerDTO breakingNewsSimplerDTO = new BreakingNewsSimplerDTO();
@@ -102,9 +112,12 @@ public class BreakingNewsController {
     @DeleteMapping(path = "/{breakingNewsId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "breakingNewsId", required = true, description = "속보뉴스 아이디")
-                                    @PathVariable("breakingNewsId") Long breakingNewsId) {
+                                    @PathVariable("breakingNewsId") Long breakingNewsId,
+                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        breakingNewsService.delete(breakingNewsId);
+        String userId =jwtGetUserService.getUser(Authorization);
+
+        breakingNewsService.delete(breakingNewsId, userId);
 
         return AnsApiResponse.noContent();
     }

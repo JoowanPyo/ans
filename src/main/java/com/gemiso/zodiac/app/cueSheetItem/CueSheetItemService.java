@@ -65,6 +65,7 @@ import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.tag.Tag;
+import com.gemiso.zodiac.app.tag.TagRepository;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
 import com.gemiso.zodiac.core.topic.CueSheetTopicService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
@@ -101,6 +102,7 @@ public class CueSheetItemService {
     private final CueSheetItemSymbolRepository cueSheetItemSymbolRepository;
     private final CueSheetMediaRepository cueSheetMediaRepository;
     private final ArticleTagRepository articleTagRepository;
+    private final TagRepository tagRepository;
     //private final ArticleActionLogRepository articleActionLogRepository;
     //private final CueTmpltItemRepository cueTmpltItemRepository;
 
@@ -807,7 +809,7 @@ public class CueSheetItemService {
             Integer contentId = cueSheetMediaEntity.getContId();
 
             //추후에 T는 클라우드 콘피그 교체
-            lboxService.cueMediaTransfer(mediaId, contentId, subrmNm, false, false, "T");
+            lboxService.cueMediaTransfer(mediaId, contentId, subrmNm, false, false, "T", userId);
         }
     }
 
@@ -847,7 +849,7 @@ public class CueSheetItemService {
             Integer contentId = cueSheetMediaEntity.getContId();
 
             //추후에 T는 클라우드 콘피그 교체
-            lboxService.cueMediaTransfer(mediaId, contentId, subrmNm, false, false, "T");
+            lboxService.cueMediaTransfer(mediaId, contentId, subrmNm, false, false, "T", userId);
 
         }
     }
@@ -1448,7 +1450,7 @@ public class CueSheetItemService {
             Integer contentId = cueSheetMedia.getContId();
 
             //추후에 T는 클라우드 콘피그 교체
-            lboxService.cueMediaTransfer(mediaId, contentId, subrmNm, false, false, "T");
+            lboxService.cueMediaTransfer(mediaId, contentId, subrmNm, false, false, "T", userId);
         }
 
     }
@@ -1640,7 +1642,7 @@ public class CueSheetItemService {
         List<AnchorCap> anchorCapList = anchorCapRepository.findAnchorCapList(artclId);
 
         articleService.articleActionLogCreate(articleEntity, userId); //기사 액션 로그 등록
-        Long articleHistId = articleService.createArticleHist(articleEntity);//기사 이력 create
+        Long articleHistId = articleService.createArticleHist(articleEntity, userId);//기사 이력 create
 
         /*********************/
         /* 기사 자막을 저장하는 부분 */
@@ -1700,7 +1702,7 @@ public class CueSheetItemService {
                     Integer contentId = articleMediaEntity.getContId();
 
                     //추후에 T는 클라우드 콘피그 교체
-                    lboxService.mediaTransfer(mediaId, contentId, subrmNm, "T", false, false);
+                    lboxService.mediaTransfer(mediaId, contentId, subrmNm, "T", false, false, userId);
 
                 }
             }
@@ -1721,6 +1723,12 @@ public class CueSheetItemService {
                     .build();
 
             articleTagRepository.save(articleTagEntity);
+
+            //테그 클릭수 증가
+            Integer clicked = tag.getTagClicked();
+            tag.setTagClicked(clicked + 1);
+
+            tagRepository.save(tag);
 
         }
 

@@ -1,14 +1,13 @@
 package com.gemiso.zodiac.app.yonhapWire;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gemiso.zodiac.app.yonhap.dto.YonhapAssignCreateDTO;
 import com.gemiso.zodiac.app.yonhapAssign.dto.YonhapAssignSimpleDTO;
 import com.gemiso.zodiac.app.yonhapPhoto.dto.YonhapExceptionDomain;
 import com.gemiso.zodiac.app.yonhapWire.dto.*;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
-import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +36,8 @@ public class YonhapWireController {
 
     private final YonhapWireService yonhapWireService;
 
-    private final UserAuthService userAuthService;
+    private final JwtGetUserService jwtGetUserService;
+    //private final UserAuthService userAuthService;
 
     @Operation(summary = "연합외신 목록조회", description = "연합외신 목록조회")
     @GetMapping(path = "")
@@ -163,9 +162,10 @@ public class YonhapWireController {
     @PostMapping(path = "/assign")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<YonhapAssignSimpleDTO> createWireAssign(@Parameter(description = "필수값<br> ", required = true)
-                                                                  @RequestBody YonhapWireAssignCreateDTO yonhapWireAssignCreateDTO) throws Exception {
+                                                                  @RequestBody YonhapWireAssignCreateDTO yonhapWireAssignCreateDTO,
+                                                                  @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
 
         log.info(" Yonhap Assign : UserId - " + userId + " Yonhap Assign articleDTO - " + yonhapWireAssignCreateDTO.toString());
 

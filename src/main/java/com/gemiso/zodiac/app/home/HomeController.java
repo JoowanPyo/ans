@@ -86,11 +86,11 @@ public class HomeController {
             SearchDate searchDate = new SearchDate(sdate, edate);
 
             articleOrderDTOList = articleOrderService.findAll(searchDate.getStartDate(), searchDate.getEndDate(),
-                    null, null, workrId, inputrId, null, orgArtclId);
+                    null, null, workrId, inputrId, null, orgArtclId, null);
         } else {
 
             articleOrderDTOList = articleOrderService.findAll(null, null,
-                    null, null, workrId, inputrId, null, orgArtclId);
+                    null, null, workrId, inputrId, null, orgArtclId, null);
         }
 
         return new AnsApiResponse<>(articleOrderDTOList);

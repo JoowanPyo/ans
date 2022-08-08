@@ -4,7 +4,6 @@ import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.ArticleRepository;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,11 +21,11 @@ public class HomeService {
 
     private final ArticleMapper articleMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
-    public List<ArticleDTO> findAll(){
+    public List<ArticleDTO> findAll(String userId){
 
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
 
         List<Article> articleList = articleRepository.findMyArticle(userId);
 

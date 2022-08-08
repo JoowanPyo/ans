@@ -4,7 +4,7 @@ import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapCreateDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapDTO;
 import com.gemiso.zodiac.app.cueSheetItemCap.dto.CueSheetItemCapUpdateDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
-import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,7 +24,8 @@ public class CueSheetItemCapController {
 
     private final CueSheetItemCapService cueSheetItemCapService;
 
-    private final UserAuthService userAuthService;
+    private final JwtGetUserService jwtGetUserService;
+    //private final UserAuthService userAuthService;
 
     @Operation(summary = "큐시트 아이템 자막 조회", description = "큐시트 아이템 자막 조회")
     @GetMapping(path = "/{cueId}/item/{cueItemId}/caption")
@@ -65,10 +66,11 @@ public class CueSheetItemCapController {
                                                                @Parameter(name = "cueId", description = "큐시트 아이디")
                                                                @PathVariable("cueId") Long cueId,
                                                                @Parameter(name = "cueItemId", description = "큐시트 아이템 아이디")
-                                                               @PathVariable("cueItemId") Long cueItemId) {
+                                                               @PathVariable("cueItemId") Long cueItemId,
+                                                               @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item Cap Create List : userId - " + userId + " cueId - " + cueId + " cueItemId - " + cueItemId);
 
         cueSheetItemCapService.createList(cueSheetItemCapCreateDTOList, cueId, cueItemId ,userId);
@@ -88,10 +90,12 @@ public class CueSheetItemCapController {
                                                      @Parameter(name = "cueId", description = "큐시트 아이디")
                                                      @PathVariable("cueId") Long cueId,
                                                      @Parameter(name = "cueItemId", description = "큐시트 아이템 아이디")
-                                                     @PathVariable("cueItemId") Long cueItemId) {
+                                                     @PathVariable("cueItemId") Long cueItemId,
+                                                     @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
+
         log.info("CueSheet Item Cap Create : userId - " + userId + " cueId - " + cueId + " cueItemId - " + cueItemId);
 
         Long cueItemCapId = cueSheetItemCapService.create(cueSheetItemCapCreateDTO, cueId, cueItemId, userId);
@@ -111,10 +115,11 @@ public class CueSheetItemCapController {
                                                      @Parameter(name = "cueItemId", description = "큐시트 아이템 아이디")
                                                      @PathVariable("cueItemId") Long cueItemId,
                                                      @Parameter(name = "cueItemCapId", description = "자막아이디")
-                                                     @PathVariable("cueItemCapId") Long cueItemCapId) {
+                                                     @PathVariable("cueItemCapId") Long cueItemCapId,
+                                                     @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item Cap Update : userId - " + userId +" cueItemCapId - "+cueItemCapId
                 +" cueId - " + cueId + " cueItemId - " + cueItemId);
 
@@ -133,10 +138,11 @@ public class CueSheetItemCapController {
                                     @Parameter(name = "cueItemId", description = "큐시트 아이템 아이디")
                                     @PathVariable("cueItemId") Long cueItemId,
                                     @Parameter(name = "cueItemCapId", description = "자막아이디")
-                                    @PathVariable("cueItemCapId") Long cueItemCapId) {
+                                    @PathVariable("cueItemCapId") Long cueItemCapId,
+                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item Cap Delete : userId - " + userId +" cueItemCapId - "+cueItemCapId
                 +" cueId - " + cueId + " cueItemId - " + cueItemId);
 

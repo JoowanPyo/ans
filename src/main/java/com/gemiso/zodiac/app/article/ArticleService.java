@@ -1,10 +1,6 @@
 package com.gemiso.zodiac.app.article;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gemiso.zodiac.app.articleTag.ArticleTag;
-import com.gemiso.zodiac.app.articleTag.ArticleTagRepository;
-import com.gemiso.zodiac.app.articleTag.dto.ArticleTagDTO;
-import com.gemiso.zodiac.app.articleTag.mapper.ArticleTagMapper;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapCreateDTO;
@@ -41,6 +37,10 @@ import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaCreateMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
+import com.gemiso.zodiac.app.articleTag.ArticleTag;
+import com.gemiso.zodiac.app.articleTag.ArticleTagRepository;
+import com.gemiso.zodiac.app.articleTag.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.articleTag.mapper.ArticleTagMapper;
 import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
@@ -50,6 +50,7 @@ import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleRepository;
 import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleService;
 import com.gemiso.zodiac.app.elasticsearch.articleDTO.ElasticSearchArticleDTO;
 import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticle;
+import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchCueSheet;
 import com.gemiso.zodiac.app.elasticsearch.mapper.ElasticSearchArticleMapper;
 import com.gemiso.zodiac.app.facilityManage.FacilityManageService;
 import com.gemiso.zodiac.app.facilityManage.dto.FacilityManageDTO;
@@ -63,6 +64,7 @@ import com.gemiso.zodiac.app.tag.Tag;
 import com.gemiso.zodiac.app.user.QUser;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserService;
+import com.gemiso.zodiac.app.user.dto.UserDTO;
 import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuth;
 import com.gemiso.zodiac.app.userGroupAuth.UserGroupAuthRepository;
 import com.gemiso.zodiac.app.userGroupUser.UserGroupUser;
@@ -87,6 +89,12 @@ import com.gemiso.zodiac.exception.UserFailException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -98,7 +106,14 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
+import java.awt.Color;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.*;
 import java.util.function.Function;
 
@@ -189,7 +204,7 @@ public class ArticleService {
     }
 
     //기사 목록조회
-    public PageResultDTO<ArticleDTO, Article> findAllElasticPush(Date sdate, Date edate,Integer page, Integer limit) {
+    public PageResultDTO<ArticleDTO, Article> findAllElasticPush(Date sdate, Date edate, Integer page, Integer limit) {
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
         PageHelper pageHelper = new PageHelper(page, limit);
@@ -235,15 +250,208 @@ public class ArticleService {
         return new PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle>(result, fn);
     }
 
+    public List<ElasticSearchArticle> findAllStatistics(Date sdate, Date edate, String rptrId, String inputrId, String brdcPgmId,
+                                                        String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
+                                                        List<String> apprvDivCdList, Long deptCd, String artclCateCd, String artclTypDtlCd,
+                                                        String delYn, Long artclId, String copyYn, Long orgArtclId, Long cueId, Integer page) throws Exception {
+
+
+        List<ElasticSearchArticle> articleList = elasticSearchArticleRepository.findByStatisticsArticle(sdate, edate, rptrId, inputrId, brdcPgmId,
+                artclDivCd, artclTypCd, searchDivCd, searchWord,
+                apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd,
+                delYn, artclId, copyYn, orgArtclId, cueId, page);
+
+
+        return articleList;
+
+    }
+
+    public Long findAllStatisticsCount(Date sdate, Date edate, String rptrId, String inputrId, String brdcPgmId,
+                                          String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
+                                          List<String> apprvDivCdList, Long deptCd, String artclCateCd, String artclTypDtlCd,
+                                          String delYn, Long artclId, String copyYn, Long orgArtclId, Long cueId) throws Exception {
+
+        Long count = elasticSearchArticleRepository.findByStatisticsArticleCount(sdate, edate, rptrId, inputrId, brdcPgmId,
+                artclDivCd, artclTypCd, searchDivCd, searchWord,
+                apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd,
+                delYn, artclId, copyYn, orgArtclId, cueId);
+
+
+        return count;
+    }
+
+    public void excelDownload(HttpServletResponse response, List<ElasticSearchArticle> articleList, Date sdate) throws IOException {
+
+        Workbook wb = new XSSFWorkbook();
+        Sheet sheet = wb.createSheet("ANS 사용자 정보");
+        sheet.setColumnWidth(0, 3000);
+        sheet.setColumnWidth(1, 6000);
+        sheet.setColumnWidth(2, 15000);
+        sheet.setColumnWidth(3, 15000);
+        sheet.setColumnWidth(4, 3000);
+        sheet.setColumnWidth(5, 2000);
+        sheet.setColumnWidth(6, 2000);
+        sheet.setColumnWidth(7, 2000);
+        sheet.setColumnWidth(8, 2000);
+        sheet.setColumnWidth(9, 4000);
+        sheet.setColumnWidth(10, 4000);
+        sheet.addMergedRegion(new CellRangeAddress(0,0,0,10));
+        Row row = null;
+        Cell cell = null;
+        int rowNum = 0;
+
+        XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
+        style.setFillForegroundColor(IndexedColors.YELLOW.getIndex());//배경색
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        // 셀의 텍스트 가운데정렬
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setBorderTop(BorderStyle.THIN); // 셀 위 테두리 실선 적용
+        style.setBorderBottom(BorderStyle.THIN); // 셀 아래 테두리 실선 적용
+        style.setBorderLeft(BorderStyle.THIN); // 셀 왼쪽 테두리 실선 적용
+        style.setBorderRight(BorderStyle.THIN); // 셀 오른쪽 테두리 실선 적용
+
+
+        XSSFCellStyle style2 = (XSSFCellStyle) wb.createCellStyle();
+        style2.setFillForegroundColor(IndexedColors.SKY_BLUE.getIndex());//배경색
+        style2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        // 셀의 텍스트 가운데정렬
+        style2.setAlignment(HorizontalAlignment.CENTER);
+        style2.setVerticalAlignment(VerticalAlignment.CENTER);
+        style2.setBorderTop(BorderStyle.THIN); // 셀 위 테두리 실선 적용
+        style2.setBorderBottom(BorderStyle.THIN); // 셀 아래 테두리 실선 적용
+        style2.setBorderLeft(BorderStyle.THIN); // 셀 왼쪽 테두리 실선 적용
+        style2.setBorderRight(BorderStyle.THIN); // 셀 오른쪽 테두리 실선 적용
+
+        String headDate = dateChangeHelper.dateToStringNoTime(sdate);
+
+        if (headDate != null && headDate.trim().isEmpty() == false) {
+            headDate = headDate.substring(0, 4);
+        }
+        //Header
+        row = sheet.createRow(rowNum++);
+        cell = row.createCell(0);
+        cell.setCellValue(headDate+"년 Story List");
+        cell.setCellStyle(style);
+
+        // Header1
+        row = sheet.createRow(rowNum++);
+        cell = row.createCell(0);
+        cell.setCellValue("솔더샷");
+        cell.setCellStyle(style2);
+        cell = row.createCell(1);
+        cell.setCellValue("기사 작성일");
+        cell.setCellStyle(style2);
+        cell = row.createCell(2);
+        cell.setCellValue("타이틀");
+        cell.setCellStyle(style2);
+        cell = row.createCell(3);
+        cell.setCellValue("영문 타이틀");
+        cell.setCellStyle(style2);
+        cell = row.createCell(4);
+        cell.setCellValue("작성자");
+        cell.setCellStyle(style2);
+        cell = row.createCell(5);
+        cell.setCellValue("타입");
+        cell.setCellStyle(style2);
+        cell = row.createCell(6);
+        cell.setCellValue("유형");
+        cell.setCellStyle(style2);
+        cell = row.createCell(7);
+        cell.setCellValue("큐시트");
+        cell.setCellStyle(style2);
+        cell = row.createCell(8);
+        cell.setCellValue("길이");
+        cell.setCellStyle(style2);
+        cell = row.createCell(9);
+        cell.setCellValue("부서");
+        cell.setCellStyle(style2);
+        cell = row.createCell(10);
+        cell.setCellValue("카테고리");
+        cell.setCellStyle(style2);
+        /*cell = row.createCell(7);
+        cell.setCellValue("등록 일시");
+        cell = row.createCell(8);
+        cell.setCellValue("사내 번호");*/
+
+        // Body
+        for (ElasticSearchArticle article : articleList) {
+
+            ElasticSearchCueSheet cueSheet = article.getCueSheet();
+            String stringCueId = "";
+            if (ObjectUtils.isEmpty(cueSheet) == false){
+                Long cueId = cueSheet.getCueId();
+                stringCueId = Long.toString(cueId);
+            }
+
+            int articleTime = Optional.ofNullable(article.getArtclCttTime()).orElse(0);
+            int anchorTime = Optional.ofNullable(article.getAncMentCttTime()).orElse(0);
+
+            int totalTime = articleTime + anchorTime;
+
+            int minute = totalTime/60;
+            int second = totalTime%60;
+
+            String min = Integer.toString(minute);
+            if (min.length() == 1){
+                min = "0"+min;
+            }
+            String sec = Integer.toString(second);
+            if (sec.length() == 1){
+                sec = "0"+sec;
+            }
+
+            String total = min+":"+sec;
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("");
+            cell = row.createCell(1);
+            cell.setCellValue(article.getInputDtm());
+            cell = row.createCell(2);
+            cell.setCellValue(article.getArtclTitl());
+            cell = row.createCell(3);
+            cell.setCellValue(article.getArtclTitlEn());
+            cell = row.createCell(4);
+            cell.setCellValue(article.getInputrNm());
+            cell = row.createCell(5);
+            cell.setCellValue(article.getArtclTypCdNm());
+            cell = row.createCell(6);
+            cell.setCellValue(article.getArtclTypDtlCdNm());
+            cell = row.createCell(7);
+            cell.setCellValue(stringCueId);
+            cell = row.createCell(8);
+            cell.setCellValue(total);
+            cell = row.createCell(9);
+            cell.setCellValue(article.getDeptNm());
+            cell = row.createCell(10);
+            cell.setCellValue(article.getArtclCateCdNm());
+
+           /* cell = row.createCell(7);
+            cell.setCellValue(userDTO.getInputDtm());
+            cell = row.createCell(8);
+            cell.setCellValue(userDTO.getInphonNo());*/
+        }
+
+        // 컨텐츠 타입과 파일명 지정
+        response.setContentType("ms-vnd/excel");
+//        response.setHeader("Content-Disposition", "attachment;filename=example.xls");
+        response.setHeader("Content-Disposition", "attachment;filename=example.xlsx");
+
+        // Excel File Output
+        wb.write(response.getOutputStream());
+        wb.close();
+    }
+
     //엘라스틱서치 lock데이터 추가
-    public PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> lockInfoAdd(PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> result){
+    public PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> lockInfoAdd(PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> result) {
 
 
         List<ElasticSearchArticleDTO> articleDTOList = result.getDtoList();
 
         List<Long> artclIds = new ArrayList<>();
 
-        for (ElasticSearchArticleDTO articleDTO : articleDTOList){
+        for (ElasticSearchArticleDTO articleDTO : articleDTOList) {
 
             Long artclId = articleDTO.getArtclId();
 
@@ -252,15 +460,15 @@ public class ArticleService {
 
         List<ArticleElasticLockInfoDTO> articleList = articleRepository.findLockArticleListElastic(artclIds);
 
-        for (ElasticSearchArticleDTO searchArticleDTO : articleDTOList){
+        for (ElasticSearchArticleDTO searchArticleDTO : articleDTOList) {
 
             Long artclId = searchArticleDTO.getArtclId();
 
-            for (ArticleElasticLockInfoDTO dbarticle : articleList){
+            for (ArticleElasticLockInfoDTO dbarticle : articleList) {
 
                 Long dbArtclId = dbarticle.getArtclId();
 
-                if (artclId.equals(dbArtclId)){
+                if (artclId.equals(dbArtclId)) {
 
                     searchArticleDTO.setLckYn(dbarticle.getLckYn());
                     searchArticleDTO.setLckDtm(dbarticle.getLckDtm());
@@ -350,7 +558,7 @@ public class ArticleService {
 
         Optional<Article> articleEntity = articleRepository.findDeleteArticle(artclId);
 
-        if (articleEntity.isPresent() == false){
+        if (articleEntity.isPresent() == false) {
             throw new ResourceNotFoundException("삭제된 기사 아이디가 없습니다. 기사 아이디  : " + artclId);
         }
 
@@ -430,7 +638,7 @@ public class ArticleService {
         articleActionLogCreate(article, userId);//기사 액션 로그 등록
 
         //기사 이력 create
-        Long articleHistId = createArticleHist(article);
+        Long articleHistId = createArticleHist(article, userId);
 
 
         //기사자막, 앵커자막 create
@@ -456,7 +664,7 @@ public class ArticleService {
     }
 
     //기사 Extra Time 수정
-    public Article updateExtraTime(ArticleExtraTimeUpdateDTO articleExtraTimeUpdateDTO, Long artclId, String userId){
+    public Article updateExtraTime(ArticleExtraTimeUpdateDTO articleExtraTimeUpdateDTO, Long artclId, String userId) {
 
         Article article = articleFindOrFail(artclId);
 
@@ -502,7 +710,7 @@ public class ArticleService {
         articleActionLogUpdate(article, articleUpdateDTO, userId);
 
         //기사이력 등록.
-        Long articleHistId = updateArticleHist(article);
+        Long articleHistId = updateArticleHist(article, userId);
 
 
         //기사 자막 Update
@@ -606,7 +814,7 @@ public class ArticleService {
                         //기사 로그 등록.
                         copyArticleActionLogUpdate(updateCopyArticle, article, userId);
                         //기사이력 등록.
-                        Long articleHistId = updateArticleHist(updateCopyArticle);
+                        Long articleHistId = updateArticleHist(updateCopyArticle, userId);
 
                         //기사 미디어 update
                         //copyarticleMediaUpdate(updateCopyArticle, articleId, articleHistId, userId);
@@ -619,7 +827,7 @@ public class ArticleService {
                         copyArticleTag(updateCopyArticle, article);
 
                         //엘라스틱서치 등록
-                       elasticSearchArticleService.elasticPush(updateCopyArticle);
+                        elasticSearchArticleService.elasticPush(updateCopyArticle);
 
                         Long artclId = updateCopyArticle.getArtclId();
                         //MQ메세지 전송
@@ -634,15 +842,15 @@ public class ArticleService {
     }
 
     /* 기사 테그를 저장하는 부분 */
-    public void copyArticleTag(Article updateCopyArticle, Article orgArticle){
+    public void copyArticleTag(Article updateCopyArticle, Article orgArticle) {
 
         Long newArtclId = updateCopyArticle.getArtclId();
         List<ArticleTag> orgArticleTagList = articleTagRepository.findArticleTag(newArtclId);
 
         //기존에 있던 테그 삭제후 재등록
-        if (CollectionUtils.isEmpty(orgArticleTagList) == false){
-            
-            for (ArticleTag articleTag : orgArticleTagList){
+        if (CollectionUtils.isEmpty(orgArticleTagList) == false) {
+
+            for (ArticleTag articleTag : orgArticleTagList) {
 
                 Long id = articleTag.getId();
 
@@ -655,7 +863,7 @@ public class ArticleService {
 
         List<ArticleTag> articleTagList = articleTagRepository.findArticleTag(artclId);
 
-        for (ArticleTag articleTag : articleTagList){
+        for (ArticleTag articleTag : articleTagList) {
 
             Tag tag = articleTag.getTag();
 
@@ -750,7 +958,7 @@ public class ArticleService {
                 //추후에 T는 클라우드 콘피그 교체
                 //부조전송
                 if (subrmNm != null && subrmNm.trim().isEmpty() == false) {
-                    lboxService.mediaTransfer(mediaId, contentId, subrmNm, "T", false, false);
+                    lboxService.mediaTransfer(mediaId, contentId, subrmNm, "T", false, false, userId);
                 }
             }
         }
@@ -812,8 +1020,8 @@ public class ArticleService {
         copyArticle.setEditorId(article.getEditorId());
         copyArticle.setArtclFixUser(article.getArtclFixUser());
         //copyArticle.setEditorFixUser(article.getEditorFixUser());
-      //  copyArticle.setAnchorFixUser(article.getAnchorFixUser());
-       // copyArticle.setDeskFixUser(article.getDeskFixUser());
+        //  copyArticle.setAnchorFixUser(article.getAnchorFixUser());
+        // copyArticle.setDeskFixUser(article.getDeskFixUser());
         copyArticle.setArtclFixDtm(article.getArtclFixDtm());
         //copyArticle.setEditorFixDtm(article.getEditorFixDtm());
         //copyArticle.setAnchorFixDtm(article.getAnchorFixDtm());
@@ -926,7 +1134,7 @@ public class ArticleService {
         articleActionLogDelete(article, userId);
 
         //기사이력 등록.
-        updateArticleHist(article);
+        updateArticleHist(article, userId);
 
         //MQ메세지 전송
         articleTopicService.articleTopic("Aarticle Delete", artclId);
@@ -1036,7 +1244,7 @@ public class ArticleService {
                 .article(article)
                 .message(ActionMesg.articleC.getActionMesg(ActionMesg.articleC))
                 .action(ActionEnum.CREATE.getAction(ActionEnum.CREATE))
-                .inputrId(userId)
+                .inputrId(article.getInputrId())
                 .artclCapInfo(marshallingJsonHelper.MarshallingJson(articleCapList))
                 .anchorCapInfo(marshallingJsonHelper.MarshallingJson(anchorCapList))
                 .artclInfo(marshallingJsonHelper.MarshallingJson(article)) //Json으로 기사내용저장
@@ -2156,7 +2364,7 @@ public class ArticleService {
     }
 
     //기사등록 이력 등록
-    public Long createArticleHist(Article article) {
+    public Long createArticleHist(Article article, String userId) {
 
         ArticleHist articleHist = ArticleHist.builder()
                 .article(article)
@@ -2168,6 +2376,7 @@ public class ArticleService {
                 .artclOrd(article.getArtclOrd())
                 .orgArtclId(article.getOrgArtclId())
                 .inputDtm(new Date())
+                .inputrId(userId)
                 .ver(0) //수정! 버전 설정?
                 .build();
 
@@ -2177,7 +2386,7 @@ public class ArticleService {
     }
 
     //기사수정 이력 등록
-    public Long updateArticleHist(Article article) {
+    public Long updateArticleHist(Article article, String userId) {
 
         Long artclId = article.getArtclId();
 
@@ -2196,6 +2405,7 @@ public class ArticleService {
                 .artclOrd(article.getArtclOrd())
                 .orgArtclId(article.getOrgArtclId())
                 .inputDtm(new Date())
+                .inputrId(userId)
                 .ver(articleHistVer + 1) //수정! 버전 설정?
                 .build();
 
@@ -2388,7 +2598,7 @@ public class ArticleService {
                             //기사 로그 등록.
                             copyArticleActionLogUpdate(updateCopyArticle, article, userId);
                             //기사이력 등록.
-                            Long articleHistId = updateArticleHist(updateCopyArticle);
+                            Long articleHistId = updateArticleHist(updateCopyArticle, userId);
                             //기사 자막 Update
                             fixCopyArticleCapUpdate(updateCopyArticle, artclId, articleHistId);
                             fixCopyAnchorCapUpdate(updateCopyArticle, artclId, articleHistId);
@@ -2619,11 +2829,11 @@ public class ArticleService {
         String inputr = article.getInputrId();
 
         if (inputr.equals(userId) == false) { //기사입력자 확인, 본인기사만 삭제 가능.
-            if (userAuthChkService.authChk(AuthEnum.DeskFix.getAuth())) {
+            if (userAuthChkService.authChk(AuthEnum.DeskFix.getAuth(), userId)) {
                 throw new UserFailException("기사를 입력한 사용자가 아닙니다. 기사 입력자 아이디 : " + inputr);
             }
         } else {
-            if (userAuthChkService.authChk(AuthEnum.DeskFix.getAuth()) ) {//관리자 권한 확인. 본인기사가 아니더라도 관리자면 삭제가능
+            if (userAuthChkService.authChk(AuthEnum.DeskFix.getAuth(), userId)) {//관리자 권한 확인. 본인기사가 아니더라도 관리자면 삭제가능
                 if (userId.equals(inputr) == false) { //하 잘못짯다 오픈전에 아라서 급하게 또 처리 ....ㅎ
 
                     throw new UserFailException("관리자 권한 이거나 기사를 입력한 사용자만 기사 삭제가 가능 합니다.");

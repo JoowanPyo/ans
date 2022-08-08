@@ -3,15 +3,13 @@ package com.gemiso.zodiac.app.articleOrder;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderCreateDTO;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderDTO;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderStatusDTO;
-import com.gemiso.zodiac.app.articleOrderFile.ArticleOrderFile;
-import com.gemiso.zodiac.app.articleOrderFile.ArticleOrderFileRepository;
-import com.gemiso.zodiac.app.articleOrderFile.dto.ArticleOrderFileDTO;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderUpdateDTO;
 import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderCreateMapper;
 import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderMapper;
 import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderUpdateMapper;
-import com.gemiso.zodiac.app.file.AttachFile;
-import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.app.articleOrderFile.ArticleOrderFile;
+import com.gemiso.zodiac.app.articleOrderFile.ArticleOrderFileRepository;
+import com.gemiso.zodiac.app.articleOrderFile.dto.ArticleOrderFileDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -48,14 +46,14 @@ public class ArticleOrderService {
 
 
     public List<ArticleOrderDTO> findAll(Date sdate, Date edate, String orderDivCd, String orderStatus, String workrId,
-                                         String inputrId, Long artclId, Long orgArtclId){
+                                         String inputrId, Long artclId, Long orgArtclId, String rptrId){
 
         //목록조회 조건 build
-        BooleanBuilder booleanBuilder = getSearch(sdate, edate, orderDivCd, orderStatus, workrId, inputrId, artclId, orgArtclId);
+        BooleanBuilder booleanBuilder = getSearch(sdate, edate, orderDivCd, orderStatus, workrId, inputrId, artclId, orgArtclId, rptrId);
 
         //조회조건으로 전체조회
         List<ArticleOrder> articleOrderList = (List<ArticleOrder>) articleOrderRepository.findAll(booleanBuilder,
-                Sort.by(Sort.Direction.ASC, "inputDtm"));
+                Sort.by(Sort.Direction.DESC, "inputDtm"));
 
         //DTO변환후 return
         List<ArticleOrderDTO> articleOrderDTOList = articleOrderMapper.toDtoList(articleOrderList);
@@ -167,7 +165,7 @@ public class ArticleOrderService {
 
         ArticleOrderDTO articleOrderDTO = articleOrderMapper.toDto(articleOrder);
         articleOrderDTO.setOrderStatus(articleOrderStatusDTO.getOrderStatus());
-        articleOrderDTO.setWorkrId(userId);
+        //articleOrderDTO.setWorkrId(userId);
 
         articleOrderMapper.updateFromDto(articleOrderDTO, articleOrder);
 
@@ -184,7 +182,7 @@ public class ArticleOrderService {
 
     //목록조회 조건 build
     public BooleanBuilder getSearch(Date sdate, Date edate, String orderDivCd, String orderStatus, String workrId,
-                                    String inputrId, Long artclId, Long orgArtclId){
+                                    String inputrId, Long artclId, Long orgArtclId, String rptrId){
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -217,6 +215,10 @@ public class ArticleOrderService {
         //원본기사 아이디
         if (ObjectUtils.isEmpty(orgArtclId) == false){
             booleanBuilder.and(qArticleOrder.article.orgArtclId.eq(orgArtclId));
+        }
+        //기자 아이디
+        if (rptrId != null && rptrId.trim().isEmpty() == false){
+            booleanBuilder.and(qArticleOrder.article.rptrId.eq(rptrId));
         }
 
         return booleanBuilder;

@@ -1,8 +1,5 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItem;
 
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
-import com.gemiso.zodiac.app.cueSheetItemSymbol.CueSheetItemSymbol;
-import com.gemiso.zodiac.app.cueSheetItemSymbol.dto.CueSheetItemSymbolDTO;
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemCreateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemDTO;
@@ -14,16 +11,13 @@ import com.gemiso.zodiac.app.cueSheetTemplateItem.mapper.CueTmpltItemUpdateMappe
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.CueTmpltItemCap;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.CueTmpltItemCapRepository;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapCreateDTO;
-import com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto.CueTmpltItemCapDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItemCap.mapper.CueTmpltItemCapCreateMapper;
-import com.gemiso.zodiac.app.cueSheetTemplateItemCap.mapper.CueTmpltItemCapMapper;
 import com.gemiso.zodiac.app.cueSheetTemplateMedia.CueTmpltMedia;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbol;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.CueTmplSymbolRepository;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.dto.CueTmplSymbolDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateSymbol.mapper.CueTmplSymbolMapper;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;

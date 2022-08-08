@@ -18,4 +18,15 @@ public interface ElasticSearchArticleCustom {
     Page<ElasticSearchArticle> findByElasticSearchArticleListCue(Date sdate, Date edate, String searchWord, Long cueId,
                                                                  String brdcPgmId, String artclTypCd,String artclTypDtlCd,
                                                                  String copyYn, Long deptCd, Long orgArtclId, String rptrId, Pageable pageable) throws Exception;
+
+
+    List<ElasticSearchArticle> findByStatisticsArticle(Date sdate, Date edate, String rptrId, String inputrId, String brdcPgmId,
+                                                       String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
+                                                       List<String> apprvDivCdList, Long deptCd, String artclCateCd, String artclTypDtlCd,
+                                                       String delYn, Long artclId, String copyYn, Long orgArtclId, Long cueId, Integer page) throws Exception;
+
+    Long findByStatisticsArticleCount(Date sdate, Date edate, String rptrId, String inputrId, String brdcPgmId,
+                                                       String artclDivCd, String artclTypCd, String searchDivCd, String searchWord,
+                                                       List<String> apprvDivCdList, Long deptCd, String artclCateCd, String artclTypDtlCd,
+                                                       String delYn, Long artclId, String copyYn, Long orgArtclId, Long cueId) throws Exception;
 }

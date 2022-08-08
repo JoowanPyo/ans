@@ -6,6 +6,7 @@ import com.gemiso.zodiac.app.yonhapAssign.dto.YonhapAssignResponseDTO;
 import com.gemiso.zodiac.app.yonhapAssign.dto.YonhapAssignUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,6 +30,8 @@ import java.util.List;
 public class YonhapAssignController {
 
     private final YonhapAssignService yonhapAssignService;
+
+    private final JwtGetUserService jwtGetUserService;
 
 
     @Operation(summary = "연합담당자지정 목록조회", description = "연합담당자지정 목록조회")
@@ -75,11 +79,14 @@ public class YonhapAssignController {
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<YonhapAssignResponseDTO> create(@Parameter(description = "필수값<br> ", required = true)
-                                                          @RequestBody YonhapAssignCreateDTO yonhapAssignCreateDTO) {
+                                                          @RequestBody YonhapAssignCreateDTO yonhapAssignCreateDTO,
+                                                          @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+
+        String userId =jwtGetUserService.getUser(Authorization);
 
         YonhapAssignResponseDTO returnId = new YonhapAssignResponseDTO();
 
-        Long assignId = yonhapAssignService.create(yonhapAssignCreateDTO);
+        Long assignId = yonhapAssignService.create(yonhapAssignCreateDTO, userId);
         returnId.setAssignId(assignId);
 
         return new AnsApiResponse<>(returnId);

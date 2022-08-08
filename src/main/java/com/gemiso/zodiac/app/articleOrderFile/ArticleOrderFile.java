@@ -2,7 +2,6 @@ package com.gemiso.zodiac.app.articleOrderFile;
 
 import com.gemiso.zodiac.app.articleOrder.ArticleOrder;
 import com.gemiso.zodiac.app.file.AttachFile;
-import com.gemiso.zodiac.app.user.User;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -28,6 +27,7 @@ public class ArticleOrderFile {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id")
+    //@JsonManagedReference
     private ArticleOrder articleOrder;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

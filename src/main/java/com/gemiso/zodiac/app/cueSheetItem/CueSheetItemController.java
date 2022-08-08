@@ -1,10 +1,8 @@
 package com.gemiso.zodiac.app.cueSheetItem;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetItem.dto.*;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
-import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +25,9 @@ public class CueSheetItemController {
     private final CueSheetItemService cueSheetItemService;
     /*private final ArticleService articleService;*/
 
-    private final UserAuthService userAuthService;
+
+    private final JwtGetUserService jwtGetUserService;
+    //private final UserAuthService userAuthService;
 
     @Operation(summary = "큐시트 아이템 목록조회", description = "큐시트 아이템 목록조회")
     @GetMapping(path = "")
@@ -58,7 +58,7 @@ public class CueSheetItemController {
     @Operation(summary = "큐시트 아이템 상세정보 조회[ 삭제 아이템 ]", description = "큐시트 아이템 상세정보 조회[ 삭제 아이템 ]")
     @GetMapping(path = "/{cueItemId}/deleteitem")
     public AnsApiResponse<CueSheetItemDTO> findDeleteItem(@Parameter(name = "cueItemId", description = "큐시트아이템아이디")
-                                                @PathVariable("cueItemId") Long cueItemId) {
+                                                          @PathVariable("cueItemId") Long cueItemId) {
 
         CueSheetItemDTO cueSheetItemDTO = cueSheetItemService.findDeleteItem(cueItemId);
 
@@ -70,10 +70,11 @@ public class CueSheetItemController {
     public AnsApiResponse<CueSheetItemResponseDTO> createTemplate(@Parameter(description = "필수값<br> ", required = true)
                                                                   @RequestBody @Valid List<CueSheetItemCreateDTO> cueSheetItemCreateDTOList,
                                                                   @Parameter(name = "cueId", description = "큐시트아이디")
-                                                                  @PathVariable("cueId") Long cueId) throws Exception {
+                                                                  @PathVariable("cueId") Long cueId,
+                                                                  @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
-        String userId = userAuthService.authUser.getUserId();
+        String userId = jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item Template Create : userId - " + userId + " CueId - " + cueId + "<br>" +
                 " CueSheet Item Model List - " + cueSheetItemCreateDTOList.toString());
 
@@ -94,10 +95,11 @@ public class CueSheetItemController {
     public AnsApiResponse<CueSheetItemResponseDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                                           @RequestBody @Valid CueSheetItemCreateDTO cueSheetItemCreateDTO,
                                                           @Parameter(name = "cueId", description = "큐시트아이디")
-                                                          @PathVariable("cueId") Long cueId) throws Exception {
+                                                          @PathVariable("cueId") Long cueId,
+                                                          @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
-        String userId = userAuthService.authUser.getUserId();
+        String userId = jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item Create : userId - " + userId + " CueId - " + cueId + "<br>" +
                 " CueSheet Item Model - " + cueSheetItemCreateDTO.toString());
 
@@ -120,10 +122,11 @@ public class CueSheetItemController {
                                                           @Parameter(name = "cueId", description = "큐시트아이디")
                                                           @PathVariable("cueId") Long cueId,
                                                           @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
-                                                          @PathVariable("cueItemId") Long cueItemId) throws Exception {
+                                                          @PathVariable("cueItemId") Long cueItemId,
+                                                          @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
-        String userId = userAuthService.authUser.getUserId();
+        String userId = jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item Update : userId - " + userId + " CueId - " + cueId + " CueItemDivCd - " + cueItemDivCd
                 + "CueItemId - " + cueItemId + "<br>" +
                 " CueSheet Item Model - " + cueSheetItemUpdateDTO.toString());
@@ -160,16 +163,17 @@ public class CueSheetItemController {
     @Operation(summary = "큐시트 아이템 수정 [아이템 컬럼 수정]", description = "큐시트 아이템 수정 [아이템 컬럼 수정]")
     @PutMapping(path = "/{cueId}/item/{cueItemId}/update")
     public AnsApiResponse<CueSheetItemResponseDTO> updateItem(@Parameter(description = "필수값<br> ", required = true)
-                                                          @RequestBody @Valid CueSheetItemUpdateDTO cueSheetItemUpdateDTO,
-                                                          @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드", required = true)
-                                                          @RequestParam(value = "cueItemDivCd") String cueItemDivCd,
-                                                          @Parameter(name = "cueId", description = "큐시트아이디")
-                                                          @PathVariable("cueId") Long cueId,
-                                                          @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
-                                                          @PathVariable("cueItemId") Long cueItemId) throws Exception {
+                                                              @RequestBody @Valid CueSheetItemUpdateDTO cueSheetItemUpdateDTO,
+                                                              @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드", required = true)
+                                                              @RequestParam(value = "cueItemDivCd") String cueItemDivCd,
+                                                              @Parameter(name = "cueId", description = "큐시트아이디")
+                                                              @PathVariable("cueId") Long cueId,
+                                                              @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
+                                                              @PathVariable("cueItemId") Long cueItemId,
+                                                              @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item Update [Item] : userId - " + userId + " CueId - " + cueId + " CueItemDivCd - " + cueItemDivCd
                 + "CueItemId - " + cueItemId + "<br>" +
                 " CueSheet Item Model - " + cueSheetItemUpdateDTO.toString());
@@ -191,10 +195,11 @@ public class CueSheetItemController {
     public AnsApiResponse<?> delete(@Parameter(name = "cueId", description = "큐시트아이디")
                                     @PathVariable("cueId") Long cueId,
                                     @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
-                                    @PathVariable("cueItemId") Long cueItemId) throws Exception {
+                                    @PathVariable("cueItemId") Long cueItemId,
+                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item Delete : userId - " + userId + " CueId - " + cueId
                 + "CueItemId - " + cueItemId);
 
@@ -212,10 +217,11 @@ public class CueSheetItemController {
                                                              @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
                                                              @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd,
                                                              @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
-                                                             @RequestParam(value = "spareYn", required = true) String spareYn) throws Exception {
+                                                             @RequestParam(value = "spareYn", required = true) String spareYn,
+                                                             @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item OrderUpdate : userId - " + userId + " CueId - " + cueId
                 + "CueItemId - " + cueItemId + "Order - " + cueItemOrd + " SpareYn - " + spareYn);
 
@@ -258,10 +264,11 @@ public class CueSheetItemController {
                                                                         @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드")
                                                                         @RequestParam(value = "cueItemDivCd", required = false) String cueItemDivCd,
                                                                         @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
-                                                                        @RequestParam(value = "spareYn", required = false) String spareYn) throws Exception {
+                                                                        @RequestParam(value = "spareYn", required = false) String spareYn,
+                                                                        @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item Create [Drag and Drop] Article : userId - " + userId + " CueId - " + cueId + "<br>" +
                 " ArticleId - " + artclId + " Order - " + cueItemOrd + " SpareYn - " + spareYn);
 
@@ -289,10 +296,11 @@ public class CueSheetItemController {
                                                                  @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드")
                                                                  @RequestParam(value = "cueItemDivCd", required = false) String cueItemDivCd,
                                                                  @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
-                                                                 @RequestParam(value = "spareYn", required = false) String spareYn) throws Exception {
+                                                                 @RequestParam(value = "spareYn", required = false) String spareYn,
+                                                                 @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item Create [Drag and Drop] : userId - " + userId + " CueId - " + cueId + "<br>" +
                 " CueSheetItemId - " + cueItemId + " Order - " + cueItemOrd + " SpareYn - " + spareYn);
 
@@ -322,10 +330,11 @@ public class CueSheetItemController {
                                                                      @Parameter(name = "cueItemDivCd", description = "큐시트 아이템 구분 코드")
                                                                      @RequestParam(value = "cueItemDivCd", required = false) String cueItemDivCd,
                                                                      @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
-                                                                     @RequestParam(value = "spareYn", required = false) String spareYn) throws Exception {
+                                                                     @RequestParam(value = "spareYn", required = false) String spareYn,
+                                                                     @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item Create [Drag and Drop] CueSheetTemplate : userId - " + userId + " CueId - " + cueId + "<br>" +
                 " CueSheet Tamplate Id and Order Body - " + cueSheetItemCreateTmplDTO.toString() + " SpareYn - " + spareYn);
 
@@ -345,10 +354,11 @@ public class CueSheetItemController {
                                                                      @Parameter(name = "cueId", description = "큐시트아이디")
                                                                      @PathVariable("cueId") Long cueId,
                                                                      @Parameter(name = "spareYn", description = "예비큐시트 여부(N, Y)")
-                                                                     @RequestParam(value = "spareYn", required = false) String spareYn) throws Exception {
+                                                                     @RequestParam(value = "spareYn", required = false) String spareYn,
+                                                                     @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item Create [Drag and Drop List] : userId - " + userId + " CueId - " + cueId);
 
         cueSheetItemService.createCueItemList(cueSheetItemCreateListDTO, cueId, spareYn, userId);
@@ -384,10 +394,11 @@ public class CueSheetItemController {
                                                                      @Parameter(name = "cueItemId", description = "큐시트아이템 아이디")
                                                                      @PathVariable("cueItemId") Long cueItemId,
                                                                      @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
-                                                                     @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd) throws Exception {
+                                                                     @RequestParam(value = "cueItemOrd", required = false) Integer cueItemOrd,
+                                                                     @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         //토큰 사용자 Id(현재 로그인된 사용자 ID)
-        String userId = userAuthService.authUser.getUserId();
+        String userId =jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item Restore : userId - " + userId + " CueId - " + cueId + " Order - " + cueItemOrd);
 
         CueSheetItemSimpleDTO cueSheetItemSimpleDTO = cueSheetItemService.cueSheetItemRestore(cueId, cueItemId, cueItemOrd);
@@ -398,7 +409,7 @@ public class CueSheetItemController {
     @Operation(summary = "큐시트 아이템 영상 매칭 목록 조회", description = "큐시트 아이템 영상 매칭 목록 조회")
     @GetMapping(path = "/medialist")
     public AnsApiResponse<CueSheetItemMediaListDTO> findAllMedia(@Parameter(name = "cueId", description = "큐시트 아이디")
-                                                         @RequestParam(value = "cueId", required = false) Long cueId) {
+                                                                 @RequestParam(value = "cueId", required = false) Long cueId) {
 
         CueSheetItemMediaListDTO cueSheetItemMediaListDTO = cueSheetItemService.findAllMedia(cueId);
 

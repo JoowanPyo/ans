@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gemiso.zodiac.app.baseProgram.BaseProgram;
 import com.gemiso.zodiac.app.baseProgram.BaseProgramRepository;
-import com.gemiso.zodiac.app.baseProgram.mapper.BaseProgramMapper;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgram;
 import com.gemiso.zodiac.app.dailyProgram.DailyProgramRepository;
 import com.gemiso.zodiac.app.dailyProgram.QDailyProgram;
@@ -12,7 +11,6 @@ import com.gemiso.zodiac.app.program.Program;
 import com.gemiso.zodiac.app.program.ProgramRepository;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.scheduling.dto.*;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +35,9 @@ public class BisInterfaceService {
     private final BaseProgramRepository baseProgramRepository;
     private final DailyProgramRepository dailyProgramRepository;
 
-    private final BaseProgramMapper baseProgramMapper;
+    //private final BaseProgramMapper baseProgramMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
     private final DateChangeHelper dateChangeHelper;
 

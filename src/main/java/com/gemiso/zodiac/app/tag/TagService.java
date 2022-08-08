@@ -6,7 +6,6 @@ import com.gemiso.zodiac.app.tag.dto.TagUpdateDTO;
 import com.gemiso.zodiac.app.tag.mapper.TagCreateMapper;
 import com.gemiso.zodiac.app.tag.mapper.TagMapper;
 import com.gemiso.zodiac.app.tag.mapper.TagUpdateMapper;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +66,14 @@ public class TagService {
     }
 
     public Tag create(TagCreateDTO tagCreateDTO){ //테그생성
+
+        String tagName = tagCreateDTO.getTag();
+
+        Optional<Tag> tagEntity = tagRepository.findTagName(tagName);
+
+        if (tagEntity.isPresent()){
+            throw new ResourceNotFoundException("동일한 테그명이 이미 존재합니다. : " + tagName);
+        }
 
         tagCreateDTO.setTagClicked(0); //0으로 초기화
         

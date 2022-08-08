@@ -52,10 +52,10 @@ public class CapTemplate extends BaseEntity {
     private String capClassCdNm;
 
     @Column(name = "cap_ln_num")
-    private int capLnNum;
+    private Integer capLnNum;
 
     @Column(name = "cap_lttr_num")
-    private int capLttrNum;
+    private Integer capLttrNum;
 
     @Column(name = "cap_cell_dlmtr", length = 10)
     private String capCellDlmtr;
@@ -64,16 +64,16 @@ public class CapTemplate extends BaseEntity {
     private String capTmpltHelp;
 
     @Column(name = "cap_tmplt_ord")
-    private int capTmpltOrd;
+    private Integer capTmpltOrd;
 
     @Column(name = "var_cnt")
-    private int varCnt;
+    private Integer varCnt;
 
     @Column(name = "var_nm", length = 100)
     private String varNm;
 
     @Column(name = "take_count")
-    private int takeCount;
+    private Integer takeCount;
 
     //맵핑테이블로 대처.
     /*@Column(name = "brdc_pgm_id", length = 21)
@@ -116,6 +116,7 @@ public class CapTemplate extends BaseEntity {
     private String delrNm;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonManagedReference
     @JoinColumn(name = "tmplt_grp_id", nullable = false)
     private CapTemplateGrp capTemplateGrp;
 

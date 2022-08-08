@@ -36,6 +36,12 @@ public class ArticleSimpleDTO {
     private Long orgArtclId;
     @Schema(description = "기사 순번")
     private Integer artclOrd;
+    @Schema(description = "기자 아이디")
+    private String rptrId;
+    @Schema(description = "기자 명")
+    private String rptrNm;
+    @Schema(description = "삭제 여부")
+    private String delYn;
     @Schema(description = "큐시트")
     private CueSheetSimpleDTO cueSheet;
     /*private String artclCtt;

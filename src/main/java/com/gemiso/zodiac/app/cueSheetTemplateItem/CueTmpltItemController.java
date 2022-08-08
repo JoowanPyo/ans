@@ -5,7 +5,7 @@ import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemUpdateDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
-import com.gemiso.zodiac.core.service.UserAuthService;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,7 +26,8 @@ public class CueTmpltItemController {
 
     private final CueTmpltItemService cueTmpltItemService;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
+    private final JwtGetUserService jwtGetUserService;
 
 
     @Operation(summary = "큐시트 템플릿 아이템 목록조회", description = "큐시트 템플릿 아이템 목록조회")
@@ -57,9 +58,10 @@ public class CueTmpltItemController {
     public AnsApiResponse<CueTmpltItemSimpleDTO> create(@Parameter(description = "필수값<br> ", required = true)
                                                         @RequestBody @Valid CueTmpltItemCreateDTO cueTmpltItemCreateDTO,
                                                         @Parameter(name = "cueTmpltId", description = "큐시트 템플릿 아이디")
-                                                        @PathVariable("cueTmpltId") Long cueTmpltId) {
+                                                        @PathVariable("cueTmpltId") Long cueTmpltId,
+                                                        @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        String userId = userAuthService.authUser.getUserId(); //토큰에서 사장자 아이디 get
+        String userId =jwtGetUserService.getUser(Authorization); //토큰에서 사장자 아이디 get
         log.info("CueSheet Template Item Create : userId - "+userId+" cueTmpltId - "+cueTmpltId+"<br>"+
                 "CueSheet Template Model - "+cueTmpltItemCreateDTO.toString());
 
@@ -73,9 +75,10 @@ public class CueTmpltItemController {
     public AnsApiResponse<CueTmpltItemSimpleDTO> update(@Parameter(description = "필수값<br> ", required = true)
                                                         @RequestBody @Valid CueTmpltItemUpdateDTO cueTmpltItemUpdateDTO,
                                                         @Parameter(name = "cueTmpltItemId", description = "큐시트 템플릿 아이템 아이디")
-                                                        @PathVariable("cueTmpltItemId") Long cueTmpltItemId) {
+                                                        @PathVariable("cueTmpltItemId") Long cueTmpltItemId,
+                                                        @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        String userId = userAuthService.authUser.getUserId(); //토큰에서 사장자 아이디 get
+        String userId =jwtGetUserService.getUser(Authorization); //토큰에서 사장자 아이디 get
         log.info("CueSheet Template Item Update : userId - "+userId+" cueTmpltItemId - "+cueTmpltItemId+"<br>"+
                 "CueSheet Template Model - "+cueTmpltItemUpdateDTO.toString());
 
@@ -87,9 +90,10 @@ public class CueTmpltItemController {
     @Operation(summary = "큐시트 템플릿 아이템 삭제", description = "큐시트 템플릿 아이템 삭제")
     @DeleteMapping(path = "/{cueTmpltItemId}")
     public AnsApiResponse<?> delete(@Parameter(name = "cueTmpltItemId", description = "큐시트 템플릿 아이템 아이디")
-                                    @PathVariable("cueTmpltItemId") Long cueTmpltItemId) {
+                                    @PathVariable("cueTmpltItemId") Long cueTmpltItemId,
+                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        String userId = userAuthService.authUser.getUserId(); //토큰에서 사장자 아이디 get
+        String userId =jwtGetUserService.getUser(Authorization); //토큰에서 사장자 아이디 get
         log.info("CueSheet Template Item Delete : userId - "+userId+" cueTmpltItemId - "+cueTmpltItemId);
 
         cueTmpltItemService.delete(cueTmpltItemId, userId);
@@ -104,9 +108,10 @@ public class CueTmpltItemController {
                                                            @Parameter(name = "cueTmpltId", description = "큐시트 템플릿 아이디")
                                                            @PathVariable("cueTmpltId") Long cueTmpltId,
                                                            @Parameter(name = "cueItemOrd", description = "큐시트 아이템 순번")
-                                                           @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd) {
+                                                           @RequestParam(value = "cueItemOrd", required = false) int cueItemOrd,
+                                                           @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        String userId = userAuthService.authUser.getUserId(); //토큰에서 사장자 아이디 get
+        String userId =jwtGetUserService.getUser(Authorization); //토큰에서 사장자 아이디 get
         log.info("CueSheet Template Item Order Update : userId - "+userId+" cueTmpltItemId - "+cueTmpltItemId+ " cueTmpltId - "
                 +cueTmpltId+" Order - "+cueItemOrd);
 

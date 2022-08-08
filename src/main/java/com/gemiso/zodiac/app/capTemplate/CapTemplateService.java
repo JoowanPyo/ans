@@ -2,14 +2,11 @@ package com.gemiso.zodiac.app.capTemplate;
 
 import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateCreateDTO;
 import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateDTO;
+import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateOrdUpdateDTO;
 import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateUpdateDTO;
 import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateCreateMapper;
 import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateMapper;
 import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateUpdateMapper;
-import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrp;
-import com.gemiso.zodiac.app.capTemplateGrp.CapTemplateGrpService;
-import com.gemiso.zodiac.app.capTemplateGrp.dto.CapTemplateGrpDTO;
-import com.gemiso.zodiac.core.service.UserAuthService;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -36,9 +32,9 @@ public class CapTemplateService {
     private final CapTemplateCreateMapper capTemplateCreateMapper;
     private final CapTemplateUpdateMapper capTemplateUpdateMapper;
 
-    private final UserAuthService userAuthService;
+    //private final UserAuthService userAuthService;
 
-    private final CapTemplateGrpService capTemplateGrpService;
+    //private final CapTemplateGrpService capTemplateGrpService;
 
 
     public List<CapTemplateDTO> findAll(Long brdc_pgm_id, String cap_class_cd, String use_yn, String search_word){
@@ -66,21 +62,21 @@ public class CapTemplateService {
 
     }
 
-    public Long create(CapTemplateCreateDTO capTemplateCreateDTO, Long tmpltGrpId){
+    public Long create(CapTemplateCreateDTO capTemplateCreateDTO, Long tmpltGrpId, String userId){
 
         CapTemplate capTemplate = new CapTemplate(); //return Object
 
         // 템플릿 그룹 유무 확인.
-        CapTemplateGrp capTemplateGrp = capTemplateGrpService.templateFindOrFail(tmpltGrpId);
+        //CapTemplateGrp capTemplateGrp = capTemplateGrpService.templateFindOrFail(tmpltGrpId);
 
         //자막템플릿에 넣어줄 자막템플릿그룹 아이디 빌드
-        CapTemplateGrpDTO capTemplateGrpDTO = CapTemplateGrpDTO.builder().tmpltGrpId(tmpltGrpId).build();
+        //CapTemplateGrpDTO capTemplateGrpDTO = CapTemplateGrpDTO.builder().tmpltGrpId(tmpltGrpId).build();
 
         //자막템플릿에 자막템플릿그룹 아이디 set
-        capTemplateCreateDTO.setCapTemplateGrp(capTemplateGrpDTO);
+        //capTemplateCreateDTO.setCapTemplateGrp(capTemplateGrpDTO);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         capTemplateCreateDTO.setInputrId(userId); //등록자 추가.
         
         if (capTemplateCreateDTO.getCapTmpltOrd() == 0){ //Ord값이 빈값으로 들어왔을경우 max(ord)값 셋팅
@@ -134,12 +130,12 @@ public class CapTemplateService {
 
     }
 
-    public void update(CapTemplateUpdateDTO capTemplateUpdateDTO, Long capTmpltId){
+    public void update(CapTemplateUpdateDTO capTemplateUpdateDTO, Long capTmpltId, String userId){
 
         CapTemplate capTemplate = capFindOrFail(capTmpltId);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId = userAuthService.authUser.getUserId();
+        //String userId = userAuthService.authUser.getUserId();
         capTemplateUpdateDTO.setUpdtrId(userId); //수정자 추가
 
         capTemplateUpdateMapper.updateFromDto(capTemplateUpdateDTO, capTemplate);
@@ -171,7 +167,7 @@ public class CapTemplateService {
 
     }
     
-    public void delete(Long[] capTmpltId){
+    public void delete(Long[] capTmpltId, String userId){
 
         for (Long capTmpltIds : capTmpltId) {
 
@@ -180,7 +176,7 @@ public class CapTemplateService {
             CapTemplateDTO capTemplateDTO = capTemplateMapper.toDto(capTemplate);
 
             // 토큰 인증된 사용자 아이디를 입력자로 등록
-            String userId = userAuthService.authUser.getUserId();
+            //String userId = userAuthService.authUser.getUserId();
             capTemplateDTO.setDelrId(userId);
             capTemplateDTO.setDelDtm(new Date());
             capTemplateDTO.setDelYn("Y");
@@ -189,6 +185,47 @@ public class CapTemplateService {
             capTemplateRepository.save(capTemplate);
         }
         
+    }
+
+    public void orderUpdate(CapTemplateOrdUpdateDTO capTemplateOrdUpdateDTO, Long capTmpltId, String userId){
+
+        CapTemplate capTemplate = capFindOrFail(capTmpltId);
+        // 토큰 인증된 사용자 아이디를 입력자로 등록
+        //String userId = userAuthService.authUser.getUserId();
+
+        CapTemplateDTO capTemplateDTO = capTemplateMapper.toDto(capTemplate);
+        capTemplateDTO.setCapTmpltOrd(capTemplateOrdUpdateDTO.getCapTmpltOrd());
+        capTemplateDTO.setUpdtrId(userId);
+
+        capTemplateMapper.updateFromDto(capTemplateDTO, capTemplate);
+
+        capTemplateRepository.save(capTemplate);
+
+        List<CapTemplate> capTemplateList = capTemplateRepository.findCapList();
+
+        if (ObjectUtils.isEmpty(capTemplateList) == false){
+
+            for (int i = 0; i < capTemplateList.size(); i++){
+                if (capTmpltId.equals(capTemplateList.get(i).getCapTmpltId())){
+                    capTemplateList.remove(i); //신규저장했던 CapTmpl을 리스트에서 삭제
+                }
+            }
+
+            capTemplateList.add(capTemplate.getCapTmpltOrd(), capTemplate); //리스트에 Ord값으로 들어왔던 순번으로 Set
+
+            int index = 1;
+            for (CapTemplate caps : capTemplateList){ //index값을 Ord에 대입하여 순차적으로 Ord을 Set
+
+                CapTemplateDTO capTemplateOrdDTO = capTemplateMapper.toDto(caps);
+                capTemplateOrdDTO.setCapTmpltOrd(index);
+                CapTemplate capTemplateEntity = capTemplateMapper.toEntity(capTemplateOrdDTO);
+                capTemplateRepository.save(capTemplateEntity);
+                index++;
+
+            }
+        }
+
+
     }
 
 
