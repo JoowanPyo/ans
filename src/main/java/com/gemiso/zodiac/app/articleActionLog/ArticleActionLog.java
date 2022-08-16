@@ -1,7 +1,6 @@
 package com.gemiso.zodiac.app.articleActionLog;
 
 import com.gemiso.zodiac.app.article.Article;
-import com.gemiso.zodiac.app.issue.Issue;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -25,6 +24,7 @@ import java.util.Date;
 @DynamicUpdate
 @EntityListeners(value = {AuditingEntityListener.class})
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
+//@TypeDef(name = "json", typeClass = JsonStringType.class)
 public class ArticleActionLog {
 
     @Id

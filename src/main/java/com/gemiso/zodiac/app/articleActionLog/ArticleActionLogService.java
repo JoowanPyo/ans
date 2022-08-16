@@ -2,14 +2,17 @@ package com.gemiso.zodiac.app.articleActionLog;
 
 import com.gemiso.zodiac.app.articleActionLog.dto.ArticleActionLogDTO;
 import com.gemiso.zodiac.app.articleActionLog.mapper.ArticleActionLogMapper;
+import com.gemiso.zodiac.core.helper.PageHelper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,13 +30,27 @@ public class ArticleActionLogService {
     //기사 액션 로그 목록조회
     public List<ArticleActionLogDTO> findAll(Long artclId){
 
-        BooleanBuilder booleanBuilder = getSearch(artclId); //기사액션로그 목록조회 조회조건 빌드.
+        //long beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
 
-        //생성된 조회조건으로 기사액션로그 목록조회
-        List<ArticleActionLog> articleActionLogList = (List<ArticleActionLog>) articleActionLogRepository.findAll(booleanBuilder);
+        //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
+        PageHelper pageHelper = new PageHelper(0, 100);
+        Pageable pageable = pageHelper.getArticlePageInfo();
 
-        //조회된 목록조회를 articleDTO List로 변환 후 리턴
-        List<ArticleActionLogDTO> articleActionLogDTOList = articleActionLogMapper.toDtoList(articleActionLogList);
+        List<ArticleActionLogDTO> articleActionLogDTOList = new ArrayList<>();
+
+        if (ObjectUtils.isEmpty(artclId) == false) {
+            BooleanBuilder booleanBuilder = getSearch(artclId); //기사액션로그 목록조회 조회조건 빌드.
+
+            //생성된 조회조건으로 기사액션로그 목록조회
+            List<ArticleActionLog> articleActionLogList = (List<ArticleActionLog>) articleActionLogRepository.findAll(booleanBuilder, pageable);
+
+            //조회된 목록조회를 articleDTO List로 변환 후 리턴
+            articleActionLogDTOList = articleActionLogMapper.toDtoList(articleActionLogList);
+
+        }
+        //long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
+        //long secDiffTime = (afterTime - beforeTime)/1000; //두 시간에 차 계산
+        //System.out.println("시간차이(m) : "+secDiffTime);
 
         return articleActionLogDTOList;
     }

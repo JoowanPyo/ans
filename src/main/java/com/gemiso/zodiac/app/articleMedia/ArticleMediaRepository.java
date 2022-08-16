@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface ArticleMediaRepository extends JpaRepository<ArticleMedia, Long>, QuerydslPredicateExecutor<ArticleMedia> {
+public interface ArticleMediaRepository extends JpaRepository<ArticleMedia, Long>, QuerydslPredicateExecutor<ArticleMedia>, ArticleMediaRepositoryCustorm {
 
     @Query("select a from ArticleMedia a where a.artclMediaId = :artclMediaId and a.delYn = 'N'")
     Optional<ArticleMedia> findByArticleMedia(@Param("artclMediaId")Long artclMediaId);

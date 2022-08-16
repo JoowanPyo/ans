@@ -1722,8 +1722,9 @@ public class CueSheetService {
                 .build();
     }
 
+    /***********자막 템플릿 설계변경*************/
     //큐시트 자막 출력 [ xml ]
-    public String capDownload(Long cueId, String brdcPgmId) {
+    public String capDownloadAsIs(Long cueId, String brdcPgmId) {
 
         List<CueSheetCapDownloadCgDTO> cueSheetCapDownloadCgDTOS = new ArrayList<>();
 
@@ -1881,6 +1882,97 @@ public class CueSheetService {
         //articleDTO TO XML 파싱
         String xml = JAXBXmlHelper.marshal(cueSheetCapDownloadXMLDTO, CueSheetCapDownloadXMLDTO.class);
 
+
+        return xml;
+    }
+
+    public String capDownload(Long cueId){
+
+        List<CueSheetCapDownloadCgDTO> cueSheetCapDownloadCgDTOS = new ArrayList<>();
+
+        int seq = 1;
+
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId); //큐시트 아이템 출력
+
+        for (CueSheetItem cueSheetItem : cueSheetItemList) {
+
+            Article article = cueSheetItem.getArticle(); //기사 정보를 가져온다.
+            Long cueItemId = cueSheetItem.getCueItemId();
+
+            if (ObjectUtils.isEmpty(article)) { //일반 큐시트 아이템, 템플릿아이템
+
+                List<CueSheetItemCap> cueSheetItemCapList = cueSheetItemCapRepotitory.findCueSheetItemCapList(cueItemId);
+
+                for (CueSheetItemCap cueSheetItemCap : cueSheetItemCapList) {
+
+                    CapTemplate capTemplate = cueSheetItemCap.getCapTemplate();
+
+                    if (ObjectUtils.isEmpty(capTemplate) == false){
+
+                        CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
+                                .page(seq)
+                                .content(cueSheetItemCap.getCapCtt())
+                                .template(capTemplate.getCapTmpltNm())
+                                .build();
+
+                        cueSheetCapDownloadCgDTOS.add(cueSheetCapDownloadCg);
+
+                        ++seq;
+
+                    }
+
+                }
+            }else {
+
+                Set<AnchorCap> anchorCapList = article.getAnchorCap();
+
+                for (AnchorCap anchorCap : anchorCapList) {
+
+                    CapTemplate capTemplate = anchorCap.getCapTemplate();
+
+                    if (ObjectUtils.isEmpty(capTemplate) == false){
+
+                        CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
+                                .page(seq)
+                                .content(anchorCap.getCapCtt())
+                                .template(capTemplate.getCapTmpltNm())
+                                .build();
+
+                        cueSheetCapDownloadCgDTOS.add(cueSheetCapDownloadCg);
+
+                        ++seq;
+
+                    }
+                }
+
+                Set<ArticleCap> articleCapList = article.getArticleCap();
+
+                for (ArticleCap articleCap : articleCapList) {
+
+                    CapTemplate capTemplate = articleCap.getCapTemplate();
+
+                    if (ObjectUtils.isEmpty(capTemplate) == false){
+
+                        CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
+                                .page(seq)
+                                .content(articleCap.getCapCtt())
+                                .template(capTemplate.getCapTmpltNm())
+                                .build();
+
+                        cueSheetCapDownloadCgDTOS.add(cueSheetCapDownloadCg);
+
+                        ++seq;
+                    }
+                }
+
+            }
+        }
+
+        CueSheetCapDownloadXMLDTO cueSheetCapDownloadXMLDTO = new CueSheetCapDownloadXMLDTO();
+        cueSheetCapDownloadXMLDTO.setCd(cueSheetCapDownloadCgDTOS);
+
+        //articleDTO TO XML 파싱
+        String xml = JAXBXmlHelper.marshal(cueSheetCapDownloadXMLDTO, CueSheetCapDownloadXMLDTO.class);
 
         return xml;
     }

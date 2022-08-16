@@ -270,18 +270,26 @@ public class CueSheetController {
         return new AnsApiResponse<>(cueSheetSimpleDTO);
     }
 
-    @Operation(summary = "큐시트 자막 다운로드", description = "큐시트 자막 다운로드")
+    /***********자막 템플릿 설계변경*************/
+   /* @Operation(summary = "큐시트 자막 다운로드", description = "큐시트 자막 다운로드")
     @GetMapping(path = "/{cueId}/download")
     public String capDownload(@Parameter(name = "cueId", description = "큐시트 아이디")
                               @PathVariable("cueId") Long cueId,
                               @Parameter(name = "brdcPgmId", description = "프로그램 아이디")
                               @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId) {
 
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authorization = context.getAuthentication();
-        String userNm = authorization.getName();
-
         String capDownload = cueSheetService.capDownload(cueId, brdcPgmId);
+
+
+        return capDownload;
+    }*/
+
+    @Operation(summary = "큐시트 자막 다운로드", description = "큐시트 자막 다운로드")
+    @GetMapping(path = "/{cueId}/download")
+    public String capDownload(@Parameter(name = "cueId", description = "큐시트 아이디")
+                              @PathVariable("cueId") Long cueId) {
+
+        String capDownload = cueSheetService.capDownload(cueId);
 
 
         return capDownload;

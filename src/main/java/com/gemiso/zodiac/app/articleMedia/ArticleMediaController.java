@@ -56,6 +56,7 @@ public class ArticleMediaController {
             articleMediaDTOList = articleMediaService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), trnsfFileNm, artclId, mediaTypCd);
 
         } else {
+
             articleMediaDTOList = articleMediaService.findAll(null, null, trnsfFileNm, artclId, mediaTypCd);
         }
         return new AnsApiResponse<>(articleMediaDTOList);
