@@ -7,6 +7,8 @@ import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,8 +35,8 @@ public class ArticleActionLogService {
         //long beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
 
         //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
-        PageHelper pageHelper = new PageHelper(0, 100);
-        Pageable pageable = pageHelper.getArticlePageInfo();
+        //PageHelper pageHelper = new PageHelper(1, 100);
+        Pageable pageable = PageRequest.of(0,100);
 
         List<ArticleActionLogDTO> articleActionLogDTOList = new ArrayList<>();
 
@@ -42,7 +44,9 @@ public class ArticleActionLogService {
             BooleanBuilder booleanBuilder = getSearch(artclId); //기사액션로그 목록조회 조회조건 빌드.
 
             //생성된 조회조건으로 기사액션로그 목록조회
-            List<ArticleActionLog> articleActionLogList = (List<ArticleActionLog>) articleActionLogRepository.findAll(booleanBuilder, pageable);
+            Page<ArticleActionLog> articleActionLogPage = articleActionLogRepository.findAll(booleanBuilder, pageable);
+
+            List<ArticleActionLog> articleActionLogList = articleActionLogPage.getContent();
 
             //조회된 목록조회를 articleDTO List로 변환 후 리턴
             articleActionLogDTOList = articleActionLogMapper.toDtoList(articleActionLogList);

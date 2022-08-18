@@ -79,7 +79,7 @@ public class CapTemplateService {
         //String userId = userAuthService.authUser.getUserId();
         capTemplateCreateDTO.setInputrId(userId); //등록자 추가.
         
-        if (capTemplateCreateDTO.getCapTmpltOrd() == 0){ //Ord값이 빈값으로 들어왔을경우 max(ord)값 셋팅
+        //if (capTemplateCreateDTO.getCapTmpltOrd() == 0){ //Ord값이 빈값으로 들어왔을경우 max(ord)값 셋팅
             Optional<Integer> capTmplOrd = capTemplateRepository.findOrd(); //max Ord값 get
             if (capTmplOrd.isPresent()){
                 int setCapTmplOrd = capTmplOrd.get();
@@ -87,11 +87,11 @@ public class CapTemplateService {
             }else {
                 capTemplateCreateDTO.setCapTmpltOrd(1); //Ord가 null일때 set 1
             }
-
+/*
             capTemplate = capTemplateCreateMapper.toEntity(capTemplateCreateDTO);
 
             capTemplateRepository.save(capTemplate);
-        }else { //Ord값을 지정하여 들어왔을경우
+        }else { //Ord값을 지정하여 들어왔을경우*/
 
             capTemplate = capTemplateCreateMapper.toEntity(capTemplateCreateDTO);
 
@@ -123,7 +123,7 @@ public class CapTemplateService {
                 }
             }
 
-        }
+        //}
 
 
         return capTemplate.getCapTmpltId();

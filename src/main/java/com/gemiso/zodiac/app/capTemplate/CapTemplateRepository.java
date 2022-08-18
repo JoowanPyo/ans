@@ -13,7 +13,7 @@ public interface CapTemplateRepository extends JpaRepository<CapTemplate, Long>,
     @Query("select a from CapTemplate a left outer join CapTemplateGrp b on b.tmpltGrpId = a.capTemplateGrp.tmpltGrpId where a.capTmpltId =:capTmpltId and a.delYn = 'N'")
     Optional<CapTemplate> finByCap(@Param("capTmpltId")Long capTmpltId);
 
-    @Query("select max(a.capTmpltOrd) from CapTemplate a")
+    @Query("select max(a.capTmpltOrd) from CapTemplate a where a.delYn = 'N' ")
     Optional<Integer> findOrd();
 
     @Query("select a from CapTemplate a where a.delYn = 'N' order by a.capTmpltOrd ASC ")

@@ -45,7 +45,8 @@ public class ArticleMediaController {
                                                          @Parameter(name = "artclId", description = "기사 아이디")
                                                          @RequestParam(value = "artclId", required = false) Long artclId,
                                                          @Parameter(name = "mediaTypCd", description = "미디어 유형 코드[media_typ_001 : 영상, media_typ_002 : 백드롭]")
-                                                         @RequestParam(value = "mediaTypCd", required = false) String mediaTypCd) throws Exception {
+                                                         @RequestParam(value = "mediaTypCd", required = false) String mediaTypCd,
+                                                         @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
         List<ArticleMediaDTO> articleMediaDTOList = new ArrayList<>();
 
@@ -57,7 +58,15 @@ public class ArticleMediaController {
 
         } else {
 
-            articleMediaDTOList = articleMediaService.findAll(null, null, trnsfFileNm, artclId, mediaTypCd);
+            if (ObjectUtils.isEmpty(artclId) == false) {
+
+                articleMediaDTOList = articleMediaService.findAll(null, null, trnsfFileNm, artclId, mediaTypCd);
+
+            }else {
+                // 토큰 인증된 사용자 아이디를 입력자로 등록
+                String userId =jwtGetUserService.getUser(Authorization);
+                log.info("Article Media FindAll Erorr : userId - "+userId);
+            }
         }
         return new AnsApiResponse<>(articleMediaDTOList);
     }

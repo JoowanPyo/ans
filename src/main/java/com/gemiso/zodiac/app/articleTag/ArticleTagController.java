@@ -5,15 +5,19 @@ import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.ArticleService;
 import com.gemiso.zodiac.app.elasticsearch.ElasticSearchArticleService;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Api(description = "기사테그 API")
@@ -26,16 +30,31 @@ public class ArticleTagController {
     private final ArticleTagService articleTagService;
     private final ArticleService articleService;
     private final ElasticSearchArticleService elasticSearchArticleService;
+    private final JwtGetUserService jwtGetUserService;
 
 
     @Operation(summary = "기사 테그 목록조회", description = "기사 테그 목록조회")
     @GetMapping(path = "")
     public AnsApiResponse<List<ArticleTagDTO>> findAll(@Parameter(name = "artclId", description = "기사 아이디")
-                                                      @RequestParam(value = "artclId", required = false)Long artclId) {
+                                                      @RequestParam(value = "artclId", required = false)Long artclId,
+                                                       @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
 
-        articleTagService.findAll(artclId);
+        List<ArticleTagDTO> articleTagDTOList = new ArrayList<>();
 
-        List<ArticleTagDTO> articleTagDTOList = articleTagService.find(artclId);
+        //기사아이디가 안들어왔을시 빈값 반환하고 로그남긴다.
+        if (ObjectUtils.isEmpty(artclId)){
+
+            // 토큰 인증된 사용자 아이디를 입력자로 등록
+            String userId =jwtGetUserService.getUser(Authorization);
+
+            log.info("Article Tag FindAll is empty : userId - "+userId);
+
+            return new AnsApiResponse<>(articleTagDTOList);
+        }
+
+        //articleTagService.findAll(artclId);
+
+        articleTagDTOList = articleTagService.find(artclId);
 
         return new AnsApiResponse<>(articleTagDTOList);
     }

@@ -6,7 +6,9 @@ import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
+import javax.persistence.*;
 import java.util.Date;
 
 @Data
@@ -20,15 +22,15 @@ public class CapTemplateDTO {
     private String capClassCd;
     private String capClassCdNm;
     private Integer capLnNum;
-    private Integer capLttrNum;
+    private String capLttrNum;
     private String capCellDlmtr;
     private String capTmpltHelp;
     private Integer capTmpltOrd;
     private Integer varCnt;
     private String varNm;
     private Integer takeCount;
-    /*private Long brdcPgmId;
-    private String brdcPgmNm;*///맵핑테이블로대처.
+    private Long brdcPgmId;
+    private String brdcPgmNm;
     private String prvwYn;
     private String useYn;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
@@ -47,4 +49,5 @@ public class CapTemplateDTO {
     private CapTemplateGrpDTO capTemplateGrp;
     private AttachFileDTO attachFile;
     private String url;
+
 }

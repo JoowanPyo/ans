@@ -18,7 +18,7 @@ public class CapTemplateCreateDTO {
     private String capTmpltFileNm;
     private String capClassCd;
     private Integer capLnNum;
-    private Integer capLttrNum;
+    private String capLttrNum;
     private String capCellDlmtr;
     private String capTmpltHelp;
     private Integer capTmpltOrd;

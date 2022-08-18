@@ -54,8 +54,8 @@ public class CapTemplate extends BaseEntity {
     @Column(name = "cap_ln_num")
     private Integer capLnNum;
 
-    @Column(name = "cap_lttr_num")
-    private Integer capLttrNum;
+    @Column(name = "cap_lttr_num", length = 50)
+    private String capLttrNum;
 
     @Column(name = "cap_cell_dlmtr", length = 10)
     private String capCellDlmtr;
@@ -76,11 +76,11 @@ public class CapTemplate extends BaseEntity {
     private Integer takeCount;
 
     //맵핑테이블로 대처.
-    /*@Column(name = "brdc_pgm_id", length = 21)
+    @Column(name = "brdc_pgm_id", length = 21)
     private Long brdcPgmId;
 
     @Column(name = "brdc_pgm_nm", length = 450)
-    private String brdcPgmNm;*/
+    private String brdcPgmNm;
 
     @Column(name = "prvw_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
     private String prvwYn;
@@ -120,8 +120,8 @@ public class CapTemplate extends BaseEntity {
     @JoinColumn(name = "tmplt_grp_id", nullable = false)
     private CapTemplateGrp capTemplateGrp;
 
-    @OneToMany(mappedBy = "capTemplate")
-    private List<ArticleCap> articleCap;
+    /*@OneToMany(mappedBy = "capTemplate")
+    private List<ArticleCap> articleCap;*/
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id")

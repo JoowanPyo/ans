@@ -48,7 +48,8 @@ public class CueSheetMediaController {
                                                           @Parameter(name = "mediaTypCd", description = "미디어 유형 코드[media_typ_001 : 영상, media_typ_002 : 백드롭]")
                                                           @RequestParam(value = "mediaTypCd", required = false) String mediaTypCd,
                                                           @Parameter(name = "delYn", description = "큐시트 미디어 삭제 여부 ( N, Y )")
-                                                          @RequestParam(value = "delYn", required = false) String delYn) throws Exception {
+                                                          @RequestParam(value = "delYn", required = false) String delYn,
+                                                          @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
         List<CueSheetMediaDTO> cueSheetMediaDTOList = new ArrayList<>();
 
@@ -59,7 +60,13 @@ public class CueSheetMediaController {
             cueSheetMediaDTOList = cueSheetMediaService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), trnsfFileNm, cueItemId, mediaTypCd, delYn);
 
         } else {
-            cueSheetMediaDTOList = cueSheetMediaService.findAll(null, null, trnsfFileNm, cueItemId, mediaTypCd, delYn);
+
+            if (ObjectUtils.isEmpty(cueItemId) == false) {
+                cueSheetMediaDTOList = cueSheetMediaService.findAll(null, null, trnsfFileNm, cueItemId, mediaTypCd, delYn);
+            }else {
+                String userId =jwtGetUserService.getUser(Authorization);
+                log.info("CueSheet Media FindAll is empty : userId - "+userId);
+            }
         }
         return new AnsApiResponse<>(cueSheetMediaDTOList);
     }

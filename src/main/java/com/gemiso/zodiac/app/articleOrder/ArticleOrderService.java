@@ -10,11 +10,15 @@ import com.gemiso.zodiac.app.articleOrder.mapper.ArticleOrderUpdateMapper;
 import com.gemiso.zodiac.app.articleOrderFile.ArticleOrderFile;
 import com.gemiso.zodiac.app.articleOrderFile.ArticleOrderFileRepository;
 import com.gemiso.zodiac.app.articleOrderFile.dto.ArticleOrderFileDTO;
+import com.gemiso.zodiac.core.helper.PageHelper;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,13 +52,21 @@ public class ArticleOrderService {
     public List<ArticleOrderDTO> findAll(Date sdate, Date edate, String orderDivCd, String orderStatus, String workrId,
                                          String inputrId, Long artclId, Long orgArtclId, String rptrId){
 
+        //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
+        //PageHelper pageHelper = new PageHelper(1, 100);
+        Pageable pageable = PageRequest.of(0,100,Sort.by(Sort.Direction.DESC, "inputDtm"));
+
         //목록조회 조건 build
         BooleanBuilder booleanBuilder = getSearch(sdate, edate, orderDivCd, orderStatus, workrId, inputrId, artclId, orgArtclId, rptrId);
 
         //조회조건으로 전체조회
-        List<ArticleOrder> articleOrderList = (List<ArticleOrder>) articleOrderRepository.findAll(booleanBuilder,
-                Sort.by(Sort.Direction.DESC, "inputDtm"));
+       /* List<ArticleOrder> articleOrderList = (List<ArticleOrder>) articleOrderRepository.findAll(booleanBuilder,
+                Sort.by(Sort.Direction.DESC, "inputDtm"));*/
 
+        Page<ArticleOrder> articleOrderPage = articleOrderRepository.findAll(booleanBuilder,
+                pageable);
+
+        List<ArticleOrder> articleOrderList = articleOrderPage.getContent();
         //DTO변환후 return
         List<ArticleOrderDTO> articleOrderDTOList = articleOrderMapper.toDtoList(articleOrderList);
 

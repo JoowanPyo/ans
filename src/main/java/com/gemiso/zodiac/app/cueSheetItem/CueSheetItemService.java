@@ -1,9 +1,5 @@
 package com.gemiso.zodiac.app.cueSheetItem;
 
-import com.gemiso.zodiac.app.articleTag.ArticleTag;
-import com.gemiso.zodiac.app.articleTag.ArticleTagRepository;
-import com.gemiso.zodiac.app.articleTag.dto.ArticleTagDTO;
-import com.gemiso.zodiac.app.articleTag.mapper.ArticleTagMapper;
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
 import com.gemiso.zodiac.app.article.Article;
@@ -13,7 +9,6 @@ import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.article.mapper.ArticleCueItemMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
-import com.gemiso.zodiac.app.articleActionLog.ArticleActionLogService;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
@@ -22,6 +17,10 @@ import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaMapper;
 import com.gemiso.zodiac.app.articleMedia.mapper.ArticleMediaSimpleMapper;
+import com.gemiso.zodiac.app.articleTag.ArticleTag;
+import com.gemiso.zodiac.app.articleTag.ArticleTagRepository;
+import com.gemiso.zodiac.app.articleTag.dto.ArticleTagDTO;
+import com.gemiso.zodiac.app.articleTag.mapper.ArticleTagMapper;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
@@ -129,7 +128,7 @@ public class CueSheetItemService {
     private final CueSheetTopicService cueSheetTopicService;
     private final LboxService lboxService;
     private final CueSheetTemplateService cueSheetTemplateService;
-    private final ArticleActionLogService articleActionLogService;
+    //private final ArticleActionLogService articleActionLogService;
     private final ArticleService articleService;
     private final ElasticSearchArticleService elasticSearchArticleService;
 

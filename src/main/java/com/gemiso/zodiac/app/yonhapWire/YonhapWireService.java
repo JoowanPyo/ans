@@ -173,7 +173,7 @@ public class YonhapWireService {
 
         //SimpleDateFormat transFormat = new SimpleDateFormat("yyyymmddhhmmss");
 
-        //Long OrgYhArtclId = yonhapWireList.get(0).getWireId();
+        Long OrgYhArtclId = yonhapWireList.get(0).getWireId();
         String credit = yonhapWireList.get(0).getCredit();
         YonhapWire yonhapWire = yonhapWireList.get(0);
 
@@ -192,8 +192,8 @@ public class YonhapWireService {
         int artclqnty = Integer.parseInt(yonhapWireCreateDTO.getArtclqnty());
 
 
-        yonhapWire = YonhapWire.builder()
-                //.wireId(OrgYhArtclId)
+       /* yonhapWire = YonhapWire.builder()
+                .wireId(OrgYhArtclId)
                 //.contId(yonhapWire.get)
                 .imprt(yonhapWireCreateDTO.getImprt())
                 .svcTyp(yonhapWireCreateDTO.getSvc_typ())
@@ -211,7 +211,23 @@ public class YonhapWireService {
                 .action(yonhapWireCreateDTO.getAction())
                 //.mamContId(getMamContId)
                 .mediaNo(yonhapWireCreateDTO.getMedia_no())
-                .build();
+                .build();*/
+
+        yonhapWire.setImprt(yonhapWireCreateDTO.getImprt());
+        yonhapWire.setSvcTyp(yonhapWireCreateDTO.getSvc_typ());
+        yonhapWire.setArtclTitl(yonhapWireCreateDTO.getArtcl_titl());
+        yonhapWire.setArtclCtt(yonhapWireCreateDTO.getArtcl_ctt());
+        yonhapWire.setAgcyCd(yonhapWireCreateDTO.getAgcy_cd());
+        yonhapWire.setAgcyNm(yonhapWireCreateDTO.getAgcy_nm());
+        yonhapWire.setCredit(credit+","+yonhapWireCreateDTO.getCont_id());
+        yonhapWire.setArtclqnty(artclqnty);
+        yonhapWire.setSource(yonhapWireCreateDTO.getSource());
+        yonhapWire.setCmnt(cmnt);
+        yonhapWire.setEmbgDtm(embgDtm);
+        yonhapWire.setTrnsfDtm(trnsfDtm);
+        yonhapWire.setAction(yonhapWireCreateDTO.getAction());
+        yonhapWire.setMediaNo(yonhapWireCreateDTO.getMedia_no());
+
 
         return yonhapWire;
     }

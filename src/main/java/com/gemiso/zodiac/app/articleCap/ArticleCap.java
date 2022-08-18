@@ -7,7 +7,6 @@ import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.symbol.Symbol;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 

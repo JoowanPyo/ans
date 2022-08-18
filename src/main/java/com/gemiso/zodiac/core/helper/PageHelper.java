@@ -60,6 +60,10 @@ public class PageHelper {
         return PageRequest.of(page, limit, Sort.by("artclId", "inputDtm").descending());
     }
 
+    public Pageable getArticleOrderPageInfo() {
+        return PageRequest.of(page, limit, Sort.by("inputDtm").descending());
+    }
+
     public Pageable getTakerCue() {
         return PageRequest.of(page, limit, Sort.by("cueId").descending());
     }
