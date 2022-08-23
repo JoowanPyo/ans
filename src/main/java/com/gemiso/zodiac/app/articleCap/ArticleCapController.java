@@ -10,8 +10,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Api(description = "기사자막 API")
@@ -29,7 +31,13 @@ public class ArticleCapController {
     public AnsApiResponse<List<ArticleCapDTO>> findAll(@Parameter(name = "artclId", description = "기사 아이디")
                                                     @RequestParam(value = "artclId", required = false) Long artclId) {
 
-        List<ArticleCapDTO> articleCapDTOList = articleCapService.findAll(artclId);
+        List<ArticleCapDTO> articleCapDTOList = new ArrayList<>();
+
+        if (ObjectUtils.isEmpty(artclId)){
+            return new AnsApiResponse<>(articleCapDTOList);
+        }
+
+        articleCapDTOList = articleCapService.findAll(artclId);
 
         return new AnsApiResponse<>(articleCapDTOList);
     }

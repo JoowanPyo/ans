@@ -10,8 +10,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Api(description = "앵커자막 API")
@@ -29,7 +31,13 @@ public class AnchorCapController {
     public AnsApiResponse<List<AnchorCapDTO>> findAll(@Parameter(name = "anchorCapId", description = "앵커자막 아이디")
                                                       @RequestParam(value = "anchorCapId", required = false) Long anchorCapId) {
 
-        List<AnchorCapDTO> anchorCapDTOList = anchorCapService.findAll(anchorCapId);
+        List<AnchorCapDTO> anchorCapDTOList = new ArrayList<>();
+
+        if (ObjectUtils.isEmpty(anchorCapId)){
+            return new AnsApiResponse<>(anchorCapDTOList);
+        }
+
+        anchorCapDTOList = anchorCapService.findAll(anchorCapId);
 
         return new AnsApiResponse<>(anchorCapDTOList);
     }

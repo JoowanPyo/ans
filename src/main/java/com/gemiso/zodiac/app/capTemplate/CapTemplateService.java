@@ -7,6 +7,8 @@ import com.gemiso.zodiac.app.capTemplate.dto.CapTemplateUpdateDTO;
 import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateCreateMapper;
 import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateMapper;
 import com.gemiso.zodiac.app.capTemplate.mapper.CapTemplateUpdateMapper;
+import com.gemiso.zodiac.app.file.AttachFile;
+import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -134,6 +136,11 @@ public class CapTemplateService {
 
         CapTemplate capTemplate = capFindOrFail(capTmpltId);
 
+        AttachFileDTO attachFile = capTemplateUpdateDTO.getAttachFile();
+
+        if (ObjectUtils.isEmpty(attachFile)){
+            capTemplate.setAttachFile(null);
+        }
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         //String userId = userAuthService.authUser.getUserId();
         capTemplateUpdateDTO.setUpdtrId(userId); //수정자 추가

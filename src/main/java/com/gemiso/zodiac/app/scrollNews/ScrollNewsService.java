@@ -36,6 +36,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -169,9 +170,11 @@ public class ScrollNewsService {
 
                     Path directoryPath = Paths.get(System.getProperty("user.dir") + File.separator + "storage" + File.separator + "send_text");
                     Files.createDirectories(directoryPath);//폴더 생성합니다.
-                    System.out.println("폴더가 생성되었습니다.");
+                    //System.out.println("폴더가 생성되었습니다.");
                 } catch (Exception e) {
-                    e.getStackTrace();
+                    String message = e.getMessage();
+                    log.error("스크롤 뉴스 send 디렉토리 생성 오류 : "+message);
+                    //e.getStackTrace();
                 }
             }
 
@@ -188,70 +191,81 @@ public class ScrollNewsService {
             FileWriter fw = new FileWriter(file);
             PrintWriter writer = new PrintWriter(fw);
 
-            if ("scroll_typ_scroll".equals(scrlFrmCd)) {
+            try {
 
-                //파일에 쓰기
-                writer.write("{#SC}\n");
-                writer.println();
 
-                for (ScrollNewsDetail entity : scrollNewsDetailList) {
+                if ("scroll_typ_scroll".equals(scrlFrmCd)) {
 
-                    String cttJson = entity.getCttJson();
-                    String title = entity.getTitl();
-
-                    writer.println("*sc " + title);
-
-                    JSONParser parser = new JSONParser();
-                    Object obj = parser.parse(cttJson);
-                    JSONArray jsonObj = (JSONArray) obj;
-
-                    for (int i = 0; i < jsonObj.size(); i++) {
-                        JSONObject object = (JSONObject) jsonObj.get(i);
-                        String line = (String) object.get("line");
-                        writer.println("=" + line);
-                    }
+                    //파일에 쓰기
+                    writer.write("{#SC}\n");
                     writer.println();
-                }
 
+                    for (ScrollNewsDetail entity : scrollNewsDetailList) {
 
-            } else if ("scroll_typ_standup".equals(scrlFrmCd)) {
+                        String cttJson = entity.getCttJson();
+                        String title = entity.getTitl();
 
-                //파일에 쓰기
-                writer.write("{#RU}\n");
-                writer.println();
+                        writer.println("*sc " + title);
 
-                for (ScrollNewsDetail entity : scrollNewsDetailList) {
+                        JSONParser parser = new JSONParser();
+                        Object obj = parser.parse(cttJson);
+                        JSONArray jsonObj = (JSONArray) obj;
 
-                    String cttJson = entity.getCttJson();
-                    String title = entity.getTitl();
-
-                    writer.println("*sc " + title);
-
-                    JSONParser parser = new JSONParser();
-                    Object obj = parser.parse(cttJson);
-                    JSONArray jsonObj = (JSONArray) obj;
-
-                    for (int i = 0; i < jsonObj.size(); i++) {
-                        JSONObject object = (JSONObject) jsonObj.get(i);
-                        String line = (String) object.get("line");
-                        writer.println("=" + line);
+                        for (int i = 0; i < jsonObj.size(); i++) {
+                            JSONObject object = (JSONObject) jsonObj.get(i);
+                            String line = (String) object.get("line");
+                            writer.println("=" + line);
+                        }
+                        writer.println();
                     }
 
+
+                } else if ("scroll_typ_standup".equals(scrlFrmCd)) {
+
+                    //파일에 쓰기
+                    writer.write("{#RU}\n");
                     writer.println();
+
+                    for (ScrollNewsDetail entity : scrollNewsDetailList) {
+
+                        String cttJson = entity.getCttJson();
+                        String title = entity.getTitl();
+
+                        writer.println("*sc " + title);
+
+                        JSONParser parser = new JSONParser();
+                        Object obj = parser.parse(cttJson);
+                        JSONArray jsonObj = (JSONArray) obj;
+
+                        for (int i = 0; i < jsonObj.size(); i++) {
+                            JSONObject object = (JSONObject) jsonObj.get(i);
+                            String line = (String) object.get("line");
+                            writer.println("=" + line);
+                        }
+
+                        writer.println();
+                    }
+
+
+                } else {
+                    log.error(" 스크롤 뉴스 타입이 맞지 않습니다 . scrlFrmCd - " + scrlFrmCd);
                 }
 
+                writer.print("####");
+                //writer.close();
 
-            } else {
-                log.error(" 스크롤 뉴스 타입이 맞지 않습니다 . scrlFrmCd - " + scrlFrmCd);
+            }catch (IndexOutOfBoundsException e){
+
+                log.error("스크롤 뉴스 프린트 에러 : "+"IndexOutOfBoundsException");
+            } finally {
+                writer.close();
             }
-
-            writer.print("####");
-            writer.close();
 
 
         } catch (IOException | ParseException e) {
 
-            log.error(" 스크롤 뉴스 에러 : massage - " + e.getMessage());
+            String message  =  e.getMessage();
+            log.error(" 스크롤 뉴스 에러 : massage - " + message);
 
         }
 
@@ -314,7 +328,8 @@ public class ScrollNewsService {
                     log.info("FTP5 파일명 : "+makeFileNm+" fis : "+fis.toString());
                 }
             } catch (Exception e) {
-                log.info("FTP5 file handle exception : "+ e.getMessage());
+                String message = e.getMessage();
+                log.info("FTP5 file handle exception : "+ message);
                 // TODO: handle exception
             } finally {
                 if(fis != null) {
@@ -323,9 +338,11 @@ public class ScrollNewsService {
             }
             ftp.disconnect();
         } catch (NumberFormatException e) {
-            log.info("FTP5 file NumberFormatException : "+ e.getMessage());
+            String message = e.getMessage();
+            log.info("FTP5 file NumberFormatException : "+ message);
         } catch (Exception e) {
-            log.info("FTP5 file Exception : "+ e.getMessage());
+            String message = e.getMessage();
+            log.info("FTP5 file Exception : "+ message);
         }
     }
 
@@ -364,7 +381,8 @@ public class ScrollNewsService {
                     log.info("FTP4 파일명 : "+makeFileNm+" fis : "+fis.toString());
                 }
             } catch (Exception e) {
-                log.info("FTP4 file handle exception : "+ e.getMessage());
+                String message = e.getMessage();
+                log.info("FTP4 file handle exception : "+ message);
                 // TODO: handle exception
             } finally {
 
@@ -374,9 +392,11 @@ public class ScrollNewsService {
             }
             ftp.disconnect();
         } catch (NumberFormatException e) {
-            log.info("FTP4 file NumberFormatException : "+ e.getMessage());
+            String message = e.getMessage();
+            log.info("FTP4 file NumberFormatException : "+ message);
         } catch (Exception e) {
-            log.info("FTP4 file Exception : "+ e.getMessage());
+            String message = e.getMessage();
+            log.info("FTP4 file Exception : "+ message);
         }
     }
 
@@ -416,7 +436,8 @@ public class ScrollNewsService {
                     log.info("FTP3 파일명 : "+makeFileNm+" fis : "+fis.toString());
                 }
             } catch (Exception e) {
-                log.info("FTP3 file handle exception : "+ e.getMessage());
+                String message = e.getMessage();
+                log.info("FTP3 file handle exception : "+ message);
                 // TODO: handle exception
             } finally {
                 if(fis != null) {
@@ -425,9 +446,11 @@ public class ScrollNewsService {
             }
             ftp.disconnect();
         } catch (NumberFormatException e) {
-            log.info("FTP3 file NumberFormatException : "+ e.getMessage());
+            String message = e.getMessage();
+            log.info("FTP3 file NumberFormatException : "+ message);
         } catch (Exception e) {
-            log.info("FTP3 file Exception : "+ e.getMessage());
+            String message = e.getMessage();
+            log.info("FTP3 file Exception : "+ message);
         }
     }
 
@@ -465,7 +488,8 @@ public class ScrollNewsService {
                     log.info("FTP2 파일명 : "+makeFileNm+" fis : "+fis.toString());
                 }
             } catch (Exception e) {
-                log.info("FTP2 file handle exception : "+ e.getMessage());
+                String message = e.getMessage();
+                log.info("FTP2 file handle exception : "+ message);
                 // TODO: handle exception
             } finally {
                 if(fis != null) {
@@ -474,9 +498,11 @@ public class ScrollNewsService {
             }
             ftp.disconnect();
         } catch (NumberFormatException e) {
-            log.info("FTP2 file NumberFormatException : "+ e.getMessage());
+            String message = e.getMessage();
+            log.info("FTP2 file NumberFormatException : "+ message);
         } catch (Exception e) {
-            log.info("FTP2 file Exception : "+ e.getMessage());
+            String message = e.getMessage();
+            log.info("FTP2 file Exception : "+ message);
         }
     }
 
@@ -514,7 +540,8 @@ public class ScrollNewsService {
                     log.info("FTP1 파일명 : "+makeFileNm+" fis : "+fis.toString());
                 }
             } catch (Exception e) {
-                log.info("FTP1 file handle exception : "+ e.getMessage());
+                String message = e.getMessage();
+                log.info("FTP1 file handle exception : "+ message);
                 // TODO: handle exception
             } finally {
                 if(fis != null) {
@@ -523,9 +550,11 @@ public class ScrollNewsService {
             }
             ftp.disconnect();
         } catch (NumberFormatException e) {
-            log.info("FTP1 file NumberFormatException : "+ e.getMessage());
+            String message = e.getMessage();
+            log.info("FTP1 file NumberFormatException : "+ message);
         } catch (Exception e) {
-            log.info("FTP1 file Exception : "+ e.getMessage());
+            String message = e.getMessage();
+            log.info("FTP1 file Exception : "+ message);
         }
     }
 

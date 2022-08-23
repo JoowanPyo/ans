@@ -31,9 +31,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -249,10 +252,21 @@ public class LboxService {
                     ++clipInfoCount;//이미전송된 파일이  한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
                 }
 
-            } catch (Exception e) { //부조 전송오류가 있을시,
+            } catch (HttpStatusCodeException e) { //부조 전송오류가 있을시,
 
                 TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
-                transportFaildDTO.setMessage(e.getMessage()); //오류 메시지
+                String message = e.getMessage();
+                transportFaildDTO.setMessage(message); //오류 메시지
+                transportFaildDTO.setSubrmNm(subrmNm); //부조 명
+                transportFaildDTO.setDestination(faildDest); // 전송대상
+
+                transportFaildDTOList.add(transportFaildDTO);
+
+            } catch (RestClientException ex){
+
+                TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
+                String message = ex.getMessage();
+                transportFaildDTO.setMessage(message); //오류 메시지
                 transportFaildDTO.setSubrmNm(subrmNm); //부조 명
                 transportFaildDTO.setDestination(faildDest); // 전송대상
 
@@ -389,10 +403,21 @@ public class LboxService {
                     ++clipInfoCount;//이미전송된 파일이  한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
                 }
 
-            } catch (Exception e) { //부조 전송오류가 있을시,
+            }catch (HttpStatusCodeException e) { //부조 전송오류가 있을시,
 
                 TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
-                transportFaildDTO.setMessage(e.getMessage()); //오류 메시지
+                String message = e.getMessage();
+                transportFaildDTO.setMessage(message); //오류 메시지
+                transportFaildDTO.setSubrmNm(subrmNm); //부조 명
+                transportFaildDTO.setDestination(faildDest); // 전송대상
+
+                transportFaildDTOList.add(transportFaildDTO);
+
+            } catch (RestClientException ex){
+
+                TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
+                String message = ex.getMessage();
+                transportFaildDTO.setMessage(message); //오류 메시지
                 transportFaildDTO.setSubrmNm(subrmNm); //부조 명
                 transportFaildDTO.setDestination(faildDest); // 전송대상
 
@@ -527,10 +552,21 @@ public class LboxService {
                     ++clipInfoCount;//이미전송된 파일이  한개라도 있으면 전송중으로 값 셋팅하기 위해 체크
                 }
 
-            } catch (Exception e) { //부조 전송오류가 있을시,
+            } catch (HttpStatusCodeException e) { //부조 전송오류가 있을시,
 
                 TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
-                transportFaildDTO.setMessage(e.getLocalizedMessage()); //오류 메시지
+                String message = e.getMessage();
+                transportFaildDTO.setMessage(message); //오류 메시지
+                transportFaildDTO.setSubrmNm(subrmNm); //부조 명
+                transportFaildDTO.setDestination(faildDest); // 전송대상
+
+                transportFaildDTOList.add(transportFaildDTO);
+
+            } catch (RestClientException ex){
+
+                TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
+                String message = ex.getMessage();
+                transportFaildDTO.setMessage(message); //오류 메시지
                 transportFaildDTO.setSubrmNm(subrmNm); //부조 명
                 transportFaildDTO.setDestination(faildDest); // 전송대상
 

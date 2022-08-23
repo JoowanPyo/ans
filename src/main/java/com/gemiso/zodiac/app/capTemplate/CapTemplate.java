@@ -76,8 +76,8 @@ public class CapTemplate extends BaseEntity {
     private Integer takeCount;
 
     //맵핑테이블로 대처.
-    @Column(name = "brdc_pgm_id", length = 21)
-    private Long brdcPgmId;
+    @Column(name = "brdc_pgm_id", length = 50)
+    private String brdcPgmId;
 
     @Column(name = "brdc_pgm_nm", length = 450)
     private String brdcPgmNm;
