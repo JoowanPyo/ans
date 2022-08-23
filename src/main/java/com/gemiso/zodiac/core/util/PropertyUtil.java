@@ -49,11 +49,11 @@ public class PropertyUtil {
             pb.setDirtype(dirtype.getValue());
             pb.setRname_yn(rname_yn.getValue());
         } catch (IOException e) {
-            log.error("IOException Occured" + e.getMessage());
+            log.error("IOException Occured" + "IOException");
         } catch (JDOMException e) {
-            log.error("JDOMException Occured" + e.getMessage());
+            log.error("JDOMException Occured" + "JDOMException");
         } catch (Exception e) {
-            log.error("Exception Occured" + e.getMessage());
+            log.error("Exception Occured" + "Exception");
         }
         return pb;
     }

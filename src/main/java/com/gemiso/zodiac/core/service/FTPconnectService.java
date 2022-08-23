@@ -54,9 +54,9 @@ public class FTPconnectService {
                 ftpClient.makeDirectory(dir);	//저장파일경로 생성
                 ftpClient.changeWorkingDirectory(dir);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             if(e.getMessage().indexOf("refused") != -1) {
-                throw new Exception("FTP서버 연결실패 - ip : "+ip +" mesagge - "+e.getMessage());
+                throw new Exception("FTP서버 연결실패 - ip : "+ip +" mesagge - "+"IOException");
             }
             throw e;
         }
@@ -96,9 +96,9 @@ public class FTPconnectService {
                 ftpClient.makeDirectory(dir);	//저장파일경로 생성
                 ftpClient.changeWorkingDirectory(dir);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             if(e.getMessage().indexOf("refused") != -1) {
-                throw new Exception("FTP서버 연결실패 - ip : "+ip +" mesagge - "+e.getMessage());
+                throw new Exception("FTP서버 연결실패 - ip : "+ip +" mesagge - "+"IOException");
             }
             throw e;
         }

@@ -53,10 +53,10 @@ public class TopicSendService {
         }
         catch (TimeoutException e) {
             e.printStackTrace();
-            log.error("ans.topic error : " +e.getMessage());
+            log.error("ans.topic error : " +"TimeoutException");
         } catch (IOException e) {
             e.printStackTrace();
-            log.error("ans.topic error : " +e.getMessage());
+            log.error("ans.topic error : " +"IOException");
         }finally {
 
             channel.close();
@@ -95,10 +95,10 @@ public class TopicSendService {
         }
         catch (TimeoutException e) {
             e.printStackTrace();
-            log.error("ans.interface error : " +e.getMessage());
+            log.error("ans.interface error : " +"TimeoutException");
         } catch (IOException e) {
             e.printStackTrace();
-            log.error("ans.interface error : " +e.getMessage());
+            log.error("ans.interface error : " +"IOException");
         }finally {
 
             channel.close();

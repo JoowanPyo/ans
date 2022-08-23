@@ -255,8 +255,8 @@ public class LboxService {
             } catch (HttpStatusCodeException e) { //부조 전송오류가 있을시,
 
                 TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
-                String message = e.getMessage();
-                transportFaildDTO.setMessage(message); //오류 메시지
+                //String message = e.getMessage(); 시큐어 코딩문제로 배제
+                transportFaildDTO.setMessage("HttpStatusCodeException"); //오류 메시지
                 transportFaildDTO.setSubrmNm(subrmNm); //부조 명
                 transportFaildDTO.setDestination(faildDest); // 전송대상
 
@@ -265,8 +265,8 @@ public class LboxService {
             } catch (RestClientException ex){
 
                 TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
-                String message = ex.getMessage();
-                transportFaildDTO.setMessage(message); //오류 메시지
+                //String message = ex.getMessage();
+                transportFaildDTO.setMessage("RestClientException"); //오류 메시지
                 transportFaildDTO.setSubrmNm(subrmNm); //부조 명
                 transportFaildDTO.setDestination(faildDest); // 전송대상
 
@@ -406,8 +406,8 @@ public class LboxService {
             }catch (HttpStatusCodeException e) { //부조 전송오류가 있을시,
 
                 TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
-                String message = e.getMessage();
-                transportFaildDTO.setMessage(message); //오류 메시지
+                //String message = e.getMessage();
+                transportFaildDTO.setMessage("HttpStatusCodeException"); //오류 메시지
                 transportFaildDTO.setSubrmNm(subrmNm); //부조 명
                 transportFaildDTO.setDestination(faildDest); // 전송대상
 
@@ -416,8 +416,8 @@ public class LboxService {
             } catch (RestClientException ex){
 
                 TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
-                String message = ex.getMessage();
-                transportFaildDTO.setMessage(message); //오류 메시지
+                //String message = ex.getMessage();
+                transportFaildDTO.setMessage("RestClientException"); //오류 메시지
                 transportFaildDTO.setSubrmNm(subrmNm); //부조 명
                 transportFaildDTO.setDestination(faildDest); // 전송대상
 
@@ -555,8 +555,8 @@ public class LboxService {
             } catch (HttpStatusCodeException e) { //부조 전송오류가 있을시,
 
                 TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
-                String message = e.getMessage();
-                transportFaildDTO.setMessage(message); //오류 메시지
+                //String message = e.getMessage();
+                transportFaildDTO.setMessage("HttpStatusCodeException"); //오류 메시지
                 transportFaildDTO.setSubrmNm(subrmNm); //부조 명
                 transportFaildDTO.setDestination(faildDest); // 전송대상
 
@@ -565,8 +565,8 @@ public class LboxService {
             } catch (RestClientException ex){
 
                 TransportFaildDTO transportFaildDTO = new TransportFaildDTO();
-                String message = ex.getMessage();
-                transportFaildDTO.setMessage(message); //오류 메시지
+                //String message = ex.getMessage();
+                transportFaildDTO.setMessage("RestClientException"); //오류 메시지
                 transportFaildDTO.setSubrmNm(subrmNm); //부조 명
                 transportFaildDTO.setDestination(faildDest); // 전송대상
 

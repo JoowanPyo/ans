@@ -175,14 +175,14 @@ public class YonhapService {
                 yonhapRepository.save(yonhapEntity);
                 yonhapId = yonhapEntity.getYonhapId();
             }catch (RuntimeException e){
-                return new YonhapExceptionDomain(yonhapId, "5001", "yonhap", e.getMessage(), "");
+                return new YonhapExceptionDomain(yonhapId, "5001", "yonhap", "RuntimeException", "");
             }
             // 파일등록
             if (yonhapCreateDTO.getUpload_files() != null && yonhapCreateDTO.getUpload_files().size() > 0) {
                 try {
                     uploadYonhapFiles(yonhapId, yonhapCreateDTO.getUpload_files());
                 }catch (RuntimeException e){
-                    return new YonhapExceptionDomain(yonhapId, "5002", "yonhap", e.getMessage(), "");
+                    return new YonhapExceptionDomain(yonhapId, "5002", "yonhap", "RuntimeException", "");
                 }
             }
 
@@ -220,7 +220,7 @@ public class YonhapService {
                 yonhapRepository.save(yonhapEntity);
                 yonhapId = yonhapEntity.getYonhapId();
             }catch (RuntimeException e){
-                return new YonhapExceptionDomain(yonhapId, "5001", "yonhap", e.getMessage(), "");
+                return new YonhapExceptionDomain(yonhapId, "5001", "yonhap", "RuntimeException", "");
             }
 
             // 파일등록
@@ -228,7 +228,7 @@ public class YonhapService {
                 try {
                     uploadYonhapFiles(yonhapId, yonhapCreateDTO.getUpload_files());
                 }catch (RuntimeException e){
-                    return new YonhapExceptionDomain(yonhapId, "5002", "yonhap", e.getMessage(), "");
+                    return new YonhapExceptionDomain(yonhapId, "5002", "yonhap", "RuntimeException", "");
                 }
             }
 
@@ -407,7 +407,7 @@ public class YonhapService {
             catch (IOException e)
             {
                 //System.out.println("BufferedReader 파일복사 중 에러 발생");
-                log.error(e.getMessage());
+                log.error("연합파일 IOException");
             }
             finally {
                 try {
@@ -415,7 +415,7 @@ public class YonhapService {
                         buffStream.close();
                     }
                 }catch (IOException e){
-                    log.error(e.getMessage());
+                    log.error("연합파일 buffStream.close() - IOException");
                 }
 
             }
@@ -443,7 +443,7 @@ public class YonhapService {
 
         } catch (IOException e) {
 
-            log.error("IOException Occured "+e.getMessage());
+            log.error("IOException Occured "+"IOException");
         }
         //return new StatusCodeFileDTO(codeDTO, msg, file_id, org_file_nm);
         return new YonhapFileResponseDTO(fileId);

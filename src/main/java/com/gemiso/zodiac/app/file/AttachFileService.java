@@ -152,7 +152,7 @@ public class AttachFileService {
             catch (IOException e)
             {
                 //System.out.println("BufferedReader 파일복사 중 에러 발생");
-                log.error(e.getMessage());
+                log.error("BufferedReader 파일복사 중 에러 발생");
             }
             finally {
                 try {
@@ -160,7 +160,7 @@ public class AttachFileService {
                         buffStream.close();
                     }
                 }catch (IOException e){
-                    log.error(e.getMessage());
+                    log.error("IOException : buffStream.close()");
                 }
 
             }
@@ -187,9 +187,9 @@ public class AttachFileService {
 
         } catch (IOException e) {
             code = 500;
-            msg = "You failed to upload " + rname + ": " + e.getMessage() + "<br/>";
+            msg = "You failed to upload " + rname + ": "+ "<br/>";
             /*e.printStackTrace();*/
-            log.error("IOException Occured "+e.getMessage());
+            log.error("IOException Occured "+msg);
         }
         //return new StatusCodeFileDTO(codeDTO, msg, file_id, org_file_nm);
         return new StatusCodeFileDTO(code, msg, fileId, orgFileNm);
@@ -304,7 +304,7 @@ public class AttachFileService {
             catch (IOException e)
             {
                 //System.out.println("BufferedReader 파일복사 중 에러 발생");
-                log.error(e.getMessage());
+                log.error("BufferedReader 파일복사 중 에러 발생");
             }
             finally {
                 try {
@@ -312,7 +312,7 @@ public class AttachFileService {
                         buffStream.close();
                     }
                 }catch (IOException e){
-                    log.error(e.getMessage());
+                    log.error("IOException - close");
                 }
 
             }
@@ -339,9 +339,9 @@ public class AttachFileService {
 
         } catch (IOException e) {
             code = 500;
-            msg = "You failed to upload " + rname + ": " + e.getMessage() + "<br/>";
+            msg = "You failed to upload " + rname + ": " + "<br/>";
             /*e.printStackTrace();*/
-            log.error("IOException Occured "+e.getMessage());
+            log.error("IOException Occured "+msg);
         }
         //return new StatusCodeFileDTO(codeDTO, msg, file_id, org_file_nm);
         return new StatusCodeFileDTO(code, msg, fileId, orgFileNm);

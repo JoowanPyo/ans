@@ -105,7 +105,7 @@ public class YtnRundownService {
                 try {
                     ytnRundownRepository.save(ytnRundown);
                 }catch (RuntimeException e){
-                    return new YonhapYtnExceptionDomain(null, "5001", "yonhapReuter", e.getMessage(), "");
+                    return new YonhapYtnExceptionDomain(null, "5001", "yonhapReuter", "RuntimeException", "");
                 }
             }
         }else {
@@ -132,7 +132,7 @@ public class YtnRundownService {
                 try {
                     ytnRundownRepository.save(ytnRundown);
                 }catch (RuntimeException e){
-                    return new YonhapYtnExceptionDomain(null, "5001", "yonhapReuter", e.getMessage(), "");
+                    return new YonhapYtnExceptionDomain(null, "5001", "yonhapReuter", "RuntimeException", "");
                 }
             }
 

@@ -66,7 +66,7 @@ public class Configuration extends AbstractConfiguration
                 this.props.load(new BufferedInputStream(fin));
             }
             catch (IOException e){
-                log.error("IOException Occured "+e.getMessage());
+                log.error("IOException Occured "+"IOException");
             }
             finally
             {
@@ -83,7 +83,7 @@ public class Configuration extends AbstractConfiguration
             throw new ConfigurationException("Can't load configuration file: " + this.configFileName);
         } catch (IOException e) {
             //System.out.println("IOException Occured");
-            log.error("IOException Occured " + e.getMessage());
+            log.error("IOException Occured ");
         }
     }
 }

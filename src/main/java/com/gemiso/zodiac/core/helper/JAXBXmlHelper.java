@@ -37,13 +37,12 @@ public class JAXBXmlHelper {
             // TODO: handle exceptione
             /*e.printStackTrace();*/
             //System.out.println("JAXBException Occured");
-            log.error("JAXBException Occured" + e.getMessage());
+            log.error("JAXBException Occured" + "JAXBException");
         }finally {
             try {
                 writer.close();
             } catch (IOException e) {
-                log.error("Writer close error");
-                log.error(e.getMessage());
+                log.error("Writer close error - IOException");
             }
         }
         return rval;
@@ -75,13 +74,12 @@ public class JAXBXmlHelper {
             // TODO: handle exceptione
             /*e.printStackTrace();*/
             //System.out.println("JAXBException Occured");
-            log.error("JAXBException Occured" + e.getMessage());
+            log.error("JAXBException Occured" + "JAXBException");
         }finally {
             try {
                 writer.close();
             } catch (IOException e) {
-                log.error("Writer close error");
-                log.error(e.getMessage());
+                log.error("Writer close error - IOException");
             }
         }
         return rval;

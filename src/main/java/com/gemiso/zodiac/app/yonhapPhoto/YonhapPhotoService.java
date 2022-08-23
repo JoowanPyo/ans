@@ -124,7 +124,7 @@ public class YonhapPhotoService {
             yonhapPhotoRepository.save(yonhapPhoto);
             yonhapPhotoId = yonhapPhoto.getYonhapArtclId();
         }catch (RuntimeException e){
-            return new YonhapExceptionDomain(yonhapPhotoId, "5001", "yonhapPhoto", e.getMessage(), "");
+            return new YonhapExceptionDomain(yonhapPhotoId, "5001", "yonhapPhoto", "RuntimeException", "");
         }
 
         /*//기사에 포함된 첨부파일get

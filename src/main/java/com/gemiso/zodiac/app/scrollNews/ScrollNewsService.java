@@ -33,9 +33,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -59,61 +57,6 @@ public class ScrollNewsService {
 
     private final DateChangeHelper dateChangeHelper;
     private final MarshallingJsonHelper marshallingJsonHelper;
-
-   /* @Value("${ftp1.ip:ftp1Ip}")
-    private String ftp1Ip;
-    @Value("${ftp1.port:ftp1Port}")
-    private Integer ftp1Port;
-    @Value("${ftp1.id:ftp1Id}")
-    private String ftp1Id;
-    @Value("${ftp1.pw:ftp1Pw}")
-    private String ftp1Pw;
-    @Value("${ftp1.path:ftp1Path}")
-    private String ftp1Path;
-
-    @Value("${ftp2.ip:ftp2Ip}")
-    private String ftp2Ip;
-    @Value("${ftp2.port:ftp2Port}")
-    private Integer ftp2Port;
-    @Value("${ftp2.id:ftp2Id}")
-    private String ftp2Id;
-    @Value("${ftp2.pw:ftp2Pw}")
-    private String ftp2Pw;
-    @Value("${ftp2.path:ftp2Path}")
-    private String ftp2Path;
-
-    @Value("${ftp3.ip:ftp3Ip}")
-    private String ftp3Ip;
-    @Value("${ftp3.port:ftp3Port}")
-    private Integer ftp3Port;
-    @Value("${ftp3.id:ftp3Id}")
-    private String ftp3Id;
-    @Value("${ftp3.pw:ftp3Pw}")
-    private String ftp3Pw;
-    @Value("${ftp3.path:ftp3Path}")
-    private String ftp3Path;
-
-    @Value("${ftp4.ip:ftp4Ip}")
-    private String ftp4Ip;
-    @Value("${ftp4.port:ftp4Port}")
-    private Integer ftp4Port;
-    @Value("${ftp4.id:ftp4Id}")
-    private String ftp4Id;
-    @Value("${ftp4.pw:ftp4Pw}")
-    private String ftp4Pw;
-    @Value("${ftp4.path:ftp4Path}")
-    private String ftp4Path;
-
-    @Value("${ftp5.ip:ftp5Ip}")
-    private String ftp5Ip;
-    @Value("${ftp5.port:ftp5Port}")
-    private Integer ftp5Port;
-    @Value("${ftp5.id:ftp5Id}")
-    private String ftp5Id;
-    @Value("${ftp5.pw:ftp5Pw}")
-    private String ftp5Pw;
-    @Value("${ftp5.path:ftp5Path}")
-    private String ftp5Path;*/
 
 
     //FTP코드 생성자
@@ -171,9 +114,14 @@ public class ScrollNewsService {
                     Path directoryPath = Paths.get(System.getProperty("user.dir") + File.separator + "storage" + File.separator + "send_text");
                     Files.createDirectories(directoryPath);//폴더 생성합니다.
                     //System.out.println("폴더가 생성되었습니다.");
-                } catch (Exception e) {
-                    String message = e.getMessage();
-                    log.error("스크롤 뉴스 send 디렉토리 생성 오류 : "+message);
+                } catch (FileAlreadyExistsException e) {
+                    log.error("스크롤 뉴스 send 디렉토리 생성 오류 : "+"FileAlreadyExistsException");
+                    //e.getStackTrace();
+                } catch (NoSuchFileException e) {
+                    log.error("스크롤 뉴스 send 디렉토리 생성 오류 : "+"NoSuchFileException");
+                    //e.getStackTrace();
+                }catch (IOException e) {
+                    log.error("스크롤 뉴스 send 디렉토리 생성 오류 : "+"IOException");
                     //e.getStackTrace();
                 }
             }
@@ -262,10 +210,13 @@ public class ScrollNewsService {
             }
 
 
-        } catch (IOException | ParseException e) {
+        } catch (IOException e) {
 
-            String message  =  e.getMessage();
-            log.error(" 스크롤 뉴스 에러 : massage - " + message);
+            log.error(" 스크롤 뉴스 에러 : massage - " + "IOException");
+
+        }catch (ParseException e) {
+
+            log.error(" 스크롤 뉴스 에러 : massage - " + "ParseException");
 
         }
 
@@ -327,9 +278,11 @@ public class ScrollNewsService {
 
                     log.info("FTP5 파일명 : "+makeFileNm+" fis : "+fis.toString());
                 }
-            } catch (Exception e) {
-                String message = e.getMessage();
-                log.info("FTP5 file handle exception : "+ message);
+            } catch (FileNotFoundException e) {
+                log.info("FTP5 file handle exception : "+ "FileNotFoundException");
+                // TODO: handle exception
+            }catch (IOException e) {
+                log.info("FTP5 file handle exception : "+ "IOException");
                 // TODO: handle exception
             } finally {
                 if(fis != null) {
@@ -338,11 +291,11 @@ public class ScrollNewsService {
             }
             ftp.disconnect();
         } catch (NumberFormatException e) {
-            String message = e.getMessage();
-            log.info("FTP5 file NumberFormatException : "+ message);
+            log.info("FTP5 file NumberFormatException : "+ "NumberFormatException");
+        } catch (IOException e) {
+            log.info("FTP5 file Exception : "+ "IOException");
         } catch (Exception e) {
-            String message = e.getMessage();
-            log.info("FTP5 file Exception : "+ message);
+            log.info("FTP5 file Exception : "+ "Exception");
         }
     }
 
@@ -380,11 +333,13 @@ public class ScrollNewsService {
 
                     log.info("FTP4 파일명 : "+makeFileNm+" fis : "+fis.toString());
                 }
-            } catch (Exception e) {
-                String message = e.getMessage();
-                log.info("FTP4 file handle exception : "+ message);
+            } catch (FileNotFoundException e) {
+                log.info("FTP4 file handle exception : "+ "FileNotFoundException");
                 // TODO: handle exception
-            } finally {
+            }catch (IOException e) {
+                log.info("FTP4 file handle exception : "+ "IOException");
+                // TODO: handle exception
+            }finally {
 
                 if(fis != null) {
                     fis.close();
@@ -392,11 +347,9 @@ public class ScrollNewsService {
             }
             ftp.disconnect();
         } catch (NumberFormatException e) {
-            String message = e.getMessage();
-            log.info("FTP4 file NumberFormatException : "+ message);
+            log.info("FTP4 file NumberFormatException : "+ "NumberFormatException");
         } catch (Exception e) {
-            String message = e.getMessage();
-            log.info("FTP4 file Exception : "+ message);
+            log.info("FTP4 file Exception : "+ "Exception");
         }
     }
 
@@ -435,9 +388,11 @@ public class ScrollNewsService {
 
                     log.info("FTP3 파일명 : "+makeFileNm+" fis : "+fis.toString());
                 }
-            } catch (Exception e) {
-                String message = e.getMessage();
-                log.info("FTP3 file handle exception : "+ message);
+            } catch (FileNotFoundException e) {
+                log.info("FTP3 file handle exception : "+ "FileNotFoundException");
+                // TODO: handle exception
+            }catch (IOException e) {
+                log.info("FTP3 file handle exception : "+ "IOException");
                 // TODO: handle exception
             } finally {
                 if(fis != null) {
@@ -446,11 +401,9 @@ public class ScrollNewsService {
             }
             ftp.disconnect();
         } catch (NumberFormatException e) {
-            String message = e.getMessage();
-            log.info("FTP3 file NumberFormatException : "+ message);
+            log.info("FTP3 file NumberFormatException : "+ "NumberFormatException");
         } catch (Exception e) {
-            String message = e.getMessage();
-            log.info("FTP3 file Exception : "+ message);
+            log.info("FTP3 file Exception : "+ "Exception");
         }
     }
 
@@ -487,9 +440,11 @@ public class ScrollNewsService {
 
                     log.info("FTP2 파일명 : "+makeFileNm+" fis : "+fis.toString());
                 }
-            } catch (Exception e) {
-                String message = e.getMessage();
-                log.info("FTP2 file handle exception : "+ message);
+            }catch (FileNotFoundException e) {
+                log.info("FTP2 file handle exception : "+ "FileNotFoundException");
+                // TODO: handle exception
+            }catch (IOException e) {
+                log.info("FTP2 file handle exception : "+ "IOException");
                 // TODO: handle exception
             } finally {
                 if(fis != null) {
@@ -498,11 +453,9 @@ public class ScrollNewsService {
             }
             ftp.disconnect();
         } catch (NumberFormatException e) {
-            String message = e.getMessage();
-            log.info("FTP2 file NumberFormatException : "+ message);
+            log.info("FTP2 file NumberFormatException : "+ "NumberFormatException");
         } catch (Exception e) {
-            String message = e.getMessage();
-            log.info("FTP2 file Exception : "+ message);
+            log.info("FTP2 file Exception : "+ "Exception");
         }
     }
 
@@ -539,9 +492,11 @@ public class ScrollNewsService {
 
                     log.info("FTP1 파일명 : "+makeFileNm+" fis : "+fis.toString());
                 }
-            } catch (Exception e) {
-                String message = e.getMessage();
-                log.info("FTP1 file handle exception : "+ message);
+            } catch (FileNotFoundException e) {
+                log.info("FTP1 file handle exception : "+ "FileNotFoundException");
+                // TODO: handle exception
+            }catch (IOException e) {
+                log.info("FTP1 file handle exception : "+ "IOException");
                 // TODO: handle exception
             } finally {
                 if(fis != null) {
@@ -550,11 +505,9 @@ public class ScrollNewsService {
             }
             ftp.disconnect();
         } catch (NumberFormatException e) {
-            String message = e.getMessage();
-            log.info("FTP1 file NumberFormatException : "+ message);
+            log.info("FTP1 file NumberFormatException : "+ "NumberFormatException");
         } catch (Exception e) {
-            String message = e.getMessage();
-            log.info("FTP1 file Exception : "+ message);
+            log.info("FTP1 file Exception : "+ "Exception");
         }
     }
 
