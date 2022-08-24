@@ -128,7 +128,7 @@ public class ElasticSearchArticleService {
 
             elasticSearchArticleRepository.save(entity);
         }catch (Exception e){
-            log.error("ElasticSearch Error : "+e.getMessage());
+            log.error("ElasticSearch Error : ");
         }
     }
 

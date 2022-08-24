@@ -21,7 +21,6 @@ public class FTPconnectService {
     }
 
     // FTP 연결 및 설정
-    // ip : FTP IP, port : FTP port, id : FTP login Id, pw : FTP login pw, dir : FTP Upload Path
     public void connectActive(String ip, int port, String id, String pw, String dir) throws Exception{
         try {
             boolean result = false;
@@ -63,7 +62,6 @@ public class FTPconnectService {
     }
 
     // FTP 연결 및 설정
-    // ip : FTP IP, port : FTP port, id : FTP login Id, pw : FTP login pw, dir : FTP Upload Path
     public void connectPassive(String ip, int port, String id, String pw, String dir) throws Exception{
         try {
             boolean result = false;

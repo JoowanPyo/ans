@@ -10,7 +10,6 @@ import org.jdom2.input.SAXBuilder;
 
 import javax.naming.ConfigurationException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @Slf4j

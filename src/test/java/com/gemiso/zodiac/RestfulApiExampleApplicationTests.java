@@ -64,17 +64,6 @@ class RestfulApiExampleApplicationTests {
     }
 
     @Test
-    void topicTest() throws IOException, TimeoutException {
-        TopicSendService topicSendService = new TopicSendService();
-
-        while (true)
-        {
-
-        }
-
-    }
-
-    @Test
     void  testJson(){
 
         String json = "{\"title\": \"0525 17 \uae40\uc138\uc644 \uc99d\uc2dc\uc5f0\uacb0 1_2 \uc720\ub7fd \uc544\uc2dc\uc544 \uc99d\uc2dc\"}";
