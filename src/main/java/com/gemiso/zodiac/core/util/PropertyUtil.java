@@ -65,7 +65,7 @@ public class PropertyUtil {
 
             log.info("configpaths : " + configpaths);
         } catch (ConfigurationException localException) {
-            log.error("SQLException Error!!" + localException.getMessage());
+            log.error("SQLException Error!! :" + "ConfigurationException");
         }
         return configpaths;
     }

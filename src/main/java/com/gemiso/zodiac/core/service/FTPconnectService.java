@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.core.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -54,10 +53,10 @@ public class FTPconnectService {
                 ftpClient.changeWorkingDirectory(dir);
             }
         } catch (IOException e) {
-            if(e.getMessage().indexOf("refused") != -1) {
+            //if(e.getMessage().indexOf("refused") != -1) {
                 throw new Exception("FTP서버 연결실패 - ip : "+ip +" mesagge - "+"IOException");
-            }
-            throw e;
+            //}
+            //throw e;
         }
     }
 
@@ -95,10 +94,10 @@ public class FTPconnectService {
                 ftpClient.changeWorkingDirectory(dir);
             }
         } catch (IOException e) {
-            if(e.getMessage().indexOf("refused") != -1) {
+            //if(e.getMessage().indexOf("refused") != -1) {
                 throw new Exception("FTP서버 연결실패 - ip : "+ip +" mesagge - "+"IOException");
-            }
-            throw e;
+            //}
+            //throw e;
         }
     }
 
@@ -124,11 +123,11 @@ public class FTPconnectService {
                 throw new Exception("FTP서버 업로드실패");
             }
         } catch (Exception e) {
-            if(e.getMessage().indexOf("not open") != -1) {
+            //if(e.getMessage().indexOf("not open") != -1) {
                 log.info("FTP서버 연결실패 : fileNm - "+saveFileNm);
                 throw new Exception("FTP서버 연결실패");
-            }
-            throw e;
+            //}
+            //throw e;
         }
     }
 }

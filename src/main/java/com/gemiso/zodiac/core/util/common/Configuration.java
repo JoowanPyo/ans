@@ -65,8 +65,9 @@ public class Configuration extends AbstractConfiguration
             //주어진 file 객체가 가리키는 파일을 바이트 스트림으로 읽기 위한 fileinputStream 객체를 생성
             FileInputStream fin = new FileInputStream(configFile);
             log.info("FileInputStream          :"+fin);
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(fin);
             try{
-                this.props.load(new BufferedInputStream(fin));
+                this.props.load(bufferedInputStream);
             }
             catch (IOException e){
                 log.error("IOException Occured "+"IOException");
@@ -77,9 +78,12 @@ public class Configuration extends AbstractConfiguration
                     if (fin != null) {
                         fin.close();
                     }
+                    if (bufferedInputStream != null){
+                        bufferedInputStream.close();
+                    }
                 }catch (IOException ex){
                     //System.out.println("BufferedReader 종료 중 에러 발생");
-                    log.error("BufferedReader 종료 중 에러 발생 "+ex.getMessage());
+                    log.error("BufferedReader 종료 중 에러 발생 :"+" IOException");
                 }
             }
         } catch (FileNotFoundException ex) {

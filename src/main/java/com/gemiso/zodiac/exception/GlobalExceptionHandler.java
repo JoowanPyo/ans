@@ -66,7 +66,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
     @ExceptionHandler(value = ApiRequestException.class)
     public ResponseEntity<Object> handleApiRequestException(ApiRequestException ex) {
         ApiException apiException = new ApiException(
-                ex.getMessage(),
+                "ApiRequestException",
                 ex,
                 HttpStatus.BAD_REQUEST,
                 ZonedDateTime.now()

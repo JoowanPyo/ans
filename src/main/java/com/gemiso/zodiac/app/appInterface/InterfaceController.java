@@ -61,7 +61,7 @@ public class InterfaceController {
     //private final CueSheetItemService cueSheetItemService;
 
 
-    @Operation(summary = "큐시트 일일편성 목록조회[Taker]", description = "큐시트 일일편성 목록조회[Taker]")
+    @Operation(summary = "큐시트 목록조회[Taker]", description = "큐시트 일일편성 목록조회[Taker]")
     @GetMapping(path = "/dailypgm")
     public String dailyPgmFindAll(@Parameter(name = "brdc_pgm_id", description = "프로그램 아이디")
                                   @RequestParam(value = "brdc_pgm_id", required = false) String brdc_pgm_id,
@@ -116,7 +116,7 @@ public class InterfaceController {
 
         } catch (Exception e) {
 
-            throw new InterfaceException(e.getMessage());
+            throw new InterfaceException("큐시트 목록조회[Taker] ERROR ");
 
         }
     }
@@ -187,7 +187,7 @@ public class InterfaceController {
             takerCue = interfaceService.takerCueToXml(takerCueSheetDataDTO);
         } catch (Exception e) {
 
-            throw new InterfaceException(e.getMessage());
+            throw new InterfaceException("큐시트 상세조회[Taker] ERROR ");
 
         }
         return takerCue;
@@ -225,7 +225,7 @@ public class InterfaceController {
             }
         } catch (Exception e) {
 
-            throw new InterfaceException(e.getMessage());
+            throw new InterfaceException("테이커 큐시트 아이템 Refresh ERROR ");
 
         }
         return returnData;
@@ -261,7 +261,7 @@ public class InterfaceController {
 
         } catch (Exception e) {
 
-            throw new InterfaceException(e.getMessage());
+            throw new InterfaceException("방송구분코드 조회[Taker] ERROR ");
 
         }
         return takerCode;
@@ -335,7 +335,7 @@ public class InterfaceController {
 
         } catch (Exception e) {
 
-            throw new InterfaceException(e.getMessage());
+            throw new InterfaceException("프롬프터 프로그램 목록조회 ERROR ");
 
         }
 
@@ -364,7 +364,7 @@ public class InterfaceController {
 
         } catch (Exception e) {
 
-            throw new InterfaceException(e.getMessage());
+            throw new InterfaceException("프롬프트 큐시트 상세조회 ERROR ");
 
         }
         return prompterCueSheetXml;
@@ -392,7 +392,7 @@ public class InterfaceController {
 
         } catch (Exception e) {
 
-            throw new InterfaceException(e.getMessage());
+            throw new InterfaceException("프롬프트 큐시트 상세조회[ Base64 인코딩 ] ERROR ");
 
         }
         return prompterCueSheetXml;
@@ -489,7 +489,7 @@ public class InterfaceController {
 
         } catch (Exception e) {
 
-            throw new InterfaceException(e.getMessage());
+            throw new InterfaceException("테이커 방송중 상태 업데이트 ERROR ");
 
         }
         return takerCueSheetDTO;
@@ -550,7 +550,7 @@ public class InterfaceController {
 
         } catch (Exception e) {
 
-            throw new InterfaceException(e.getMessage());
+            throw new InterfaceException("방송중 테이커 큐시트 동기화 ERROR ");
 
         }
         return AnsApiResponse.ok();

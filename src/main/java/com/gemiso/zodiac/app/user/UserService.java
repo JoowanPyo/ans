@@ -304,7 +304,6 @@ public class UserService {
         //아리랑 pwd sha256해싱 [ pwd + salt ]
         EncodingHelper encodingHelper = new EncodingHelper(comfirm, saltKey);
         String hexPwd = encodingHelper.getHex();
-        //String encodePassword = encodePassword(hexPwd); //패스워드 비크립트
 
         //log.info(" 패스워드 확인 : "+ hexPwd.toString());
 

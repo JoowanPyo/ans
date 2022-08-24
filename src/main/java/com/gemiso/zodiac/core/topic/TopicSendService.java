@@ -52,10 +52,8 @@ public class TopicSendService {
             log.info("ans.topic Sent "+"EXCHANGE : " +EXCHANGE_WEB_NAME+" ROUTINGKEY : "+ routingKey +" MESSAGE : "+ msg );
         }
         catch (TimeoutException e) {
-            e.printStackTrace();
             log.error("ans.topic error : " +"TimeoutException");
         } catch (IOException e) {
-            e.printStackTrace();
             log.error("ans.topic error : " +"IOException");
         }finally {
 
@@ -94,10 +92,8 @@ public class TopicSendService {
             log.info("ans.interface Sent "+"EXCHANGE : " +EXCHANGE_INTERFACE_NAME+" ROUTINGKEY : "+ routingKey +" MESSAGE : "+ msg );
         }
         catch (TimeoutException e) {
-            e.printStackTrace();
             log.error("ans.interface error : " +"TimeoutException");
         } catch (IOException e) {
-            e.printStackTrace();
             log.error("ans.interface error : " +"IOException");
         }finally {
 

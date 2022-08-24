@@ -1,5 +1,6 @@
 package com.gemiso.zodiac;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gemiso.zodiac.core.scheduling.BisInterfaceService;
 import com.gemiso.zodiac.core.topic.TopicSendService;
@@ -64,14 +65,13 @@ class RestfulApiExampleApplicationTests {
     }
 
     @Test
-    void  testJson(){
+    void  testJson() throws JsonProcessingException {
 
         String json = "{\"title\": \"0525 17 \uae40\uc138\uc644 \uc99d\uc2dc\uc5f0\uacb0 1_2 \uc720\ub7fd \uc544\uc2dc\uc544 \uc99d\uc2dc\"}";
 
 
         ObjectMapper mapper = new ObjectMapper();
 
-        try {
 
             // convert JSON string to Map
             Map<String, String> map = mapper.readValue(json, Map.class);
@@ -80,11 +80,6 @@ class RestfulApiExampleApplicationTests {
             //Map<String, String> map = mapper.readValue(json, new TypeReference<Map<String, String>>() {});
 
             System.out.println(map);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
 
 
     }

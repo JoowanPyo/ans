@@ -74,22 +74,19 @@ public class AttachFileController {
         if (attachFileDTO.getFileDivCd().equals(fileDivCd)) {
             rep = attachFileService.find(request, response, attachFileDTO, fileDivCd);
         } else {
-            try {
+
                 String errorMessage = "File does not exist";
                 OutputStream outputStream = response.getOutputStream();
                 try {
                     outputStream.write(errorMessage.getBytes(Charset.forName("UTF-8")));
-                } finally {
+                }catch (IOException e){
+                    log.error("파일 다운로드 에러 : IOException ");
+                }finally {
 
                     if (outputStream != null) {
                         outputStream.close();
                     }
                 }
-            }
-            catch (Exception e){
-
-            }
-
 
             return null;
         }
