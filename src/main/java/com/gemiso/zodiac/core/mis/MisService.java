@@ -210,7 +210,7 @@ public class MisService {
         Depts dept = findDept(misDeptCode);
         Long deptId = null;
         if (ObjectUtils.isEmpty(dept) ==false){
-            deptId = dept.getId();
+            deptId = Optional.ofNullable(dept.getId()).orElse(0L);
         }
 
         String misPassword = misUser.getScrtNumb(); //조회된 misUser에서 패스워드 get
@@ -272,7 +272,7 @@ public class MisService {
         Depts dept = findDept(misDeptCode);
         Long deptId = null;
         if (ObjectUtils.isEmpty(dept) ==false){
-            deptId = dept.getId();
+            deptId = Optional.ofNullable(dept.getId()).orElse(0L);
         }
 
         UserDTO userDTO = userMapper.toDto(user);

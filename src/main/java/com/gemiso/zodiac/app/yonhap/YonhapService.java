@@ -395,11 +395,13 @@ public class YonhapService {
             byte[] bytes = file.getBytes();
 
             BufferedOutputStream buffStream = null;
+            FileOutputStream fileOutputStream = new FileOutputStream(new File(realpath + File.separator + rname));
+
             try {
 
                 //파일을 버퍼링을 이용하여 저장할 경로
                 // YYYYMMDD+FI+seq 요런식으로 들어감...
-                buffStream = new BufferedOutputStream(new FileOutputStream(new File(realpath + File.separator + rname)));
+                buffStream = new BufferedOutputStream(fileOutputStream);
 
                 //파일 복사
                 buffStream.write(bytes);
@@ -413,6 +415,9 @@ public class YonhapService {
                 try {
                     if (buffStream != null) {
                         buffStream.close();
+                    }
+                    if (fileOutputStream != null){
+                        fileOutputStream.close();
                     }
                 }catch (IOException e){
                     log.error("연합파일 buffStream.close() - IOException");

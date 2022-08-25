@@ -5,6 +5,7 @@ import com.gemiso.zodiac.app.elasticsearch.articleEntity.ElasticSearchArticle;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.querydsl.core.BooleanBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -36,6 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Repository
 public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleCustom {
 
@@ -259,7 +261,9 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
                 list.add(objectMapper.convertValue(jsonObject, ElasticSearchArticle.class));*/
                 list.add(objectMapper.convertValue(hit.getSourceAsMap(), ElasticSearchArticle.class));
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            log.error("findByElasticSearchArticleList ERROR ");
+        }
 
         //return null;
         return new PageImpl<>(list, pageable, totalCount);
@@ -385,7 +389,9 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
                 list.add(objectMapper.convertValue(jsonObject, ElasticSearchArticle.class));*/
                 list.add(objectMapper.convertValue(hit.getSourceAsMap(), ElasticSearchArticle.class));
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            log.error("findByElasticSearchArticleListCue ERROR ");
+        }
 
         //return null;
         return new PageImpl<>(list, pageable, totalCount);
@@ -562,7 +568,9 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
                 list.add(objectMapper.convertValue(jsonObject, ElasticSearchArticle.class));*/
                 list.add(objectMapper.convertValue(hit.getSourceAsMap(), ElasticSearchArticle.class));
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            log.error("findByStatisticsArticle ERROR ");
+        }
 
         //return null;
         return list;
@@ -732,7 +740,9 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
                 list.add(objectMapper.convertValue(jsonObject, ElasticSearchArticle.class));*/
                 list.add(objectMapper.convertValue(hit.getSourceAsMap(), ElasticSearchArticle.class));
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            log.error("findByStatisticsArticleCount ERROR ");
+        }
 
         //return null;
         return totalCount;
