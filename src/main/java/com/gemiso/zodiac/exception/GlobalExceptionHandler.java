@@ -114,7 +114,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         log.error(" Exception : "+ ApiErrorResponse.makeExceptionHandlerErrorResponse(ex));
 
         ApiErrorResponse.Error error =
-                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.InternalServerError, ex.getMessage());
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.InternalServerError, "Exception");
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.INTERNAL_SERVER_ERROR);
 
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -131,7 +131,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
     @ExceptionHandler(value = { ExpiredJwtException.class })
     public ResponseEntity<Object> handleExpiredJwtException(ExpiredJwtException ex){
         ApiErrorResponse.Error error =
-                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.expiredAccesstoken, ex.getMessage());
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.expiredAccesstoken, "ExpiredJwtException");
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
 
 
@@ -143,7 +143,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
     @ExceptionHandler(value = { ResponseStatusException.class })
     public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex){
         ApiErrorResponse.Error error =
-                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.expiredAccesstoken, ex.getMessage());
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.expiredAccesstoken, "ResponseStatusException");
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
 
 
