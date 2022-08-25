@@ -42,6 +42,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -114,7 +115,7 @@ public class InterfaceController {
 
             return takerCueSheetDTO;
 
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
 
             throw new InterfaceException("큐시트 목록조회[Taker] ERROR ");
 
@@ -185,7 +186,8 @@ public class InterfaceController {
                     ch_div_cd, usr_id, token, usr_ip, format, lang, os_type);
 
             takerCue = interfaceService.takerCueToXml(takerCueSheetDataDTO);
-        } catch (Exception e) {
+
+        } catch (RuntimeException e) {
 
             throw new InterfaceException("큐시트 상세조회[Taker] ERROR ");
 
@@ -223,7 +225,8 @@ public class InterfaceController {
                 returnData = interfaceService.takerSpareCueRefresh(takerSpareCueSheetDTO);
 
             }
-        } catch (Exception e) {
+
+        } catch (RuntimeException e) {
 
             throw new InterfaceException("테이커 큐시트 아이템 Refresh ERROR ");
 
@@ -259,7 +262,7 @@ public class InterfaceController {
 
             takerCode = interfaceService.codeToTakerCodeXml(takerCodeDTO);
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
 
             throw new InterfaceException("방송구분코드 조회[Taker] ERROR ");
 
@@ -333,7 +336,7 @@ public class InterfaceController {
                 prompterProgram = interfaceService.prompterProgramToXml(prompterProgramDTOList);
             }
 
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
 
             throw new InterfaceException("프롬프터 프로그램 목록조회 ERROR ");
 
@@ -362,7 +365,7 @@ public class InterfaceController {
 
             prompterCueSheetXml = interfaceService.prompterCueSheetXml(prompterCueSheetDataDTO);
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
 
             throw new InterfaceException("프롬프트 큐시트 상세조회 ERROR ");
 
@@ -390,7 +393,7 @@ public class InterfaceController {
 
             prompterCueSheetXml = interfaceService.prompterCueSheetXml(prompterCueSheetDataDTO);
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
 
             throw new InterfaceException("프롬프트 큐시트 상세조회[ Base64 인코딩 ] ERROR ");
 
@@ -476,7 +479,7 @@ public class InterfaceController {
                                 @PathVariable("rd_id") Long rd_id,
                                 @Parameter(description = "필수값<br> on_air ", required = true)
                                 @RequestBody @Valid TakerCdUpdateDTO takerCdUpdateDTO,
-                                @RequestHeader(value = "securityKey") String securityKey) throws JsonProcessingException {
+                                @RequestHeader(value = "securityKey") String securityKey) throws Exception {
 
         log.info("Taker CueSheet State Code Update : rd_id - " + rd_id + " cue_st_cd : " + takerCdUpdateDTO.toString());
         String takerCueSheetDTO = "";
@@ -487,11 +490,12 @@ public class InterfaceController {
 
             takerCueSheetDTO = interfaceService.takerPgmToXmlOne(parentProgramDTO);
 
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
 
             throw new InterfaceException("테이커 방송중 상태 업데이트 ERROR ");
 
         }
+
         return takerCueSheetDTO;
     }
 
@@ -539,7 +543,7 @@ public class InterfaceController {
     @PostMapping(path = "/takersetcue")
     public AnsApiResponse<?> takerSetCue(@Parameter(description = "필수값<br> ", required = true)
                                          @RequestBody @Valid TakerToCueBodyDTO takerToCueBodyDTO,
-                                         @RequestHeader(value = "securityKey") String securityKey) throws JsonProcessingException {
+                                         @RequestHeader(value = "securityKey") String securityKey) throws Exception {
 
         log.info("Taker On Air status  : rd_id - " + takerToCueBodyDTO.toString());
 
@@ -548,7 +552,7 @@ public class InterfaceController {
 
             interfaceService.takerSetCue2(takerToCueBodyDTO);
 
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
 
             throw new InterfaceException("방송중 테이커 큐시트 동기화 ERROR ");
 

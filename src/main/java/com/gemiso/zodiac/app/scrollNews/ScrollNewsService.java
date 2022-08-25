@@ -221,6 +221,7 @@ public class ScrollNewsService {
                 log.error("스크롤 뉴스 프린트 에러 : "+"IndexOutOfBoundsException");
             } finally {
                 writer.close();
+                fw.close();
             }
 
 
