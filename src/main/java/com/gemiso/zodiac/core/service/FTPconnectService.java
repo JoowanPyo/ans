@@ -14,6 +14,7 @@ import java.io.InputStream;
 public class FTPconnectService {
 
     private FTPClient ftpClient;
+    public static final int MAX_ATTEMPTS = 10;
 
     public FTPconnectService() {
         this.ftpClient = new FTPClient();
@@ -32,6 +33,16 @@ public class FTPconnectService {
                 log.info("FTP서버 연결실패 - ip : "+ip);
                 throw new Exception("FTP서버 연결실패");
             }
+
+            /********시큐어 코딩 인증 가이드 **********/
+            String ok = "FAIL";
+            int count = 0;
+
+            while ("FAIL".equals(ok) && (count < MAX_ATTEMPTS)){
+                ok = verifyUser(id, pw);
+                count++;
+            }
+
             if(!ftpClient.login(id, pw)) {
                 ftpClient.logout();
                 log.info("FTP서버 로그인실패");
@@ -73,6 +84,15 @@ public class FTPconnectService {
                 log.info("FTP서버 연결실패 - ip : "+ip);
                 throw new Exception("FTP서버 연결실패");
             }
+            /********시큐어 코딩 인증 가이드 **********/
+            String ok = "FAIL";
+            int count = 0;
+
+            while ("FAIL".equals(ok) && (count < MAX_ATTEMPTS)){
+                ok = verifyUser(id, pw);
+                count++;
+            }
+
             if(!ftpClient.login(id, pw)) {
                 ftpClient.logout();
                 log.info("FTP서버 로그인실패");
@@ -129,6 +149,14 @@ public class FTPconnectService {
             //}
             //throw e;
         }
+    }
+
+    public String verifyUser(String id, String pw){
+
+        if( id.length() > 0 && pw.length() > 0 )
+            return "OK";
+
+        return "FAIL";
     }
 }
 

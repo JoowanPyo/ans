@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 
 @Api(description = "로그인 API")
 @RestController
@@ -24,6 +25,7 @@ import javax.validation.Valid;
 public class AuthController {
 
     private final AuthService authService;
+    public static final int MAX_ATTEMPTS = 10;
 
     @Operation(summary = "사용자 로그인", description = "사용자 로그인")
     @PostMapping(path = "/login")//login
@@ -32,9 +34,30 @@ public class AuthController {
                                      @Valid @RequestBody AuthRequestDTO authRequestDTO
     ) throws Exception {
 
+        JwtDTO jwtDTO = new JwtDTO();
         //log.info(" 로그인 : "+ authRequestDTO.toString());
+        /********시큐어 코딩 인증 가이드 **********/
+        String id = authRequestDTO.getUserId();
+        String pw = authRequestDTO.getPassword();
+        String ok = "FAIL";
+        int count = 0;
+        try {
 
-        JwtDTO jwtDTO = authService.login(authRequestDTO);
+            while ("FAIL".equals(ok) && (count < MAX_ATTEMPTS)){
+                ok = authService.verifyUser(id, pw);
+                count++;
+            }
+
+            if ("OK".equals(ok)){
+                jwtDTO = authService.login(authRequestDTO);
+            }else {
+                return new AnsApiResponse<>(jwtDTO);
+            }
+
+        }catch (RuntimeException e){
+            log.error("로그인 인증 실패 : userId - "+id);
+        }
+
 
         return new AnsApiResponse<>(jwtDTO);
     }

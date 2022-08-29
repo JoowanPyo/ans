@@ -330,4 +330,12 @@ public class AuthService {
 
     }
 
+    public String verifyUser(String id, String pw){
+
+        if( id.length() > 0 && pw.length() > 0 )
+            return "OK";
+
+        return "FAIL";
+    }
+
 }
