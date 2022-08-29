@@ -382,32 +382,37 @@ public class YonhapService {
             }
 
             //오리지널 파일네임 여부
-            if (ub.getRname_yn().equals("N") == false) {
+           /* if (ub.getRname_yn().equals("N") == false) {
                 //확장자 파싱
                 ext = cutExtension(rname);
 
                 rname = fileId + "." + ext;
-            }
+            }*/
 
-            /*File uploadFile = null;
+            File uploadFile = null;
 
             if (rname != null && rname.trim().isEmpty() == false){
 
-                *//* FIX *//*
                 if( rname.endsWith(".doc") || rname.endsWith(".hwp") || rname.endsWith(".pdf") || rname.endsWith(".xls") ||
                         rname.endsWith(".png") || rname.endsWith(".svg") || rname.endsWith(".txt") || rname.endsWith(".zip") ||
                         rname.endsWith(".jpg") || rname.endsWith(".xml")){
 
-                    String fileName = file.getOriginalFilename();
-                    uploadFile = new File(realpath + File.separator + fileName);
+                    //String fileName = file.getOriginalFilename();
+                    //오리지널 파일네임 여부
+                    if (ub.getRname_yn().equals("N") == false) {
+                        //확장자 파싱
+                        ext = cutExtension(rname);
+
+                        rname = fileId + "." + ext;
+                    }
+                    uploadFile = new File(realpath + File.separator + rname);
                 }
             }
-*/
 
             byte[] bytes = file.getBytes();
 
             BufferedOutputStream buffStream = null;
-            FileOutputStream fileOutputStream = new FileOutputStream(new File(realpath + File.separator + rname));
+            FileOutputStream fileOutputStream = new FileOutputStream(uploadFile);
             //FileOutputStream fileOutputStream = new FileOutputStream(uploadFile);
 
             try {
