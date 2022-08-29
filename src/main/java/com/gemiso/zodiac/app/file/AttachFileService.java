@@ -113,9 +113,6 @@ public class AttachFileService {
             //로그인 아이디로 바꿔야 함?
             //	fb.setFile_upldr_id("system");
 
-            msg = "/store/"+upDir+"/"+rname;
-            log.info("msg: "+msg);
-
             //DB에 insert
             AttachFile attachFileEntity = attachFileMapper.toEntity(fb);
             attachFileRepository.save(attachFileEntity);
@@ -168,10 +165,6 @@ public class AttachFileService {
                 }
 
             }
-            /*buffStream.close();*/
-            msg += "Uploaded (" + file.getOriginalFilename() + ")";
-            code = 200;
-
 
             AttachFile attachFile = attachFileRepository.findById(fileId)
                   .orElseThrow(() -> new ResourceNotFoundException("File not found. FileId :"));
@@ -182,10 +175,14 @@ public class AttachFileService {
             AttachFile aveAttachFile = attachFileMapper.toEntity(attachFileDTO);
             attachFileRepository.save(aveAttachFile);
 
+            msg = "/store/"+upDir+"/"+rname;
+            log.info("msg: "+msg);
+
+            /*buffStream.close();*/
+            msg += " - Uploaded (" + file.getOriginalFilename() + ")";
+            code = 200;
 
             log.info("attach file start : " + fileId);
-
-
 
             //return attachFileDTO;
 
@@ -268,8 +265,6 @@ public class AttachFileService {
             //로그인 아이디로 바꿔야 함?
             //	fb.setFile_upldr_id("system");
 
-            msg = "/store/"+upDir+"/"+rname;
-            log.info("msg: "+msg);
 
             //DB에 insert
             AttachFile attachFileEntity = attachFileMapper.toEntity(fb);
@@ -291,7 +286,6 @@ public class AttachFileService {
 
                 rname = fileId + "." + ext;
             }
-
 
             byte[] bytes = file.getBytes();
 
@@ -325,10 +319,6 @@ public class AttachFileService {
                 }
 
             }
-            /*buffStream.close();*/
-            msg += "Uploaded (" + file.getOriginalFilename() + ")";
-            code = 200;
-
 
             AttachFile attachFile = attachFileRepository.findById(fileId)
                     .orElseThrow(() -> new ResourceNotFoundException("File not found. FileId :"));
@@ -340,8 +330,14 @@ public class AttachFileService {
             attachFileRepository.save(aveAttachFile);
 
 
-            log.info("attach file start : " + fileId);
+            msg = "/store/"+upDir+"/"+rname;
+            log.info("msg: "+msg);
 
+            /*buffStream.close();*/
+            msg += " - Uploaded (" + file.getOriginalFilename() + ")";
+            code = 200;
+
+            log.info("attach file start : " + fileId);
 
 
             //return attachFileDTO;

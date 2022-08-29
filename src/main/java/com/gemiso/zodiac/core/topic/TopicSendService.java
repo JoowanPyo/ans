@@ -24,7 +24,7 @@ public class TopicSendService {
     private static final String EXCHANGE_WEB_NAME = "ans.topic";
     private static final String EXCHANGE_INTERFACE_NAME = "amq.topic";
 
-    public void topicWeb(String msg) throws Exception {
+    public void topicWeb(String msg) throws IOException, TimeoutException {
 
         Connection connection = null;
         Channel channel = null;
@@ -63,7 +63,7 @@ public class TopicSendService {
         }
     }
 
-    public void topicInterface(String msg) throws Exception {
+    public void topicInterface(String msg) throws IOException, TimeoutException {
 
         Connection connection = null;
         Channel channel = null;

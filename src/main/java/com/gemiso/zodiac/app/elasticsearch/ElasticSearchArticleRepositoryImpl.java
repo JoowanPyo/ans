@@ -31,6 +31,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -261,7 +263,7 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
                 list.add(objectMapper.convertValue(jsonObject, ElasticSearchArticle.class));*/
                 list.add(objectMapper.convertValue(hit.getSourceAsMap(), ElasticSearchArticle.class));
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             log.error("findByElasticSearchArticleList ERROR ");
         }
 
@@ -389,7 +391,7 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
                 list.add(objectMapper.convertValue(jsonObject, ElasticSearchArticle.class));*/
                 list.add(objectMapper.convertValue(hit.getSourceAsMap(), ElasticSearchArticle.class));
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             log.error("findByElasticSearchArticleListCue ERROR ");
         }
 
@@ -568,7 +570,7 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
                 list.add(objectMapper.convertValue(jsonObject, ElasticSearchArticle.class));*/
                 list.add(objectMapper.convertValue(hit.getSourceAsMap(), ElasticSearchArticle.class));
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             log.error("findByStatisticsArticle ERROR ");
         }
 
@@ -740,7 +742,7 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
                 list.add(objectMapper.convertValue(jsonObject, ElasticSearchArticle.class));*/
                 list.add(objectMapper.convertValue(hit.getSourceAsMap(), ElasticSearchArticle.class));
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             log.error("findByStatisticsArticleCount ERROR ");
         }
 

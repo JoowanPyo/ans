@@ -116,13 +116,13 @@ public class FTPconnectService {
     }
 
     // FTP 파일 업로드
-    public void storeFile(String saveFileNm, InputStream inputStream) throws Exception{
+    public void storeFile(String saveFileNm, InputStream inputStream) throws Exception {
         try {
             if(!ftpClient.storeFile(saveFileNm, inputStream)) {
                 log.info("FTP서버 업로드실패 : fileNm - "+saveFileNm);
                 throw new Exception("FTP서버 업로드실패");
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             //if(e.getMessage().indexOf("not open") != -1) {
                 log.info("FTP서버 연결실패 : fileNm - "+saveFileNm);
                 throw new Exception("FTP서버 연결실패");

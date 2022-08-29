@@ -25,9 +25,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 
 @Service
 @Slf4j
@@ -266,9 +268,9 @@ public class CueSheetMediaService {
             //web에 큐메세지 전송
             topicSendService.topicWeb(webJson);
 
-        } catch (Exception e) {
+        } catch (IOException | TimeoutException e){
 
-            log.error("CueSheetMedia Topic Errer : CueSheet - " + cueSheet.toString() + " CueItemId - " + cueItemId + " Message - " + eventId);
+            log.error("CueSheetMedia Topic Errer : CueSheet - " + cueSheet.toString() + " CueItemId - " + cueItemId + " Message - " + eventId + "  Topic Error");
 
         }
     }

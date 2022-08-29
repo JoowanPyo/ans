@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -127,7 +128,7 @@ public class ElasticSearchArticleService {
                     .build();
 
             elasticSearchArticleRepository.save(entity);
-        }catch (Exception e){
+        }catch (RuntimeException e){
             log.error("ElasticSearch Error : ");
         }
     }

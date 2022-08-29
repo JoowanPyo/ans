@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -367,9 +368,6 @@ public class YonhapService {
             //로그인 아이디로 바꿔야 함?
             //	fb.setFile_upldr_id("system");
 
-            msg = "/store/"+upDir+"/"+rname;
-            log.info("msg: "+msg);
-
             //DB에 insert
             AttachFile attachFileEntity = attachFileMapper.toEntity(fb);
             attachFileRepository.save(attachFileEntity);
@@ -391,11 +389,26 @@ public class YonhapService {
                 rname = fileId + "." + ext;
             }
 
+            /*File uploadFile = null;
+
+            if (rname != null && rname.trim().isEmpty() == false){
+
+                *//* FIX *//*
+                if( rname.endsWith(".doc") || rname.endsWith(".hwp") || rname.endsWith(".pdf") || rname.endsWith(".xls") ||
+                        rname.endsWith(".png") || rname.endsWith(".svg") || rname.endsWith(".txt") || rname.endsWith(".zip") ||
+                        rname.endsWith(".jpg") || rname.endsWith(".xml")){
+
+                    String fileName = file.getOriginalFilename();
+                    uploadFile = new File(realpath + File.separator + fileName);
+                }
+            }
+*/
 
             byte[] bytes = file.getBytes();
 
             BufferedOutputStream buffStream = null;
             FileOutputStream fileOutputStream = new FileOutputStream(new File(realpath + File.separator + rname));
+            //FileOutputStream fileOutputStream = new FileOutputStream(uploadFile);
 
             try {
 
@@ -424,10 +437,6 @@ public class YonhapService {
                 }
 
             }
-            /*buffStream.close();*/
-            msg += "Uploaded (" + file.getOriginalFilename() + ")";
-            code = 200;
-
 
             AttachFile attachFile = attachFileRepository.findById(fileId)
                     .orElseThrow(() -> new ResourceNotFoundException("File not found. FileId :"));
@@ -438,11 +447,15 @@ public class YonhapService {
             AttachFile aveAttachFile = attachFileMapper.toEntity(attachFileDTO);
             attachFileRepository.save(aveAttachFile);
 
+            msg = "/store/"+upDir+"/"+rname;
+            log.info("msg: "+msg);
+            /*buffStream.close();*/
+            msg += " - Uploaded (" + file.getOriginalFilename() + ")";
+            code = 200;
 
             log.info("attach file start : " + fileId);
-
-
-            HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
+            
+            //HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
 
             //return attachFileDTO;
 
