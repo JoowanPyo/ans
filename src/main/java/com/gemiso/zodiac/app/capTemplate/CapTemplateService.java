@@ -136,10 +136,27 @@ public class CapTemplateService {
 
         CapTemplate capTemplate = capFindOrFail(capTmpltId);
 
-        AttachFileDTO attachFile = capTemplateUpdateDTO.getAttachFile();
+        AttachFileDTO newAttachFile = capTemplateUpdateDTO.getAttachFile();
+        AttachFile orgAttachFile = capTemplate.getAttachFile();
 
-        if (ObjectUtils.isEmpty(attachFile)){
+        if (ObjectUtils.isEmpty(newAttachFile)){
             capTemplate.setAttachFile(null);
+        }else {
+
+            Long newFileId = newAttachFile.getFileId();
+
+            if (ObjectUtils.isEmpty(orgAttachFile) == false){
+
+                Long orgFileId = Optional.ofNullable(orgAttachFile.getFileId()).orElse(0L);
+
+                //파일 변경시.
+                if (orgFileId.equals(newFileId) == false){
+
+                    AttachFile attachFile = AttachFile.builder().fileId(newFileId).build();
+
+                    capTemplate.setAttachFile(attachFile);
+                }
+            }
         }
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         //String userId = userAuthService.authUser.getUserId();
@@ -148,9 +165,9 @@ public class CapTemplateService {
         capTemplateUpdateMapper.updateFromDto(capTemplateUpdateDTO, capTemplate);
         capTemplateRepository.save(capTemplate); //update
 
-        List<CapTemplate> capTemplateList = capTemplateRepository.findCapList();
+        //List<CapTemplate> capTemplateList = capTemplateRepository.findCapList();
 
-        if (!ObjectUtils.isEmpty(capTemplateList)){
+       /* if (!ObjectUtils.isEmpty(capTemplateList)){
 
             for (int i = 0; i < capTemplateList.size(); i++){
                 if (capTmpltId.equals(capTemplateList.get(i).getCapTmpltId())){
@@ -170,7 +187,7 @@ public class CapTemplateService {
                 index++;
 
             }
-        }
+        }*/
 
     }
     

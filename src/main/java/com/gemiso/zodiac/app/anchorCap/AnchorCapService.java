@@ -141,7 +141,7 @@ public class AnchorCapService {
     public AnchorCap relationshipCreate(AnchorCap anchorCap, AnchorCapCreateDTO anchorCapCreateDTO){
 
         Long articleId = anchorCapCreateDTO.getArticleId();
-        Long capTmpltId = anchorCapCreateDTO.getCapTemplateId();
+        Long capTmpltId = anchorCapCreateDTO.getCapTmpltId();
         String symbolId = anchorCapCreateDTO.getSymbolId();
 
         if (ObjectUtils.isEmpty(articleId) == false) { //기사아이디가 있으면 엔엔티 빌드후 set

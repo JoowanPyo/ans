@@ -3176,6 +3176,29 @@ public class InterfaceService {
         topicSendService.topicWeb(json);*/
     }
 
+    //방송중 프롬프터 큐시트 동기화
+    public void prompterSetCue(TakerToCueBodyDTO takerToCueBodyDTO) throws Exception {
+
+        interfaceTopicService.prompterStatusUpdate(takerToCueBodyDTO);
+
+
+        /*Long rdId = takerToCueBodyDTO.getRd_id();
+        Long cueId = takerToCueBodyDTO.getCue_id();
+        String status = takerToCueBodyDTO.getStatus();
+
+        CueSheetItem cueSheetItem = cueSheetItemService.cueItemFindOrFail(rdId);
+
+        TakerToCueTopic2DTO takerToCueTopicDTO = new TakerToCueTopic2DTO();
+        takerToCueTopicDTO.setEventId("CueSheetItem Start From The Taker");
+        takerToCueTopicDTO.setCueItemId(rdId);
+        takerToCueTopicDTO.setCueId(cueId);
+        takerToCueTopicDTO.setStatus(status);
+
+        String json = marshallingJsonHelper.MarshallingJson(takerToCueTopicDTO);
+
+        topicSendService.topicWeb(json);*/
+    }
+
     //큐시트 아이템중 기사아이템만 get
     public CueSheetDTO getCueSheetItemArticle(CueSheetDTO cueSheetDTO) {
 

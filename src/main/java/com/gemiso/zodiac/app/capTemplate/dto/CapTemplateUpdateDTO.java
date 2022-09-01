@@ -22,7 +22,7 @@ public class CapTemplateUpdateDTO {
     private String capLttrNum;
     private String capCellDlmtr;
     private String capTmpltHelp;
-    private Integer capTmpltOrd;
+    //private Integer capTmpltOrd;
     private Integer varCnt;
     private String varNm;
     private Integer takeCount;

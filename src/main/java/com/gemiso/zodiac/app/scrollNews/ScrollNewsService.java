@@ -113,7 +113,8 @@ public class ScrollNewsService {
 
                 try {
 
-                    Path directoryPath = Paths.get(System.getProperty("user.dir") + File.separator + "storage" + File.separator + "send_text");
+                    //Path directoryPath = Paths.get(System.getProperty("user.dir") + File.separator + "storage" + File.separator + "send_text");
+                    Path directoryPath = Paths.get("/data/storage/send_text");
                     Files.createDirectories(directoryPath);//폴더 생성합니다.
                     //System.out.println("폴더가 생성되었습니다.");
                 } catch (FileAlreadyExistsException e) {

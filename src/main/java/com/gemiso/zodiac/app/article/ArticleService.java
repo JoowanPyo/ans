@@ -1574,7 +1574,7 @@ public class ArticleService {
 
                 AnchorCap anchorCap = anchorCapCreateMapper.toEntity(anchorCapCreateDTO);
 
-                Long getCapTemplateId = anchorCapCreateDTO.getCapTemplateId();//앵커자막에 추가할 템플릿아이디.
+                Long getCapTemplateId = anchorCapCreateDTO.getCapTmpltId();//앵커자막에 추가할 템플릿아이디.
                 if (ObjectUtils.isEmpty(getCapTemplateId) == false) { //등록할 템플릿이 있을경우.
 
                     CapTemplate capTemplate = CapTemplate.builder().capTmpltId(getCapTemplateId).build();//등록할 템플릿아이디 엔티티 빌드.
@@ -1929,7 +1929,7 @@ public class ArticleService {
                     .capRmk(anchorCap.getCapRmk())
                     .lnOrd(anchorCap.getLnOrd())
                     .articleId(articleId)
-                    .capTemplateId(capTmpltId)
+                    .capTmpltId(capTmpltId)
                     .symbolId(symbolId)
                     .build();
 

@@ -1,7 +1,5 @@
 package com.gemiso.zodiac.core.topic;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerToCueBodyDTO;
 import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerToCueBodyDataDTO;
 import com.gemiso.zodiac.core.helper.MarshallingJsonHelper;
@@ -38,6 +36,40 @@ public class InterfaceTopicService {
         //topic 메세지 header 생성
         TakerToCueTopicDTO header = new TakerToCueTopicDTO();
         takerToCueTopicArrayDTO.setEventId("CueSheetItem Start From The Taker");
+        takerToCueTopicArrayDTO.setCueId(cueId);
+
+        //topic 메세지 body 생성
+        List<TakerToCueArrayBodyDTO> newBodyList = new ArrayList<>();
+
+        for (TakerToCueBodyDataDTO body : bodyList ){
+
+            TakerToCueArrayBodyDTO takerToCueArrayBodyDTO = new TakerToCueArrayBodyDTO();
+            takerToCueArrayBodyDTO.setCueItemId(body.getRd_id());
+            takerToCueArrayBodyDTO.setStatus(body.getStatus()); //Null값이 오면 상태 초기화
+
+            newBodyList.add(takerToCueArrayBodyDTO);
+        }
+
+        takerToCueTopicArrayDTO.setBody(newBodyList);
+
+        String json = marshallingJsonHelper.MarshallingJson(takerToCueTopicArrayDTO);
+
+        topicSendService.topicWeb(json);
+
+    }
+
+    //큐시트 아이템 상태 업데이트 [Taker to web]
+    //프롬프터 플레이, 선택 정보를 웹으로 전달 웹은 이를 표시
+    public void prompterStatusUpdate(TakerToCueBodyDTO takerToCueBodyDTO) throws Exception {
+
+        List<TakerToCueBodyDataDTO> bodyList = takerToCueBodyDTO.getBody();
+        Long cueId = takerToCueBodyDTO.getCue_id();
+
+        TakerToCueTopicArrayDTO takerToCueTopicArrayDTO = new TakerToCueTopicArrayDTO();
+
+        //topic 메세지 header 생성
+        TakerToCueTopicDTO header = new TakerToCueTopicDTO();
+        takerToCueTopicArrayDTO.setEventId("CueSheetItem Start From The Prompter");
         takerToCueTopicArrayDTO.setCueId(cueId);
 
         //topic 메세지 body 생성

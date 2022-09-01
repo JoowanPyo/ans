@@ -32,7 +32,7 @@ public class AnchorCapCreateDTO {
     @Schema(description = "기사 아이디")
     private Long articleId;
     @Schema(description = "자막 템플릿 아이디")
-    private Long capTemplateId;
+    private Long capTmpltId;
     @Schema(description = "방송아이콘 아이디")
     private String symbolId;
 }

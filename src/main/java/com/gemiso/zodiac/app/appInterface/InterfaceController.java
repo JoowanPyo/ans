@@ -560,6 +560,27 @@ public class InterfaceController {
         return AnsApiResponse.ok();
     }
 
+    @Operation(summary = "방송중 프롬프터 큐시트 동기화", description = "방송중 프롬프터 큐시트 동기화")
+    @PostMapping(path = "/promptersetcue")
+    public AnsApiResponse<?> prompterSetCue(@Parameter(description = "필수값<br> ", required = true)
+                                         @RequestBody @Valid TakerToCueBodyDTO takerToCueBodyDTO,
+                                         @RequestHeader(value = "securityKey") String securityKey) throws Exception {
+
+        log.info("Prompter On Air status  : rd_id - " + takerToCueBodyDTO.toString());
+
+        try {
+
+
+            interfaceService.prompterSetCue(takerToCueBodyDTO);
+
+        } catch (IOException | RuntimeException e) {
+
+            throw new InterfaceException("방송중 테이커 큐시트 동기화 ERROR ");
+
+        }
+        return AnsApiResponse.ok();
+    }
+
    /* @Operation(summary = "방송중 테이커 큐시트 동기화 test", description = "방송중 테이커 큐시트 동기화 test")
     @PostMapping(path = "/takersetcuetest")
     public AnsApiResponse<?> takerSetCueTest(@Parameter(description = "필수값<br> ", required = true)
