@@ -111,14 +111,28 @@ public class BisInterfaceService {
                 String pgmCd = dsProgramDTO.getPgmCd(); // BIS 프로그램 아이디를 가져온다.
                 String newsYn = dsProgramDTO.getNewsYn();
 
-                String pgmOnm = dsProgramDTO.getPgmOnm();
+                String pgmOnm = dsProgramDTO.getPgmOnm();// Bis에서 조회된 프로그램 영문명 get
+                String chanTp = dsProgramDTO.getChanTp(); //Bis에서 조회된 채널정보 get
+                String jenreClf1 = dsProgramDTO.getJenreClf1();//Bis에서 조회된 장르구분 get
+                String productClf = dsProgramDTO.getProductClf();//Bis에서 조회된 제작구분 get
 
                 if ("Y".equals(newsYn) || "PG2190007K".equals(pgmCd)) {
                     if (brdcPgmId.equals(pgmCd)) {// ANS프로그램 아이디와 BIS프로그램 아이디가 같으면 BIS프로그램 리스트에서 삭제.
 
+                        //채널유형 01:TV 02:라디오
+                        String chDivCd = getChannelCd(chanTp);
+                        //장르구분 100 보도, 200:교양, 300:오락
+                        String gneDivCd = getGenreCd(jenreClf1);
+                        //제작구분 100:자체제작, 200:외주제작, 300:국내구매, 400:해외구매, 500리패키지, 999:기타
+                        String prdDivCd = getProduceCd(productClf);
+
                         //Bis에서 들어온 정보 사용여부 Y
                         program.setUseYn("Y");
-                        program.setBrdcPgmNmEn(pgmOnm);
+                        program.setBrdcPgmNmEn(pgmOnm);//프로그램 영문명
+                        program.setBrdcPgmNm(dsProgramDTO.getPgmNm());//프로그램 명
+                        program.setChDivCd(chDivCd);//채널구분
+                        program.setGneDivCd(gneDivCd);//장르구분
+                        program.setPrdDivCd(prdDivCd);//제작구분
 
                         programRepository.save(program);
                         iter.remove();
@@ -152,7 +166,7 @@ public class BisInterfaceService {
                             .gneDivCd(gneDivCd)//장르구분
                             .prdDivCd(prdDivCd)//제작구분
                             .useYn("Y")
-                            .brdcPgmNmEn(dsProgramDTO.getPgmOnm())
+                            .brdcPgmNmEn(dsProgramDTO.getPgmOnm())//프로그램 영문명
                             /*.inputrId(userId)*/
                             .build();
 

@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItem;
 
+import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.cueSheetTemplate.dto.CueSheetTemplateSimpleDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemCreateDTO;
 import com.gemiso.zodiac.app.cueSheetTemplateItem.dto.CueTmpltItemDTO;
@@ -182,15 +183,24 @@ public class CueTmpltItemService {
     public void createCap(List<CueTmpltItemCapCreateDTO> cueTmpltItemCapCreateDTOList, Long cueTmpltItemId, String userId){
 
         //큐시트 템플릿 아이템 아이디 빌드
-        CueTmpltItemSimpleDTO cueTmpltItem = CueTmpltItemSimpleDTO.builder().cueTmpltItemId(cueTmpltItemId).build();
+        CueTmpltItem cueTmpltItem = CueTmpltItem.builder().cueTmpltItemId(cueTmpltItemId).build();
 
         //들어온 큐시트 템플릿 아이템 자막 전부 등록.
         for (CueTmpltItemCapCreateDTO cueTmpltItemCapCreateDTO : cueTmpltItemCapCreateDTOList){
 
-            cueTmpltItemCapCreateDTO.setCueTmpltItem(cueTmpltItem); //큐시트 템플릿 아이템 아이디 set
+            //cueTmpltItemCapCreateDTO.setCueTmpltItem(cueTmpltItem); //큐시트 템플릿 아이템 아이디 set
             cueTmpltItemCapCreateDTO.setInputrId(userId);// 등록자 set
 
             CueTmpltItemCap cueTmpltItemCap = cueTmpltItemCapCreateMapper.toEntity(cueTmpltItemCapCreateDTO);
+
+            Long getCapTemplateId = cueTmpltItemCapCreateDTO.getCapTmpltId();//기사자막에 추가할 템플릿아이디.
+            if (ObjectUtils.isEmpty(getCapTemplateId) == false) {
+
+                CapTemplate capTemplate = CapTemplate.builder().capTmpltId(getCapTemplateId).build();//등록할 템플릿아이디 엔티티 빌드.
+                cueTmpltItemCap.setCapTemplate(capTemplate); //템플릿아이디 엔티티set.
+            }
+
+            cueTmpltItemCap.setCueTmpltItem(cueTmpltItem);//큐시트 템플릿 아이템 아이디 set
             cueTmpltItemCapRepository.save(cueTmpltItemCap); //큐시트 템플릿 아이템 자막 등록
 
         }
@@ -211,9 +221,9 @@ public class CueTmpltItemService {
         //UpdatqDTO에서 큐시트 템플릿 아이템 자막 리스트 get
         List<CueTmpltItemCapCreateDTO> cueTmpltItemCapCreateDTOList = cueTmpltItemUpdateDTO.getCueTmpltItemCap();
         //큐시트 템플릿 아이템 자막 리스트가 있으면 등록.
-        if (CollectionUtils.isEmpty(cueTmpltItemCapCreateDTOList) == false){
-            updateCap(cueTmpltItemCapCreateDTOList, cueTmpltItemId, userId);
-        }
+        //if (CollectionUtils.isEmpty(cueTmpltItemCapCreateDTOList) == false){
+        updateCap(cueTmpltItemCapCreateDTOList, cueTmpltItemId, userId);
+        //}
 
         //리턴시켜줄 큐시트템플릿아이템 아이디를 DTO에 set
         CueTmpltItemSimpleDTO cueTmpltItemSimpleDTO = new CueTmpltItemSimpleDTO();

@@ -28,7 +28,7 @@ public class InterfaceFilter implements Filter {
                 ",/interface/getmstlistservice,/interface/getcuesheetservice,/interface/pstakerlist,/interface/pstaker" +
                 ",/interface/takerrefresh,/interface/mediatransfer/updatestate,/interface/cuestcdupdate,/interface/takersetcue" +
                 ",/interface/smamfindcue,/interface/smamfindallcue,/interface/homepagecd,/interface/users,/interface/user,/nod" +
-                ",/interface/getcuesheetservice/prompter,/interface/promptersetcue";
+                ",/interface/getcuesheetservice/prompter,/interface/promptersetcue,/interface/article";
         excludedUrls = Arrays.asList(excludePattern.split(","));
     }
 

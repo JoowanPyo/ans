@@ -94,11 +94,11 @@ public class CueTmpltItemCap extends BaseEntity {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
     private String delrNm;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cap_tmplt_id")
     private CapTemplate capTemplate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cue_tmplt_item_id")
     @JsonBackReference
     private CueTmpltItem cueTmpltItem;

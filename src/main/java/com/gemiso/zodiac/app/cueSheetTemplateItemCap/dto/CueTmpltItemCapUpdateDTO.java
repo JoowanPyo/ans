@@ -1,6 +1,7 @@
 package com.gemiso.zodiac.app.cueSheetTemplateItemCap.dto;
 
 import com.gemiso.zodiac.app.symbol.dto.SymbolSimpleDTO;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,8 @@ public class CueTmpltItemCapUpdateDTO {
     //private String inputrId;
     //private String inputrNm;
     private String updtrId;
+    @Schema(description = "자막 템플릿 아이디")
+    private Long capTmpltId;
     //private String updtrNm;
     //private String delrId;
     //private String delrNm;

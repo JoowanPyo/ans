@@ -1892,6 +1892,224 @@ public class CueSheetService {
 
         int seq = 1;
 
+        //String match = "[^\uAC00-\uD7A30-9a-zA-Z]";
+        //기호문자 처리할 String[]
+       /* String[] puncts = {"!", "#", "$", "%", "&",*//*, "(", ")", "{", "}",*//* "@"*//*, "'"*//*, "*", ":", "+", ";", "-", "."
+                , ",", "<", ">", "^", "~", "|", "`"*//*, "[", "]"*//* };
+        String[] punctList = {"(", ")", "{", "}", "'", "[", "]"*//*, "\""*//*};*/
+
+        Date now = new Date();
+        String sToday = dateChangeHelper.dateToStringNoTime(now);
+        sToday = sToday.substring(5,10);
+        String today = sToday.replaceAll("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9]", "");
+
+        List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId); //큐시트 아이템 출력
+
+        for (CueSheetItem cueSheetItem : cueSheetItemList) {
+
+            Article article = cueSheetItem.getArticle(); //기사 정보를 가져온다.
+            Long cueItemId = cueSheetItem.getCueItemId();
+
+            if (ObjectUtils.isEmpty(article)) { //일반 큐시트 아이템, 템플릿아이템
+
+                List<CueSheetItemCap> cueSheetItemCapList = cueSheetItemCapRepotitory.findCueSheetItemCapList(cueItemId);
+
+                for (CueSheetItemCap cueSheetItemCap : cueSheetItemCapList) {
+
+                    CapTemplate capTemplate = cueSheetItemCap.getCapTemplate();
+
+                    if (ObjectUtils.isEmpty(capTemplate) == false){
+
+                        //순번이 1자리숫자 이면 앞에 +"0" 시켜준다
+                        //Integer ord = capTemplate.getCapTmpltOrd();
+                        String sOrd = cueSheetItem.getCueItemOrdCd();
+                        if (sOrd.length() < 2){
+                            sOrd = "0"+sOrd;
+                        }
+
+                        //자막앞에 ()에 있는 문자 추출
+                        String title = article.getArtclTitl();
+                        String frontWord = "";
+                        if (title.indexOf(")") >= 0){
+
+                            frontWord = title.substring(1 , title.indexOf(")"));
+
+                        }
+                        //제목 두번째 공백까지( 두단어만 짤라서 입력 )
+                        int fBlank = title.indexOf(" ");
+                        int sBlank = title.indexOf(" ", fBlank + 1);
+
+                        String firstWords = title.substring(fBlank + 1, sBlank);
+
+                        String firstWord = firstWords.replaceAll("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9]", "");
+
+                        //두번째 단어 추출
+                        String secondSentence = title.substring(sBlank + 1, title.length());
+
+                        int sfBlank = secondSentence.indexOf(" ");
+
+                        if (sfBlank == 1){
+                            sfBlank = secondSentence.indexOf(" ", sfBlank+1);
+                        }
+
+                        String secondWords = secondSentence.substring(0, sfBlank);
+
+                        String secondWord = secondWords.replaceAll("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9]", "");
+
+
+                        CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
+                                .project(sOrd+" "+today+" "+frontWord+" "+firstWord+" "+secondWord)
+                                .page(seq)
+                                .content(cueSheetItemCap.getCapCtt())
+                                .template(capTemplate.getCapTmpltNm())
+                                .build();
+
+                        cueSheetCapDownloadCgDTOS.add(cueSheetCapDownloadCg);
+
+                        ++seq;
+
+                    }
+
+                }
+            }else {
+
+                Set<AnchorCap> anchorCapList = article.getAnchorCap();
+
+                for (AnchorCap anchorCap : anchorCapList) {
+
+                    CapTemplate capTemplate = anchorCap.getCapTemplate();
+
+                    if (ObjectUtils.isEmpty(capTemplate) == false){
+
+                        //순번이 1자리숫자 이면 앞에 +"0" 시켜준다
+                        String sOrd = cueSheetItem.getCueItemOrdCd();
+                        if (sOrd.length() < 2){
+                            sOrd = "0"+sOrd;
+                        }
+
+                        //자막앞에 ()에 있는 문자 추출
+                        String title = article.getArtclTitl();
+                        String frontWord = "";
+                        if (title.indexOf(")") >= 0){
+
+                            frontWord = title.substring(1 , title.indexOf(")"));
+
+                        }
+                        //제목 두번째 공백까지( 두단어만 짤라서 입력 )
+                        int fBlank = title.indexOf(" ");
+                        int sBlank = title.indexOf(" ", fBlank + 1);
+
+                        String firstWords = title.substring(fBlank + 1, sBlank);
+
+                        String firstWord = firstWords.replaceAll("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9]", "");
+
+                        //두번째 단어 추출
+                        String secondSentence = title.substring(sBlank + 1, title.length());
+
+                        int sfBlank = secondSentence.indexOf(" ");
+
+                        if (sfBlank == 1){
+                            sfBlank = secondSentence.indexOf(" ", sfBlank+1);
+                        }
+
+                        String secondWords = secondSentence.substring(0, sfBlank);
+
+                        String secondWord = secondWords.replaceAll("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9]", "");
+
+
+                        CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
+                                .project(sOrd+" "+today+" "+frontWord+" "+firstWord+" "+secondWord)
+                                .page(seq)
+                                .content(anchorCap.getCapCtt())
+                                .template(capTemplate.getCapTmpltNm())
+                                .build();
+
+                        cueSheetCapDownloadCgDTOS.add(cueSheetCapDownloadCg);
+
+                        ++seq;
+
+                    }
+                }
+
+                Set<ArticleCap> articleCapList = article.getArticleCap();
+
+                for (ArticleCap articleCap : articleCapList) {
+
+                    CapTemplate capTemplate = articleCap.getCapTemplate();
+
+                    if (ObjectUtils.isEmpty(capTemplate) == false){
+
+                        //순번이 1자리숫자 이면 앞에 +"0" 시켜준다
+                        String sOrd = cueSheetItem.getCueItemOrdCd();
+                        if (sOrd.length() < 2){
+                            sOrd = "0"+sOrd;
+                        }
+
+                        //자막앞에 ()에 있는 문자 추출
+                        String title = article.getArtclTitl();
+                        String frontWord = "";
+                        if (title.indexOf(")") >= 0){
+
+                            frontWord = title.substring(1 , title.indexOf(")"));
+
+                        }
+                        //제목 두번째 공백까지( 두단어만 짤라서 입력 )
+                        int fBlank = title.indexOf(" ");
+                        int sBlank = title.indexOf(" ", fBlank + 1);
+
+                        String firstWords = title.substring(fBlank + 1, sBlank);
+
+                        String firstWord = firstWords.replaceAll("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9]", "");
+                        firstWord.trim();
+
+                        //두번째 단어 추출
+                        String secondSentence = title.substring(sBlank + 1, title.length());
+
+                        int sfBlank = secondSentence.indexOf(" ");
+
+                        if (sfBlank == 1){
+                            sfBlank = secondSentence.indexOf(" ", sfBlank+1);
+                        }
+
+                        String secondWords = secondSentence.substring(0, sfBlank);
+
+                        String secondWord = secondWords.replaceAll("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9]", "");
+                        secondWord.trim();
+
+
+                        //firstWord = firstWord.replace()
+
+                        CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
+                                .project(sOrd+" "+today+" "+frontWord+" "+firstWord+" "+secondWord)
+                                .page(seq)
+                                .content(articleCap.getCapCtt())
+                                .template(capTemplate.getCapTmpltNm())
+                                .build();
+
+                        cueSheetCapDownloadCgDTOS.add(cueSheetCapDownloadCg);
+
+                        ++seq;
+                    }
+                }
+
+            }
+        }
+
+        CueSheetCapDownloadXMLDTO cueSheetCapDownloadXMLDTO = new CueSheetCapDownloadXMLDTO();
+        cueSheetCapDownloadXMLDTO.setCd(cueSheetCapDownloadCgDTOS);
+
+        //articleDTO TO XML 파싱
+        String xml = JAXBXmlHelper.marshal(cueSheetCapDownloadXMLDTO, CueSheetCapDownloadXMLDTO.class);
+
+        return xml;
+    }
+
+    /*public String capDownload(Long cueId){
+
+        List<CueSheetCapDownloadCgDTO> cueSheetCapDownloadCgDTOS = new ArrayList<>();
+
+        int seq = 1;
+
         List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueItemList(cueId); //큐시트 아이템 출력
 
         for (CueSheetItem cueSheetItem : cueSheetItemList) {
@@ -1975,7 +2193,7 @@ public class CueSheetService {
         String xml = JAXBXmlHelper.marshal(cueSheetCapDownloadXMLDTO, CueSheetCapDownloadXMLDTO.class);
 
         return xml;
-    }
+    }*/
 
     //큐시트 락이 6시간이상 걸려있는 큐시트 체크후 락 해제
     public void cueSheetLockChk() {

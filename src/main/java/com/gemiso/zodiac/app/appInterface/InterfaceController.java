@@ -1,9 +1,7 @@
 package com.gemiso.zodiac.app.appInterface;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.appInterface.codeDTO.TakerCodeDTO;
 import com.gemiso.zodiac.app.appInterface.mediaTransferDTO.MediaTransferDTO;
-import com.gemiso.zodiac.app.appInterface.prompterCueDTO.PrompterCueSheetDTO;
 import com.gemiso.zodiac.app.appInterface.prompterCueDTO.PrompterCueSheetDataDTO;
 import com.gemiso.zodiac.app.appInterface.prompterProgramDTO.PrompterProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerCueFindAllDTO.TakerCueSheetDataDTO;
@@ -11,22 +9,16 @@ import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerCueRefreshData
 import com.gemiso.zodiac.app.appInterface.takerCueRefreshDTO.TakerSpareCueRefreshDataDTO;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.ParentProgramDTO;
 import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerCdUpdateDTO;
-import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerToCueBody2DTO;
 import com.gemiso.zodiac.app.appInterface.takerUpdateDTO.TakerToCueBodyDTO;
-import com.gemiso.zodiac.app.article.dto.ArticleCreateDTO;
-import com.gemiso.zodiac.app.article.dto.ArticleDeleteConfirmDTO;
-import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
-import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
+import com.gemiso.zodiac.app.article.ArticleService;
+import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.code.CodeService;
 import com.gemiso.zodiac.app.code.dto.CodeDTO;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetFindAllDTO;
-import com.gemiso.zodiac.app.cueSheetItem.CueSheetItemService;
-import com.gemiso.zodiac.app.cueSheetItem.dto.CueSheetItemDTO;
 import com.gemiso.zodiac.app.user.UserService;
 import com.gemiso.zodiac.app.user.dto.UserDTO;
-import com.gemiso.zodiac.app.user.dto.UserDeleteUpdateDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.helper.SearchDateInterface;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
@@ -59,6 +51,7 @@ public class InterfaceController {
     private final CueSheetService cueSheetService;
     private final CodeService codeService;
     private final UserService userService;
+    private final ArticleService articleService;
     //private final CueSheetItemService cueSheetItemService;
 
 
@@ -517,7 +510,7 @@ public class InterfaceController {
     @PostMapping(path = "/takersetcue")
     public AnsApiResponse<?> takerSetCue(@Parameter(description = "필수값<br> ", required = true)
                                          @RequestBody @Valid TakerToCueBodyDTO takerToCueBodyDTO,
-                                         @RequestHeader(value = "securityKey") String securityKey) throws JsonProcessingException {
+                                         @RequestHeader(value = "securityKey") String securityKey) throws Exception {
 
         log.info("Taker On Air status  : rd_id - " + takerToCueBodyDTO.toString());
 
@@ -691,6 +684,19 @@ public class InterfaceController {
         UserDTO returnUser = userService.find(userId);
 
         return new AnsApiResponse<UserDTO>(returnUser);
+
+    }
+
+    @Operation(summary = "기사 상세조회 ( 외부 )", description = "기사 상세조회 ( 외부 )")
+    @GetMapping(path = "/article")
+    public AnsApiResponse<ArticleDTO> findArticle(@Parameter(name = "artclId", description = "기사 아이디", in = ParameterIn.QUERY)
+                                            @RequestParam(value = "artclId", required = false) Long artclId,
+                                            @RequestHeader(value = "securityKey") String securityKey) {
+
+
+        ArticleDTO articleDTO = articleService.find(artclId);
+
+        return new AnsApiResponse<ArticleDTO>(articleDTO);
 
     }
 }

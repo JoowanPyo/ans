@@ -291,7 +291,6 @@ public class CueSheetController {
 
         String capDownload = cueSheetService.capDownload(cueId);
 
-
         return capDownload;
     }
 

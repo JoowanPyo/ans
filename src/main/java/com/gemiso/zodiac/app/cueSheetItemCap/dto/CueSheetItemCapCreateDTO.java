@@ -32,7 +32,7 @@ public class CueSheetItemCapCreateDTO {
     private Date inputDtm;
     private Long capTmpltId;
     private String inputrId;
-    private CapTemplateDTO capTemplate;
+    //private CapTemplateDTO capTemplate;
     @NotNull
     private CueSheetItemSimpleDTO cueSheetItem;
     private SymbolSimpleDTO symbol;

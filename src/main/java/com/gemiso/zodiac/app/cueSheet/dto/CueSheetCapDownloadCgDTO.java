@@ -18,6 +18,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CueSheetCapDownloadCgDTO {
 
+    @XmlElement(name = "PROJECT")
+    private String project;
+
     @XmlElement(name="PAGE")
     private Integer page;
 

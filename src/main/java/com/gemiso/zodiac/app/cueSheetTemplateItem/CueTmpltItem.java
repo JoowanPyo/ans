@@ -126,16 +126,16 @@ public class CueTmpltItem extends BaseEntity {
     @JsonBackReference
     private CueSheetTemplate cueSheetTemplate;
 
-    @OneToMany(mappedBy = "cueTmpltItem")
+    @OneToMany(mappedBy = "cueTmpltItem", fetch = FetchType.LAZY)
     @JsonManagedReference
     @Where(clause = "del_yn = 'N'")
     private List<CueTmpltItemCap> cueTmpltItemCap = new ArrayList<>();
 
-    @OneToMany(mappedBy = "cueTmpltItem")
+    @OneToMany(mappedBy = "cueTmpltItem", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<CueTmplSymbol> cueTmplSymbol = new ArrayList<>();
 
-    @OneToMany(mappedBy = "cueTmpltItem")
+    @OneToMany(mappedBy = "cueTmpltItem", fetch = FetchType.LAZY)
     @JsonManagedReference
     @Where(clause = "del_yn = 'N'")
     private List<CueTmpltMedia> cueTmpltMedia = new ArrayList<>();

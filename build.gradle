@@ -106,10 +106,6 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-net/commons-net
     implementation 'commons-net:commons-net:3.6'
 
-    //queryDsl jon get
-    // https://mavenlibs.com/maven/dependency/com.github.alexliesenfeld/querydsl-jpa-postgres-json
-    //implementation 'com.github.alexliesenfeld:querydsl-jpa-postgres-json:0.0.7'
-
 }
 
 /*bootWar {
@@ -120,7 +116,7 @@ dependencies {
 }*/
 bootJar {
     archiveBaseName = 'ans'
-    archiveVersion = "0.1_09-01"
+    archiveVersion = "0.1_09-21"
 }
 
 

@@ -2,15 +2,20 @@ package com.gemiso.zodiac.app.cueSheetItem;
 
 import com.gemiso.zodiac.app.anchorCap.AnchorCap;
 import com.gemiso.zodiac.app.anchorCap.AnchorCapRepository;
+import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapSimpleDTO;
 import com.gemiso.zodiac.app.article.Article;
 import com.gemiso.zodiac.app.article.ArticleRepository;
 import com.gemiso.zodiac.app.article.ArticleService;
 import com.gemiso.zodiac.app.article.dto.ArticleCueItemDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleDTO;
+import com.gemiso.zodiac.app.article.dto.ArticleSimpleDTO;
 import com.gemiso.zodiac.app.article.dto.ArticleUpdateDTO;
 import com.gemiso.zodiac.app.article.mapper.ArticleCueItemMapper;
 import com.gemiso.zodiac.app.article.mapper.ArticleMapper;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleCap.ArticleCapRepository;
+import com.gemiso.zodiac.app.articleCap.dto.ArticleCapDTO;
+import com.gemiso.zodiac.app.articleCap.dto.ArticleCapSimpleDTO;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.articleMedia.ArticleMediaRepository;
 import com.gemiso.zodiac.app.articleMedia.dto.ArticleMediaDTO;
@@ -21,6 +26,7 @@ import com.gemiso.zodiac.app.articleTag.ArticleTag;
 import com.gemiso.zodiac.app.articleTag.ArticleTagRepository;
 import com.gemiso.zodiac.app.articleTag.dto.ArticleTagDTO;
 import com.gemiso.zodiac.app.articleTag.mapper.ArticleTagMapper;
+import com.gemiso.zodiac.app.capTemplate.CapTemplate;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.cueSheet.CueSheetRepository;
 import com.gemiso.zodiac.app.cueSheet.CueSheetService;
@@ -146,6 +152,7 @@ public class CueSheetItemService {
         List<CueSheetItem> cueSheetItemList = cueSheetItemRepository.findByCueSheetItemList(artclId, cueId, delYn, spareYn);
 
         List<CueSheetItemDTO> cueSheetItemDTOList = cueSheetItemMapper.toDtoList(cueSheetItemList);
+
 
         cueSheetItemDTOList = setSymbol(cueSheetItemDTOList); //방송아이콘 url 추가.
 
@@ -1315,6 +1322,53 @@ public class CueSheetItemService {
 
             Long cueItemId = cueSheetItemDTO.getCueItemId(); //아이템 아이디 get
 
+            ArticleCueItemDTO article = cueSheetItemDTO.getArticle();
+
+            //기사가 있는 아이템일시, 기사자막에 포함된 심볼 url 조합해서 보내준다.
+            if (ObjectUtils.isEmpty(article) == false){
+
+                List<ArticleCapSimpleDTO> articleCapSimpleDTOList = article.getArticleCap();
+
+                if (CollectionUtils.isEmpty(articleCapSimpleDTOList) == false){
+
+                    for (ArticleCapSimpleDTO capSimpleDTO : articleCapSimpleDTOList){
+
+                        SymbolDTO symbolDTO = capSimpleDTO.getSymbol();
+
+                        if (ObjectUtils.isEmpty(symbolDTO) == false){
+
+                            String fileLoc = symbolDTO.getAttachFile().getFileLoc();//파일로그 get
+                            String url = fileUrl + fileLoc; //url + 파일로그
+
+                            symbolDTO.setUrl(url);//방송아이콘이 저장된 url set
+
+                            capSimpleDTO.setSymbol(symbolDTO);
+                        }
+                    }
+                }
+
+                List<AnchorCapSimpleDTO> anchorCapSimpleDTOList = article.getAnchorCap();
+
+                if (CollectionUtils.isEmpty(anchorCapSimpleDTOList) == false){
+
+                    for (AnchorCapSimpleDTO capSimpleDTO : anchorCapSimpleDTOList){
+
+                        SymbolDTO symbolDTO = capSimpleDTO.getSymbol();
+
+                        if (ObjectUtils.isEmpty(symbolDTO) == false) {
+
+                            String fileLoc = symbolDTO.getAttachFile().getFileLoc();//파일로그 get
+                            String url = fileUrl + fileLoc; //url + 파일로그
+
+                            symbolDTO.setUrl(url);//방송아이콘이 저장된 url set
+
+                            capSimpleDTO.setSymbol(symbolDTO);
+                        }
+                    }
+                }
+
+            }
+
             //아이템 아이디로 방송아이콘 맵핑테이블 조회
             List<CueSheetItemSymbolDTO> cueSheetItemSymbolList = cueSheetItemDTO.getCueSheetItemSymbol();
 
@@ -1485,6 +1539,13 @@ public class CueSheetItemService {
             capCreateDTO.setInputrId(userId);//등록자 set
 
             CueSheetItemCap cueSheetItemCap = cueSheetItemCapCreateMapper.toEntity(capCreateDTO);
+
+            Long getCapTemplateId = capCreateDTO.getCapTmpltId();//기사자막에 추가할 템플릿아이디.
+            if (ObjectUtils.isEmpty(getCapTemplateId) == false) {
+
+                CapTemplate capTemplate = CapTemplate.builder().capTmpltId(getCapTemplateId).build();//등록할 템플릿아이디 엔티티 빌드.
+                cueSheetItemCap.setCapTemplate(capTemplate); //템플릿아이디 엔티티set.
+            }
 
             cueSheetItemCapRepotitory.save(cueSheetItemCap);//등록
         }
