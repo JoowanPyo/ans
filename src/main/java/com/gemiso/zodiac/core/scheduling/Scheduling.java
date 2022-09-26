@@ -64,17 +64,33 @@ public class Scheduling {
         //bis에서 프로그램 정보를 가져온다.
         BisProgramDTO bisProgramDTO = bisInterfaceService.bisProgramfindAll();
 
-        BisDailyScheduleDTO bisDailyScheduleDTO = bisInterfaceService.bisDailyScheduleFindAll();
+        List<BisDailyScheduleDTO> bisDailyScheduleDTOList = bisInterfaceService.bisDailyScheduleFindAll();
 
-        bisInterfaceService.bisDailyScheduleCreate(bisDailyScheduleDTO, bisProgramDTO);
+        bisInterfaceService.bisDailyScheduleCreate(bisDailyScheduleDTOList, bisProgramDTO);
 
     }
 
     //주간편성 금요일 새벽 5시마다 업데이트
     @Scheduled(cron = "0 0 23 ? * FRI")//매주 금요일 23시에 한번씩
     //@Scheduled(cron = "0 * * * * *")
-    //@Scheduled(cron = "0 10 5 * * ?")//매일 새벽 5시10분에 한번씩
     public void bisDailyScheduleCreateFri() throws Exception {
+
+        log.info("Dailly Program Week Create Start");
+
+        //bis에서 프로그램 정보를 가져온다.
+        BisProgramDTO bisProgramDTO = bisInterfaceService.bisProgramfindAll();
+
+        List<BisDailyScheduleDTO> bisDailyScheduleDTOList = bisInterfaceService.bisDailyScheduleFindAllFri();
+
+        bisInterfaceService.bisDailyScheduleCreate(bisDailyScheduleDTOList, bisProgramDTO);
+
+    }
+
+    //주간편성 금요일 새벽 5시마다 업데이트
+    //@Scheduled(cron = "0 0 23 ? * FRI")//매주 금요일 23시에 한번씩
+    //@Scheduled(cron = "0 * * * * *")
+    //@Scheduled(cron = "0 10 5 * * ?")//매일 새벽 5시10분에 한번씩
+    /*public void bisDailyScheduleCreateFri() throws Exception {
 
         log.info("Dailly Program Week Create Start");
 
@@ -85,7 +101,7 @@ public class Scheduling {
 
         bisInterfaceService.bisDailyScheduleCreateFri(bisDailyScheduleDTOList, bisProgramDTO);
 
-    }
+    }*/
 
     //Mis 부서 조회 및 등록(수정)
     //@Scheduled(cron = "10 * * * * *")

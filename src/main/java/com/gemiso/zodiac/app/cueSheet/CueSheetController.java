@@ -87,10 +87,10 @@ public class CueSheetController {
                                                     @RequestBody @Valid CueSheetCreateDTO cueSheetCreateDTO,
                                                     @Parameter(name = "cueTmpltId", description = "큐시트템플릿아이디", in = ParameterIn.QUERY)
                                                     @RequestParam(value = "cueTmpltId", required = false) Long cueTmpltId,
-                                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+                                                    @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId =jwtGetUserService.getUser(Authorization);
+        String userId = jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Create : UserId - " + userId + "<br>" +
                 "CueSheet model - " + cueSheetCreateDTO.toString());
 
@@ -121,11 +121,11 @@ public class CueSheetController {
                                                     @Valid @RequestBody CueSheetUpdateDTO cueSheetUpdateDTO,
                                                     @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
                                                     @PathVariable("cueId") Long cueId,
-                                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+                                                    @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
         //버전체크
         //토픽메세지
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId =jwtGetUserService.getUser(Authorization);
+        String userId = jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Update : UserId - " + userId + "<br>" +
                 "CueSheet model - " + cueSheetUpdateDTO.toString());
 
@@ -145,12 +145,12 @@ public class CueSheetController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
                                     @PathVariable("cueId") Long cueId,
-                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+                                    @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
         //사용자 비밀번호 체크
         //토픽메세지
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId =jwtGetUserService.getUser(Authorization);
+        String userId = jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Update : UserId - " + userId + "<br>" +
                 "CueSheet Id - " + cueId);
 
@@ -165,11 +165,10 @@ public class CueSheetController {
                                                                          @Valid @RequestBody CueSheetOrderLockDTO cueSheetOrderLockDTO,
                                                                          @Parameter(name = "cueId", required = true, description = "큐시트 아이디")
                                                                          @PathVariable("cueId") Long cueId,
-                                                                         @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+                                                                         @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
 
-
-        String getUserId =jwtGetUserService.getUser(Authorization);
+        String getUserId = jwtGetUserService.getUser(Authorization);
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
         //String userId = userAuthService.authUser.getUserId();
@@ -177,10 +176,10 @@ public class CueSheetController {
                 "<br>" + "CueSheet Model - " + cueSheetOrderLockDTO.toString());
 
         //권한이 없는 사용자 error.forbidden
-         if (userAuthChkService.authChkPutUser(AuthEnum.CueSheetEdit.getAuth(), getUserId)) {
-             log.info("CueSheet Auth Fail : userId - "+getUserId+" token : "+Authorization);
-             throw new ResourceNotFoundException("큐시트 수정 권한이 없습니다. 사용자 아이디 : " + getUserId);
-         }
+        if (userAuthChkService.authChkPutUser(AuthEnum.CueSheetEdit.getAuth(), getUserId)) {
+            log.info("CueSheet Auth Fail : userId - " + getUserId + " token : " + Authorization);
+            throw new ResourceNotFoundException("큐시트 수정 권한이 없습니다. 사용자 아이디 : " + getUserId);
+        }
 
 
         CueSheetOrderLockResponsDTO cueSheetDTO = cueSheetService.cueSheetOrderLock(cueSheetOrderLockDTO, cueId, getUserId);
@@ -197,10 +196,10 @@ public class CueSheetController {
     @PutMapping(path = "/{cueId}/unLock")
     public AnsApiResponse<CueSheetDTO> cueSheetUnLock(@Parameter(name = "cueId", required = true, description = "큐시트 아이디")
                                                       @PathVariable("cueId") Long cueId,
-                                                      @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+                                                      @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId =jwtGetUserService.getUser(Authorization);
+        String userId = jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Unlock : UserId - " + userId + "CueSheet Id - " + cueId);
 
 
@@ -221,10 +220,10 @@ public class CueSheetController {
                                                           @RequestParam(value = "brdcPgmId", required = false) String brdcPgmId,
                                                           @Parameter(name = "brdcDt", description = "방송일자")
                                                           @RequestParam(value = "brdcDt", required = false) String brdcDt,
-                                                          @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+                                                          @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId =jwtGetUserService.getUser(Authorization);
+        String userId = jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Copy : UserId - " + userId + "CueSheet Id - " + cueId + " Program Id - " + brdcPgmId + " Brdc Date - " + brdcDt);
 
         //오더버전?
@@ -252,10 +251,10 @@ public class CueSheetController {
                                                           @PathVariable("cueId") Long cueId,
                                                           @Parameter(name = "newCueId", description = "새로운 큐시트 아이디")
                                                           @RequestParam(value = "newCueId", required = false) Long newCueId,
-                                                          @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+                                                          @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
         // 토큰 인증된 사용자 아이디를 입력자로 등록
-        String userId =jwtGetUserService.getUser(Authorization);
+        String userId = jwtGetUserService.getUser(Authorization);
         log.info("CueSheet Item List Copy : UserId - " + userId + "CueSheet Id - " + cueId);
 
         //오더버전?
@@ -283,13 +282,24 @@ public class CueSheetController {
 
         return capDownload;
     }*/
-
     @Operation(summary = "큐시트 자막 다운로드", description = "큐시트 자막 다운로드")
+    @GetMapping(path = "/{cueId}/downloads")
+    public String capDownloads(@Parameter(name = "cueId", description = "큐시트 아이디")
+                               @PathVariable("cueId") Long cueId) {
+
+        String capDownload = cueSheetService.capDownloads(cueId);
+
+        return capDownload;
+    }
+
+    @Operation(summary = "큐시트 자막 다운로드 단건", description = "큐시트 자막 다운로드 단건")
     @GetMapping(path = "/{cueId}/download")
     public String capDownload(@Parameter(name = "cueId", description = "큐시트 아이디")
-                              @PathVariable("cueId") Long cueId) {
+                              @PathVariable("cueId") Long cueId,
+                              @Parameter(name = "cueItemId", description = "큐시트 아이템 아이디")
+                              @RequestParam("cueItemId") Long cueItemId) {
 
-        String capDownload = cueSheetService.capDownload(cueId);
+        String capDownload = cueSheetService.capDownload(cueItemId, cueId);
 
         return capDownload;
     }

@@ -352,7 +352,67 @@ public class BisInterfaceService {
     }
 
     //Bis에서 주간편성 정보를 가져온다.
-    public BisDailyScheduleDTO bisDailyScheduleFindAll() throws Exception {
+    public List<BisDailyScheduleDTO> bisDailyScheduleFindAll() throws Exception {
+
+        List<BisDailyScheduleDTO> bisDailyScheduleDTOList = new ArrayList<>();
+
+        //헤더 설정
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        httpHeaders.add("Session_user_id", "ans");
+
+        for (int i = 0; i < 2; i++/*int i = 0; i < 7; i++*/) {
+            Calendar cal = Calendar.getInstance();
+            //현재 날짜 구하기
+            Date now = new Date();
+
+            cal.setTime(now);
+            cal.add(Calendar.DATE, i);
+            Date nowFormat = cal.getTime();
+            //Date to String (yyyymmdd)
+            String nowDate = dateChangeHelper.dateToStringNoTimeStraight(nowFormat);
+
+            //Object Mapper를 통한 Json바인딩할 dmParam생성
+            Map<String, Object> dmParam = new HashMap<>();
+            dmParam.put("chanId", "CH_K");
+            dmParam.put("broadYmd", nowDate);
+            dmParam.put("planNo", "1");
+            //dmParam.put("broadType", "L");
+
+            //Object Mapper를 통한 Json바인딩할 data생성
+            Map<String, Object> data = new HashMap<>();
+            data.put("dmParam", dmParam);
+
+            //Object Mapper를 통한 Json바인딩
+            Map<String, Object> map = new HashMap<>();
+            map.put("data", data);
+            ObjectMapper objectMapper = new ObjectMapper();
+            String params = objectMapper.writeValueAsString(map);
+
+            //httpEntity에 헤더 및 params 설정
+            HttpEntity entity = new HttpEntity(params, httpHeaders);
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> responseEntity =
+                    restTemplate.exchange("https://bis.arirang.com/api/v1/bis/listScheduleV3.do", HttpMethod.POST,
+                            entity, String.class);
+
+
+            String results = responseEntity.getBody();
+
+            bisDailyScheduleDTOList.add(objectMapper.readValue(results, BisDailyScheduleDTO.class));
+
+        }
+
+        //bisDailyScheduleDTO = objectMapper.readValue(results, BisDailyScheduleDTO.class);
+
+
+        return bisDailyScheduleDTOList;
+    }
+
+
+    //Bis에서 주간편성 정보를 가져온다.[이전버전]
+    /*public BisDailyScheduleDTO bisDailyScheduleFindAll() throws Exception {
 
         //헤더 설정
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -398,7 +458,7 @@ public class BisInterfaceService {
 
         return bisDailyScheduleDTO;
 
-    }
+    }*/
 
     public void bisDailyScheduleCreateFri(List<BisDailyScheduleDTO> bisDailyScheduleDTOList, BisProgramDTO bisProgramDTO) throws ParseException {
 
@@ -430,57 +490,68 @@ public class BisInterfaceService {
     }
 
     //Bis에서 조회한 주간편성 정보와 ANS에 이미 등록되어 있는 일일편성 정보와 비교하여 새로들어온 data가 있으면 재등록
-    public void bisDailyScheduleCreate(BisDailyScheduleDTO bisDailyScheduleDTO, BisProgramDTO bisProgramDTO) throws ParseException {
+    public void bisDailyScheduleCreate(List<BisDailyScheduleDTO> bisDailyScheduleDTOList, BisProgramDTO bisProgramDTO) throws ParseException {
 
-        //Bis에서 조회하여 담아온 DTO에서 데이터 주간편성 데이터 리스트를 가져온다.
-        List<DschWeekDTO> dschWeekDTOList = bisDailyScheduleDTO.getDsSchWeek();
+        for (BisDailyScheduleDTO bisDailyScheduleDTO : bisDailyScheduleDTOList) {
 
-        //현재 날짜 구하기
-        Date now = new Date();
-        //Date to String (yyyymmdd)
-        String nowDate = dateChangeHelper.dateToStringNoTime(now);
+            //Bis에서 조회하여 담아온 DTO에서 데이터 주간편성 데이터 리스트를 가져온다.
+            List<DschWeekDTO> dschWeekDTOList = bisDailyScheduleDTO.getDsSchWeek();
 
-        BooleanBuilder booleanBuilder = getSearch(nowDate);
+            String boroadYmd = formatYmd(dschWeekDTOList.get(0).getBroadYmd());
+            //현재 날짜 구하기
+            //Date now = new Date();
+            //Date to String (yyyymmdd)
+            //String nowDate = dateChangeHelper.dateToStringNoTime(now);
 
-        //기존에 등록되어 있던 일일편성 데이터를 모두 가져온다.
-        List<DailyProgram> dailyProgramList = (List<DailyProgram>) dailyProgramRepository.findAll(booleanBuilder);
+            BooleanBuilder booleanBuilder = getSearch(boroadYmd);
 
-        //Ans등록되어 있는 일일편성이 없을 경우
-        if (CollectionUtils.isEmpty(dailyProgramList)) {
-            if (CollectionUtils.isEmpty(dschWeekDTOList) == false) { //ANS에 등록되어있는 일일편성이 없고, Bis에서 조회된 일일편성이 있을 경우
-                createDailyProgram(dschWeekDTOList, bisProgramDTO);
+            //기존에 등록되어 있던 일일편성 데이터를 모두 가져온다.
+            List<DailyProgram> dailyProgramList = (List<DailyProgram>) dailyProgramRepository.findAll(booleanBuilder);
+
+            //Ans등록되어 있는 일일편성이 없을 경우
+            if (CollectionUtils.isEmpty(dailyProgramList)) {
+                if (CollectionUtils.isEmpty(dschWeekDTOList) == false) { //ANS에 등록되어있는 일일편성이 없고, Bis에서 조회된 일일편성이 있을 경우
+                    createDailyProgram(dschWeekDTOList, bisProgramDTO);
+                    continue;
+                }
             }
-        }
 
-        int dschWeekDTOListSize = dschWeekDTOList.size();//BIS 에서 조회된 리스트 사이즈를 가져온다.
-        int dailyProgramListSize = dailyProgramList.size();//ANS에 등록되어있는 리스트 사이즈를 가져온다.
-        //BIS와 ANS리스트 사이즈가 다르면 기존데이터 삭재후 BIS에서 조회한 데이터 재등록.
-        if (dschWeekDTOListSize != dailyProgramListSize) {
+            int dschWeekDTOListSize = 0;//BIS 에서 조회된 리스트 사이즈를 가져온다.
+            for (DschWeekDTO dschWeekDTO : dschWeekDTOList){
+                String broadType = dschWeekDTO.getBroadType();
+                if ("L".equals(broadType.trim())) {
+                    dschWeekDTOListSize = dschWeekDTOListSize + 1;
+                }
+            }
+            int dailyProgramListSize = dailyProgramList.size();//ANS에 등록되어있는 리스트 사이즈를 가져온다.
+            //BIS와 ANS리스트 사이즈가 다르면 기존데이터 삭재후 BIS에서 조회한 데이터 재등록.
+            if (dschWeekDTOListSize != dailyProgramListSize) {
 
-            regenerateDailyProgram(dailyProgramList, dschWeekDTOList); //ANS일일편성 재등록.
-            return;
-        }
+                regenerateDailyProgram(dailyProgramList, dschWeekDTOList, bisProgramDTO); //ANS일일편성 재등록.
+                continue;
+            }
 
-        //ANS 일일편성 리스트와 BIS에서 조회한 주간편성 리스트 업데이트 여부 검증.
-        for (DailyProgram dailyProgram : dailyProgramList) {
+            //ANS 일일편성 리스트와 BIS에서 조회한 주간편성 리스트 업데이트 여부 검증.
+            for (DailyProgram dailyProgram : dailyProgramList) {
 
-            String brdcPgmId = dailyProgram.getProgram().getBrdcPgmId();//방송프로그램 아이디를 가져온다.
-            String brdcStartTime = dailyProgram.getBrdcStartTime();//방송 시작시간을 가져온다.
-            String updtDtm = dailyProgram.getUpdtDtm(); //수정날짜.
+                String brdcPgmId = dailyProgram.getProgram().getBrdcPgmId();//방송프로그램 아이디를 가져온다.
+                String brdcStartTime = dailyProgram.getBrdcStartTime();//방송 시작시간을 가져온다.
+                String updtDtm = dailyProgram.getUpdtDtm(); //수정날짜.
 
-            //ANS데이터와 BIS조회 데이터 비교검증
-            for (DschWeekDTO dschWeekDTO : dschWeekDTOList) {
+                //ANS데이터와 BIS조회 데이터 비교검증
+                for (DschWeekDTO dschWeekDTO : dschWeekDTOList) {
 
-                String pgmCd = dschWeekDTO.getPgmCd(); //프로그램 아이디를 가져온다.
-                String broadHm = dschWeekDTO.getBroadHm(); //방송시각
-                String updDt = dschWeekDTO.getUpdDt();//수정날짜
+                    String pgmCd = dschWeekDTO.getPgmCd(); //프로그램 아이디를 가져온다.
+                    String broadHm = dschWeekDTO.getBroadHm(); //방송시각
+                    String updDt = dschWeekDTO.getUpdDt();//수정날짜
 
-                if (brdcPgmId.equals(pgmCd) && brdcStartTime.equals(broadHm)) {
+                    if (brdcPgmId.equals(pgmCd) && brdcStartTime.equals(broadHm)) {
 
-                    if (updDt != null && updDt.trim().isEmpty() == false) {
-                        if (updDt.equals(updtDtm) == false) {
-                            regenerateDailyProgram(dailyProgramList, dschWeekDTOList);
-                            return;
+                        if (updDt != null && updDt.trim().isEmpty() == false) {
+                            if (updDt.equals(updtDtm) == false) {
+                                regenerateDailyProgram(dailyProgramList, dschWeekDTOList, bisProgramDTO);
+                                continue;
+                            }
                         }
                     }
                 }
@@ -636,7 +707,7 @@ public class BisInterfaceService {
 }
 
     //Ans 일일편성 재등록.
-    public void regenerateDailyProgram(List<DailyProgram> dailyProgramList, List<DschWeekDTO> dschWeekDTOList) throws ParseException {
+    public void regenerateDailyProgram(List<DailyProgram> dailyProgramList, List<DschWeekDTO> dschWeekDTOList, BisProgramDTO bisProgramDTO) throws ParseException {
 
         //ANS일일편성 삭제
         for (DailyProgram dailyProgram : dailyProgramList) {
@@ -660,13 +731,15 @@ public class BisInterfaceService {
 
                 String endTime = getEndTime(broadRun, formatBoradHm);
 
+                Program program = findProgram(brdcPgmId, bisProgramDTO);
+
                 //기본편성 생성 및 업데이트 return value = 기본편성 아이디
-                Long basePgmId = createBaseProgram(boroadYmd, formatBoradHm, endTime, /*brdcPgmId*/null);
+                Long basePgmId = createBaseProgram(boroadYmd, formatBoradHm, endTime, /*brdcPgmId*/program);
 
                 //기본편성 아이디 빌드
                 BaseProgram baseProgram = BaseProgram.builder().basePgmschId(basePgmId).build();
                 //방송프로그램 아이디 빌드
-                Program program = Program.builder().brdcPgmId(brdcPgmId).build();
+                //Program program = Program.builder().brdcPgmId(brdcPgmId).build();
 
                 DailyProgram dailyProgram = DailyProgram.builder()
                         .brdcDt(boroadYmd) //방송일자
@@ -675,8 +748,8 @@ public class BisInterfaceService {
                         .inputDtm(dschWeekDTO.getRegDt()) //입력일시
                         .updtDtm(dschWeekDTO.getUpdDt()) //수정일시
                         .program(program) //프로그램 아이디
-                        .brdcRunTime(broadRun)
-                        .baseProgram(baseProgram)
+                        .brdcRunTime(broadRun)//방송길이
+                        .baseProgram(baseProgram) //방송시각
                         .build();
 
                 dailyProgramRepository.save(dailyProgram);
