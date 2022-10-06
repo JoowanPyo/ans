@@ -43,20 +43,20 @@ public class ArticleActionLogRepositoryImpl implements ArticleActionLogRepositor
 
         /*List<ArticleActionLog> articleActionLogs = new ArrayList<>();
 
-        for (ArticleActionLogQueryDslDTO dto : articleActionLogQueryDslDTOS){
+        for (ArticleActionLogQueryDslDTO Rundown : articleActionLogQueryDslDTOS){
 
             ArticleActionLog articleActionLog = new ArticleActionLog();
 
-            articleActionLog.setId(dto.getId());
-            articleActionLog.setMessage(dto.getMessage());
-            articleActionLog.setAction(dto.getAction());
-            articleActionLog.setInputDtm(dto.getInputDtm());
-            articleActionLog.setInputrId(dto.getInputrId());
-            articleActionLog.setInputrNm(dto.getInputrNm());
+            articleActionLog.setId(Rundown.getId());
+            articleActionLog.setMessage(Rundown.getMessage());
+            articleActionLog.setAction(Rundown.getAction());
+            articleActionLog.setInputDtm(Rundown.getInputDtm());
+            articleActionLog.setInputrId(Rundown.getInputrId());
+            articleActionLog.setInputrNm(Rundown.getInputrNm());
             //articleActionLog.setArtclInfo();
             //articleActionLog.setAnchorCapInfo();
             //articleActionLog.setArtclCapInfo();
-            articleActionLog.setArticle(dto.getArticle());
+            articleActionLog.setArticle(Rundown.getArticle());
         }*/
 
         return articleActionLogs;

@@ -14,5 +14,5 @@ public class CueTmplSymbolDTO {
     private Long id;
     private CueTmpltItemSimpleDTO cueTmpltItem;
     private SymbolDTO symbol;
-    private int ord;
+    private Integer ord;
 }

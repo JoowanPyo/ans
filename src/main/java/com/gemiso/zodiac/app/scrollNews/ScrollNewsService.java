@@ -711,7 +711,7 @@ public class ScrollNewsService {
                 returnCtt = marshallingJsonHelper.MarshallingJson(ctts);
             }
 
-            //dto.setCttJson(returnCtt);//내용 Json타입으로 변환
+            //Rundown.setCttJson(returnCtt);//내용 Json타입으로 변환
             dto.setScrollNews(scrollNewsSimpleDTO);//스크롤 뉴스 아이디 set
             ScrollNewsDetail scrollNewsDetail = scrollNewsDetailCreateMapper.toEntity(dto);//스크롤 뉴스 상세DTO 엔티티 변환
             scrollNewsDetail.setCttJson(returnCtt);

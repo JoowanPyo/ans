@@ -92,10 +92,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         resultDTO.setSuccess("false");
         resultDTO.setMsg(apiErrorResponse.getError().getMessage());
         dto.setResult(resultDTO);
-       /* dto.setErrors(apiErrorResponse.getError().getErrors());
-        dto.setCode(apiErrorResponse.getError().getCode().toString());
-        dto.setMessage(apiErrorResponse.getError().getMessage());
-        dto.setStatus(apiErrorResponse.getStatus());*/
+       /* Rundown.setErrors(apiErrorResponse.getError().getErrors());
+        Rundown.setCode(apiErrorResponse.getError().getCode().toString());
+        Rundown.setMessage(apiErrorResponse.getError().getMessage());
+        Rundown.setStatus(apiErrorResponse.getStatus());*/
 
         //articleDTO TO XML 파싱
         String xml = JAXBXmlHelper.marshalNohead(dto, InterfaceExceptionDTO.class);

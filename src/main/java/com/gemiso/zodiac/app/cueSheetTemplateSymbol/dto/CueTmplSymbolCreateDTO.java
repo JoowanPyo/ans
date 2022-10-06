@@ -18,5 +18,5 @@ public class CueTmplSymbolCreateDTO {
     @NotNull
     private SymbolSimpleDTO symbol;
     @NotNull
-    private int ord;
+    private Integer ord;
 }

@@ -40,6 +40,6 @@ public class CueTmplSymbol {
     @JoinColumn(name = "symbol_id")
     private Symbol symbol;
 
-    @Column(name = "순번")
-    private int ord;
+    @Column(name = "ord")
+    private Integer ord;
 }
