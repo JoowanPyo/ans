@@ -1610,6 +1610,7 @@ public class CueSheetService {
                     .editorFixDtm(article.getEditorFixDtm())
                     //.anchorFixDtm(article.getAnchorFixDtm())
                     //.deskFixDtm(article.getDeskFixDtm())
+                    .rundownItem(article.getRundownItem())
                     .build();
         } else { //원본기사 아이디가 있을시[복사된 기사 다시 복사일시]
 
@@ -1671,6 +1672,7 @@ public class CueSheetService {
                     .editorFixDtm(article.getEditorFixDtm())
                     //.anchorFixDtm(article.getAnchorFixDtm())
                     //.deskFixDtm(article.getDeskFixDtm())
+                    .rundownItem(article.getRundownItem())
                     .build();
         }
     }
@@ -2045,10 +2047,14 @@ public class CueSheetService {
 
                         String fileNm = buildProjectNm(cueSheetItem, title, today);
 
+                        String ctt = cueSheetItemCap.getCapCtt();
+
+                        ctt = ctt+System.lineSeparator() ;
+
                         CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
                                 .project(fileNm)
                                 .page(seq)
-                                .content(cueSheetItemCap.getCapCtt())
+                                .content(ctt)
                                 .template(capTemplate.getCapTmpltNm())
                                 .build();
 
@@ -2074,10 +2080,14 @@ public class CueSheetService {
 
                         String fileNm = buildProjectNm(cueSheetItem, title, today);
 
+                        String ctt = anchorCap.getCapCtt();
+
+                        ctt = ctt+System.lineSeparator() ;
+
                         CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
                                 .project(fileNm)
                                 .page(seq)
-                                .content(anchorCap.getCapCtt())
+                                .content(ctt)
                                 .template(capTemplate.getCapTmpltNm())
                                 .build();
 
@@ -2101,10 +2111,14 @@ public class CueSheetService {
 
                         String fileNm = buildProjectNm(cueSheetItem, title, today);
 
+                        String ctt = articleCap.getCapCtt();
+
+                        ctt = ctt+System.getProperty("line.separator") ;
+
                         CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
                                 .project(fileNm)
                                 .page(seq)
-                                .content(articleCap.getCapCtt())
+                                .content(ctt)
                                 .template(capTemplate.getCapTmpltNm())
                                 .build();
 

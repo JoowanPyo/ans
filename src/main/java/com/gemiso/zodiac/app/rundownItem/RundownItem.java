@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.app.rundownItem;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gemiso.zodiac.app.rundown.Rundown;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -18,6 +20,7 @@ import java.util.Date;
 @Setter
 @ToString
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) //json 파싱때 필드가 없는 클래스를 Serialize문제 설정
 public class RundownItem {
 
     @Id
@@ -48,7 +51,7 @@ public class RundownItem {
     @Formula("(select a.user_nm from tb_user_mng a where a.user_id = rptr_id)")
     private String rptrNm;
 
-    @Column(name = "rundown_titl", length = 50)
+    @Column(name = "rundown_titl", length = 500)
     private String rundownTitl; // 제목
 
     @Column(name = "rundown_add_data", columnDefinition = "text")
@@ -69,6 +72,7 @@ public class RundownItem {
     private String inputrNm;*/
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     @JoinColumn(name = "rundown_id")
     private Rundown rundown;
 

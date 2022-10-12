@@ -7,6 +7,7 @@ import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.articleMedia.ArticleMedia;
 import com.gemiso.zodiac.app.cueSheet.CueSheet;
 import com.gemiso.zodiac.app.issue.Issue;
+import com.gemiso.zodiac.app.rundownItem.RundownItem;
 import com.gemiso.zodiac.core.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -313,6 +314,10 @@ public class Article extends BaseEntity {
     @Where(clause = "del_yn = 'N'")
     @JoinColumn(name = "issu_id")
     private Issue issue;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rundown_item_id")
+    private RundownItem rundownItem;
 
    /* @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     @JsonManagedReference

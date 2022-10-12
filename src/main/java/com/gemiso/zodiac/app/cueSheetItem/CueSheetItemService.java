@@ -1668,8 +1668,7 @@ public class CueSheetItemService {
 
     }
 
-    public Article
-    copyArticle(Long artclId, Long cueId, String userId) throws Exception {
+    public Article copyArticle(Long artclId, Long cueId, String userId) throws Exception {
 
         /*********************/
         /* 기사를 저장하는 부분 */
@@ -1910,6 +1909,7 @@ public class CueSheetItemService {
                     //.editorFixDtm(article.getEditorFixDtm())
                     //.anchorFixDtm(article.getAnchorFixDtm())
                     //.deskFixDtm(article.getDeskFixDtm())
+                     .rundownItem(article.getRundownItem())
                     .build();
 
             articleRepository.save(articleEntity);
@@ -1968,6 +1968,7 @@ public class CueSheetItemService {
                     //.editorFixDtm(article.getEditorFixDtm())
                     //.anchorFixDtm(article.getAnchorFixDtm())
                     //.deskFixDtm(article.getDeskFixDtm())
+                    .rundownItem(article.getRundownItem())
                     .build();
 
             articleRepository.save(articleEntity);

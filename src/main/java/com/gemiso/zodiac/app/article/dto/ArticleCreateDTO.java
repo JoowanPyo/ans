@@ -3,6 +3,8 @@ package com.gemiso.zodiac.app.article.dto;
 import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapCreateDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapCreateDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
+import com.gemiso.zodiac.app.rundownItem.RundownItem;
+import com.gemiso.zodiac.app.rundownItem.dto.RundownItemSimpleDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -112,6 +114,7 @@ public class ArticleCreateDTO {
     @Schema(description = "데스커픽스 일시")
     private Date deskFixDtm;
 
+    private RundownItemSimpleDTO rundownItem;
     //private List<ArticleMediaDTO> articleMedia;
     private List<ArticleCapCreateDTO> articleCap = new ArrayList<>();
     private List<AnchorCapCreateDTO> anchorCap = new ArrayList<>();

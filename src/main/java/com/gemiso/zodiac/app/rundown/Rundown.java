@@ -1,5 +1,6 @@
 package com.gemiso.zodiac.app.rundown;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gemiso.zodiac.app.articleCap.ArticleCap;
 import com.gemiso.zodiac.app.rundownItem.RundownItem;
@@ -23,6 +24,7 @@ import java.util.Set;
 @Setter
 @ToString
 @DynamicUpdate
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) //json 파싱때 필드가 없는 클래스를 Serialize문제 설정
 public class Rundown {
 
     @Id

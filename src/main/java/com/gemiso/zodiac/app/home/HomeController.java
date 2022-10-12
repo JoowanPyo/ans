@@ -5,9 +5,13 @@ import com.gemiso.zodiac.app.article.ArticleService;
 import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.articleOrder.ArticleOrderService;
 import com.gemiso.zodiac.app.articleOrder.dto.ArticleOrderDTO;
+import com.gemiso.zodiac.app.rundownItem.RundownItem;
+import com.gemiso.zodiac.app.rundownItem.RundownItemService;
+import com.gemiso.zodiac.app.rundownItem.dto.RundownItemDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
+import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,6 +37,7 @@ public class HomeController {
 
     private final ArticleService articleService;
     private final ArticleOrderService articleOrderService;
+    private final RundownItemService rundownItemService;
 
     //작성자 기준?? 기자아이디(rptr_id)기준?
     @Operation(summary = "홈화면 내기사 목록", description = "홈화면 내기사 목록")
@@ -95,6 +100,24 @@ public class HomeController {
 
         return new AnsApiResponse<>(articleOrderDTOList);
 
+    }
+
+    @Operation(summary = "런다운 아이템 목록조회", description = "런다운 아이템 목록조회")
+    @GetMapping(path = "/myrundown")
+    public AnsApiResponse<PageResultDTO<RundownItemDTO, RundownItem>> findMyRundown(@Parameter(name = "sdate", description = "검색 시작 데이터 날짜(yyyy-MM-dd)", required = false)
+                                                              @DateTimeFormat(pattern = "yyyy-MM-dd") Date sdate,
+                                                              @Parameter(name = "edate", description = "검색 종료 날짜(yyyy-MM-dd)", required = false)
+                                                              @DateTimeFormat(pattern = "yyyy-MM-dd") Date edate,
+                                                              @Parameter(name = "rptrId", description = "기자 아이디")
+                                                              @RequestParam(value = "rptrId", required = false) String rptrId,
+                                                              @Parameter(name = "page", description = "시작페이지")
+                                                              @RequestParam(value = "page", required = false) Integer page,
+                                                              @Parameter(name = "limit", description = "한 페이지에 데이터 수")
+                                                              @RequestParam(value = "limit", required = false) Integer limit) {
+
+        PageResultDTO<RundownItemDTO, RundownItem> pageList = rundownItemService.findMyRundown(sdate, edate, rptrId, page, limit);
+
+        return new AnsApiResponse<>(pageList);
     }
 
     /*private final HomeService homeService;

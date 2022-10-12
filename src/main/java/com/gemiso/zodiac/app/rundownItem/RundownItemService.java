@@ -1,5 +1,7 @@
 package com.gemiso.zodiac.app.rundownItem;
 
+import com.gemiso.zodiac.app.article.Article;
+import com.gemiso.zodiac.app.article.dto.ArticleDTO;
 import com.gemiso.zodiac.app.rundown.Rundown;
 import com.gemiso.zodiac.app.rundownItem.dto.RundownItemCreateDTO;
 import com.gemiso.zodiac.app.rundownItem.dto.RundownItemDTO;
@@ -7,14 +9,20 @@ import com.gemiso.zodiac.app.rundownItem.dto.RundownItemUpdateDTO;
 import com.gemiso.zodiac.app.rundownItem.mapper.RundownItemCreateMapper;
 import com.gemiso.zodiac.app.rundownItem.mapper.RundownItemMapper;
 import com.gemiso.zodiac.app.rundownItem.mapper.RundownItemUpdateMapper;
+import com.gemiso.zodiac.core.helper.PageHelper;
+import com.gemiso.zodiac.core.page.PageResultDTO;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @Slf4j
@@ -37,6 +45,20 @@ public class RundownItemService {
         List<RundownItemDTO> rundownItemDTOS = rundownItemMapper.toDtoList(rundownItems);
 
         return rundownItemDTOS;
+    }
+
+    //런다운 아이템 목록 조회 [홈 화면]
+    public PageResultDTO<RundownItemDTO, RundownItem> findMyRundown(Date sdate, Date edate, String rptrId, Integer page, Integer limit){
+
+        //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
+        PageHelper pageHelper = new PageHelper(page, limit);
+        Pageable pageable = pageHelper.getArticlePageInfo();
+
+        Page<RundownItem> rundownItems = rundownItemRepository.findMyRundown(sdate, edate, rptrId, pageable);
+
+        Function<RundownItem, RundownItemDTO> fn = (entity -> rundownItemMapper.toDto(entity));
+
+        return new PageResultDTO<RundownItemDTO, RundownItem>(rundownItems, fn);
     }
 
     //런다운 아이템 조회
@@ -116,7 +138,7 @@ public class RundownItemService {
         for (int i = rundownItems.size() - 1; i >= 0; i-- ){
 
             Long chkId = rundownItems.get(i).getRundownItemId();
-            if (rundownItemOrd.equals(chkId) == false){
+            if (rundownItemId.equals(chkId) == false){
                 continue;
             }
 

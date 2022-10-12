@@ -4,6 +4,7 @@ import com.gemiso.zodiac.app.anchorCap.dto.AnchorCapCreateDTO;
 import com.gemiso.zodiac.app.articleCap.dto.ArticleCapCreateDTO;
 import com.gemiso.zodiac.app.cueSheet.dto.CueSheetSimpleDTO;
 import com.gemiso.zodiac.app.issue.dto.IssueDTO;
+import com.gemiso.zodiac.app.rundownItem.dto.RundownItemSimpleDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -108,6 +109,9 @@ public class ArticleUpdateDTO {
     private Date anchorFixDtm;
     @Schema(description = "데스커픽스 일시")
     private Date deskFixDtm;
+
+    @Schema(description = "런다운 아이템")
+    private RundownItemSimpleDTO rundownItem;
 
     //@Schema(description = "큐시트")
     private CueSheetSimpleDTO cueSheet;
