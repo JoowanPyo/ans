@@ -39,11 +39,11 @@ public class RundownItemController {
     }
 
     @Operation(summary = "런다운 아이템 상세조회", description = "런다운 아이템 상세조회")
-    @GetMapping(path = "/{rundownId}")
-    public AnsApiResponse<RundownItemDTO> find(@Parameter(name = "rundownId", description = "런다운 아이디", required = true)
-                                               @PathVariable("rundownId") Long rundownId) throws Exception {
+    @GetMapping(path = "/{rundownItemId}")
+    public AnsApiResponse<RundownItemDTO> find(@Parameter(name = "rundownItemId", description = "런다운 아이디", required = true)
+                                               @PathVariable("rundownItemId") Long rundownItemId) throws Exception {
 
-        RundownItemDTO rundownItemDTO = rundownItemService.find(rundownId);
+        RundownItemDTO rundownItemDTO = rundownItemService.find(rundownItemId);
 
         return new AnsApiResponse<>(rundownItemDTO);
 

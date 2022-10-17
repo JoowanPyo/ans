@@ -4,7 +4,11 @@ import com.gemiso.zodiac.app.rundown.dto.RundownSimpleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.FetchType;
 import java.util.Date;
 
 @Data
@@ -24,6 +28,12 @@ public class RundownItemDTO {
     private String rundownAddData; // 추가내용
     private String publicationCd; //기사화
     private Integer rundownItemOrd; // 순번
+
+    /*private Date delDtm;
+    private String delYn;
+    private String delrId;
+    private String delrNm;*/
+
     private RundownSimpleDTO rundown;
 
 }

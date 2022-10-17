@@ -63,6 +63,19 @@ public class RundownItem {
     @Column(name = "rundown_item_ord")
     private Integer rundownItemOrd; // 순번
 
+   /* @Column(name = "del_dtm")
+    private Date delDtm;
+
+    @Column(name = "del_yn", columnDefinition = "bpchar(1) default 'N'", nullable = false)
+    private String delYn;
+
+    @Column(name = "delr_id", length = 50)
+    private String delrId;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Formula("(select a.user_nm from tb_user_mng a where a.user_id = delr_id)")
+    private String delrNm;*/
+
    /* @Column(name = "inputr_id", length = 50)
     private String inputrId; // 작성자
 
@@ -75,5 +88,13 @@ public class RundownItem {
     @JsonBackReference
     @JoinColumn(name = "rundown_id")
     private Rundown rundown;
+
+   /* @PrePersist
+    public void prePersist() {
+
+        if (this.delYn == null || this.delYn == "") {
+            this.delYn = "N";
+        }
+    }*/
 
 }

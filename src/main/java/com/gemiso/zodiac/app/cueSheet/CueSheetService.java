@@ -73,6 +73,7 @@ import com.gemiso.zodiac.app.tag.TagRepository;
 import com.gemiso.zodiac.app.user.User;
 import com.gemiso.zodiac.app.user.UserService;
 import com.gemiso.zodiac.core.enumeration.ActionEnum;
+import com.gemiso.zodiac.core.helper.CapSeparatorHelper;
 import com.gemiso.zodiac.core.helper.DateChangeHelper;
 import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
 import com.gemiso.zodiac.core.topic.CueSheetTopicService;
@@ -141,6 +142,7 @@ public class CueSheetService {
     private final DailyProgramService dailyProgramService;
 
     private final DateChangeHelper dateChangeHelper;
+    private final CapSeparatorHelper capSeparatorHelper;
 
     //private final MarshallingJsonHelper marshallingJsonHelper;
 
@@ -1934,10 +1936,14 @@ public class CueSheetService {
 
                     String fileNm = buildProjectNm(cueSheetItem, title, today);
 
+                    String ctt = cueSheetItemCap.getCapCtt();
+
+                    ctt = capSeparatorHelper.separator(ctt);
+
                     CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
                             .project(fileNm)
                             .page(seq)
-                            .content(cueSheetItemCap.getCapCtt())
+                            .content(ctt)
                             .template(capTemplate.getCapTmpltNm())
                             .build();
 
@@ -1963,10 +1969,14 @@ public class CueSheetService {
 
                     String fileNm = buildProjectNm(cueSheetItem, title, today);
 
+                    String ctt = anchorCap.getCapCtt();
+
+                    ctt = capSeparatorHelper.separator(ctt);
+
                     CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
                             .project(fileNm)
                             .page(seq)
-                            .content(anchorCap.getCapCtt())
+                            .content(ctt)
                             .template(capTemplate.getCapTmpltNm())
                             .build();
 
@@ -1990,10 +2000,14 @@ public class CueSheetService {
 
                     String fileNm = buildProjectNm(cueSheetItem, title, today);
 
+                    String ctt = articleCap.getCapCtt();
+
+                    ctt = capSeparatorHelper.separator(ctt);
+
                     CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
                             .project(fileNm)
                             .page(seq)
-                            .content(articleCap.getCapCtt())
+                            .content(ctt)
                             .template(capTemplate.getCapTmpltNm())
                             .build();
 
@@ -2049,7 +2063,9 @@ public class CueSheetService {
 
                         String ctt = cueSheetItemCap.getCapCtt();
 
-                        ctt = ctt+System.lineSeparator() ;
+                        //ctt = ctt+System.lineSeparator();
+                        //ctt = ctt+"\n";
+                        ctt = capSeparatorHelper.separator(ctt);
 
                         CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
                                 .project(fileNm)
@@ -2082,7 +2098,7 @@ public class CueSheetService {
 
                         String ctt = anchorCap.getCapCtt();
 
-                        ctt = ctt+System.lineSeparator() ;
+                        ctt = capSeparatorHelper.separator(ctt);
 
                         CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
                                 .project(fileNm)
@@ -2113,7 +2129,7 @@ public class CueSheetService {
 
                         String ctt = articleCap.getCapCtt();
 
-                        ctt = ctt+System.getProperty("line.separator") ;
+                        ctt = capSeparatorHelper.separator(ctt);
 
                         CueSheetCapDownloadCgDTO cueSheetCapDownloadCg = CueSheetCapDownloadCgDTO.builder()
                                 .project(fileNm)
