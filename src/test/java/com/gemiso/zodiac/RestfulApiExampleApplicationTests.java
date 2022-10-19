@@ -2,6 +2,7 @@ package com.gemiso.zodiac;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gemiso.zodiac.app.stats.StatsService;
 import com.gemiso.zodiac.core.scheduling.BisInterfaceService;
 import com.gemiso.zodiac.core.topic.TopicSendService;
 import com.mysema.commons.lang.Assert;
@@ -21,6 +22,9 @@ class RestfulApiExampleApplicationTests {
 
     @Autowired
     private BisInterfaceService bisInterfaceService;
+
+    @Autowired
+    private StatsService statsService;
 
     @Test
     void contextLoads() {
@@ -82,6 +86,12 @@ class RestfulApiExampleApplicationTests {
             System.out.println(map);
 
 
+    }
+
+    @Test
+    void statsCreate(){
+
+        statsService.create();
     }
 
 }

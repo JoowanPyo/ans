@@ -143,7 +143,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
     @ExceptionHandler(value = { ResponseStatusException.class })
     public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex){
         ApiErrorResponse.Error error =
-                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.expiredAccesstoken, "ResponseStatusException");
+                new ApiErrorResponse.Error(ApiErrorResponse.ErrorCodes.expiredAccesstoken, ex.getMessage());
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(error, HttpStatus.UNAUTHORIZED);
 
 
