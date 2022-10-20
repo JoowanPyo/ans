@@ -143,7 +143,7 @@ public class Scheduling {
 
     }
 
-    //BIS프로그램 조회 및 등록
+    //기사 통계 등록
     @Scheduled(cron = "0 0 2 * * ?")//매일 새벽 2시에 한번씩
     //@Scheduled(cron = "0 * * * * *")
     public void statsCreate() throws Exception {
