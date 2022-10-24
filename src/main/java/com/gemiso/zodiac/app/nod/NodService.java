@@ -130,7 +130,8 @@ public class NodService {
 
             nodRepository.save(nod);
 
-            sendHomePage(nod.getNodId());
+            //홈페이지 등록 하지 않음 2022-10-20 사항
+            //sendHomePage(nod.getNodId());
 
         }else {
 
@@ -138,7 +139,8 @@ public class NodService {
 
             nodRepository.save(nod);
 
-            sendHomePage(nod.getNodId());
+            //홈페이지 등록 하지 않음 2022-10-20 사항
+            //sendHomePage(nod.getNodId());
         }
 
 
@@ -163,7 +165,8 @@ public class NodService {
 
         if ("Bulletin".equals(brdcPgmDivCd)){
 
-            sendCueId(cueId);
+            //홈페이지 등록 하지 않음 2022-10-20 사항
+            //sendCueId(cueId);
 
         }else {
             throw new ResourceNotFoundException("블랜틴 큐시트가 아닙니다. 블랜틴 큐시트 인지 확인해 주세요.");

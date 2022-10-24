@@ -65,6 +65,7 @@ public class NodController {
         return new AnsApiResponse<>(returnNod);
     }
 
+    //사용하진 않으나 홈페이지 전송 부분은 주석처리 하여 사용하지 않음 2022-10-20
     @Operation(summary = "NOD 스크립트 홈페이지 등록", description = "NOD 스크립트 홈페이지 등록")
     @PostMapping(path = "/sendhomepage")
     @ResponseStatus(HttpStatus.CREATED)
