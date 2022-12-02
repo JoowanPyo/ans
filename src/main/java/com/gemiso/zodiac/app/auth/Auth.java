@@ -61,4 +61,7 @@ public class Auth {
     @Column(name = "user_id", length = 50)
     private String userId;
 
+    @Column(name = "user_login_typ", length = 50)
+    private String userLoginTyp;
+
 }

@@ -1,9 +1,8 @@
 package com.gemiso.zodiac.app.stats;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.swagger.models.auth.In;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 
@@ -24,8 +23,14 @@ public class Stats {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "brdc_dt", length = 10)
-    private String brdcDt;
+    @Column(name = "artcl_div", length = 50)
+    private String artclDiv;
+
+    /*@Formula("(select a.cd_nm from tb_cd a where a.cd = artcl_div)")
+    private String artclDivNm;*/
+
+    @Column(name = "stats_dt", length = 10)
+    private String statsDt;
 
     @Column(name = "broll_count")
     private Integer brollCount;
@@ -50,4 +55,5 @@ public class Stats {
 
     @Column(name = "pk_count")
     private Integer pkCount;
+
 }

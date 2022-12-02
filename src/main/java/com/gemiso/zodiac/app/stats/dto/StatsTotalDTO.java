@@ -7,12 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StatsDTO {
+public class StatsTotalDTO {
 
-    private Long id;
+    private Integer mmOrd;
     private String artclDiv;
-    //private String artclDivNm;
-    private String statsDt;
     private Integer brollCount;
     private Integer mngCount;
     private Integer telephoneCount;

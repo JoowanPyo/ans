@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.IOException;
+import java.util.List;
 
 @Api(description = "로그인 API")
 @RestController
@@ -31,7 +31,7 @@ public class AuthController {
     @PostMapping(path = "/login")//login
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<JwtDTO> login(@Parameter(name = "loginDTO", required = true, description = "필수값<br> userId , password")
-                                     @Valid @RequestBody AuthRequestDTO authRequestDTO
+                                        @Valid @RequestBody AuthRequestDTO authRequestDTO
     ) throws Exception {
 
         JwtDTO jwtDTO = new JwtDTO();
@@ -41,21 +41,46 @@ public class AuthController {
         String pw = authRequestDTO.getPassword();
         String ok = "FAIL";
         int count = 0;
-        try {
 
-            while ("FAIL".equals(ok) && (count < MAX_ATTEMPTS)){
-                ok = authService.verifyUser(id, pw);
-                count++;
-            }
+        while ("FAIL".equals(ok) && (count < MAX_ATTEMPTS)) {
+            ok = authService.verifyUser(id, pw);
+            count++;
+        }
 
-            if ("OK".equals(ok)){
-                jwtDTO = authService.login(authRequestDTO);
-            }else {
-                return new AnsApiResponse<>(jwtDTO);
-            }
+        if ("OK".equals(ok)) {
+            jwtDTO = authService.login(authRequestDTO);
+        } else {
+            return new AnsApiResponse<>(jwtDTO);
+        }
 
-        }catch (RuntimeException e){
-            log.error("로그인 인증 실패 : userId - "+id);
+
+        return new AnsApiResponse<>(jwtDTO);
+    }
+
+    @Operation(summary = "사용자 로그인 [모바일]", description = "사용자 로그인 [모바일]")
+    @PostMapping(path = "/loginmobile")//login
+    @ResponseStatus(HttpStatus.CREATED)
+    public AnsApiResponse<JwtDTO> loginMobile(@Parameter(name = "loginDTO", required = true, description = "필수값<br> userId , password")
+                                              @Valid @RequestBody AuthRequestDTO authRequestDTO
+    ) throws Exception {
+
+        JwtDTO jwtDTO = new JwtDTO();
+        //log.info(" 로그인 : "+ authRequestDTO.toString());
+        /********시큐어 코딩 인증 가이드 **********/
+        String id = authRequestDTO.getUserId();
+        String pw = authRequestDTO.getPassword();
+        String ok = "FAIL";
+        int count = 0;
+
+        while ("FAIL".equals(ok) && (count < MAX_ATTEMPTS)) {
+            ok = authService.verifyUser(id, pw);
+            count++;
+        }
+
+        if ("OK".equals(ok)) {
+            jwtDTO = authService.loginMobile(authRequestDTO);
+        } else {
+            return new AnsApiResponse<>(jwtDTO);
         }
 
 
@@ -66,7 +91,7 @@ public class AuthController {
     @PostMapping(path = "/againlogin")//againlogin
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<JwtDTO> reissuance(@Parameter(name = "authorization", description = "엑세스토큰")
-                                          @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {
+                                             @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {
 
         JwtDTO jwtDTO = authService.reissuance(authorization);
 
@@ -77,7 +102,7 @@ public class AuthController {
     @PostMapping(path = "/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> logout(@Parameter(name = "authorization", description = "엑세스토큰")
-                                 @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {
+                                    @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {
 
         authService.logout(authorization);
 
@@ -87,10 +112,35 @@ public class AuthController {
     @Operation(summary = "사용자 로그인 정보 조회", description = "사용자 로그인 정보 조회")
     @GetMapping(path = "/me")
     public AnsApiResponse<AuthDTO> find(@Parameter(name = "authorization", description = "엑세스토큰", in = ParameterIn.PATH)
-                                      @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {
+                                        @RequestHeader(value = "authorization", required = false) String authorization) throws Exception {
 
         AuthDTO authDTO = authService.find(authorization);
 
         return new AnsApiResponse<>(authDTO);
+    }
+
+    @Operation(summary = "사용자 접속 타입 조회( 모바일 , 웹 )", description = "사용자 접속 타입 조회( 모바일 , 웹 )")
+    @GetMapping(path = "/usertype")
+    public AnsApiResponse<List<AuthDTO>> findAllUserType(@Parameter(name = "userId", description = "사용자 아이디[아이디 없이 조회할 경우 모든 사용자 조회]")
+                                                         @RequestParam(value = "userId", required = false) String userId,
+                                                         @Parameter(name = "userLoginTyp", description = "사용자 로그인 타입[web[L01], mobile[L02]]")
+                                                         @RequestParam(value = "userLoginTyp", required = false) String userLoginTyp) throws Exception {
+
+        List<AuthDTO> authDTOList = authService.findAllUserType(userId, userLoginTyp);
+
+        return new AnsApiResponse<>(authDTOList);
+    }
+
+    @Operation(summary = "모바일 사용자 강제 로그아웃", description = "모바일 사용자 강제 로그아웃")
+    //@PutMapping(path = "/mobilelogout")
+    @DeleteMapping(path = "/mobilelogout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public AnsApiResponse<?> mobileLogout(@Parameter(name = "userId", description = "사용자 아이디[아이디 없이 조회할 경우 모든 사용자 조회]")
+                                          @RequestParam(value = "userId", required = false) String userId,
+                                          @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
+
+        authService.mobileLogOut(userId);
+
+        return AnsApiResponse.noContent();
     }
 }

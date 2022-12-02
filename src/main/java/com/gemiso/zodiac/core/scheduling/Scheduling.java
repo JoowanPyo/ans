@@ -148,8 +148,9 @@ public class Scheduling {
     //@Scheduled(cron = "0 * * * * *")
     public void statsCreate() throws Exception {
 
+        log.info("Article Stats Create Start");
 
-        statsService.create();
+        statsService.createDaily();
 
 
     }

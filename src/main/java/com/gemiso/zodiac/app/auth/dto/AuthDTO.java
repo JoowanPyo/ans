@@ -28,6 +28,7 @@ public class AuthDTO {
     private String stCdNm;
     private String clientVer;
     private String userId;
+    private String userLoginTyp;
 
     List<AppAuthUserDTO> appAuthUser = new ArrayList<>();
     /*private List<UserGroupDTO> userGroupDTO = new ArrayList<>();

@@ -89,9 +89,9 @@ class RestfulApiExampleApplicationTests {
     }
 
     @Test
-    void statsCreate(){
+    void statsCreate() throws Exception {
 
-        statsService.create();
+        statsService.createDaily();
     }
 
 }

@@ -81,6 +81,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         return new ResponseEntity<>(ApiErrorResponse.makeResourceNotFoundResponse(ex), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    @ExceptionHandler(value = PasswordFailedException.class)
+    public ResponseEntity<Object> handleApiRequestException(PasswordFailedException ex) {
+        log.error(" ResourceNotFoundException : "+ ApiErrorResponse.makePasswordFailedException(ex));
+        return new ResponseEntity<>(ApiErrorResponse.makePasswordFailedException(ex), HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(value = InterfaceException.class)
     public String handleInterfaceApiRequestException(InterfaceException ex) {
         log.error(" Interface Exception : "+ ApiErrorResponse.makeInterfaceResponse(ex));

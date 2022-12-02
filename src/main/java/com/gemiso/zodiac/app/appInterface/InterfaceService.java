@@ -391,7 +391,7 @@ public class InterfaceService {
         takerProgramDTO.setResult(takerProgramResultDTO);
         takerProgramDTO.setData(takerProgramDataDTO);
 
-        //articleDTO TO XML 파싱
+        //articleDTO TO  파싱
         String xml = JAXBXmlHelper.marshal(takerProgramDTO, TakerProgramDTO.class);
 
         // name.out.println("xml : " + xml);

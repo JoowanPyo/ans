@@ -4,12 +4,14 @@ import com.gemiso.zodiac.app.breakingNews.dto.BreakingNewsCreateDTO;
 import com.gemiso.zodiac.app.breakingNews.dto.BreakingNewsDTO;
 import com.gemiso.zodiac.app.breakingNews.dto.BreakingNewsSimplerDTO;
 import com.gemiso.zodiac.app.breakingNews.dto.BreakingNewsUpdateDTO;
+import com.gemiso.zodiac.app.scrollNews.dto.ScrollNewsDTO;
 import com.gemiso.zodiac.core.helper.SearchDate;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import com.gemiso.zodiac.core.service.JwtGetUserService;
 import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -50,8 +52,7 @@ public class BreakingNewsController {
             SearchDate searchDate = new SearchDate(sdate, edate);
 
             breakingNewsDTOList = breakingNewsService.findAll(searchDate.getStartDate(), searchDate.getEndDate(), delYn);
-        }
-        else {
+        } else {
             breakingNewsDTOList = breakingNewsService.findAll(null, null, delYn);
         }
 
@@ -74,9 +75,9 @@ public class BreakingNewsController {
     public AnsApiResponse<BreakingNewsSimplerDTO> create(@Parameter(description = "필수값<br>방송일자[brdcDtm],제목[titl]," +
             "속보구분[breakingNewsDiv],라인형식[lnTypCd],전송상태[trnsfStCd] ", required = true)
                                                          @RequestBody @Valid BreakingNewsCreateDTO breakingNewsCreateDTO,
-                                                         @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+                                                         @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        String userId =jwtGetUserService.getUser(Authorization);
+        String userId = jwtGetUserService.getUser(Authorization);
 
         Long breakingNewsId = breakingNewsService.create(breakingNewsCreateDTO, userId);
 
@@ -95,9 +96,9 @@ public class BreakingNewsController {
             @RequestBody @Valid BreakingNewsUpdateDTO breakingNewsUpdateDTO,
             @Parameter(name = "breakingNewsId", required = true, description = "속보뉴스 아이디")
             @PathVariable("breakingNewsId") Long breakingNewsId,
-            @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+            @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        String userId =jwtGetUserService.getUser(Authorization);
+        String userId = jwtGetUserService.getUser(Authorization);
 
         breakingNewsService.update(breakingNewsUpdateDTO, breakingNewsId, userId);
 
@@ -113,12 +114,32 @@ public class BreakingNewsController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "breakingNewsId", required = true, description = "속보뉴스 아이디")
                                     @PathVariable("breakingNewsId") Long breakingNewsId,
-                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+                                    @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        String userId =jwtGetUserService.getUser(Authorization);
+        String userId = jwtGetUserService.getUser(Authorization);
 
         breakingNewsService.delete(breakingNewsId, userId);
 
         return AnsApiResponse.noContent();
+    }
+
+    @Operation(summary = "속보뉴스 FTP 전송", description = "속보뉴스 FTP 전송")
+    @GetMapping(path = "/send")
+    public AnsApiResponse<BreakingNewsDTO> send(@Parameter(name = "breakingNewsId", required = true, description = "속보뉴스 아이디")
+                     @RequestParam(value = "breakingNewsId", required = false) Long breakingNewsId,
+                     @RequestHeader(value = "Authorization", required = false) String Authorization) throws UnsupportedEncodingException {
+
+        String userId = jwtGetUserService.getUser(Authorization);
+
+        log.info("속보뉴스 XML 생성 및 FTP 전송 : 속보뉴스 아이디 - "+breakingNewsId+" 사용자 아이디 - "+userId);
+
+        BreakingNewsDTO breakingNewsDTO = breakingNewsService.find(breakingNewsId);
+
+        breakingNewsDTO = breakingNewsService.send(breakingNewsDTO);
+
+        //BreakingNewsDTO breakingNewsDTO = breakingNewsService.find(breakingNewsId);
+
+        return new AnsApiResponse<>(breakingNewsDTO);
+
     }
 }

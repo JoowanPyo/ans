@@ -1,5 +1,6 @@
-package com.gemiso.zodiac.app.scrollNewsFtpInfo;
+package com.gemiso.zodiac.app.fileFtpInfo;
 
+import com.gemiso.zodiac.app.fileFtpInfo.dto.FileFtpInfoDTO;
 import com.gemiso.zodiac.app.scrollNewsFtpInfo.dto.ScrollNewsFtpInfoDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;
@@ -13,23 +14,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(description = "스크롤 뉴스 FTP정보 API")
+@Api(description = "파일 FTP 정보 조회 API")
 @RestController
-@RequestMapping("/scrollnewsftpinfo")
-@RequiredArgsConstructor
+@RequestMapping("/fileftpinfo")
 @Slf4j
-public class ScrollNewsFtpInfoController {
+@RequiredArgsConstructor
+public class FileFtpInfoController {
 
-    private final ScrollNewsFtpInfoService scrollNewsFtpInfoService;
+    private final FileFtpInfoService fileFtpInfoService;
 
 
-    @Operation(summary = "스크롤 뉴스 FTP 정보 상세 상세조회", description = "스크롤 뉴스 FTP 정보 상세 상세조회")
+    @Operation(summary = "파일 FTP 정보 상세 상세조회", description = "파일 FTP 정보 상세 상세조회")
     @GetMapping(path = "/{id}")
-    public AnsApiResponse<ScrollNewsFtpInfoDTO> find(@Parameter(name = "id", required = true, description = "스크롤 뉴스 상세 아이디",
+    public AnsApiResponse<FileFtpInfoDTO> find(@Parameter(name = "id", required = true, description = "스크롤 뉴스 상세 아이디",
             in = ParameterIn.PATH) @PathVariable("id") Long id) {
 
-        ScrollNewsFtpInfoDTO scrollNewsFtpInfoDTO = scrollNewsFtpInfoService.find(id);
+        FileFtpInfoDTO fileFtpInfoDTO = fileFtpInfoService.find(id);
 
-        return new AnsApiResponse<>(scrollNewsFtpInfoDTO);
+        return new AnsApiResponse<>(fileFtpInfoDTO);
     }
 }

@@ -1,7 +1,13 @@
 package com.gemiso.zodiac.app.symbol;
 
+import com.gemiso.zodiac.app.breakingNewsFtpInfo.dto.BreakingNewsFtpInfoDTO;
 import com.gemiso.zodiac.app.file.AttachFile;
+import com.gemiso.zodiac.app.file.AttachFileService;
 import com.gemiso.zodiac.app.file.dto.AttachFileDTO;
+import com.gemiso.zodiac.app.fileFtpInfo.FileFtpInfo;
+import com.gemiso.zodiac.app.fileFtpInfo.FileFtpInfoRepository;
+import com.gemiso.zodiac.app.fileFtpInfo.FileFtpInfoService;
+import com.gemiso.zodiac.app.fileFtpInfo.dto.FileFtpInfoDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolCreateDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolDTO;
 import com.gemiso.zodiac.app.symbol.dto.SymbolOrdUpdateDTO;
@@ -9,6 +15,9 @@ import com.gemiso.zodiac.app.symbol.dto.SymbolUpdateDTO;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolCreateMapper;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolMapper;
 import com.gemiso.zodiac.app.symbol.mapper.SymbolUpdateMapper;
+import com.gemiso.zodiac.core.service.FTPconnectService;
+import com.gemiso.zodiac.core.util.PropertyUtil;
+import com.gemiso.zodiac.core.util.UploadFileBean;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,12 +42,16 @@ import java.util.Optional;
 public class SymbolService {
 
     private final SymbolRepository symbolRepository;
+    private final FileFtpInfoRepository fileFtpInfoRepository;
     //private final AttachFileRepository attachFileRepository;
 
     private final SymbolMapper symbolMapper;
     private final SymbolCreateMapper symbolCreateMapper;
     private final SymbolUpdateMapper symbolUpdateMapper;
     //private final AttachFileMapper attachFileMapper;
+
+    private final AttachFileService attachFileService;
+    //private final FileFtpInfoService fileFtpInfoService;
 
     //private final UserAuthService userAuthService;
 
@@ -214,4 +229,175 @@ public class SymbolService {
 
         return booleanBuilder;
     }
+
+    public void sendFileToPrompter(String symbolId){
+
+        //방송아이콘 확인
+        Symbol symbol = symbolFindOrFail(symbolId);
+
+        /*****방송아이콘 이미지 파일 확인*****/
+        AttachFile SymbolAttachFile = symbol.getAttachFile();
+
+        Long fileId = SymbolAttachFile.getFileId();
+
+        AttachFileDTO attachFile = attachFileService.strFilefind(fileId);
+
+        String fileDivCd = attachFile.getFileDivCd();
+
+        PropertyUtil xu = new PropertyUtil();
+        UploadFileBean ub = new UploadFileBean();
+        ub = xu.getUploadInfo("FileAttach.xml", fileDivCd);
+
+        String fileLoc = attachFile.getFileLoc();
+        String realpath = ub.getDest() + fileLoc + File.separator + attachFile.getFileNm();
+
+        File file = null;
+        // file에 파일경로 및 파일네임.확장자
+        file=new File(realpath);
+
+        //파일 존재 여부 확인
+        if (!file.exists()) {
+            String errorMessage = "send file to Prompter - file does not exist";
+            log.info(errorMessage);
+            throw new ResourceNotFoundException("전송 하려는 방송아이콘 이미지 파일이 존재하지 않습니다. 방송아이콘 아이디 : "+symbolId);
+        }
+
+        /***** A 부조 전송 *****/
+        Optional<FileFtpInfo> AfileFtpInfoEntity = fileFtpInfoRepository.findFtpInfo(1L);
+
+        if (AfileFtpInfoEntity.isPresent()){
+
+            FileFtpInfo AfileFtpInfo = AfileFtpInfoEntity.get();
+
+            ftpSend(file, AfileFtpInfo);
+
+        }
+
+        /***** B 부조 전송 *****/
+        Optional<FileFtpInfo> BfileFtpInfoEntity = fileFtpInfoRepository.findFtpInfo(2L);
+
+        if (BfileFtpInfoEntity.isPresent()){
+
+            FileFtpInfo BfileFtpInfo = BfileFtpInfoEntity.get();
+
+            ftpSend(file, BfileFtpInfo);
+
+        }
+
+    }
+
+    public void sendFileToTaker(String symbolId){
+
+        //방송아이콘 확인
+        Symbol symbol = symbolFindOrFail(symbolId);
+
+        /*****방송아이콘 이미지 파일 확인*****/
+        AttachFile SymbolAttachFile = symbol.getAttachFile();
+
+        Long fileId = SymbolAttachFile.getFileId();
+
+        AttachFileDTO attachFile = attachFileService.strFilefind(fileId);
+
+        String fileDivCd = attachFile.getFileDivCd();
+
+        PropertyUtil xu = new PropertyUtil();
+        UploadFileBean ub = new UploadFileBean();
+        ub = xu.getUploadInfo("FileAttach.xml", fileDivCd);
+
+        String fileLoc = attachFile.getFileLoc();
+        String realpath = ub.getDest() + fileLoc + File.separator + attachFile.getFileNm();
+
+        File file = null;
+        // file에 파일경로 및 파일네임.확장자
+        file=new File(realpath);
+
+        //파일 존재 여부 확인
+        if (!file.exists()) {
+            String errorMessage = "send file to taker - file does not exist";
+            log.info(errorMessage);
+            throw new ResourceNotFoundException("전송 하려는 방송아이콘 이미지 파일이 존재하지 않습니다. 방송아이콘 아이디 : "+symbolId);
+        }
+
+        /***** A 부조 전송 *****/
+        Optional<FileFtpInfo> AfileFtpInfoEntity = fileFtpInfoRepository.findFtpInfo(3L);
+
+        if (AfileFtpInfoEntity.isPresent()){
+
+            FileFtpInfo AfileFtpInfo = AfileFtpInfoEntity.get();
+
+            ftpSend(file, AfileFtpInfo);
+
+        }
+
+        /***** B 부조 전송 *****/
+        Optional<FileFtpInfo> BfileFtpInfoEntity = fileFtpInfoRepository.findFtpInfo(4L);
+
+        if (BfileFtpInfoEntity.isPresent()){
+
+            FileFtpInfo BfileFtpInfo = BfileFtpInfoEntity.get();
+
+            ftpSend(file, BfileFtpInfo);
+
+        }
+
+    }
+
+    public void ftpSend(File file, FileFtpInfo fileFtpInfo){
+
+        String ftpIp = fileFtpInfo.getFtpIp();
+        Integer ftpPort = fileFtpInfo.getFtpPort();
+        String ftpId = fileFtpInfo.getFtpId();
+        String ftpPw = fileFtpInfo.getFtpPw();
+        String ftpPath = fileFtpInfo.getFtpPath();
+        String ftpType = fileFtpInfo.getFtpType();
+
+        //FTP코드 생성자
+        FTPconnectService ftp = new FTPconnectService();
+        FileInputStream fis = null;
+
+        String fileNm = file.getName();
+
+        try {
+            //nam ftp 커넥트
+            if ("active".equals(ftpType)) {
+                ftp.connectActive(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
+
+            }else if ("passive".equals(ftpType)){
+                ftp.connectPassive(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
+            }
+
+            try {
+                if(file.exists()) {
+                    fis = new FileInputStream(file);
+                    ftp.storeFile(fileNm, fis); //파일명
+
+                    log.info("속보 뉴스 FTP1 파일명 : "+file.getName()+" fis : "+fis.toString());
+                }
+            } catch (FileNotFoundException e) {
+                log.error("속보 뉴스 FTP file handle exception : "+ "FileNotFoundException");
+                // TODO: handle exception
+            }catch (IOException e) {
+                log.error("속보 뉴스 FTP file handle exception : "+ "IOException");
+                // TODO: handle exception
+            } finally {
+                if(fis != null) {
+                    fis.close();
+                }
+            }
+            //ftp.disconnect();
+        } catch (NumberFormatException e) {
+            log.error("속보 뉴스 FTP file NumberFormatException : "+ "NumberFormatException");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("속보 뉴스 FTP file Exception : "+ "Exception - "+e.getMessage() );
+        } finally {
+            if (ftp != null){
+                ftp.disconnect();
+            }
+
+        }
+
+    }
+
+
 }
