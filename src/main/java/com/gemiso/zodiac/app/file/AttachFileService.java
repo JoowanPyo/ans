@@ -140,7 +140,8 @@ public class AttachFileService {
 
                 if( rname.endsWith(".doc") || rname.endsWith(".hwp") || rname.endsWith(".pdf") || rname.endsWith(".xls") ||
                         rname.endsWith(".png") || rname.endsWith(".svg") || rname.endsWith(".txt") || rname.endsWith(".zip") ||
-                        rname.endsWith(".jpg") || rname.endsWith(".xml")){
+                        rname.endsWith(".jpg") || rname.endsWith(".xml") || rname.endsWith(".wav") || rname.endsWith(".mp4") ||
+                        rname.endsWith(".mp3") || rname.endsWith(".wma") || rname.endsWith(".m4a")){
 
                     //String fileName = file.getOriginalFilename();
                     //오리지널 파일네임 여부
@@ -151,6 +152,8 @@ public class AttachFileService {
                         rname = fileId + "." + ext;
                     }
                     uploadFile = new File(realpath + File.separator + rname);
+                }else {
+                    throw new ResourceNotFoundException(" 업로드할 수 없는 확장자입니다. 현재 확장자 : "+rname);
                 }
             }
 

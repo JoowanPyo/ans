@@ -39,5 +39,8 @@ public interface CueSheetRepository extends JpaRepository<CueSheet, Long>, Query
     @Query("select a from CueSheet a where a.lckrId =:userId and a.lckYn =:lckYn ")
     List<CueSheet> findLockCueList(@Param("userId")String userId, @Param("lckYn")String lckYn);
 
+    @Query("select a from CueSheet a where a.brdcDt =:statsDate and a.cueStCd ='end_on_air' and a.delYn ='N' ")
+    List<CueSheet> findStatsCue(@Param("statsDate") String statsDate);
+
 
 }

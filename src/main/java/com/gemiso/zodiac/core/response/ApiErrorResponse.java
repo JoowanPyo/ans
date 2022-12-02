@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gemiso.zodiac.app.appInterface.takerProgramDTO.TakerProgramDTO;
 import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
 import com.gemiso.zodiac.exception.InterfaceException;
+import com.gemiso.zodiac.exception.PasswordFailedException;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.gemiso.zodiac.exception.UserFailException;
 import lombok.Getter;
@@ -144,6 +145,12 @@ public class ApiErrorResponse extends BaseApiResponse {
         Error error = new Error(ErrorCodes.ResourceNotFound, exception.getLocalizedMessage(), null);
 
         return new ApiErrorResponse(error, HttpStatus.NOT_FOUND);
+    }
+
+    public static ApiErrorResponse makePasswordFailedException(PasswordFailedException exception) {
+        Error error = new Error(ErrorCodes.ResourceNotFound, exception.getLocalizedMessage(), null);
+
+        return new ApiErrorResponse(error, HttpStatus.FORBIDDEN);
     }
 
     public static ApiErrorResponse makeInterfaceResponse(InterfaceException exception) {

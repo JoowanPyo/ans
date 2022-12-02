@@ -1,16 +1,27 @@
 package com.gemiso.zodiac.app.breakingNews;
 
-import com.gemiso.zodiac.app.breakingNews.dto.BreakingNewsCreateDTO;
-import com.gemiso.zodiac.app.breakingNews.dto.BreakingNewsDTO;
-import com.gemiso.zodiac.app.breakingNews.dto.BreakingNewsSimplerDTO;
-import com.gemiso.zodiac.app.breakingNews.dto.BreakingNewsUpdateDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.gemiso.zodiac.app.breakingNews.dto.*;
 import com.gemiso.zodiac.app.breakingNews.mapper.BreakingNewsCreateMapper;
 import com.gemiso.zodiac.app.breakingNews.mapper.BreakingNewsMapper;
 import com.gemiso.zodiac.app.breakingNews.mapper.BreakingNewsUpdateMapper;
 import com.gemiso.zodiac.app.breakingNewsDetail.BreakingNewsDtl;
 import com.gemiso.zodiac.app.breakingNewsDetail.BreakingNewsDtlRepository;
 import com.gemiso.zodiac.app.breakingNewsDetail.dto.BreakingNewsDtlCreateDTO;
+import com.gemiso.zodiac.app.breakingNewsDetail.dto.BreakingNewsDtlDTO;
 import com.gemiso.zodiac.app.breakingNewsDetail.mapper.BreakingNewsDtlCreateMapper;
+import com.gemiso.zodiac.app.breakingNewsFtpInfo.BreakingNewsFtpInfo;
+import com.gemiso.zodiac.app.breakingNewsFtpInfo.BreakingNewsFtpInfoService;
+import com.gemiso.zodiac.app.breakingNewsFtpInfo.dto.BreakingNewsFtpInfoDTO;
+import com.gemiso.zodiac.app.cueSheet.dto.CueSheetCapDownloadXMLDTO;
+import com.gemiso.zodiac.core.helper.CapSeparatorHelper;
+import com.gemiso.zodiac.core.helper.DateChangeHelper;
+import com.gemiso.zodiac.core.helper.JAXBXmlHelper;
+import com.gemiso.zodiac.core.service.FTPconnectService;
+import com.gemiso.zodiac.core.util.PropertyUtil;
+import com.gemiso.zodiac.core.util.UploadFileBean;
 import com.gemiso.zodiac.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +31,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +56,11 @@ public class BreakingNewsService {
     private final BreakingNewsCreateMapper breakingNewsCreateMapper;
     private final BreakingNewsUpdateMapper breakingNewsUpdateMapper;
     private final BreakingNewsDtlCreateMapper breakingNewsDtlCreateMapper;
+
+    private final CapSeparatorHelper capSeparatorHelper;
+    private final DateChangeHelper dateChangeHelper;
+
+    private final BreakingNewsFtpInfoService breakingNewsFtpInfoService;
 
     //private final UserAuthService userAuthService;
 
@@ -194,5 +218,174 @@ public class BreakingNewsService {
         }
 
         return booleanBuilder;
+    }
+
+    public BreakingNewsDTO send(BreakingNewsDTO breakingNewsDTO) throws UnsupportedEncodingException {
+
+
+        List<BreakingNewsSendDTO> breakingNewsSendDTOS = new ArrayList<>();
+
+        List<BreakingNewsDtlDTO> breakingNewsDtls = breakingNewsDTO.getBreakingNewsDtls();
+        String lnTypCdNm = breakingNewsDTO.getLnTypCdNm();
+
+        Integer page = 1;
+
+        for (BreakingNewsDtlDTO breakingNewsDtlDTO : breakingNewsDtls){
+
+            BreakingNewsSendDTO breakingNewsSendDTO = new BreakingNewsSendDTO();
+            breakingNewsSendDTO.setPage(page);
+            breakingNewsSendDTO.setContent(capSeparatorHelper.separator(breakingNewsDtlDTO.getCtt()));
+            breakingNewsSendDTO.setTemplate(lnTypCdNm);
+
+            breakingNewsSendDTOS.add(breakingNewsSendDTO);
+            ++page;
+
+        }
+
+        BreakingNewsSendListDTO breakingNewsSendListDTO = new BreakingNewsSendListDTO();
+        breakingNewsSendListDTO.setCg(breakingNewsSendDTOS);
+
+        /******************* xml 파일 생성 ******************/
+        JAXBContext jaxc = null;
+        Marshaller marshaller = null;
+        File file = null;
+
+        try {
+            jaxc = JAXBContext.newInstance(BreakingNewsSendListDTO.class);
+        } catch (JAXBException e) {
+            log.error("Jaxb instance 생성 에러");
+        }
+
+        Date todayDate = new Date();
+        String today = dateChangeHelper.dateToStringNoTimeStraight(todayDate);
+        today = today.replaceAll("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9]", "");
+
+        //String firstFileNm = getValidFileName(breakingNewsDTO.getTitl());
+
+        String fileNm = breakingNewsDTO.getTitl()+"_"+today;
+
+        fileNm = getValidFileName(fileNm);
+        fileNm = fileNm +".xml";
+
+        //fileNm = getValidFileName(fileNm);
+
+        //ftp서버에 한글파일을 쓸때 한글깨짐 방지
+        //String tempFileName = new String(fileNm.getBytes("utf-8"),"iso_8859_1");
+        String tempFileName = new String(fileNm.getBytes("euc-kr"),"euc-kr");
+        //String tempFileName = new String(fileNm.getBytes("utf-8"), "UTF-16");
+
+        file = new File("/data/storage/temp",tempFileName);
+
+
+        //articleDTO TO XML 파싱
+        //String xml = JAXBXmlHelper.marshal(breakingNewsSendListDTO, BreakingNewsSendListDTO.class);
+
+        try {
+            marshaller = jaxc.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, "utf-8");
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+
+            marshaller.marshal( breakingNewsSendListDTO, file );
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+
+        /******************* ftp 전송 ******************/
+
+        ftpSend(file);
+
+        /******************* ftp 전송 후 전송 Date 업데이트 ******************/
+        breakingNewsDTO.setTrnsfDtm(new Date());
+
+        BreakingNews breakingNews = breakingNewsMapper.toEntity(breakingNewsDTO);
+
+        breakingNewsRepository.save(breakingNews);
+
+        return breakingNewsDTO;
+
+    }
+
+    public String getValidFileName(String fileName){
+
+        //String REGEX_PATTERN = "[(),'.%}]";
+        String INVALID_WINDOWS_SPECIFIC_CHARS = "[\\\\/:*?\"<>|]";
+
+        String newFileName = fileName.replaceAll(INVALID_WINDOWS_SPECIFIC_CHARS, "").trim();
+
+        if (newFileName.length() == 0){
+            throw new IllegalStateException("BreakingNews FileName : "+fileName + "results in a empty fileName!");
+        }
+
+        return newFileName;
+    }
+
+    public void ftpSend(File file){
+
+        Long id = 1L;
+
+        BreakingNewsFtpInfoDTO breakingNewsFtpInfoDTO = breakingNewsFtpInfoService.find(id);
+
+        log.info("속보뉴스 FTP INFO : "+breakingNewsFtpInfoDTO.toString());
+
+        String ftpIp = breakingNewsFtpInfoDTO.getFtpIp();
+        Integer ftpPort = breakingNewsFtpInfoDTO.getFtpPort();
+        String ftpId = breakingNewsFtpInfoDTO.getFtpId();
+        String ftpPw = breakingNewsFtpInfoDTO.getFtpPw();
+        String ftpPath = breakingNewsFtpInfoDTO.getFtpPath();
+        String ftpType = breakingNewsFtpInfoDTO.getFtpType();
+
+        //FTP코드 생성자
+        FTPconnectService ftp = new FTPconnectService();
+        FileInputStream fis = null;
+
+        String fileNm = file.getName();
+
+        try {
+            //nam ftp 커넥트
+            if ("active".equals(ftpType)) {
+                ftp.connectActiveEucKr(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
+
+            }else if ("passive".equals(ftpType)){
+                ftp.connectPassive(ftpIp, ftpPort, ftpId, ftpPw, ftpPath);
+            }
+
+            try {
+                if(file.exists()) {
+                    fis = new FileInputStream(file);
+                    ftp.storeFile(fileNm, fis); //파일명
+
+                    log.info("속보 뉴스 FTP1 파일명 : "+file.getName()+" fis : "+fis.toString());
+                }
+            } catch (FileNotFoundException e) {
+                log.error("속보 뉴스 FTP file handle exception : "+ "FileNotFoundException");
+                // TODO: handle exception
+            }catch (IOException e) {
+                log.error("속보 뉴스 FTP file handle exception : "+ "IOException");
+                // TODO: handle exception
+            } finally {
+                if(fis != null) {
+                    fis.close();
+                }
+            }
+            //ftp.disconnect();
+        } catch (NumberFormatException e) {
+            log.error("속보 뉴스 FTP file NumberFormatException : "+ "NumberFormatException");
+        } catch (Exception e) {
+            log.error("속보 뉴스 FTP file Exception : "+ "Exception - "+e.getMessage() );
+        } finally {
+            if (ftp != null){
+                ftp.disconnect();
+            }
+
+            if( file.exists() ){
+                if(file.delete()){
+                    log.info("속보 뉴스 File Delete ");
+                }else{
+                    log.error("속보 뉴스 file delete failed");
+                }
+            }
+
+        }
+
     }
 }

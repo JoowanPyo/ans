@@ -50,4 +50,8 @@ public interface CueSheetItemRepository extends JpaRepository<CueSheetItem, Long
 
     @Query("select max(a.cueItemOrd) from CueSheetItem a where a.cueSheet.cueId =:cueId and a.delYn = 'N' and a.spareYn = 'N' ")
     Optional<Integer> findCueItemMaxOrder(@Param("cueId")Long cueId);
+
+    @Query("select a from CueSheetItem a left outer join Article b on b.artclId = a.article.artclId and b.delYn = 'N' " +
+            "where a.cueSheet.cueId = :cueId  and a.delYn = 'N' order by a.cueItemOrd asc ")
+    List<CueSheetItem> findStatsCueItemList(@Param("cueId")Long cueId);
 }

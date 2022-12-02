@@ -54,10 +54,10 @@ public class SymbolController {
     @ResponseStatus(HttpStatus.CREATED)
     public AnsApiResponse<SymbolDTO> create(@Parameter(name = "symbolCreateDTO", required = true, description = "방송아이콘 아이디")
                                             @Valid @RequestBody SymbolCreateDTO symbolCreateDTO,
-                                            @RequestHeader(value = "Authorization", required = false)String Authorization
+                                            @RequestHeader(value = "Authorization", required = false) String Authorization
     ) throws Exception {
 
-        String userId =jwtGetUserService.getUser(Authorization);
+        String userId = jwtGetUserService.getUser(Authorization);
 
         String symbolId = symbolService.create(symbolCreateDTO, userId);
 
@@ -73,9 +73,9 @@ public class SymbolController {
                                             @Valid @RequestBody SymbolUpdateDTO symbolUpdateDTO,
                                             @Parameter(name = "symbolId", required = true, description = "방송아이콘 아이디")
                                             @PathVariable("symbolId") String symbolId,
-                                            @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+                                            @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        String userId =jwtGetUserService.getUser(Authorization);
+        String userId = jwtGetUserService.getUser(Authorization);
 
         symbolService.update(symbolUpdateDTO, symbolId, userId);
 
@@ -90,9 +90,9 @@ public class SymbolController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AnsApiResponse<?> delete(@Parameter(name = "symbolId", required = true, description = "방송아이콘 아이디")
                                     @PathVariable("symbolId") String symbolId,
-                                    @RequestHeader(value = "Authorization", required = false)String Authorization) throws Exception {
+                                    @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
-        String userId =jwtGetUserService.getUser(Authorization);
+        String userId = jwtGetUserService.getUser(Authorization);
 
         symbolService.delete(symbolId, userId);
 
@@ -102,9 +102,9 @@ public class SymbolController {
     @Operation(summary = "방송 아이콘 순서 변경", description = "큐시트 아이템 순서변경")
     @PutMapping(path = "/{symbolId}/order")
     public AnsApiResponse<SymbolSimpleDTO> ordUpdate(@Parameter(name = "symbolCreateDTO", required = true, description = "필수값<br>")
-                                       @Valid @RequestBody SymbolOrdUpdateDTO symbolOrdUpdateDTO,
-                                       @Parameter(name = "symbolId", required = true, description = "방송아이콘 아이디")
-                                       @PathVariable("symbolId") String symbolId) {
+                                                     @Valid @RequestBody SymbolOrdUpdateDTO symbolOrdUpdateDTO,
+                                                     @Parameter(name = "symbolId", required = true, description = "방송아이콘 아이디")
+                                                     @PathVariable("symbolId") String symbolId) {
 
         symbolService.ordupdate(symbolOrdUpdateDTO, symbolId);
 
@@ -115,4 +115,34 @@ public class SymbolController {
         return new AnsApiResponse<>(symbolSimpleDTO);
     }
 
+    @Operation(summary = "파일 프롬프터 전송", description = "파일 프롬프터 전송")
+    @GetMapping(path = "/{symbolId}/send/prompter")
+    public void sendFileToPrompter(@Parameter(name = "symbolId", required = true, description = "방송아이콘 아이디")
+                                   @PathVariable("symbolId") String symbolId,
+                                   @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
+
+        String userId = jwtGetUserService.getUser(Authorization);
+
+        log.info("Send file to prompter - symbolId : " + symbolId + " userId : " + userId);
+
+        symbolService.sendFileToPrompter(symbolId);
+
+
     }
+
+    @Operation(summary = "파일 테이커 전송", description = "파일 테이커 전송")
+    @GetMapping(path = "/{symbolId}/send/taker")
+    public void sendFileToTaker(@Parameter(name = "symbolId", required = true, description = "방송아이콘 아이디")
+                                   @PathVariable("symbolId") String symbolId,
+                                   @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
+
+        String userId = jwtGetUserService.getUser(Authorization);
+
+        log.info("Send file to taker - symbolId : " + symbolId + " userId : " + userId);
+
+        symbolService.sendFileToTaker(symbolId);
+
+
+    }
+
+}

@@ -75,6 +75,7 @@ public class AuthService {
     private final JWTBuilder jwtBuilder;
     private final JWTParser jwtParser;
 
+    //로그인 웹
     public JwtDTO login(AuthRequestDTO authRequestDTO) throws Exception {
 
         JwtDTO jwtDTO = new JwtDTO(); //returnDTO
@@ -188,6 +189,124 @@ public class AuthService {
 
     }
 
+    //로그인 모바일
+    public JwtDTO loginMobile(AuthRequestDTO authRequestDTO) throws Exception {
+
+        JwtDTO jwtDTO = new JwtDTO(); //returnDTO
+
+        String userId = authRequestDTO.getUserId();
+        String password = authRequestDTO.getPassword();
+
+        /*MisUser userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("MisUser not found. userId : " + userId));*/
+        User userEntity = userService.userFindOrFail(userId);
+
+        UserDTO userDTO = userMapper.toDto(userEntity); //tb_user_login 테이블에 정보를 저장하기위한 DTO생성
+        userDTO.setLastLoginDtm(new Date()); //로그인 시간 set
+
+        userMapper.updateFromDto(userDTO, userEntity);
+
+        userRepository.save(userEntity);
+
+        //아리랑 pwd sha256해싱 [ pwd + salt ]
+        EncodingHelper encodingHelper = new EncodingHelper(password, saltKey);
+        String hexPwd = encodingHelper.getHex();
+
+        //log.info(" 패스워드 확인 : "+ hexPwd.toString());
+
+        if (!passwordEncoder.matches(hexPwd, userEntity.getPwd())) {
+            throw new PasswordFailedException("비빌 번호가 다릅니다 비밀번호를 확인해 주세요.");
+        }
+
+        Optional<UserToken> getUserToken = userTokenRepository.findUserToken(userId);
+
+        if (getUserToken.isPresent() == false) {
+
+            String refreshToken = jwtBuilder.createRefreshToken(""); //리플레시 토큰 생성 [토큰 유효시간 24시간 유저정보 X]
+
+            UserTokenDTO userTokenDTO = new UserTokenDTO();
+
+            Date expirationDtm = jwtParser.refreshTokenParser(refreshToken); //생성한 리플레시 토큰 파싱하여 만료시간 저장.
+
+            userTokenDTO.setRefreshToken(refreshToken); //tb_user_token에 정보 Set
+            userTokenDTO.setUserId(userId);
+            userTokenDTO.setExpirationDtm(expirationDtm);
+
+            UserToken userToken = userTokenMapper.toEntity(userTokenDTO); //userToken 정보 Entity변환
+            userTokenRepository.save(userToken);//tb_user_token 테이블에 사용자 리플레시토큰 정보 저장
+
+            int returnExpirationDtm = jwtParser.verityJwt(refreshToken); //client로 만료시간 초단위(int)로 변환하여 보내준다
+
+            jwtDTO.setExpirationIn(returnExpirationDtm); //client로 보내줄 리플레시 토큰 만료시간
+            jwtDTO.setRefreshToken(refreshToken);   // client로 보내줄 리플레시 토큰
+
+        } else {
+
+            UserToken userTokenEntity = getUserToken.get();
+
+            //리플레시 토큰이 있으면, 리플레시토큰 시간이 만료되었는지 검증.
+            String refreshToken = jwtParser.refreshTokenVerification(userTokenEntity.getRefreshToken());
+            if (refreshToken == null || refreshToken.trim().isEmpty()) {
+                refreshToken = jwtBuilder.createRefreshToken(""); //만료된 토큰 재생성.
+
+                Date expirationDtm = jwtParser.refreshTokenParser(refreshToken); //생성한 리플레시 토큰 파싱하여 만료시간 저장.
+
+                UserTokenDTO userTokenDTO = userTokenMapper.toDto(userTokenEntity);
+                userTokenDTO.setUserId(userId);
+                userTokenDTO.setRefreshToken(refreshToken);
+                userTokenDTO.setExpirationDtm(expirationDtm);
+
+                userTokenMapper.updateFromDto(userTokenDTO, userTokenEntity);
+                userTokenRepository.save(userTokenEntity);
+
+            }
+            int returnExpirationDtm = jwtParser.verityJwt(refreshToken); //client로 만료시간 초단위(int)로 변환하여 보내준다
+
+            jwtDTO.setExpirationIn(returnExpirationDtm); //client로 보내줄 리플레시 토큰 만료시간
+            jwtDTO.setRefreshToken(refreshToken);   // client로 보내줄 리플레시 토큰
+        }
+
+        String accessToken = jwtBuilder.createAccessToken(userId);
+
+        Auth auth = authRepository.findByLogin(userId);
+
+        if (ObjectUtils.isEmpty(auth)) {
+            //사용자 로그인 정보 신규 저장
+            AuthDTO authDTO = new AuthDTO(); //DTO생성
+            authDTO.setToken(accessToken);
+            authDTO.setUserNm(userDTO.getUserNm());
+            authDTO.setDeptId(userDTO.getDeptId());
+            authDTO.setLoginDtm(new Date());
+            authDTO.setStCd(userDTO.getUserStCd());
+            //authDTO.setStCd("L02"); //모바일 코드
+            authDTO.setUserId(userDTO.getUserId());
+            authDTO.setUserLoginTyp("L02");
+
+            Auth authEntity = authMapper.toEntity(authDTO);
+            authRepository.save(authEntity);
+
+        } else {
+            AuthDTO authDTO = authMapper.toDto(auth); //기존 로그인 정보가 있을경우 업데이트
+            //사용자 로그인 정보 업데이트
+            authDTO.setToken(accessToken);
+            authDTO.setUserNm(userDTO.getUserNm());
+            authDTO.setDeptId(userDTO.getDeptId());
+            authDTO.setLoginDtm(new Date());
+            authDTO.setStCd(userDTO.getUserStCd());
+            //authDTO.setStCd("L02"); //모바일 코드
+            authDTO.setUserId(userDTO.getUserId());
+            authDTO.setUserLoginTyp("L02");
+
+            Auth authEntity = authMapper.toEntity(authDTO);
+            authRepository.save(authEntity);
+        }
+
+        jwtDTO.setAccessToken(accessToken);
+
+        return jwtDTO;
+
+    }
+
     //패스워드 비크립트
     public String encodePassword(String password) {
 
@@ -208,7 +327,7 @@ public class AuthService {
         UserToken userToken = getUserToken.get();
 
         String refreshToken = jwtParser.refreshTokenVerification(userToken.getRefreshToken()); //리플레시 토큰이 만료되었는지 검증
-        if (refreshToken == null && refreshToken.trim().isEmpty()) { //만료되었으면 재생성
+        if (refreshToken == null || refreshToken.trim().isEmpty()) { //만료되었으면 재생성
             //throw new TokenFailedException("리플레시 토큰 기간이 만료되었습니다 다시 로그인 해주세요" );
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
@@ -264,6 +383,7 @@ public class AuthService {
         AuthDTO authDTO = authMapper.toDto(auth);
         authDTO.setLogoutDtm(new Date());
         authDTO.setToken(null);
+        authDTO.setUserLoginTyp(null);
         Auth authEntity = authMapper.toEntity(authDTO);
         authRepository.save(authEntity);
 
@@ -336,6 +456,35 @@ public class AuthService {
             return "OK";
 
         return "FAIL";
+    }
+
+    public List<AuthDTO> findAllUserType(String userId, String userLoginTyp){
+
+        List<Auth> authList = authRepository.findAllUserType(userId, userLoginTyp);
+
+        List<AuthDTO> authDTOList = authMapper.toDtoList(authList);
+
+        return authDTOList;
+    }
+
+    public void mobileLogOut(String userId){
+
+        Auth auth = authRepository.findByLogin(userId);
+
+        Optional<UserToken> userTokenEntity = userTokenRepository.findUserToken(userId);
+
+        if (userTokenEntity.isPresent() == false){
+            throw new ResourceNotFoundException("이미 로그아웃된 사용자입니다. 사용자 아이디 : "+ userId);
+        }
+
+        UserToken userToken = userTokenEntity.get();
+
+        userTokenRepository.delete(userToken);
+
+        auth.setUserLoginTyp(null);
+
+        authRepository.save(auth);
+
     }
 
 }

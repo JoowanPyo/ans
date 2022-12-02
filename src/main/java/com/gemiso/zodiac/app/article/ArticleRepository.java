@@ -67,4 +67,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Queryds
     @Query("select a from Article a where a.cueSheet.cueId =:cueId and a.delYn = 'N'")
     List<Article> findArticleCue(@Param("cueId") Long cueId);
 
+    @Query("select a from Article a where a.inputDtm between :sdate and :edate and a.artclOrd = 0 ")
+    List<Article> findOrgArticleStats(@Param("sdate")Date sdate, @Param("edate")Date edate);
+
 }

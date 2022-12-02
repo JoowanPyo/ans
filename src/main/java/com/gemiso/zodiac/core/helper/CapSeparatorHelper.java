@@ -8,7 +8,9 @@ public class CapSeparatorHelper {
     public String separator(String ctt){
 
         //ctt = ctt+System.lineSeparator();
-        ctt = ctt+"\n";
+        if (ctt != null && ctt.trim().isEmpty() == false) {
+            ctt = ctt + "\n";
+        }
 
 
         return ctt;

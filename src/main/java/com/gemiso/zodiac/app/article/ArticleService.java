@@ -247,11 +247,14 @@ public class ArticleService {
                                                         List<String> apprvDivCdList, Long deptCd, String artclCateCd, String artclTypDtlCd,
                                                         String delYn, Long artclId, String copyYn, Long orgArtclId, Long cueId, Integer page) throws Exception {
 
+        //페이지 셋팅 page, limit null일시 page = 1 limit = 50 디폴트 셋팅
+        PageHelper pageHelper = new PageHelper(page, 10000);
+        Pageable pageable = pageHelper.getArticlePageInfo();
 
         List<ElasticSearchArticle> articleList = elasticSearchArticleRepository.findByStatisticsArticle(sdate, edate, rptrId, inputrId, brdcPgmId,
                 artclDivCd, artclTypCd, searchDivCd, searchWord,
                 apprvDivCdList, deptCd, artclCateCd, artclTypDtlCd,
-                delYn, artclId, copyYn, orgArtclId, cueId, page);
+                delYn, artclId, copyYn, orgArtclId, cueId, pageable);
 
 
         return articleList;
@@ -276,14 +279,14 @@ public class ArticleService {
 
         Workbook wb = new XSSFWorkbook();
         Sheet sheet = wb.createSheet("ANS 사용자 정보");
-        sheet.setColumnWidth(0, 3000);
-        sheet.setColumnWidth(1, 6000);
-        sheet.setColumnWidth(2, 15000);
-        sheet.setColumnWidth(3, 15000);
+        sheet.setColumnWidth(0, 2000);
+        sheet.setColumnWidth(1, 5000);
+        sheet.setColumnWidth(2, 13000);
+        sheet.setColumnWidth(3, 13000);
         sheet.setColumnWidth(4, 3000);
         sheet.setColumnWidth(5, 2000);
         sheet.setColumnWidth(6, 2000);
-        sheet.setColumnWidth(7, 2000);
+        sheet.setColumnWidth(7, 8000);
         sheet.setColumnWidth(8, 2000);
         sheet.setColumnWidth(9, 4000);
         sheet.setColumnWidth(10, 4000);
@@ -371,9 +374,14 @@ public class ArticleService {
 
             ElasticSearchCueSheet cueSheet = article.getCueSheet();
             String stringCueId = "";
+            String cueNm = "";
             if (ObjectUtils.isEmpty(cueSheet) == false){
-                Long cueId = cueSheet.getCueId();
-                stringCueId = Long.toString(cueId);
+
+                //변경 2022-10-31 성민효 과장님 요청 [큐시트 아이디 말고 큐시트 명으로]
+                //Long cueId = cueSheet.getCueId();
+                //stringCueId = Long.toString(cueId);
+
+                cueNm = cueSheet.getBrdcPgmNm();
             }
 
             int articleTime = Optional.ofNullable(article.getArtclCttTime()).orElse(0);
@@ -411,7 +419,7 @@ public class ArticleService {
             cell = row.createCell(6);
             cell.setCellValue(article.getArtclTypDtlCdNm());
             cell = row.createCell(7);
-            cell.setCellValue(stringCueId);
+            cell.setCellValue(cueNm);
             cell = row.createCell(8);
             cell.setCellValue(total);
             cell = row.createCell(9);

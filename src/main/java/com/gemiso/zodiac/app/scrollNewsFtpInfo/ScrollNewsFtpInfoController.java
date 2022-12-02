@@ -1,6 +1,5 @@
 package com.gemiso.zodiac.app.scrollNewsFtpInfo;
 
-import com.gemiso.zodiac.app.scrollNewsDetail.dto.ScrollNewsDetailDTO;
 import com.gemiso.zodiac.app.scrollNewsFtpInfo.dto.ScrollNewsFtpInfoDTO;
 import com.gemiso.zodiac.core.response.AnsApiResponse;
 import io.swagger.annotations.Api;

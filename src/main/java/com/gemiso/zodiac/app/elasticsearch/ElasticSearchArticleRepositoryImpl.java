@@ -405,7 +405,7 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
                                                               String artclTypCd, String searchDivCd, String searchWord,
                                                               List<String> apprvDivCdList, Long deptCd, String artclCateCd,
                                                               String artclTypDtlCd, String delYn, Long artclId, String copyYn,
-                                                              Long orgArtclId, Long cueId, Integer page) throws Exception {
+                                                              Long orgArtclId, Long cueId, Pageable pageable) throws Exception {
 
 
 
@@ -550,12 +550,13 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
 
         sourceBuilder.query(query);
         sourceBuilder.sort(new FieldSortBuilder("inputDtm").order(SortOrder.DESC));
-        sourceBuilder.from(page);
-        sourceBuilder.size(10000);
+        sourceBuilder.from((int) pageable.getOffset());
+        sourceBuilder.size(pageable.getPageSize());
         sourceBuilder.trackTotalHits(true);
 
         SearchRequest searchRequest = new SearchRequest("ans_article");
         searchRequest.source(sourceBuilder);
+
 
         List<ElasticSearchArticle> list = new ArrayList<>();
         long totalCount = 0;
