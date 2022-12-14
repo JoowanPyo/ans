@@ -9,7 +9,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
@@ -52,7 +54,7 @@ public class SymbolController {
     @Operation(summary = "방송아이콘 등록", description = "방송아이콘 등록")
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public AnsApiResponse<SymbolDTO> create(@Parameter(name = "symbolCreateDTO", required = true, description = "방송아이콘 아이디")
+    public AnsApiResponse<SymbolDTO> create(@Parameter(name = "symbolCreateDTO", required = true, description = "방송아이콘 등록 DTO")
                                             @Valid @RequestBody SymbolCreateDTO symbolCreateDTO,
                                             @RequestHeader(value = "Authorization", required = false) String Authorization
     ) throws Exception {
@@ -116,31 +118,30 @@ public class SymbolController {
     }
 
     @Operation(summary = "파일 프롬프터 전송", description = "파일 프롬프터 전송")
-    @GetMapping(path = "/{symbolId}/send/prompter")
-    public void sendFileToPrompter(@Parameter(name = "symbolId", required = true, description = "방송아이콘 아이디")
-                                   @PathVariable("symbolId") String symbolId,
+    @PostMapping(path = "/send/prompter", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void sendFileToPrompter(@RequestPart MultipartFile file,@RequestParam String symbolId,
                                    @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
         String userId = jwtGetUserService.getUser(Authorization);
 
-        log.info("Send file to prompter - symbolId : " + symbolId + " userId : " + userId);
+        log.info("Send file to prompter - symbol file name : " + file.getOriginalFilename() + " userId : " + userId);
 
-        symbolService.sendFileToPrompter(symbolId);
+        symbolService.sendFileToPrompter(file, symbolId);
 
 
     }
 
     @Operation(summary = "파일 테이커 전송", description = "파일 테이커 전송")
-    @GetMapping(path = "/{symbolId}/send/taker")
-    public void sendFileToTaker(@Parameter(name = "symbolId", required = true, description = "방송아이콘 아이디")
-                                   @PathVariable("symbolId") String symbolId,
-                                   @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
+    @PostMapping(path = "/send/taker", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void sendFileToTaker(@RequestPart MultipartFile file, @RequestParam String fileDivCd, @RequestParam String symbolId,
+                                @RequestHeader(value = "Authorization", required = false) String Authorization) throws Exception {
 
         String userId = jwtGetUserService.getUser(Authorization);
 
-        log.info("Send file to taker - symbolId : " + symbolId + " userId : " + userId);
+        log.info("Send file to taker - symbolId : "+symbolId
+                + "symbol type cd : " + fileDivCd + " userId : " + userId +" file name : "+file.getOriginalFilename());
 
-        symbolService.sendFileToTaker(symbolId);
+        symbolService.sendFileToTaker(file, symbolId, fileDivCd);
 
 
     }

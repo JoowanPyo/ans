@@ -499,16 +499,16 @@ public class StatsService {
 
         Workbook wb = new XSSFWorkbook();
         Sheet sheet = wb.createSheet("ANS 기사 통계");
-        sheet.setColumnWidth(0, 4000);
-        sheet.setColumnWidth(1, 4000);
-        sheet.setColumnWidth(2, 2500);
-        sheet.setColumnWidth(3, 2500);
-        sheet.setColumnWidth(4, 2500);
-        sheet.setColumnWidth(5, 2500);
-        sheet.setColumnWidth(6, 2500);
-        sheet.setColumnWidth(7, 2500);
-        sheet.setColumnWidth(8, 2500);
-        sheet.setColumnWidth(9, 2500);
+        sheet.setColumnWidth(0, 5000);
+        sheet.setColumnWidth(1, 5000);
+        sheet.setColumnWidth(2, 3500);
+        sheet.setColumnWidth(3, 3500);
+        sheet.setColumnWidth(4, 3500);
+        sheet.setColumnWidth(5, 3500);
+        sheet.setColumnWidth(6, 3500);
+        sheet.setColumnWidth(7, 3500);
+        sheet.setColumnWidth(8, 3500);
+        sheet.setColumnWidth(9, 3500);
         //sheet.setColumnWidth(6, 4000);
         Row row = null;
         Cell cell = null;
@@ -521,21 +521,22 @@ public class StatsService {
         cell = row.createCell(1);
         cell.setCellValue("기사 구분");
         cell = row.createCell(2);
-        cell.setCellValue("broll 기사 수");
+        cell.setCellValue("broll");
         cell = row.createCell(3);
-        cell.setCellValue("mng 기사 수");
+        cell.setCellValue("apk");
         cell = row.createCell(4);
-        cell.setCellValue("telephone 기사 수");
+        cell.setCellValue("pk");
         cell = row.createCell(5);
-        cell.setCellValue("news_studio 기사 수");
+        cell.setCellValue("mng");
         cell = row.createCell(6);
-        cell.setCellValue("smartphone 기사 수");
+        cell.setCellValue("news_studio");
         cell = row.createCell(7);
-        cell.setCellValue("empty 기사 수");
+        cell.setCellValue("smartphone");
         cell = row.createCell(8);
-        cell.setCellValue("apk 기사 수");
+        cell.setCellValue("telephone");
         cell = row.createCell(9);
-        cell.setCellValue("pk 기사 수");
+        cell.setCellValue("empty");
+
 
         // Body
         for (StatsDTO statsDTO : statsList) {
@@ -548,19 +549,19 @@ public class StatsService {
             cell = row.createCell(2);
             cell.setCellValue(statsDTO.getBrollCount());
             cell = row.createCell(3);
-            cell.setCellValue(statsDTO.getMngCount());
-            cell = row.createCell(4);
-            cell.setCellValue(statsDTO.getTelephoneCount());
-            cell = row.createCell(5);
-            cell.setCellValue(statsDTO.getNewsStudioCount());
-            cell = row.createCell(6);
-            cell.setCellValue(statsDTO.getSmartphoneCount());
-            cell = row.createCell(7);
-            cell.setCellValue(statsDTO.getEmptyCount());
-            cell = row.createCell(8);
             cell.setCellValue(statsDTO.getApkCount());
-            cell = row.createCell(9);
+            cell = row.createCell(4);
             cell.setCellValue(statsDTO.getPkCount());
+            cell = row.createCell(5);
+            cell.setCellValue(statsDTO.getMngCount());
+            cell = row.createCell(6);
+            cell.setCellValue(statsDTO.getNewsStudioCount());
+            cell = row.createCell(7);
+            cell.setCellValue(statsDTO.getSmartphoneCount());
+            cell = row.createCell(8);
+            cell.setCellValue(statsDTO.getTelephoneCount());
+            cell = row.createCell(9);
+            cell.setCellValue(statsDTO.getEmptyCount());
 
         }
 
