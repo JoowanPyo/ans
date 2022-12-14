@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProgramCreateDTO {
 
-    private Long brdcPgmId;
+    private String brdcPgmId;
     private String brdcPgmNm;
     private String brdcPgmNmEn; //영문명
     private String chDivCd;

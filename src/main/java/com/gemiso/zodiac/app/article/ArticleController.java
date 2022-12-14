@@ -121,6 +121,8 @@ public class ArticleController {
             @Parameter(name = "cueId", description = "큐시트 아이디") @RequestParam(value = "cueId", required = false) Long cueId) throws Exception {
 
         PageResultDTO<ElasticSearchArticleDTO, ElasticSearchArticle> pageList = null;
+
+        Long count = 0L;
         //List<ArticleDTO> articleDTOList = new ArrayList<>();
 
         //기사읽기 권한이 없는 사용자 error.forbidden
@@ -138,8 +140,14 @@ public class ArticleController {
                     brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd,
                     artclCateCd, artclTypDtlCd, delYn, artclId, copyYn, orgArtclId, cueId);
 
+            count = articleService.findAllStatisticsCount(searchDate.getStartDate(), searchDate.getEndDate(), rptrId, inputrId,
+                    brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, apprvDivCdList, deptCd,
+                    artclCateCd, artclTypDtlCd, delYn, artclId, copyYn, orgArtclId, cueId);
+
             //엘라스틱서치 lock데이터 추가
             pageList = articleService.lockInfoAdd(pageList);
+
+            pageList.setTotalCount(count);
             //검색조건 날짜형식이 안들어왔을경우
         } else {
 
@@ -147,8 +155,14 @@ public class ArticleController {
                     artclTypCd, searchDivCd, searchWord, page, limit, apprvDivCdList, deptCd, artclCateCd,
                     artclTypDtlCd, delYn, artclId, copyYn, orgArtclId, cueId);
 
+            count = articleService.findAllStatisticsCount(null, null, rptrId, inputrId,
+                    brdcPgmId, artclDivCd, artclTypCd, searchDivCd, searchWord, apprvDivCdList, deptCd,
+                    artclCateCd, artclTypDtlCd, delYn, artclId, copyYn, orgArtclId, cueId);
+
             //엘라스틱서치 lock데이터 추가
             pageList = articleService.lockInfoAdd(pageList);
+
+            pageList.setTotalCount(count);
 
         }
 
