@@ -26,6 +26,16 @@ import java.util.Set;
                 , @Index(name = "index_article_title", columnList = "artcl_titl")
                 , @Index(name = "index_article_title_en", columnList = "artcl_titl_en")
                 , @Index(name = "index_article_retrid", columnList = "rptr_id")
+                /*, @Index(name = "index_article_brdc_pgm_id", columnList = "brdc_pgm_id")
+                , @Index(name = "index_article_cue_id", columnList = "cue_id")
+                , @Index(name = "index_article_del_yn", columnList = "del_yn")
+                , @Index(name = "index_article_editor_id", columnList = "editor_id")
+                , @Index(name = "index_article_issu_id", columnList = "issu_id")
+                , @Index(name = "index_article_lckr_id", columnList = "lckr_id")
+                , @Index(name = "index_article_org_artcl_id", columnList = "org_artcl_id")
+                , @Index(name = "index_article_parent_artlc_id", columnList = "parent_artlc_id")
+                , @Index(name = "index_article_artcl_id", columnList = "artcl_id")
+                , @Index(name = "index_article_user_grp_id", columnList = "user_grp_id")*/
         })
 @Builder
 @AllArgsConstructor
@@ -36,7 +46,7 @@ import java.util.Set;
 @DynamicUpdate
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 //@Document(indexName = "articles")
-public class Article extends BaseEntity {
+public class         Article extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
