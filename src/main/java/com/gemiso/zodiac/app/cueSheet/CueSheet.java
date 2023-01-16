@@ -16,7 +16,8 @@ import java.util.Date;
 @Table(
         name = "tb_cue",
         indexes = { @Index(name = "index_cue_brdc_dt", columnList = "brdc_dt")
-                ,@Index(name = "index_cue_brdc_pgm_nm", columnList = "brdc_pgm_nm")}
+                ,@Index(name = "index_cue_brdc_pgm_nm", columnList = "brdc_pgm_nm")
+        }
 )
 @Builder
 @AllArgsConstructor

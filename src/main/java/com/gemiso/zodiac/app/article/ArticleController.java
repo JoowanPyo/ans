@@ -308,6 +308,9 @@ public class ArticleController {
 
         pageList = articleService.confirmArticleListElastic(pageList, cueId);
 
+        //엘라스틱서치 lock데이터 추가
+        pageList = articleService.lockInfoAdd(pageList);
+
         return new AnsApiResponse<>(pageList);
 
     }

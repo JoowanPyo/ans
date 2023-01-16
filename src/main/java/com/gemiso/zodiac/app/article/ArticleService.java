@@ -2666,6 +2666,54 @@ public class ArticleService {
                     article.setAnchorFixDtm(null);
                     article.setDeskFixUser(null);
                     article.setDeskFixDtm(null);
+
+                    Integer orgArticleOrder = article.getArtclOrd();
+                    Long orgArticleId = article.getOrgArtclId();
+                    Long artclId = article.getArtclId();
+
+                    List<Article> articleList = articleRepository.findCopyArticle(orgArticleId);
+
+                    for (Article articleEntity : articleList) {
+
+                        //원본 기사일 경우
+                        Integer articleOrd = articleEntity.getArtclOrd();
+                        if (articleOrd == 0) {
+                            continue;
+                        }
+
+                        String apprvDicCd = articleEntity.getApprvDivCd();
+
+                        if ("fix_none".equals(apprvDicCd)) { //복사된 기사가 fix_none일경우 article_fix로 업데이트
+
+                            //Long orgArtclId = article.getOrgArtclId();
+                            if (orgArticleOrder == 0) {//원본 기사일 경우 기사내용전부 업데이트
+
+                                // 수정할 기사 빌드 후 업데이트 save
+                                Article updateCopyArticle = fixCopyArticleBuild(articleEntity, article, userId);
+
+                                //기사 로그 등록.
+                                copyArticleActionLogUpdate(updateCopyArticle, article, userId);
+                                //기사이력 등록.
+                                Long articleHistId = updateArticleHist(updateCopyArticle, userId);
+                                //기사 자막 Update
+                                fixCopyArticleCapUpdate(updateCopyArticle, artclId, articleHistId);
+                                fixCopyAnchorCapUpdate(updateCopyArticle, artclId, articleHistId);
+
+                                /* 기사 테그를 저장하는 부분 */
+                                copyArticleTag(updateCopyArticle, article);
+
+                                //엘라스틱서치 등록
+                                elasticSearchArticleService.elasticPush(updateCopyArticle);
+
+                                Long updateArtclId = updateCopyArticle.getArtclId();
+                                //MQ메세지 전송
+                                articleTopicService.articleTopic("CopyAarticle Update", updateArtclId);
+
+                            }
+                        }
+                    }
+
+
                 } else {
 
                     article.setAnchorFixUser(null);
@@ -2697,6 +2745,53 @@ public class ArticleService {
                     article.setAnchorFixDtm(new Date());
                     article.setDeskFixUser(null);
                     article.setDeskFixDtm(null);
+
+                    Integer orgArticleOrder = article.getArtclOrd();
+                    Long orgArticleId = article.getOrgArtclId();
+                    Long artclId = article.getArtclId();
+
+                    List<Article> articleList = articleRepository.findCopyArticle(orgArticleId);
+
+                    for (Article articleEntity : articleList) {
+
+                        //원본 기사일 경우
+                        Integer articleOrd = articleEntity.getArtclOrd();
+                        if (articleOrd == 0) {
+                            continue;
+                        }
+
+                        String apprvDicCd = articleEntity.getApprvDivCd();
+
+                        if ("fix_none".equals(apprvDicCd)) { //복사된 기사가 fix_none일경우 article_fix로 업데이트
+
+                            //Long orgArtclId = article.getOrgArtclId();
+                            if (orgArticleOrder == 0) {//원본 기사일 경우 기사내용전부 업데이트
+
+                                // 수정할 기사 빌드 후 업데이트 save
+                                Article updateCopyArticle = fixCopyArticleBuild(articleEntity, article, userId);
+
+                                //기사 로그 등록.
+                                copyArticleActionLogUpdate(updateCopyArticle, article, userId);
+                                //기사이력 등록.
+                                Long articleHistId = updateArticleHist(updateCopyArticle, userId);
+                                //기사 자막 Update
+                                fixCopyArticleCapUpdate(updateCopyArticle, artclId, articleHistId);
+                                fixCopyAnchorCapUpdate(updateCopyArticle, artclId, articleHistId);
+
+                                /* 기사 테그를 저장하는 부분 */
+                                copyArticleTag(updateCopyArticle, article);
+
+                                //엘라스틱서치 등록
+                                elasticSearchArticleService.elasticPush(updateCopyArticle);
+
+                                Long updateArtclId = updateCopyArticle.getArtclId();
+                                //MQ메세지 전송
+                                articleTopicService.articleTopic("CopyAarticle Update", updateArtclId);
+
+                            }
+                        }
+                    }
+
                 } else if ("article_fix".equals(orgApprvDivcd)) {
 
                     article.setEditorFixUser(userId);
