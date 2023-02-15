@@ -464,25 +464,26 @@ public class ArticleController {
             log.info("Article Create Success ID : " + articleDTO);
 
             return new AnsApiResponse<>(articleDTO);
+        }else {
+
+            log.info("Article Create : User Id - " + getUserId + "<br>" + "Create Model - " + articleCreateDTO);
+
+
+            Article article = articleService.create(articleCreateDTO, getUserId);
+
+            //엘라스틱서치 등록
+            elasticSearchArticleService.elasticPush(article);
+
+            //기사 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
+            ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
+            articleDTO.setArtclId(article.getArtclId());
+            articleDTO.setOrgArtclId(article.getOrgArtclId());
+
+
+            log.info("Article Create Success ID : " + articleDTO);
+
+            return new AnsApiResponse<>(articleDTO);
         }
-
-        log.info("Article Create : User Id - " + getUserId + "<br>" + "Create Model - " + articleCreateDTO);
-
-
-        Article article = articleService.create(articleCreateDTO, getUserId);
-
-        //엘라스틱서치 등록
-        elasticSearchArticleService.elasticPush(article);
-
-        //기사 등록 후 생성된 아이디만 response [아이디로 다시 상세조회 api 호출.]
-        ArticleSimpleDTO articleDTO = new ArticleSimpleDTO();
-        articleDTO.setArtclId(article.getArtclId());
-        articleDTO.setOrgArtclId(article.getOrgArtclId());
-
-
-        log.info("Article Create Success ID : " + articleDTO);
-
-        return new AnsApiResponse<>(articleDTO);
     }
 
     @Operation(summary = "기사 수정", description = "기사 수정")

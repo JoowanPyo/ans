@@ -74,8 +74,8 @@ public class Scheduling {
 
     //주간편성 금요일 새벽 5시마다 업데이트
     //@Scheduled(cron = "0 0 23 ? * FRI")//매주 금요일 23시에 한번씩
-    //@Scheduled(cron = "0 0 23 ? * THU")//매주 금요일 23시에 한번씩
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 23 ? * THU")//매주 목요일 23시에 한번씩
+    //@Scheduled(cron = "0 * * * * *")
     public void bisDailyScheduleCreateFri() throws Exception {
 
         log.info("Dailly Program Week Create Start");
@@ -93,7 +93,7 @@ public class Scheduling {
     //@Scheduled(cron = "0 0 23 ? * FRI")//매주 금요일 23시에 한번씩
     //@Scheduled(cron = "0 * * * * *")
     //@Scheduled(cron = "0 10 5 * * ?")//매일 새벽 5시10분에 한번씩
-    /*public void bisDailyScheduleCreateFri() throws Exception {
+   /* public void bisDailyScheduleCreateFri() throws Exception {
 
         log.info("Dailly Program Week Create Start");
 

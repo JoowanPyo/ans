@@ -256,7 +256,7 @@ public class ElasticSearchArticleRepositoryImpl implements ElasticSearchArticleC
             SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
             SearchHits searchHits = response.getHits();
             totalCount = searchHits.getTotalHits().value;
-            for(SearchHit hit : searchHits.getHits()) {
+             for(SearchHit hit : searchHits.getHits()) {
                 ObjectMapper objectMapper = new ObjectMapper();
 /*                JSONParser jsonParser = new JSONParser();
                 JSONObject jsonObject = (JSONObject) jsonParser.parse(hit.toString());
