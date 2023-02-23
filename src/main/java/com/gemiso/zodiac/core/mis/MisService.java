@@ -223,24 +223,11 @@ public class MisService {
                 .userNm(misUser.getEmplName()) //사용자 이름
                 .pwd(password) //비밀번호
                 .emplNo(misUser.getEmplNumb()) //사원번호
-                //.freeYn() //프리렌서 여부
                 .deptId(deptId) //부서 아이디
-                //.dutyCd() //직종코드
-                //.chiefYn() //부서장 여부
                 .email(misUser.getEltrMlad()) //이메일
-                //.tel() //전화번호
-                //.telPubYn() //전화번호 공개 여부
                 .userDivCd(misUserId.getUsdnCode()) //사용자 구분 코드
-                //.memo() //메모
-                //.rmk() //비고
-                //.userStCd() //사용자 상태 코드
                 .useStartDtm(new Date()) //사용시작 일시
-                //.useEndDtm() //사용 종료 일시
-                //.useYn() //사용 여부
-                //.inputrId() //등록자
-                //.inphonNo() //사내번호
                 .deptCd(misDeptCode) //부서코드
-                //.userGroupUser(userGroup) //기본그룹설정
                 .build();
 
         userRepository.save(user);

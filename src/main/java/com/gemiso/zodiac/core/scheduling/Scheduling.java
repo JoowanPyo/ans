@@ -107,7 +107,6 @@ public class Scheduling {
     }*/
 
     //Mis 부서 조회 및 등록(수정)
-    //@Scheduled(cron = "10 * * * * *")
     @Scheduled(cron = "0 0 2 * * ?")//매일 새벽 2시에 한번씩
     public void misDeptScheduled(){
 
@@ -118,7 +117,6 @@ public class Scheduling {
     }
 
     //Mis 사용자 조회 및 등록(수정)
-    //@Scheduled(cron = "0 * * * * *")
     @Scheduled(cron = "0 10 2 * * ?")//매일 새벽 2시에 한번씩
     public void misUserScheduled() throws NoSuchAlgorithmException {
 

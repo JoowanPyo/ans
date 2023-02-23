@@ -1232,13 +1232,16 @@ public class CueSheetService {
             cueItemDTO.setCueSheet(cueSheetDTO); //복사된 큐시트 아이디 set
 
             Integer setDisplayCd = 0;
-            if (ord == 0) {
+           /* if (ord == 0) {
                 cueItemDTO.setCueItemOrd(ord);
                 setDisplayCd = ord + 1;
             } else {
                 cueItemDTO.setCueItemOrd(ord + 1);
                 setDisplayCd = ord + 2;
-            }
+            }*/
+
+            cueItemDTO.setCueItemOrd(ord);
+            setDisplayCd = ord + 1;
 
             String displayCd = Integer.toString(setDisplayCd);
 
